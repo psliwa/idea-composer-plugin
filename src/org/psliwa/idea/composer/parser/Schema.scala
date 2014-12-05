@@ -32,7 +32,7 @@ object Schema {
   def jsonObjectToBooleanSchema: Converter[JSONObject] = jsonObjectTo(SBoolean, "boolean")
 
   def jsonObjectToSchema: Converter[JSONObject] = {
-    jsonObjectToObjectSchema | jsonObjectToStringSchema | jsonObjectToNumberSchema | jsonObjectToBooleanSchema | jsonObjectToArraySchema
+    jsonObjectToObjectSchema | jsonObjectToStringSchema | jsonObjectToNumberSchema | jsonObjectToBooleanSchema | jsonObjectToArraySchema | jsonObjectToEnum
   }
 
   import OptionOps._
@@ -40,7 +40,7 @@ object Schema {
   def jsonObjectToObjectSchema: Converter[JSONObject] = t => {
     if(t.obj.get("type").exists(_ == "object")) {
       for {
-        rawProperties <- tryJsonObject(t.obj.get("properties"))
+        rawProperties <- t.obj.get("properties").flatMap(tryJsonObject)
         properties <- traverseMap(rawProperties.obj){
           case o@JSONObject(_) => jsonObjectToSchema(o)
           case _ => None
@@ -54,7 +54,7 @@ object Schema {
   def jsonObjectToArraySchema: Converter[JSONObject] = t => {
     if(t.obj.get("type").exists(_ == "array")) {
       for {
-        rawItems <- tryJsonObject(t.obj.get("items"))
+        rawItems <- t.obj.get("items").flatMap(tryJsonObject)
         itemsType <- jsonObjectToSchema(rawItems)
       } yield SArray(itemsType)
     } else {
@@ -64,20 +64,40 @@ object Schema {
 
   def jsonObjectTo(s: Schema, t: String)(o: JSONObject): Option[Schema] = o.obj.get("type").filter(_ == t).map(_ => s)
 
+  def jsonObjectToEnum: Converter[JSONObject] = t => {
+    if(t.obj.contains("enum")) {
+      for {
+        arr <- t.obj.get("enum").flatMap(tryJsonArray)
+        values <- traverse(arr.list)(tryString)
+      } yield SStringChoice(values)
+    } else {
+      None
+    }
+  }
+
   private object OptionOps {
     def traverseMap[K,A,B](as: Map[K,A])(f: A => Option[B]): Option[Map[K,B]] = {
       as.foldLeft(Option(Map[K, B]()))((obs, ka) => map2(f(ka._2), obs)((b, m) => m + (ka._1 -> b)))
     }
+
+    def traverse[A,B](as: List[A])(f: A => Option[B]): Option[List[B]] = {
+      as.foldLeft(Option(List[B]()))((obs, a) => map2(obs, f(a))(_ :+ _))
+    }
+
     def map2[A,B,C](o1: Option[A], o2: Option[B])(f: (A,B) => C) = o1.flatMap(a => o2.map(b => f(a, b)))
 
-    //TODO
-    def tryJsonObject(a: Option[Any]): Option[JSONObject] = a.flatMap {
+    def tryJsonObject(a: Any): Option[JSONObject] = a match {
       case o@JSONObject(_) => Some(o)
       case _ => None
     }
 
     def tryJsonArray(a: Any): Option[JSONArray] = a match {
       case a@JSONArray(_) => Some(a)
+      case _ => None
+    }
+
+    def tryString(a: Any): Option[String] = a match {
+      case s: String => Some(s)
       case _ => None
     }
   }

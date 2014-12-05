@@ -143,7 +143,29 @@ class SchemaTest {
           |     }
           |   }
           | }
-        """.stripMargin)
+        """.stripMargin
+      )
+    )
+  }
+
+  @Test
+  def parseSchemaWithStringChoice() = {
+    assertSchemaEquals(
+      SObject(Map(
+        "enumProp" -> SStringChoice(List("value1", "value2"))
+      )),
+      Schema.parse(
+        """
+          | {
+          |   "type": "object",
+          |   "properties": {
+          |     "enumProp": {
+          |       "enum": [ "value1", "value2" ]
+          |     }
+          |   }
+          | }
+        """.stripMargin
+      )
     )
   }
 
