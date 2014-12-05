@@ -1,0 +1,31 @@
+<idea-plugin version="2">
+  <id>org.psliwa.idea.composer</id>
+  <name>Composer.json completion</name>
+  <version>1.0</version>
+  <vendor email="i@psliwa.org" url="http://github.org/psliwa/idea-composer-plugin">psliwa</vendor>
+
+  <description><![CDATA[
+      Adds completion feature to composer.json file for PHP projects
+    ]]></description>
+
+  <change-notes><![CDATA[]]>
+  </change-notes>
+
+  <idea-version since-build="131"/>
+
+  <depends>com.intellij.modules.platform</depends>
+
+  <extensions defaultExtensionNs="com.intellij">
+    <completion.contributor language="JSON" implementationClass="org.psliwa.idea.composer.idea.ComposerJsonCompletionContributor" />
+  </extensions>
+
+  <application-components>
+  </application-components>
+
+  <project-components>
+  </project-components>
+
+  <actions>
+  </actions>
+
+</idea-plugin>
