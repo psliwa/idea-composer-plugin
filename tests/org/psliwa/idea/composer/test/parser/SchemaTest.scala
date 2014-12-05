@@ -245,5 +245,14 @@ class SchemaTest {
     )
   }
 
+  @Test
+  def givenSchemaIsInvalid_expectNone() = {
+    assertEquals(None, Schema.parse(
+      """
+        | { "type": "invalid" }
+      """.stripMargin
+    ))
+  }
+
   def assertSchemaEquals(expected: Schema, actual: Option[Schema]) = assertEquals(Some(expected), actual)
 }
