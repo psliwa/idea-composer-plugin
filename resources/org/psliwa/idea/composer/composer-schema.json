@@ -134,7 +134,6 @@
           "type": ["string", "integer"]
         },
         "discard-changes": {
-          "type": ["string", "boolean"],
           "oneOf": [
             { "type": "boolean" },
             { "enum": ["stash"] }
@@ -198,7 +197,7 @@
       }
     },
     "archive": {
-      "type": ["object"],
+      "type": "object",
       "properties": {
         "exclude": {
           "type": "array",
@@ -213,22 +212,22 @@
       "enum": [ "dev", "alpha", "beta", "RC", "stable" ]
     },
     "prefer-stable": {
-      "type": ["boolean"]
+      "type": "boolean"
     },
     "bin": {
-      "type": ["array"],
+      "type": "array",
       "items": {
         "type": "string"
       }
     },
     "include-path": {
-      "type": ["array"],
+      "type": "array",
       "items": {
         "type": "string"
       }
     },
     "scripts": {
-      "type": ["object"],
+      "type": "object",
       "properties": {
         "pre-install-cmd": {
           "type": ["array", "string"]

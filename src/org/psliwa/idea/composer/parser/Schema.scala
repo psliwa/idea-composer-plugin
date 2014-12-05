@@ -9,7 +9,7 @@ sealed trait Schema
 case class SObject(children: Map[String, Schema]) extends Schema
 case class SArray(child: Schema) extends Schema
 case class SStringChoice(choices: List[String]) extends Schema
-case class SOr(left: Schema, right: Schema) extends Schema
+case class SOr(alternatives: List[Schema]) extends Schema
 
 object SBoolean extends Schema
 object SString extends Schema
@@ -31,17 +31,20 @@ object Schema {
   def jsonObjectToNumberSchema: Converter[JSONObject] = jsonObjectTo(SNumber, "integer")
   def jsonObjectToBooleanSchema: Converter[JSONObject] = jsonObjectTo(SBoolean, "boolean")
 
-  def jsonObjectToSchema: Converter[JSONObject] = {
-    jsonObjectToObjectSchema | jsonObjectToStringSchema | jsonObjectToNumberSchema | jsonObjectToBooleanSchema | jsonObjectToArraySchema | jsonObjectToEnum
-  }
+  def jsonObjectToSchema: Converter[JSONObject] = (
+    jsonObjectToObjectSchema | jsonObjectToStringSchema | jsonObjectToNumberSchema | jsonObjectToBooleanSchema
+    | jsonObjectToArraySchema | jsonObjectToEnum | jsonObjectToOr
+  )
 
   import OptionOps._
 
   def jsonObjectToObjectSchema: Converter[JSONObject] = t => {
     if(t.obj.get("type").exists(_ == "object")) {
+      val maybeJsonObject = t.obj.getOrElse("properties", JSONObject(Map()))
+
       for {
-        rawProperties <- t.obj.get("properties").flatMap(tryJsonObject)
-        properties <- traverseMap(rawProperties.obj){
+        jsonObject <- tryJsonObject(maybeJsonObject)
+        properties <- traverseMap(jsonObject.obj){
           case o@JSONObject(_) => jsonObjectToSchema(o)
           case _ => None
         }
@@ -53,8 +56,10 @@ object Schema {
 
   def jsonObjectToArraySchema: Converter[JSONObject] = t => {
     if(t.obj.get("type").exists(_ == "array")) {
+      val maybeJsonObject = t.obj.getOrElse("items", JSONObject(Map("type" -> "object")))
+
       for {
-        rawItems <- t.obj.get("items").flatMap(tryJsonObject)
+        rawItems <- tryJsonObject(maybeJsonObject)
         itemsType <- jsonObjectToSchema(rawItems)
       } yield SArray(itemsType)
     } else {
@@ -74,6 +79,27 @@ object Schema {
       None
     }
   }
+
+  def jsonObjectToComplexOr: Converter[JSONObject] = t => {
+    if(t.obj.contains("oneOf")) {
+      for {
+        arr <- t.obj.get("oneOf").flatMap(tryJsonArray)
+        alternatives <- traverse(arr.list)(tryJsonObject(_).flatMap(jsonObjectToSchema))
+      } yield SOr(alternatives)
+    } else {
+      None
+    }
+  }
+
+  def jsonObjectToSimpleOr: Converter[JSONObject] = t => {
+    for {
+      arr <- t.obj.get("type").flatMap(tryJsonArray)
+      stringValues <- traverse(arr.list)(tryString)
+      schemaValues <- traverse(stringValues)(s => jsonObjectToSchema(JSONObject(Map("type" -> s))))
+    } yield SOr(schemaValues)
+  }
+
+  def jsonObjectToOr: Converter[JSONObject] = jsonObjectToComplexOr | jsonObjectToSimpleOr
 
   private object OptionOps {
     def traverseMap[K,A,B](as: Map[K,A])(f: A => Option[B]): Option[Map[K,B]] = {

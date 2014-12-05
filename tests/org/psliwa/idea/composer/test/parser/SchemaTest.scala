@@ -169,5 +169,81 @@ class SchemaTest {
     )
   }
 
+  @Test
+  def parseSchemaWithOr() = {
+    assertSchemaEquals(
+      SObject(Map(
+        "orProp" -> SOr(List(SBoolean, SString))
+      )),
+      Schema.parse(
+        """
+          | {
+          |   "type": "object",
+          |   "properties": {
+          |     "orProp": {
+          |       "oneOf": [
+          |         { "type": "boolean" },
+          |         { "type": "string" }
+          |       ]
+          |     }
+          |   }
+          | }
+        """.stripMargin
+      )
+    )
+  }
+
+  @Test
+  def parseSchemaWithInlineOr() = {
+    assertSchemaEquals(
+      SObject(Map(
+        "orProp" -> SOr(List(SString, SNumber))
+      )),
+      Schema.parse(
+        """
+          | {
+          |   "type": "object",
+          |   "properties": {
+          |     "orProp": {
+          |       "type": ["string", "integer" ]
+          |     }
+          |   }
+          | }
+        """.stripMargin
+      )
+    )
+  }
+
+  @Test
+  def parseSchemaWithWildcardObject() = {
+    assertSchemaEquals(
+      SObject(Map()),
+      Schema.parse(
+        """
+          | { "type": "object" }
+        """.stripMargin
+      )
+    )
+  }
+
+  @Test
+  def parseSchemaWithWildcardArray() = {
+    assertSchemaEquals(
+      SObject(Map(
+        "arrProp" -> SArray(SObject(Map()))
+      )),
+      Schema.parse(
+        """
+          | {
+          |   "type": "object",
+          |   "properties": {
+          |     "arrProp": { "type": "array" }
+          |   }
+          | }
+        """.stripMargin
+      )
+    )
+  }
+
   def assertSchemaEquals(expected: Schema, actual: Option[Schema]) = assertEquals(Some(expected), actual)
 }
