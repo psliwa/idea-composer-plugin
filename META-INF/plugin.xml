@@ -16,7 +16,7 @@
   <depends>com.intellij.modules.platform</depends>
 
   <extensions defaultExtensionNs="com.intellij">
-    <completion.contributor language="JSON" implementationClass="org.psliwa.idea.composer.idea.ComposerJsonCompletionContributor" />
+    <completion.contributor language="JSON" implementationClass="org.psliwa.idea.composer.idea.CompletionContributor" />
   </extensions>
 
   <application-components>
