@@ -11,7 +11,7 @@ class CompletionContributorTest extends LightPlatformCodeInsightFixtureTestCase 
         | <caret>
         | }
       """.stripMargin,
-      Array[String]("name", "type")
+      Array("name", "type")
     )
   }
 
@@ -22,14 +22,58 @@ class CompletionContributorTest extends LightPlatformCodeInsightFixtureTestCase 
     assertContainsElements(myFixture.getLookupElementStrings, expectedSuggestions:_*)
   }
 
+  def testCompletionOnTopLevelWithQuotes() = {
+    completion(
+      """
+        | {
+        | "<caret>"
+        | }
+      """.stripMargin,
+      Array("name", "type")
+    )
+  }
+
   def testEnumCompletion() = {
     completion(
       """
         | {
-        |   "license": <caret>
+        |   "type": <caret>
         | }
       """.stripMargin,
-      Array[String]("MIT", "BSD")
+      Array("library", "project")
+    )
+  }
+
+  def testEnumCompletionWithLandingColon() = {
+    completion(
+      """
+        | {
+        |   "type": <caret>,
+        | }
+      """.stripMargin,
+      Array("library", "project")
+    )
+  }
+
+  def testEnumCompletionWithQuotes() = {
+    completion(
+      """
+        | {
+        |   "type": "<caret>"
+        | }
+      """.stripMargin,
+      Array("library", "project")
+    )
+  }
+
+  def testEnumCompletionWithQuotesAndLandingColon() = {
+    completion(
+      """
+        | {
+        |   "type": "<caret>",
+        | }
+      """.stripMargin,
+      Array("library", "project")
     )
   }
 }

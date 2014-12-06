@@ -34,29 +34,5 @@ class CompletionContributor extends com.intellij.codeInsight.completion.Completi
     }
   )
 
-  //TODO
-  private def getSchemaFor(e: PsiElement): Option[Schema] = schema
-
-  private def getCompletionsFor(e: PsiElement): List[String] = {
-    getSchemaFor(e)
-    .map {
-      case SObject(m) => m.keys.toList
-      case SStringChoice(m) => m
-      case _ => List()
-    }
-    .getOrElse(List())
-  }
-
-  private def getJsonPath(e: PsiElement): List[JsonElement] = {
-    @tailrec
-    def loop(e: PsiElement, l: List[JsonElement]): List[JsonElement] = {
-      e match {
-        case j: JsonElement => loop(e.getParent, l :+ j)
-        case _ if e.getPrevSibling != null && (e.getPrevSibling.getText == "," || e.getPrevSibling.getText == "{" || e.getPrevSibling.getText == "[" || e.getPrevSibling.getText == ":") => loop(e.getParent, l)
-        case _ => l
-      }
-    }
-
-    loop(e, List())
-  }
+  private def getCompletionsFor(e: PsiElement): List[String] = schema.map(Completion.getCompletionsFor(_)(e)).getOrElse(List())
 }
