@@ -15,11 +15,12 @@ class CompletionContributorTest extends LightPlatformCodeInsightFixtureTestCase 
     )
   }
 
-  private def completion(contents: String, expectedSuggestions: Array[String]) = {
+  private def completion(contents: String, expectedSuggestions: Array[String], unexpectedSuggestions: Array[String] = Array()) = {
     myFixture.configureByText("composer.json", contents)
     myFixture.completeBasic()
 
     assertContainsElements(myFixture.getLookupElementStrings, expectedSuggestions:_*)
+    assertDoesntContain(myFixture.getLookupElementStrings, unexpectedSuggestions:_*)
   }
 
   def testCompletionOnTopLevelWithQuotes() = {
@@ -40,7 +41,8 @@ class CompletionContributorTest extends LightPlatformCodeInsightFixtureTestCase 
         |   "type": <caret>
         | }
       """.stripMargin,
-      Array("library", "project")
+      Array("library", "project"),
+      Array("name", "type")
     )
   }
 
@@ -51,7 +53,8 @@ class CompletionContributorTest extends LightPlatformCodeInsightFixtureTestCase 
         |   "type": <caret>,
         | }
       """.stripMargin,
-      Array("library", "project")
+      Array("library", "project"),
+      Array("name", "type")
     )
   }
 
@@ -62,7 +65,8 @@ class CompletionContributorTest extends LightPlatformCodeInsightFixtureTestCase 
         |   "type": "<caret>"
         | }
       """.stripMargin,
-      Array("library", "project")
+      Array("library", "project"),
+      Array("name", "type")
     )
   }
 
@@ -73,7 +77,72 @@ class CompletionContributorTest extends LightPlatformCodeInsightFixtureTestCase 
         |   "type": "<caret>",
         | }
       """.stripMargin,
-      Array("library", "project")
+      Array("library", "project"),
+      Array("name", "type")
+    )
+  }
+
+  def testNestedObjectCompletion() = {
+    completion(
+      """
+        |{
+        | "support": {
+        |   <caret>
+        | }
+        |}
+      """.stripMargin,
+      Array("email", "issues"),
+      Array("type")
+    )
+  }
+
+  def testOrCompletion_firstAlternative() = {
+    completion(
+      """
+        |{
+        | "license": <caret>
+        |}
+      """.stripMargin,
+      Array("MIT", "BSD")
+    )
+  }
+
+  def testOrCompletion_secondAlternative() = {
+    completion(
+      """
+        |{
+        | "license": [
+        |   <caret>
+        | ]
+        |}
+      """.stripMargin,
+      Array("MIT", "BSD")
+    )
+  }
+
+  def testBooleanCompletion() = {
+    completion(
+      """
+        |{
+        | "prefer-stable": <caret>
+        |}
+      """.stripMargin,
+      Array("true", "false")
+    )
+  }
+
+  def testArrayCompletion() = {
+    completion(
+      """
+        |{
+        | "authors": [
+        |   {
+        |     <caret>
+        |   }
+        | ]
+        |}
+      """.stripMargin,
+      Array("name", "email", "homepage")
     )
   }
 }
