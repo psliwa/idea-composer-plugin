@@ -1,11 +1,11 @@
-package org.psliwa.idea.composer.test.idea
+package org.psliwa.idea.composer.test.idea.CompletionContributor
 
 import com.intellij.testFramework.fixtures.LightPlatformCodeInsightFixtureTestCase
 
-class CompletionContributorTest extends LightPlatformCodeInsightFixtureTestCase {
+class SuggestionsTest extends LightPlatformCodeInsightFixtureTestCase {
 
-  def testCompletionOnTopLevel() = {
-    completion(
+  def testSuggestionsOnTopLevel() = {
+    suggestions(
       """
         | {
         | <caret>
@@ -15,7 +15,7 @@ class CompletionContributorTest extends LightPlatformCodeInsightFixtureTestCase 
     )
   }
 
-  private def completion(contents: String, expectedSuggestions: Array[String], unexpectedSuggestions: Array[String] = Array()) = {
+  private def suggestions(contents: String, expectedSuggestions: Array[String], unexpectedSuggestions: Array[String] = Array()) = {
     myFixture.configureByText("composer.json", contents)
     myFixture.completeBasic()
 
@@ -23,8 +23,8 @@ class CompletionContributorTest extends LightPlatformCodeInsightFixtureTestCase 
     assertDoesntContain(myFixture.getLookupElementStrings, unexpectedSuggestions:_*)
   }
 
-  def testCompletionOnTopLevelWithQuotes() = {
-    completion(
+  def testSuggestionsOnTopLevelWithQuotes() = {
+    suggestions(
       """
         | {
         | "<caret>"
@@ -34,8 +34,32 @@ class CompletionContributorTest extends LightPlatformCodeInsightFixtureTestCase 
     )
   }
 
-  def testEnumCompletion() = {
-    completion(
+  def testSuggestionsOnTopLevelWithQuotes_givenPartialText() = {
+    suggestions(
+      """
+        | {
+        | "ty<caret>"
+        | }
+      """.stripMargin,
+      Array("type"),
+      Array("name")
+    )
+  }
+
+  def testSuggestionsOnTopLevelWithoutQuotes_givenPartialText() = {
+    suggestions(
+      """
+        | {
+        | ty<caret>
+        | }
+      """.stripMargin,
+      Array("type"),
+      Array("name")
+    )
+  }
+
+  def testEnumSuggestions() = {
+    suggestions(
       """
         | {
         |   "type": <caret>
@@ -46,8 +70,8 @@ class CompletionContributorTest extends LightPlatformCodeInsightFixtureTestCase 
     )
   }
 
-  def testEnumCompletionWithLandingColon() = {
-    completion(
+  def testEnumSuggestionsWithLandingColon() = {
+    suggestions(
       """
         | {
         |   "type": <caret>,
@@ -58,8 +82,8 @@ class CompletionContributorTest extends LightPlatformCodeInsightFixtureTestCase 
     )
   }
 
-  def testEnumCompletionWithQuotes() = {
-    completion(
+  def testEnumSuggestionsWithQuotes() = {
+    suggestions(
       """
         | {
         |   "type": "<caret>"
@@ -70,8 +94,8 @@ class CompletionContributorTest extends LightPlatformCodeInsightFixtureTestCase 
     )
   }
 
-  def testEnumCompletionWithQuotesAndLandingColon() = {
-    completion(
+  def testEnumSuggestionsWithQuotesAndLandingColon() = {
+    suggestions(
       """
         | {
         |   "type": "<caret>",
@@ -82,8 +106,8 @@ class CompletionContributorTest extends LightPlatformCodeInsightFixtureTestCase 
     )
   }
 
-  def testNestedObjectCompletion() = {
-    completion(
+  def testNestedObjectSuggestions() = {
+    suggestions(
       """
         |{
         | "support": {
@@ -96,8 +120,8 @@ class CompletionContributorTest extends LightPlatformCodeInsightFixtureTestCase 
     )
   }
 
-  def testOrCompletion_firstAlternative() = {
-    completion(
+  def testOrSuggestions_firstAlternative() = {
+    suggestions(
       """
         |{
         | "license": <caret>
@@ -107,8 +131,8 @@ class CompletionContributorTest extends LightPlatformCodeInsightFixtureTestCase 
     )
   }
 
-  def testOrCompletion_secondAlternative() = {
-    completion(
+  def testOrSuggestions_secondAlternative() = {
+    suggestions(
       """
         |{
         | "license": [
@@ -120,8 +144,8 @@ class CompletionContributorTest extends LightPlatformCodeInsightFixtureTestCase 
     )
   }
 
-  def testBooleanCompletion() = {
-    completion(
+  def testBooleanSuggestions() = {
+    suggestions(
       """
         |{
         | "prefer-stable": <caret>
@@ -131,8 +155,8 @@ class CompletionContributorTest extends LightPlatformCodeInsightFixtureTestCase 
     )
   }
 
-  def testArrayCompletion() = {
-    completion(
+  def testArraySuggestions() = {
+    suggestions(
       """
         |{
         | "authors": [
