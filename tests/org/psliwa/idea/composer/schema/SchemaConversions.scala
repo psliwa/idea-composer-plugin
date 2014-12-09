@@ -1,6 +1,6 @@
-package org.psliwa.idea.composer.test.parser
+package org.psliwa.idea.composer.schema
 
-import org.psliwa.idea.composer.parser._
+import org.psliwa.idea.composer.schema._
 import scala.language.implicitConversions
 
 object SchemaConversions {

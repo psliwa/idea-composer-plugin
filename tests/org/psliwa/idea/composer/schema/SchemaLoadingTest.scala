@@ -1,8 +1,8 @@
-package org.psliwa.idea.composer.test.parser
+package org.psliwa.idea.composer.schema
 
 import org.junit.Test
 import org.junit.Assert._
-import org.psliwa.idea.composer.parser.SchemaLoader
+import org.psliwa.idea.composer.schema.SchemaLoader
 
 class SchemaLoadingTest {
 

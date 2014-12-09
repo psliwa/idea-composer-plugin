@@ -1,4 +1,4 @@
-package org.psliwa.idea.composer.parser
+package org.psliwa.idea.composer.schema
 
 import scala.language.{higherKinds, implicitConversions}
 import scala.util.parsing.json.{JSONArray, JSONType, JSONObject, JSON}

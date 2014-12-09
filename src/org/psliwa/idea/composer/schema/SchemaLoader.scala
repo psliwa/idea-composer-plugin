@@ -1,4 +1,4 @@
-package org.psliwa.idea.composer.parser
+package org.psliwa.idea.composer.schema
 
 import scala.io.Source
 

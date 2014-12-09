@@ -1,4 +1,4 @@
-package org.psliwa.idea.composer.test.idea.CompletionContributor
+package org.psliwa.idea.composer.idea.completionContributor
 
 import com.intellij.testFramework.fixtures.LightPlatformCodeInsightFixtureTestCase
 

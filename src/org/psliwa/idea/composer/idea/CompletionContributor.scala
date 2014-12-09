@@ -9,7 +9,7 @@ import com.intellij.patterns.StandardPatterns._
 import com.intellij.patterns.{PatternCondition, PsiElementPattern}
 import com.intellij.psi._
 import com.intellij.util.ProcessingContext
-import org.psliwa.idea.composer.parser._
+import org.psliwa.idea.composer.schema._
 
 class CompletionContributor extends com.intellij.codeInsight.completion.CompletionContributor {
   private lazy val schema = SchemaLoader.load()
