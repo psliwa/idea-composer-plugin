@@ -56,7 +56,7 @@
       }
     },
     "require": {
-      "type": "object"
+      "type": "packages"
     },
     "replace": {
       "type": "object"

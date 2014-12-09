@@ -1,6 +1,10 @@
 package org.psliwa.idea.composer.idea.completionContributor
 
+import com.intellij.codeInsight._
+import com.intellij.json.JsonLanguage
+import com.intellij.openapi.extensions.{Extensions, ExtensionPointName}
 import com.intellij.testFramework.fixtures.LightPlatformCodeInsightFixtureTestCase
+import org.psliwa.idea.composer.idea.CompletionContributor
 
 class SuggestionsTest extends LightPlatformCodeInsightFixtureTestCase {
 
@@ -167,6 +171,28 @@ class SuggestionsTest extends LightPlatformCodeInsightFixtureTestCase {
         |}
       """.stripMargin,
       Array("name", "email", "homepage")
+    )
+  }
+
+  def testRequireSuggestions() = {
+    import scala.collection.JavaConverters._
+    val completionContr = completion.CompletionContributor.forLanguage(JsonLanguage.INSTANCE).asScala
+      .filter(_.isInstanceOf[CompletionContributor])
+      .map(_.asInstanceOf[CompletionContributor])
+      .head
+
+    val packages = List("ps/image-optimizer", "ps/fluent-traversable")
+    completionContr.setPackagesLoader(() => packages)
+
+    suggestions(
+      """
+        |{
+        | "require": {
+        |   <caret>
+        | }
+        |}
+      """.stripMargin,
+      packages.toArray
     )
   }
 }

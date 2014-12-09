@@ -9,11 +9,16 @@ import com.intellij.patterns.StandardPatterns._
 import com.intellij.patterns.{PatternCondition, PsiElementPattern}
 import com.intellij.psi._
 import com.intellij.util.ProcessingContext
+import org.psliwa.idea.composer.packagist.Packagist
 import org.psliwa.idea.composer.schema._
 
 class CompletionContributor extends com.intellij.codeInsight.completion.CompletionContributor {
   private lazy val schema = SchemaLoader.load()
   private val emptyNamePlaceholder = "IntellijIdeaRulezzz"
+
+  private var loadPackages: () => List[String] = () => Packagist.load().right.toOption.getOrElse(List())
+
+  private lazy val packages = loadPackages().map(Keyword(_))
 
   type Capture = PsiElementPattern.Capture[_ <: PsiElement]
 
@@ -40,6 +45,24 @@ class CompletionContributor extends com.intellij.codeInsight.completion.Completi
     case SOr(l) => l.flatMap(loop(_, parent))
     case SArray(i) => loop(i, psiElement(classOf[JsonArray]).withParent(parent))
     case SBoolean => List((psiElement().withSuperParent(2, parent).afterLeaf(":"), KeywordsCompletionProvider(List("true", "false").map(Keyword(_, quoted = false)))))
+    case SPackages => {
+      //TODO: refactoring with SObject - SPackages should be special case of SObject?
+      val propertyCapture = psiElement(classOf[JsonProperty]).withParent(psiElement(classOf[JsonObject]).withParent(parent))
+      List(
+        (
+          psiElement().withSuperParent(2, psiElement().and(propertyCapture)
+            .andOr(
+              psiElement().withName(string().`with`(new PatternCondition[String]("contains") {
+                override def accepts(t: String, context: ProcessingContext): Boolean = t.contains(emptyNamePlaceholder)
+              })),
+              psiElement().withName(emptyNamePlaceholder)
+            )
+          )
+          ,
+          KeywordsCompletionProvider(packages)
+          )
+      )
+    }
     case _ => List()
   }
 
@@ -74,5 +97,9 @@ class CompletionContributor extends com.intellij.codeInsight.completion.Completi
 
       editor.getCaretModel.moveToOffset(context.getStartOffset + item.getLookupString.length + 2)
     }
+  }
+
+  protected[idea] def setPackagesLoader(l: () => List[String]): Unit = {
+    loadPackages = l
   }
 }

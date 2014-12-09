@@ -13,6 +13,7 @@ case class SOr(alternatives: List[Schema]) extends Schema
 object SBoolean extends Schema
 object SString extends Schema
 object SNumber extends Schema
+object SPackages extends Schema
 
 object Schema {
 
@@ -36,7 +37,7 @@ object Schema {
 
   private def jsonObjectToSchema: Converter[JSONObject] = (
     jsonObjectToObjectSchema | jsonObjectToStringSchema | jsonObjectToNumberSchema | jsonObjectToBooleanSchema
-    | jsonObjectToArraySchema | jsonObjectToEnum | jsonObjectToOr
+    | jsonObjectToArraySchema | jsonObjectToEnum | jsonObjectToOr | jsonObjectToPackagesSchema
   )
 
   private def jsonObjectToOr: Converter[JSONObject] = jsonObjectToComplexOr | jsonObjectToSimpleOr
@@ -95,6 +96,14 @@ object Schema {
         rawItems <- tryJsonObject(maybeJsonObject)
         itemsType <- jsonObjectToSchema(rawItems)
       } yield SArray(itemsType)
+    } else {
+      None
+    }
+  }
+
+  private def jsonObjectToPackagesSchema: Converter[JSONObject] = t => {
+    if(t.obj.get("type").exists(_ == "packages")) {
+      Some(SPackages)
     } else {
       None
     }

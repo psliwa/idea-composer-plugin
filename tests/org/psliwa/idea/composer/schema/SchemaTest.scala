@@ -246,6 +246,25 @@ class SchemaTest {
   }
 
   @Test
+  def parsePackagesType() = {
+    assertSchemaEquals(
+      SObject(Map(
+        "require" -> SPackages
+      )),
+      Schema.parse(
+        """
+          | {
+          |   "type": "object",
+          |   "properties": {
+          |     "require": { "type": "packages" }
+          |   }
+          | }
+        """.stripMargin
+      )
+    )
+  }
+
+  @Test
   def givenSchemaIsInvalid_expectNone() = {
     assertEquals(None, Schema.parse(
       """
