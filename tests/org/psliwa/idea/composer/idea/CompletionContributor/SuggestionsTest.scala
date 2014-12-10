@@ -175,11 +175,7 @@ class SuggestionsTest extends LightPlatformCodeInsightFixtureTestCase {
   }
 
   def testRequireSuggestions() = {
-    import scala.collection.JavaConverters._
-    val completionContr = completion.CompletionContributor.forLanguage(JsonLanguage.INSTANCE).asScala
-      .filter(_.isInstanceOf[CompletionContributor])
-      .map(_.asInstanceOf[CompletionContributor])
-      .head
+    val completionContr = getCompletionContributor
 
     val packages = List("ps/image-optimizer", "ps/fluent-traversable")
     completionContr.setPackagesLoader(() => packages)
@@ -193,6 +189,38 @@ class SuggestionsTest extends LightPlatformCodeInsightFixtureTestCase {
         |}
       """.stripMargin,
       packages.toArray
+    )
+  }
+
+  def getCompletionContributor = {
+    import scala.collection.JavaConverters._
+
+    completion.CompletionContributor.forLanguage(JsonLanguage.INSTANCE).asScala
+      .filter(_.isInstanceOf[CompletionContributor])
+      .map(_.asInstanceOf[CompletionContributor])
+      .head
+  }
+
+  def testRequireVersionsSuggestions() = {
+    val completionContr = getCompletionContributor
+
+    val pkg = "ps/image-optimizer"
+    val versions = List("dev-master", "1.0.0")
+
+    val map = Map(pkg -> versions)
+
+    completionContr.setPackagesLoader(() => List(pkg))
+    completionContr.setVersionsLoader(map.getOrElse(_, List()))
+
+    suggestions(
+      """
+        |{
+        | "require": {
+        |   "ps/image-optimizer": "<caret>"
+        | }
+        |}
+      """.stripMargin,
+      versions.toArray
     )
   }
 }

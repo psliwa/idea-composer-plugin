@@ -12,14 +12,16 @@ import com.intellij.util.ProcessingContext
 import org.psliwa.idea.composer.packagist.Packagist
 import org.psliwa.idea.composer.schema._
 
+import scala.annotation.tailrec
+
 class CompletionContributor extends com.intellij.codeInsight.completion.CompletionContributor {
   import CompletionContributor._
 
-  private val emptyNamePlaceholder = "IntellijIdeaRulezzz"
-
   private lazy val schema = SchemaLoader.load()
   private lazy val packages = loadPackages().map(Keyword(_))
-  private var loadPackages: () => List[String] = () => Packagist.loadPackages().right.toOption.getOrElse(List())
+
+  private var loadPackages: () => List[String] = () => Packagist.loadPackages().right.getOrElse(List())
+  private var loadVersions: (String) => List[String] = Packagist.loadVersions(_).right.getOrElse(List())
 
   schema.foreach(addCompletionProvidersForSchema)
 
@@ -39,7 +41,8 @@ class CompletionContributor extends com.intellij.codeInsight.completion.Completi
     case SArray(i) => completionProvidersForSchema(i, psiElement(classOf[JsonArray]).withParent(parent))
     case SBoolean => List((psiElement().withSuperParent(2, parent).afterLeaf(":"), KeywordsCompletionProvider(() => List("true", "false").map(Keyword(_, quoted = false)))))
     case SPackages => {
-      propertyCompletionProviders(parent, () => packages)
+      propertyCompletionProviders(parent, () => packages) ++
+        List((psiElement().withSuperParent(2, psiElement().and(propertyCapture(parent))), new ContextAwareCompletionProvider(loadVersions)))
     }
     case _ => List()
   }
@@ -71,6 +74,10 @@ class CompletionContributor extends com.intellij.codeInsight.completion.Completi
     loadPackages = l
   }
 
+  protected[idea] def setVersionsLoader(l: (String) => List[String]): Unit = {
+    loadVersions = l
+  }
+
   private def stringContains(s: String) = {
     string().`with`(new PatternCondition[String]("contains") {
       override def accepts(t: String, context: ProcessingContext): Boolean = t.contains(s)
@@ -79,6 +86,8 @@ class CompletionContributor extends com.intellij.codeInsight.completion.Completi
 }
 
 private object CompletionContributor {
+  private val emptyNamePlaceholder = "IntellijIdeaRulezzz"
+
   type Capture = PsiElementPattern.Capture[_ <: PsiElement]
   type Keywords = () => Iterable[Keyword]
 
@@ -86,12 +95,33 @@ private object CompletionContributor {
 
   case class KeywordsCompletionProvider(keywords: Keywords) extends CompletionProvider[CompletionParameters] {
     override def addCompletions(parameters: CompletionParameters, context: ProcessingContext, result: CompletionResultSet): Unit = {
-      keywords().foreach(k => result.addElement(LookupElementBuilder.create(k.text).bold.withInsertHandler(insertHandler(parameters.getPosition, k))))
+      addKeywordsToResult(keywords())(parameters, result)
+    }
+  }
+
+  private def addKeywordsToResult(keywords: Iterable[Keyword])(parameters: CompletionParameters, result: CompletionResultSet) {
+    keywords.foreach(k => result.addElement(LookupElementBuilder.create(k.text).bold.withInsertHandler(insertHandler(parameters.getPosition, k))))
+  }
+
+  private def insertHandler(element: PsiElement, keyword: Keyword) = {
+    if(element.getParent.isInstanceOf[JsonStringLiteral] || !keyword.quoted) null
+    else QuoteInsertHandler
+  }
+  
+  case class ContextAwareCompletionProvider(loadKeywords: (String) => List[String]) extends CompletionProvider[CompletionParameters] {
+    override def addCompletions(parameters: CompletionParameters, context: ProcessingContext, result: CompletionResultSet): Unit = {
+      val keywords = firstNamedProperty(parameters.getPosition).map(_.getName).map(loadKeywords).getOrElse(List()).map(Keyword(_))
+
+      addKeywordsToResult(keywords)(parameters, result)
     }
 
-    private def insertHandler(element: PsiElement, keyword: Keyword) = {
-      if(element.getParent.isInstanceOf[JsonStringLiteral] || !keyword.quoted) null
-      else QuoteInsertHandler
+    @tailrec
+    private def firstNamedProperty(element: PsiElement): Option[JsonProperty] = {
+      element match {
+        case p@JsonProperty(name) => Some(p)
+        case _: JsonFile => None
+        case e => firstNamedProperty(e.getParent)
+      }
     }
   }
 
@@ -105,5 +135,9 @@ private object CompletionContributor {
 
       editor.getCaretModel.moveToOffset(context.getStartOffset + item.getLookupString.length + 2)
     }
+  }
+
+  object JsonProperty {
+    def unapply(x: JsonProperty): Option[(String)] = if(x.getName.contains(emptyNamePlaceholder)) None else Some(x.getName)
   }
 }

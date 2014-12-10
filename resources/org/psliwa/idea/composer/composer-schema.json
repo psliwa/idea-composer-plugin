@@ -59,19 +59,19 @@
       "type": "packages"
     },
     "replace": {
-      "type": "object"
+      "type": "packages"
     },
     "conflict": {
-      "type": "object"
+      "type": "packages"
     },
     "provide": {
-      "type": "object"
+      "type": "packages"
     },
     "require-dev": {
-      "type": "object"
+      "type": "packages"
     },
     "suggest": {
-      "type": "object"
+      "type": "packages"
     },
     "config": {
       "type": "object",
