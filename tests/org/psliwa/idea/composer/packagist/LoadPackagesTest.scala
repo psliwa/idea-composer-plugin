@@ -2,7 +2,6 @@ package org.psliwa.idea.composer.packagist
 
 import org.junit.Test
 import org.junit.Assert._
-import org.psliwa.idea.composer.packagist.Packagist
 
 class LoadPackagesTest {
   @Test
@@ -18,7 +17,7 @@ class LoadPackagesTest {
         |}
       """.stripMargin
 
-    val result = Packagist.loadFromString(s)
+    val result = Packagist.loadPackagesFromString(s)
 
     assertFalse(result.isLeft)
     assertEquals(
@@ -31,13 +30,13 @@ class LoadPackagesTest {
   def loadFromString_givenInvalidJson_expectedError() = {
     val s = "invalid json"
 
-    val result = Packagist.loadFromString(s)
+    val result = Packagist.loadPackagesFromString(s)
     assertTrue(result.isLeft)
   }
 
   @Test
   def loadJsonFromPackagist_shouldBeLoaded() = {
-    val result = Packagist.loadFromPackagist()
+    val result = Packagist.loadPackagesFromPackagist()
 
     assertFalse(result.isLeft)
     assertTrue(result.right.toOption.map(_.contains("packageNames")).get)
@@ -45,7 +44,7 @@ class LoadPackagesTest {
 
   @Test
   def loadJsonFromPackagist_givenInvalidIri_expectedError() = {
-    val result = Packagist.loadFromPackagist("some/invalid/uri.json")
+    val result = Packagist.loadUri("some/invalid/uri.json")
 
     assertTrue(result.isLeft)
   }

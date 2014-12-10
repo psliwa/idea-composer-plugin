@@ -19,7 +19,7 @@ class CompletionContributor extends com.intellij.codeInsight.completion.Completi
 
   private lazy val schema = SchemaLoader.load()
   private lazy val packages = loadPackages().map(Keyword(_))
-  private var loadPackages: () => List[String] = () => Packagist.load().right.toOption.getOrElse(List())
+  private var loadPackages: () => List[String] = () => Packagist.loadPackages().right.toOption.getOrElse(List())
 
   schema.foreach(addCompletionProvidersForSchema)
 
