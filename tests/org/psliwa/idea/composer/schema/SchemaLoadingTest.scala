@@ -2,7 +2,6 @@ package org.psliwa.idea.composer.schema
 
 import org.junit.Test
 import org.junit.Assert._
-import org.psliwa.idea.composer.schema.SchemaLoader
 
 class SchemaLoadingTest {
 

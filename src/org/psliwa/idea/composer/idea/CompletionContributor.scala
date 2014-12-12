@@ -1,18 +1,14 @@
 package org.psliwa.idea.composer.idea
 
 import com.intellij.codeInsight.completion._
-import com.intellij.codeInsight.lookup.{LookupElement, LookupElementBuilder}
 import com.intellij.json.JsonLanguage
 import com.intellij.json.psi._
 import com.intellij.patterns.PlatformPatterns._
 import com.intellij.patterns.StandardPatterns._
 import com.intellij.patterns.{PsiElementPattern, PatternCondition}
-import com.intellij.psi._
 import com.intellij.util.ProcessingContext
 import org.psliwa.idea.composer.packagist.Packagist
 import org.psliwa.idea.composer.schema._
-
-import scala.annotation.tailrec
 
 class CompletionContributor extends com.intellij.codeInsight.completion.CompletionContributor {
 

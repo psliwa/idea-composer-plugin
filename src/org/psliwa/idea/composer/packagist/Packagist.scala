@@ -1,7 +1,7 @@
 package org.psliwa.idea.composer.packagist
 
 import scala.io.Source
-import scala.util.parsing.json.{JSONArray, JSONObject, JSONType, JSON}
+import scala.util.parsing.json.{JSONArray, JSONObject, JSON}
 
 object Packagist {
 

@@ -37,7 +37,7 @@ protected[idea] case class KeywordsCompletionProvider(keywords: Keywords) extend
 
 protected[idea] trait CompletionProviderMixin {
   protected def addKeywordsToResult(keywords: Iterable[Keyword])(parameters: CompletionParameters, result: CompletionResultSet) {
-    keywords.foreach(k => result.addElement(LookupElementBuilder.create(k.text).bold.withInsertHandler(insertHandler(parameters.getPosition, k))))
+    keywords.foreach(k => result.addElement(LookupElementBuilder.create(k.text).withInsertHandler(insertHandler(parameters.getPosition, k))))
   }
 
   protected def insertHandler(element: PsiElement, keyword: Keyword) = {
