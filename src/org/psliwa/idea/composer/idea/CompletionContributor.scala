@@ -15,7 +15,6 @@ import org.psliwa.idea.composer.schema._
 import scala.annotation.tailrec
 
 class CompletionContributor extends com.intellij.codeInsight.completion.CompletionContributor {
-  import CompletionContributor._
 
   private lazy val schema = SchemaLoader.load()
   private lazy val packages = loadPackages().map(Keyword(_))
@@ -82,62 +81,5 @@ class CompletionContributor extends com.intellij.codeInsight.completion.Completi
     string().`with`(new PatternCondition[String]("contains") {
       override def accepts(t: String, context: ProcessingContext): Boolean = t.contains(s)
     })
-  }
-}
-
-private object CompletionContributor {
-  private val emptyNamePlaceholder = "IntellijIdeaRulezzz"
-
-  type Capture = PsiElementPattern.Capture[_ <: PsiElement]
-  type Keywords = () => Iterable[Keyword]
-
-  case class Keyword(text: String, quoted: Boolean = true)
-
-  case class KeywordsCompletionProvider(keywords: Keywords) extends CompletionProvider[CompletionParameters] {
-    override def addCompletions(parameters: CompletionParameters, context: ProcessingContext, result: CompletionResultSet): Unit = {
-      addKeywordsToResult(keywords())(parameters, result)
-    }
-  }
-
-  private def addKeywordsToResult(keywords: Iterable[Keyword])(parameters: CompletionParameters, result: CompletionResultSet) {
-    keywords.foreach(k => result.addElement(LookupElementBuilder.create(k.text).bold.withInsertHandler(insertHandler(parameters.getPosition, k))))
-  }
-
-  private def insertHandler(element: PsiElement, keyword: Keyword) = {
-    if(element.getParent.isInstanceOf[JsonStringLiteral] || !keyword.quoted) null
-    else QuoteInsertHandler
-  }
-  
-  case class ContextAwareCompletionProvider(loadKeywords: (String) => List[String]) extends CompletionProvider[CompletionParameters] {
-    override def addCompletions(parameters: CompletionParameters, context: ProcessingContext, result: CompletionResultSet): Unit = {
-      val keywords = firstNamedProperty(parameters.getPosition).map(_.getName).map(loadKeywords).getOrElse(List()).map(Keyword(_))
-
-      addKeywordsToResult(keywords)(parameters, result)
-    }
-
-    @tailrec
-    private def firstNamedProperty(element: PsiElement): Option[JsonProperty] = {
-      element match {
-        case p@JsonProperty(name) => Some(p)
-        case _: JsonFile => None
-        case e => firstNamedProperty(e.getParent)
-      }
-    }
-  }
-
-  object QuoteInsertHandler extends InsertHandler[LookupElement] {
-    override def handleInsert(context: InsertionContext, item: LookupElement): Unit = {
-      val document = context.getEditor.getDocument
-      val editor = context.getEditor
-
-      document.insertString(context.getStartOffset, "\"")
-      document.insertString(context.getStartOffset + 1 + item.getLookupString.length, "\"")
-
-      editor.getCaretModel.moveToOffset(context.getStartOffset + item.getLookupString.length + 2)
-    }
-  }
-
-  object JsonProperty {
-    def unapply(x: JsonProperty): Option[(String)] = if(x.getName.contains(emptyNamePlaceholder)) None else Some(x.getName)
   }
 }
