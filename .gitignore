@@ -1,2 +1,6 @@
 .idea/
 out/
+shrink.properties
+target/*
+!target/.gitkeep
+composer-json-plugin.zip
