@@ -1,14 +1,15 @@
 package org.psliwa.idea.composer.idea
 
-import com.intellij.openapi.application.Application
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.ApplicationComponent
 import com.intellij.openapi.fileEditor.{FileEditorManager, FileEditorManagerAdapter, FileEditorManagerListener}
 import com.intellij.openapi.vfs.VirtualFile
 import org.psliwa.idea.composer.packagist.Packagist
 import org.psliwa.idea.composer._
 
-class PackagesLoader(app: Application) extends ApplicationComponent {
+class PackagesLoader extends ApplicationComponent {
   override def initComponent(): Unit = {
+    val app = ApplicationManager.getApplication
     val bus = app.getMessageBus.connect(app)
 
     //load packages first time, when composer.json file is opened
