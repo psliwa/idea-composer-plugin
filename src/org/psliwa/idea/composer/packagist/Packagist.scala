@@ -5,17 +5,17 @@ import scala.util.parsing.json.{JSONArray, JSONObject, JSON}
 
 object Packagist {
 
-  private val packagistUrl = "https://packagist.org/"
+  private val PackagistUrl = "https://packagist.org/"
 
   type Error = String
 
-  def loadPackages(): Either[Error,List[String]] = loadPackagesFromPackagist().right.flatMap(loadPackagesFromString)
-  def loadVersions(pkg: String): Either[Error,List[String]] = loadUri("packages/"+pkg+".json").right.flatMap(loadVersionsFromString)
+  def loadPackages(): Either[Error,Seq[String]] = loadPackagesFromPackagist().right.flatMap(loadPackagesFromString)
+  def loadVersions(pkg: String): Either[Error,Seq[String]] = loadUri("packages/"+pkg+".json").right.flatMap(loadVersionsFromString)
 
   protected[packagist] def loadPackagesFromPackagist(): Either[Error,String] = loadUri("packages/list.json")
   protected[packagist] def loadUri(uri: String): Either[Error,String] = {
     try {
-      val in = Source.fromURL(packagistUrl+uri)
+      val in = Source.fromURL(PackagistUrl+uri)
       try {
         Right(in.getLines().mkString)
       } finally {
@@ -26,7 +26,7 @@ object Packagist {
     }
   }
 
-  protected[packagist] def loadPackagesFromString(data: String): Either[Error,List[String]] = {
+  protected[packagist] def loadPackagesFromString(data: String): Either[Error,Seq[String]] = {
     val packages = for {
       result <- JSON.parseRaw(data)
       o <- tryJsonObject(result)
@@ -47,7 +47,7 @@ object Packagist {
     case _ => None
   }
 
-  protected[packagist] def loadVersionsFromString(data: String): Either[Error,List[String]] = {
+  protected[packagist] def loadVersionsFromString(data: String): Either[Error,Seq[String]] = {
     val versions = for {
       result <- JSON.parseRaw(data)
       o <- tryJsonObject(result)

@@ -10,14 +10,15 @@ import com.intellij.util.ProcessingContext
 import org.psliwa.idea.composer.packagist.Packagist
 import org.psliwa.idea.composer.schema._
 import org.psliwa.idea.composer.util.Funcs._
+import org.psliwa.idea.composer._
 
 class CompletionContributor extends com.intellij.codeInsight.completion.CompletionContributor {
 
   private lazy val schema = SchemaLoader.load()
-  private lazy val packages = loadPackages().map(Keyword(_))
+  private lazy val packages = loadPackages()
 
-  private var loadPackages: () => List[String] = () => Packagist.loadPackages().right.getOrElse(List())
-  private var loadVersions: (String) => List[String] = memorize(30)(Packagist.loadVersions(_).right.getOrElse(List()))
+  private var loadPackages: () => Seq[Keyword] = () => PackagesLoader.loadPackages
+  private var loadVersions: (String) => Seq[String] = memorize(30)(Packagist.loadVersions(_).right.getOrElse(List()))
 
   schema.foreach(addCompletionProvidersForSchema)
 
@@ -46,7 +47,7 @@ class CompletionContributor extends com.intellij.codeInsight.completion.Completi
   private def rootPsiElementPattern: PsiElementPattern.Capture[JsonFile] = {
     psiElement(classOf[JsonFile])
       .withLanguage(JsonLanguage.INSTANCE)
-      .inFile(psiFile(classOf[JsonFile]).withName("composer.json"))
+      .inFile(psiFile(classOf[JsonFile]).withName(ComposerJson))
   }
 
   private def propertyCompletionProviders(parent: Capture, keywords: Keywords) = {
@@ -66,11 +67,11 @@ class CompletionContributor extends com.intellij.codeInsight.completion.Completi
     psiElement(classOf[JsonProperty]).withParent(psiElement(classOf[JsonObject]).withParent(parent))
   }
 
-  protected[idea] def setPackagesLoader(l: () => List[String]): Unit = {
+  protected[idea] def setPackagesLoader(l: () => Seq[Keyword]): Unit = {
     loadPackages = l
   }
 
-  protected[idea] def setVersionsLoader(l: (String) => List[String]): Unit = {
+  protected[idea] def setVersionsLoader(l: (String) => Seq[String]): Unit = {
     loadVersions = l
   }
 

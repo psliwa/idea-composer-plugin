@@ -7,8 +7,9 @@ import com.intellij.psi.PsiElement
 import com.intellij.util.ProcessingContext
 
 import scala.annotation.tailrec
+import scala.collection.Seq
 
-protected[idea] case class ContextAwareCompletionProvider(loadKeywords: (String) => List[String]) extends CompletionProvider[CompletionParameters] with CompletionProviderMixin {
+protected[idea] case class ContextAwareCompletionProvider(loadKeywords: (String) => Seq[String]) extends CompletionProvider[CompletionParameters] with CompletionProviderMixin {
   override def addCompletions(parameters: CompletionParameters, context: ProcessingContext, result: CompletionResultSet): Unit = {
     val keywords = firstNamedProperty(parameters.getPosition).map(_.getName).map(loadKeywords).getOrElse(List()).map(Keyword(_))
 

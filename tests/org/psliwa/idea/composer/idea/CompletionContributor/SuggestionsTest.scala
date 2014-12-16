@@ -4,7 +4,7 @@ import com.intellij.codeInsight._
 import com.intellij.json.JsonLanguage
 import com.intellij.openapi.extensions.{Extensions, ExtensionPointName}
 import com.intellij.testFramework.fixtures.LightPlatformCodeInsightFixtureTestCase
-import org.psliwa.idea.composer.idea.CompletionContributor
+import org.psliwa.idea.composer.idea.{Keyword, CompletionContributor}
 
 class SuggestionsTest extends LightPlatformCodeInsightFixtureTestCase {
 
@@ -178,7 +178,7 @@ class SuggestionsTest extends LightPlatformCodeInsightFixtureTestCase {
     val completionContr = getCompletionContributor
 
     val packages = List("ps/image-optimizer", "ps/fluent-traversable")
-    completionContr.setPackagesLoader(() => packages)
+    completionContr.setPackagesLoader(() => packages.map(Keyword(_)))
 
     suggestions(
       """
@@ -209,7 +209,7 @@ class SuggestionsTest extends LightPlatformCodeInsightFixtureTestCase {
 
     val map = Map(pkg -> versions)
 
-    completionContr.setPackagesLoader(() => List(pkg))
+    completionContr.setPackagesLoader(() => List(Keyword(pkg)))
     completionContr.setVersionsLoader(map.getOrElse(_, List()))
 
     suggestions(
