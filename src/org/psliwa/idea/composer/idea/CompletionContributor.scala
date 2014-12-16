@@ -9,6 +9,7 @@ import com.intellij.patterns.{PsiElementPattern, PatternCondition}
 import com.intellij.util.ProcessingContext
 import org.psliwa.idea.composer.packagist.Packagist
 import org.psliwa.idea.composer.schema._
+import org.psliwa.idea.composer.util.Funcs._
 
 class CompletionContributor extends com.intellij.codeInsight.completion.CompletionContributor {
 
@@ -16,7 +17,7 @@ class CompletionContributor extends com.intellij.codeInsight.completion.Completi
   private lazy val packages = loadPackages().map(Keyword(_))
 
   private var loadPackages: () => List[String] = () => Packagist.loadPackages().right.getOrElse(List())
-  private var loadVersions: (String) => List[String] = Packagist.loadVersions(_).right.getOrElse(List())
+  private var loadVersions: (String) => List[String] = memorize(30)(Packagist.loadVersions(_).right.getOrElse(List()))
 
   schema.foreach(addCompletionProvidersForSchema)
 
