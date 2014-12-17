@@ -8,9 +8,14 @@ protected[idea] object QuoteInsertHandler extends InsertHandler[LookupElement] {
     val document = context.getEditor.getDocument
     val editor = context.getEditor
 
-    document.insertString(context.getStartOffset, "\"")
-    document.insertString(context.getStartOffset + 1 + item.getLookupString.length, "\"")
+    val firstChar = document.getCharsSequence.subSequence(context.getStartOffset-1, context.getStartOffset)
 
-    editor.getCaretModel.moveToOffset(context.getStartOffset + item.getLookupString.length + 2)
+    if(firstChar.toString != "\"") {
+      document.insertString(context.getStartOffset, "\"")
+      document.insertString(context.getStartOffset + 1 + item.getLookupString.length, "\"")
+
+      editor.getCaretModel.moveToOffset(context.getStartOffset + item.getLookupString.length + 1)
+    }
   }
 }
+

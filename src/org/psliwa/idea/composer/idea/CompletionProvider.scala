@@ -1,7 +1,7 @@
 package org.psliwa.idea.composer.idea
 
-import com.intellij.codeInsight.completion.{CompletionResultSet, CompletionParameters, CompletionProvider}
-import com.intellij.codeInsight.lookup.LookupElementBuilder
+import com.intellij.codeInsight.completion.{InsertHandler, CompletionResultSet, CompletionParameters, CompletionProvider}
+import com.intellij.codeInsight.lookup.{LookupElement, LookupElementBuilder}
 import com.intellij.json.psi.{JsonStringLiteral, JsonFile, JsonProperty}
 import com.intellij.psi.PsiElement
 import com.intellij.util.ProcessingContext
@@ -30,19 +30,25 @@ protected[idea] case class ContextAwareCompletionProvider(loadKeywords: (String)
   }
 }
 
-protected[idea] case class KeywordsCompletionProvider(keywords: Keywords) extends CompletionProvider[CompletionParameters] with CompletionProviderMixin {
+protected[idea] case class KeywordsCompletionProvider(keywords: Keywords, getInsertHandler: InsertHandlerFinder = _ => None)
+  extends CompletionProvider[CompletionParameters] with CompletionProviderMixin {
+
   override def addCompletions(parameters: CompletionParameters, context: ProcessingContext, result: CompletionResultSet): Unit = {
-    addKeywordsToResult(keywords())(parameters, result)
+    addKeywordsToResult(keywords(), getInsertHandler)(parameters, result)
   }
 }
 
 protected[idea] trait CompletionProviderMixin {
-  protected def addKeywordsToResult(keywords: Iterable[Keyword])(parameters: CompletionParameters, result: CompletionResultSet) {
-    keywords.foreach(k => result.addElement(LookupElementBuilder.create(k.text).withInsertHandler(insertHandler(parameters.getPosition, k))))
+  protected def addKeywordsToResult(keywords: Iterable[Keyword], getInsertHandler: InsertHandlerFinder = _ => None)
+      (parameters: CompletionParameters, result: CompletionResultSet) {
+
+    keywords.foreach(k => {
+      result.addElement(LookupElementBuilder.create(k.text).withInsertHandler(insertHandler(parameters.getPosition, k, getInsertHandler)))
+    })
   }
 
-  protected def insertHandler(element: PsiElement, keyword: Keyword) = {
-    if(element.getParent.isInstanceOf[JsonStringLiteral] || !keyword.quoted) null
-    else QuoteInsertHandler
+  protected def insertHandler(element: PsiElement, keyword: Keyword, getInsertHandler: InsertHandlerFinder) = {
+    if(!keyword.quoted) null
+    else getInsertHandler(keyword).getOrElse(QuoteInsertHandler)
   }
 }

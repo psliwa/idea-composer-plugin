@@ -1,6 +1,7 @@
 package org.psliwa.idea.composer.idea
 
 import com.intellij.codeInsight.completion._
+import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.json.JsonLanguage
 import com.intellij.json.psi._
 import com.intellij.patterns.PlatformPatterns._
@@ -12,13 +13,15 @@ import org.psliwa.idea.composer.schema._
 import org.psliwa.idea.composer.util.Funcs._
 import org.psliwa.idea.composer._
 
+import scala.annotation.tailrec
+
 class CompletionContributor extends com.intellij.codeInsight.completion.CompletionContributor {
 
   private lazy val schema = SchemaLoader.load()
-  private lazy val packages = loadPackages()
 
-  private var loadPackages: () => Seq[Keyword] = () => PackagesLoader.loadPackages
-  private var loadVersions: (String) => Seq[String] = memorize(30)(Packagist.loadVersions(_).right.getOrElse(List()))
+  //vars only for testability
+  private var packagesLoader: () => Seq[Keyword] = () => PackagesLoader.loadPackages
+  private var versionsLoader: (String) => Seq[String] = memorize(30)(Packagist.loadVersions(_).right.getOrElse(List()))
 
   schema.foreach(addCompletionProvidersForSchema)
 
@@ -30,7 +33,7 @@ class CompletionContributor extends com.intellij.codeInsight.completion.Completi
 
   private def completionProvidersForSchema(s: Schema, parent: Capture): List[(Capture, CompletionProvider[CompletionParameters])] = s match {
     case SObject(m) => {
-      propertyCompletionProviders(parent, () => m.keys.map(Keyword(_))) ++
+      propertyCompletionProvider(parent, () => m.keys.map(Keyword(_)), (k) => insertHandlerFor(m.get(k.text).get)) ++
         m.flatMap(t => completionProvidersForSchema(t._2, psiElement().and(propertyCapture(parent)).withName(t._1)))
     }
     case SStringChoice(m) => List((psiElement().withSuperParent(2, parent), KeywordsCompletionProvider(() => m.map(Keyword(_)))))
@@ -38,7 +41,7 @@ class CompletionContributor extends com.intellij.codeInsight.completion.Completi
     case SArray(i) => completionProvidersForSchema(i, psiElement(classOf[JsonArray]).withParent(parent))
     case SBoolean => List((psiElement().withSuperParent(2, parent).afterLeaf(":"), KeywordsCompletionProvider(() => List("true", "false").map(Keyword(_, quoted = false)))))
     case SPackages => {
-      propertyCompletionProviders(parent, () => packages) ++
+      propertyCompletionProvider(parent, loadPackages, _ => Some(StringPropertyValueInsertHandler)) ++
         List((psiElement().withSuperParent(2, psiElement().and(propertyCapture(parent))), new ContextAwareCompletionProvider(loadVersions)))
     }
     case _ => List()
@@ -50,17 +53,25 @@ class CompletionContributor extends com.intellij.codeInsight.completion.Completi
       .inFile(psiFile(classOf[JsonFile]).withName(ComposerJson))
   }
 
-  private def propertyCompletionProviders(parent: Capture, keywords: Keywords) = {
-    List(
-      (
-        psiElement()
-          .withSuperParent(2,
-            psiElement().and(propertyCapture(parent))
-              .withName(stringContains(emptyNamePlaceholder))
-          ),
-        KeywordsCompletionProvider(keywords)
-      )
-    )
+  private def propertyCompletionProvider(parent: Capture, keywords: Keywords, getInsertHandler: InsertHandlerFinder = _ => None) = {
+    List((
+      psiElement()
+        .withSuperParent(2,
+          psiElement().and(propertyCapture(parent))
+            .withName(stringContains(emptyNamePlaceholder))
+        ),
+      KeywordsCompletionProvider(keywords, getInsertHandler)
+    ))
+  }
+
+  @tailrec
+  private def insertHandlerFor(schema: Schema): Option[InsertHandler[LookupElement]] = schema match {
+    case SString | SStringChoice(_) => Some(StringPropertyValueInsertHandler)
+    case SObject(_) | SPackages => Some(ObjectPropertyValueInsertHandler)
+    case SArray(_) => Some(ArrayPropertyValueInsertHandler)
+    case SBoolean | SNumber => Some(EmptyPropertyValueInsertHandler)
+    case SOr(h::_) => insertHandlerFor(h)
+    case _ => None
   }
 
   private def propertyCapture(parent: Capture): PsiElementPattern.Capture[JsonProperty] = {
@@ -68,12 +79,15 @@ class CompletionContributor extends com.intellij.codeInsight.completion.Completi
   }
 
   protected[idea] def setPackagesLoader(l: () => Seq[Keyword]): Unit = {
-    loadPackages = l
+    packagesLoader = l
   }
 
   protected[idea] def setVersionsLoader(l: (String) => Seq[String]): Unit = {
-    loadVersions = l
+    versionsLoader = l
   }
+
+  private def loadPackages() = packagesLoader()
+  private def loadVersions(s: String) = versionsLoader(s)
 
   private def stringContains(s: String) = {
     string().`with`(new PatternCondition[String]("contains") {

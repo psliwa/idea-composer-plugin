@@ -1,12 +1,14 @@
 package org.psliwa.idea.composer.idea.completionContributor
 
+import java.util.Collections
+
 import com.intellij.codeInsight._
 import com.intellij.json.JsonLanguage
 import com.intellij.openapi.extensions.{Extensions, ExtensionPointName}
 import com.intellij.testFramework.fixtures.LightPlatformCodeInsightFixtureTestCase
 import org.psliwa.idea.composer.idea.{Keyword, CompletionContributor}
 
-class SuggestionsTest extends LightPlatformCodeInsightFixtureTestCase {
+class SuggestionsTest extends LightPlatformCodeInsightFixtureTestCase with TestCase {
 
   def testSuggestionsOnTopLevel() = {
     suggestions(
@@ -23,8 +25,10 @@ class SuggestionsTest extends LightPlatformCodeInsightFixtureTestCase {
     myFixture.configureByText("composer.json", contents)
     myFixture.completeBasic()
 
-    assertContainsElements(myFixture.getLookupElementStrings, expectedSuggestions:_*)
-    assertDoesntContain(myFixture.getLookupElementStrings, unexpectedSuggestions:_*)
+    val lookupElements = myFixture.getLookupElementStrings
+
+    assertContainsElements(lookupElements, expectedSuggestions:_*)
+    assertDoesntContain(lookupElements, unexpectedSuggestions:_*)
   }
 
   def testSuggestionsOnTopLevelWithQuotes() = {
@@ -175,10 +179,8 @@ class SuggestionsTest extends LightPlatformCodeInsightFixtureTestCase {
   }
 
   def testRequireSuggestions() = {
-    val completionContr = getCompletionContributor
-
-    val packages = List("ps/image-optimizer", "ps/fluent-traversable")
-    completionContr.setPackagesLoader(() => packages.map(Keyword(_)))
+    val packages = List("some/package1", "some/package2")
+    setCompletionPackageLoader(() => packages.map(Keyword(_)))
 
     suggestions(
       """
@@ -192,25 +194,15 @@ class SuggestionsTest extends LightPlatformCodeInsightFixtureTestCase {
     )
   }
 
-  def getCompletionContributor = {
-    import scala.collection.JavaConverters._
-
-    completion.CompletionContributor.forLanguage(JsonLanguage.INSTANCE).asScala
-      .filter(_.isInstanceOf[CompletionContributor])
-      .map(_.asInstanceOf[CompletionContributor])
-      .head
-  }
-
   def testRequireVersionsSuggestions() = {
-    val completionContr = getCompletionContributor
 
     val pkg = "ps/image-optimizer"
     val versions = List("dev-master", "1.0.0")
 
     val map = Map(pkg -> versions)
 
-    completionContr.setPackagesLoader(() => List(Keyword(pkg)))
-    completionContr.setVersionsLoader(map.getOrElse(_, List()))
+    setCompletionPackageLoader(() => List(Keyword(pkg)))
+    setCompletionVersionsLoader(map.getOrElse(_, List()))
 
     suggestions(
       """
