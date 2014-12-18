@@ -20,6 +20,106 @@ class CompletionTest extends LightPlatformCodeInsightFixtureTestCase with TestCa
     )
   }
 
+  def testCompletionQuotedStringProperty_propertyValueExists_caretShouldBeMovedToPropertyValue() = {
+    completion(
+      """
+        |{
+        | "nam<caret>": "someValue"
+        |}
+      """.stripMargin,
+      """
+        |{
+        | "name": "<caret><selection>someValue</selection>"
+        |}
+      """.stripMargin
+    )
+  }
+
+  def testCompletionQuotedStringProperty_propertyValueExists_thisIsNotLastPropertyInObject_caretShouldBeMovedToPropertyValue() = {
+    completion(
+      """
+        |{
+        | "nam<caret>": "someValue",
+        | "some": "value"
+        |}
+      """.stripMargin,
+      """
+        |{
+        | "name": "<caret><selection>someValue</selection>",
+        | "some": "value"
+        |}
+      """.stripMargin
+    )
+  }
+
+  def testCompletionStringProperty_unexpectedObjectPropertyValueExists_caretShouldBeMovedToPropertyValue() = {
+    completion(
+      """
+        |{
+        | "nam<caret>": { "abc": "value" }
+        |}
+      """.stripMargin,
+      """
+        |{
+        | "name": <caret><selection>{ "abc": "value" }</selection>
+        |}
+      """.stripMargin
+    )
+  }
+
+  def testCompletionStringProperty_unexpectedNestedObjectPropertyValueExists_caretShouldBeMovedToPropertyValue() = {
+    completion(
+      """
+        |{
+        | "nam<caret>": {
+        |   "abc": {
+        |     "prop": "val"
+        |   }
+        | }
+        |}
+      """.stripMargin,
+      """
+        |{
+        | "name": <caret><selection>{
+        |   "abc": {
+        |     "prop": "val"
+        |   }
+        | }</selection>
+        |}
+      """.stripMargin
+    )
+  }
+
+  def testCompletionStringProperty_unexpectedArrayPropertyValueExists_caretShouldBeMovedToPropertyValue() = {
+    completion(
+      """
+        |{
+        | "nam<caret>": [ "abc" ]
+        |}
+      """.stripMargin,
+      """
+        |{
+        | "name": <caret><selection>[ "abc" ]</selection>
+        |}
+      """.stripMargin
+    )
+  }
+
+  def testCompletionStringProperty_unexpectedLiteralPropertyValueExists_caretShouldBeMovedToPropertyValue() = {
+    completion(
+      """
+        |{
+        | "nam<caret>": true
+        |}
+      """.stripMargin,
+      """
+        |{
+        | "name": <caret><selection>true</selection>
+        |}
+      """.stripMargin
+    )
+  }
+
   def testCompletionQuotedStringPropertyOutsideQuotes_quotesShouldBeFixed_propertyValueShouldBeCompleted() = {
     completion(
       """
