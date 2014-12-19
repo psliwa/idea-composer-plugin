@@ -1,5 +1,6 @@
 package org.psliwa.idea.composer.idea
 
+import com.intellij.codeInsight.AutoPopupController
 import com.intellij.codeInsight.completion.{InsertionContext, InsertHandler}
 import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.openapi.editor.{Editor, Document}
@@ -24,6 +25,10 @@ protected[idea] case class PropertyValueInsertHandler(wrapper: String) extends I
     findExistingValueRange(trailingOffset) match {
       case Some(range) => selectRange(range)
       case None => completeValue(trailingOffset)
+    }
+
+    ensure('"' || ' ')(editor.getCaretModel.getOffset-1).foreach {
+      _ => AutoPopupController.getInstance(editor.getProject).scheduleAutoPopup(editor)
     }
   }
 
