@@ -1,6 +1,6 @@
 package org.psliwa.idea.composer.idea.completionContributor
 
-import com.intellij.codeInsight.completion._
+import com.intellij._
 import com.intellij.json.JsonLanguage
 import com.intellij.testFramework.fixtures.LightPlatformCodeInsightFixtureTestCase
 import org.psliwa.idea.composer.idea.{Keyword, CompletionContributor}
@@ -13,7 +13,7 @@ abstract class TestCase extends LightPlatformCodeInsightFixtureTestCase {
   def getCompletionContributors = {
     import scala.collection.JavaConverters._
 
-    CompletionContributor.forLanguage(JsonLanguage.INSTANCE).asScala
+    codeInsight.completion.CompletionContributor.forLanguage(JsonLanguage.INSTANCE).asScala
       .filter(_.isInstanceOf[CompletionContributor])
       .map(_.asInstanceOf[CompletionContributor])
   }

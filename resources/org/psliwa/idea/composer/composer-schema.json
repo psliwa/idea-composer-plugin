@@ -217,7 +217,7 @@
     "bin": {
       "type": "array",
       "items": {
-        "type": "string"
+        "type": "path"
       }
     },
     "include-path": {

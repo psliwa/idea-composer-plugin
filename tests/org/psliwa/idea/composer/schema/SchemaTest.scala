@@ -273,5 +273,24 @@ class SchemaTest {
     ))
   }
 
+  @Test
+  def parseSchemaWithPathProperty() = {
+    assertSchemaEquals(
+      SObject(Map(
+        "name" -> SFilePath
+      )),
+      Schema.parse(
+        """
+          | {
+          |   "type": "object",
+          |   "properties": {
+          |     "name": { "type": "path" }
+          |   }
+          | }
+        """.stripMargin
+      )
+    )
+  }
+
   def assertSchemaEquals(expected: Schema, actual: Option[Schema]) = assertEquals(Some(expected), actual)
 }

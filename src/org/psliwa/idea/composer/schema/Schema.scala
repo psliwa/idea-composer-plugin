@@ -14,6 +14,7 @@ object SBoolean extends Schema
 object SString extends Schema
 object SNumber extends Schema
 object SPackages extends Schema
+object SFilePath extends Schema
 
 object Schema {
 
@@ -37,7 +38,7 @@ object Schema {
 
   private def jsonObjectToSchema: Converter[JSONObject] = (
     jsonObjectToObjectSchema | jsonObjectToStringSchema | jsonObjectToNumberSchema | jsonObjectToBooleanSchema
-    | jsonObjectToArraySchema | jsonObjectToEnum | jsonObjectToOr | jsonObjectToPackagesSchema
+    | jsonObjectToArraySchema | jsonObjectToEnum | jsonObjectToOr | jsonObjectToPackagesSchema | jsonObjectToPathSchema
   )
 
   private def jsonObjectToOr: Converter[JSONObject] = jsonObjectToComplexOr | jsonObjectToSimpleOr
@@ -104,6 +105,14 @@ object Schema {
   private def jsonObjectToPackagesSchema: Converter[JSONObject] = t => {
     if(t.obj.get("type").exists(_ == "packages")) {
       Some(SPackages)
+    } else {
+      None
+    }
+  }
+
+  private def jsonObjectToPathSchema: Converter[JSONObject] = t => {
+    if(t.obj.get("type").exists(_ == "path")) {
+      Some(SFilePath)
     } else {
       None
     }
