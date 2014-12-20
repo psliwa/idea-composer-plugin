@@ -46,17 +46,35 @@ class VersionTest {
   }
 
   @Test
-  def givenSemanticVersion_givenPeakPrefix_threeAndTwoDigitsVersionsShouldBeAnAlternative() = {
+  def givenSemanticVersion_givenCaretPrefix_threeAndTwoDigitsVersionsShouldBeAnAlternative() = {
     val version = "1.2.3"
 
     assertVersionAlternatives(List("1.2.3", "1.2"), List("1.2.*"), Version.alternativesForPrefix("^")(version))
   }
 
   @Test
-  def givenSemanticVersion_givenPeakWithVersionAndWhitespace_allAlternativesAreExpected() = {
+  def givenSemanticVersion_givenCaretWithVersionAndSpace_allAlternativesAreExpected() = {
     val version = "1.2.3"
 
-    assertVersionAlternatives(List("1.2.3", "1.2", "1.2.*"), List(), Version.alternativesForPrefix("^3.2.1 <caret>")(version))
+    assertVersionAlternatives(List("1.2.3", "1.2", "1.2.*"), List(), Version.alternativesForPrefix("^3.2.1 ")(version))
+  }
+
+  @Test
+  def givenSemanticVersion_givenComparisonPrefix_threeAndTwoDigitsVersionsShouldBeAnAlternative() = {
+    val version = "1.2.3"
+
+    for(prefix <- List(">=", ">", "<", "<=")) {
+      assertVersionAlternatives(List("1.2.3", "1.2"), List("1.2.*"), Version.alternativesForPrefix(prefix)(version))
+    }
+  }
+
+  @Test
+  def givenSemanticVersion_givenSpaceWithComparisonPrefix_threeAndTwoDigitsVersionsShouldBeAnAlternative() = {
+    val version = "1.2.3"
+
+    for(prefix <- List(">=", ">", "<", "<=")) {
+      assertVersionAlternatives(List("1.2.3", "1.2"), List("1.2.*"), Version.alternativesForPrefix("1.2.1 "+prefix)(version))
+    }
   }
 
   private def assertVersionAlternatives(expected: List[String], actualAlternatives: List[String]) {

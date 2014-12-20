@@ -1,9 +1,8 @@
 package org.psliwa.idea.composer.idea.completionContributor
 
-import com.intellij.testFramework.fixtures.LightPlatformCodeInsightFixtureTestCase
-import org.psliwa.idea.composer.idea.Keyword
+class StructureCompletionTest extends TestCase {
 
-class CompletionTest extends LightPlatformCodeInsightFixtureTestCase with TestCase {
+
 
   def testCompletionQuotedStringProperty_propertyValueShouldBeCompleted() = {
     completion(
@@ -180,117 +179,6 @@ class CompletionTest extends LightPlatformCodeInsightFixtureTestCase with TestCa
     )
   }
 
-  def testCompletionPackageName_quotesShouldBeFixed() = {
-    val contributor = getCompletionContributor
-
-    val pkg = "ps/image-optimizer"
-    contributor.setPackagesLoader(() => List(Keyword(pkg)))
-
-    completion(
-      """
-        |{
-        | "require": {
-        |   "ps/image-opti<caret>"
-        | }
-        |}
-      """.stripMargin,
-      """
-        |{
-        | "require": {
-        |   "ps/image-optimizer": "<caret>"
-        | }
-        |}
-      """.stripMargin
-    )
-  }
-
-  def testCompletionPackageVersion_givenPrefix_quotesShouldBeStillValid() = {
-    val pkg = "ps/image-optimizer"
-
-    setCompletionPackageLoader(() => List(Keyword(pkg)))
-    setCompletionVersionsLoader(_ => List("1.2.3"))
-
-    completion(
-      """
-        |{
-        | "require": {
-        |   "ps/image-optimizer": "~1<caret>"
-        | }
-        |}
-      """.stripMargin,
-      """
-        |{
-        | "require": {
-        |   "ps/image-optimizer": "~1.2<caret>"
-        | }
-        |}
-      """.stripMargin
-    )
-  }
-
-  def testCompletionPackageVersion_givenPrefixWithSpace_completeVersion() = {
-    setCompletionVersionsLoader(_ => List("1.2.3"))
-
-    completion(
-      """
-        |{
-        | "require": {
-        |   "ps/image-optimizer": "1.2.2 123<caret>"
-        | }
-        |}
-      """.stripMargin,
-      """
-        |{
-        | "require": {
-        |   "ps/image-optimizer": "1.2.2 1.2.3"
-        | }
-        |}
-      """.stripMargin
-    )
-  }
-
-  def testCompletionPackageVersion_givenPrefixWithSpaceAndTilda_completeVersion() = {
-    setCompletionVersionsLoader(_ => List("1.2.3"))
-
-    completion(
-      """
-        |{
-        | "require": {
-        |   "ps/image-optimizer": "1.2.2 ~12<caret>"
-        | }
-        |}
-      """.stripMargin,
-      """
-        |{
-        | "require": {
-        |   "ps/image-optimizer": "1.2.2 ~1.2"
-        | }
-        |}
-      """.stripMargin
-    )
-  }
-
-  def testCompletionPackageVersion_givenPrefixWithComma_completeVersion() = {
-    setCompletionVersionsLoader(_ => List("1.2.3"))
-
-    completion(
-      """
-        |{
-        | "require": {
-        |   "ps/image-optimizer": "1.2.2,123<caret>"
-        | }
-        |}
-      """.stripMargin,
-      """
-        |{
-        | "require": {
-        |   "ps/image-optimizer": "1.2.2,1.2.3"
-        | }
-        |}
-      """.stripMargin
-    )
-  }
-
   def testCompletionBooleanProperty_colonShouldBeAdded() = {
     completion(
       """
@@ -353,12 +241,5 @@ class CompletionTest extends LightPlatformCodeInsightFixtureTestCase with TestCa
         |}
       """.stripMargin
     )
-  }
-
-  def completion(contents: String, expected: String) = {
-    myFixture.configureByText("composer.json", contents)
-    myFixture.completeBasic()
-
-    myFixture.checkResult(expected.replace("\r", ""))
   }
 }

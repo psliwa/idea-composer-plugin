@@ -1,19 +1,19 @@
 package org.psliwa.idea.composer.idea.completionContributor
 
-import com.intellij.codeInsight.completion
+import com.intellij.codeInsight.completion._
 import com.intellij.json.JsonLanguage
+import com.intellij.testFramework.fixtures.LightPlatformCodeInsightFixtureTestCase
 import org.psliwa.idea.composer.idea.{Keyword, CompletionContributor}
 
-trait TestCase {
+abstract class TestCase extends LightPlatformCodeInsightFixtureTestCase {
   def getCompletionContributor = {
-    println(getCompletionContributors.head)
     getCompletionContributors.head
   }
 
   def getCompletionContributors = {
     import scala.collection.JavaConverters._
 
-    completion.CompletionContributor.forLanguage(JsonLanguage.INSTANCE).asScala
+    CompletionContributor.forLanguage(JsonLanguage.INSTANCE).asScala
       .filter(_.isInstanceOf[CompletionContributor])
       .map(_.asInstanceOf[CompletionContributor])
   }
@@ -24,5 +24,22 @@ trait TestCase {
 
   def setCompletionVersionsLoader(f: String => Seq[String]) = {
     getCompletionContributors.foreach(_.setVersionsLoader(f))
+  }
+
+  protected def suggestions(contents: String, expectedSuggestions: Array[String], unexpectedSuggestions: Array[String] = Array()) = {
+    myFixture.configureByText("composer.json", contents)
+    myFixture.completeBasic()
+
+    val lookupElements = myFixture.getLookupElementStrings
+
+    assertContainsElements(lookupElements, expectedSuggestions:_*)
+    assertDoesntContain(lookupElements, unexpectedSuggestions:_*)
+  }
+
+  protected def completion(contents: String, expected: String) = {
+    myFixture.configureByText("composer.json", contents)
+    myFixture.completeBasic()
+
+    myFixture.checkResult(expected.replace("\r", ""))
   }
 }

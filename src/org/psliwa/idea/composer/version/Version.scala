@@ -18,7 +18,7 @@ object Version {
   }
 
   private def semanticVersionRequired(text: String) = {
-    findOffsetReverse('~' || '^' || ' ')(text.length-1)(text)
+    findOffsetReverse('~' || '^' || '>' || '<' || '=' || ' ')(text.length-1)(text)
       .flatMap(ensure(not(' '))(_)(text))
       .isDefined
   }
@@ -37,8 +37,8 @@ object Version {
       .flatMap(ensure('~')(_))
       .map(_ => alternativesForSemantic(version, List(tilde), includeOriginal = false))
       .orElse(
-        findOffset('^' || ' ')(0)
-          .flatMap(ensure('^')(_))
+        findOffset('^' || '>' || '<' || '=' || ' ')(0)
+          .flatMap(ensure(not(' '))(_))
           .map(_ => alternativesForSemantic(version, List(peak)))
       )
       .getOrElse(alternativesForSemantic(version, List(*, tilde, peak)))

@@ -1,6 +1,6 @@
 package org.psliwa.idea.composer.idea.completionContributor
 
-class StructureSuggestionsTest extends SuggestionsTest {
+class StructureSuggestionsTest extends TestCase {
 
   def testSuggestionsOnTopLevel() = {
     suggestions(

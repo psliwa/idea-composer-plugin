@@ -2,7 +2,9 @@ package org.psliwa.idea.composer.idea.completionContributor
 
 import org.psliwa.idea.composer.idea.Keyword
 
-class PackagesSuggestionsTest extends SuggestionsTest {
+//TODO: rages support (>, <, >= etc)
+//TODO: Better Custom matcher and tests for it
+class PackageSuggestionsTest extends TestCase {
 
   def testPackageSuggestions() = {
     val packages = List("some/package1", "some/package2")
@@ -43,13 +45,8 @@ class PackagesSuggestionsTest extends SuggestionsTest {
   }
 
   def testVersionSuggestions_includeVersionWildcards() = {
-    val pkg = "ps/image-optimizer"
     val versions = List("1.2.1")
-
-    val map = Map(pkg -> versions)
-
-    setCompletionPackageLoader(() => List(pkg).map(Keyword(_)))
-    setCompletionVersionsLoader(map.getOrElse(_, List()))
+    setCompletionVersionsLoader(_ => versions)
 
     suggestions(
       """
@@ -64,13 +61,8 @@ class PackagesSuggestionsTest extends SuggestionsTest {
   }
 
   def testVersionsSuggestions_tildeGiven_suggestOnlySemanticVersionWithTwoNumbers() = {
-    val pkg = "ps/image-optimizer"
     val versions = List("1.2.1", "1.2.2", "v1.2.3", "dev-master")
-
-    val map = Map(pkg -> versions)
-
-    setCompletionPackageLoader(() => List(pkg).map(Keyword(_)))
-    setCompletionVersionsLoader(map.getOrElse(_, List()))
+    setCompletionVersionsLoader(_ => versions)
 
     suggestions(
       """
@@ -122,8 +114,17 @@ class PackagesSuggestionsTest extends SuggestionsTest {
     val versions = List("1.2.1", "1.3.1", "dev-master")
     setCompletionVersionsLoader(_ => versions)
 
-
-
+    suggestions(
+      """
+        |{
+        | "require": {
+        |   "ps/image-optimizer": "1.2.1 12<caret>"
+        | }
+        |}
+      """.stripMargin,
+      Array("1.2.1"),
+      Array("1.3.1")
+    )
   }
 
   def testVersionsSuggestions_givenSuggestionsAfterSpaceWithTilda_semanticVersionsShouldBeSuggested() = {
@@ -157,5 +158,43 @@ class PackagesSuggestionsTest extends SuggestionsTest {
       """.stripMargin,
       versions.toArray
     )
+  }
+
+  def testVersionsSuggestions_givenSuggestionsAfterComparisonChar_allSemanticVersionsShouldBeSuggested() = {
+    val versions = List("1.2.1", "1.3.1", "dev-master")
+    setCompletionVersionsLoader(_ => versions)
+
+    for(prefix <- List(">", "<", ">=", "<=")) {
+      suggestions(
+        s"""
+          |{
+          | "require": {
+          |   "ps/image-optimizer": "$prefix<caret>"
+          | }
+          |}
+        """.stripMargin,
+        Array("1.2.1", "1.3.1", "1.2", "1.3"),
+        Array("dev-master", "1.2.*")
+      )
+    }
+  }
+
+  def testVersionSuggestions_givenSuggestionsAfterSpaceAndComparisonChar_allSemanticVersionsShouldBeSuggested() = {
+    val versions = List("1.2.1", "1.3.1", "dev-master")
+    setCompletionVersionsLoader(_ => versions)
+
+    for(prefix <- List(">", "<", ">=", "<=")) {
+      suggestions(
+        s"""
+          |{
+          | "require": {
+          |   "ps/image-optimizer": "1.2.1 $prefix<caret>"
+          | }
+          |}
+        """.stripMargin,
+        Array("1.2.1", "1.3.1", "1.2", "1.3"),
+        Array("dev-master", "1.2.*")
+      )
+    }
   }
 }

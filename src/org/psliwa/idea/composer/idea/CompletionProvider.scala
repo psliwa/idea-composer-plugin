@@ -20,11 +20,11 @@ protected[idea] case class ContextAwareCompletionProvider(loadKeywords: Context 
 
     val prefix = result.getPrefixMatcher.getPrefix
 
-    val fixedPrefix = findOffsetReverse(' ' || '~' || '^' || ',')(prefix.length-1)(prefix)
+    val fixedPrefix = findOffsetReverse(' ' || '~' || '^' || ',' || '>' || '<' || '=')(prefix.length-1)(prefix)
       .map(offset => prefix.substring(offset + 1))
       .getOrElse(prefix)
 
-    addKeywordsToResult(keywords)(parameters, result.withPrefixMatcher(new Matcher(fixedPrefix)))
+    addKeywordsToResult(keywords)(parameters, result.withPrefixMatcher(new CharContainsMatcher(fixedPrefix)))
   }
 
   private def getTypedText(e: PsiElement): Option[String] = e match {
@@ -49,11 +49,6 @@ protected[idea] case class ContextAwareCompletionProvider(loadKeywords: Context 
 
   private object LeafPsiElement {
     def unapply(x: LeafPsiElement): Option[(String)] = Some(x.getText)
-  }
-
-  private class Matcher(prefix: String) extends PrefixMatcher(prefix) {
-    override def cloneWithPrefix(prefix: String): PrefixMatcher = new Matcher(prefix)
-    override def prefixMatches(name: String): Boolean = myPrefix.toCharArray.forall(c => name.contains(c))
   }
 }
 
