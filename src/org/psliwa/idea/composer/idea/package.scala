@@ -9,9 +9,9 @@ package object idea {
   protected[idea] val emptyNamePlaceholder = "IntellijIdeaRulezzz"
 
   protected[idea] type Capture = PsiElementPattern.Capture[_ <: PsiElement]
-  protected[idea] type Keywords = () => Iterable[Keyword]
+  protected[idea] type LookupElements = () => Iterable[BaseLookupElement]
 
-  protected[idea] type InsertHandlerFinder = Keyword => Option[InsertHandler[LookupElement]]
+  protected[idea] type InsertHandlerFinder = BaseLookupElement => Option[InsertHandler[LookupElement]]
 
   protected[idea] val StringPropertyValueInsertHandler = new PropertyValueInsertHandler("\"\"")
   protected[idea] val ObjectPropertyValueInsertHandler = new PropertyValueInsertHandler("{}")

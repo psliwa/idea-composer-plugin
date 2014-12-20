@@ -1,9 +1,13 @@
 package org.psliwa.idea.composer.idea
 
+import javax.swing.Icon
+
 import com.intellij.codeInsight.completion._
 import com.intellij.codeInsight.lookup.{LookupElementBuilder, LookupElement}
 import com.intellij.json.JsonLanguage
 import com.intellij.json.psi._
+import com.intellij.openapi.fileTypes.FileTypeManager
+import com.intellij.openapi.util.Iconable
 import com.intellij.patterns.PlatformPatterns._
 import com.intellij.patterns.StandardPatterns._
 import com.intellij.patterns.{PsiElementPattern, PatternCondition}
@@ -28,7 +32,7 @@ class CompletionContributor extends com.intellij.codeInsight.completion.Completi
   private lazy val schema = SchemaLoader.load()
 
   //vars only for testability
-  private var packagesLoader: () => Seq[Keyword] = () => PackagesLoader.loadPackages
+  private var packagesLoader: () => Seq[BaseLookupElement] = () => PackagesLoader.loadPackages
   private var versionsLoader: (String) => Seq[String] = memorize(30)(Packagist.loadVersions(_).right.getOrElse(List()))
 
   schema.foreach(addCompletionProvidersForSchema)
@@ -42,18 +46,19 @@ class CompletionContributor extends com.intellij.codeInsight.completion.Completi
   import CompletionContributor._
   private def completionProvidersForSchema(s: Schema, parent: Capture): List[(Capture, CompletionProvider[CompletionParameters])] = s match {
     case SObject(m) => {
-      propertyCompletionProvider(parent, () => m.keys.map(Keyword(_)), (k) => insertHandlerFor(m.get(k.text).get)) ++
+      propertyCompletionProvider(parent, () => m.keys.map(BaseLookupElement(_)), (k) => insertHandlerFor(m.get(k.name).get)) ++
         m.flatMap(t => completionProvidersForSchema(t._2, psiElement().and(propertyCapture(parent)).withName(t._1)))
     }
-    case SStringChoice(m) => List((psiElement().withSuperParent(2, parent), new KeywordsCompletionProvider(() => m.map(Keyword(_)))))
+    case SStringChoice(m) => List((psiElement().withSuperParent(2, parent), new LookupElementsCompletionProvider(() => m.map(BaseLookupElement(_)))))
     case SOr(l) => l.flatMap(completionProvidersForSchema(_, parent))
     case SArray(i) => completionProvidersForSchema(i, psiElement(classOf[JsonArray]).withParent(parent))
-    case SBoolean => List((psiElement().withSuperParent(2, parent).afterLeaf(":"), new KeywordsCompletionProvider(() => List("true", "false").map(Keyword(_, quoted = false)))))
     case SPackages => {
       propertyCompletionProvider(parent, loadPackages, _ => Some(StringPropertyValueInsertHandler)) ++
         List((
           psiElement().withSuperParent(2, psiElement().and(propertyCapture(parent))).afterLeaf(":"),
-          new VersionCompletionProvider(c => loadVersions(c.propertyName).flatMap(Version.alternativesForPrefix(c.typedQuery)))
+          new VersionCompletionProvider(c => {
+            loadVersions(c.propertyName).flatMap(Version.alternativesForPrefix(c.typedQuery)).map(BaseLookupElement(_))
+          })
         ))
     }
     case SFilePath => {
@@ -71,14 +76,14 @@ class CompletionContributor extends com.intellij.codeInsight.completion.Completi
       .inFile(psiFile(classOf[JsonFile]).withName(ComposerJson))
   }
 
-  private def propertyCompletionProvider(parent: Capture, keywords: Keywords, getInsertHandler: InsertHandlerFinder = _ => None) = {
+  private def propertyCompletionProvider(parent: Capture, es: LookupElements, getInsertHandler: InsertHandlerFinder = _ => None) = {
     List((
       psiElement()
         .withSuperParent(2,
           psiElement().and(propertyCapture(parent))
             .withName(stringContains(emptyNamePlaceholder))
         ),
-      new KeywordsCompletionProvider(keywords, getInsertHandler)
+      new LookupElementsCompletionProvider(es, getInsertHandler)
     ))
   }
 
@@ -96,7 +101,7 @@ class CompletionContributor extends com.intellij.codeInsight.completion.Completi
     psiElement(classOf[JsonProperty]).withParent(psiElement(classOf[JsonObject]).withParent(parent))
   }
 
-  protected[idea] def setPackagesLoader(l: () => Seq[Keyword]): Unit = {
+  protected[idea] def setPackagesLoader(l: () => Seq[BaseLookupElement]): Unit = {
     packagesLoader = l
   }
 
@@ -119,25 +124,25 @@ protected[idea] object CompletionContributor {
   //completion providers
 
   abstract class AbstractCompletionProvider extends com.intellij.codeInsight.completion.CompletionProvider[CompletionParameters] {
-    protected def addKeywordsToResult(keywords: Iterable[Keyword], getInsertHandler: InsertHandlerFinder = _ => None)
+    protected def addLookupElementsToResult(es: Iterable[BaseLookupElement], getInsertHandler: InsertHandlerFinder = _ => None)
         (parameters: CompletionParameters, result: CompletionResultSet) {
 
-      keywords.foreach(k => {
-        result.addElement(LookupElementBuilder.create(k.text).withInsertHandler(insertHandler(parameters.getPosition, k, getInsertHandler)))
+      es.foreach(e => {
+        result.addElement(e.withInsertHandler(insertHandler(parameters.getPosition, e, getInsertHandler)))
       })
     }
 
-    protected def insertHandler(element: PsiElement, keyword: Keyword, getInsertHandler: InsertHandlerFinder) = {
-      if(!keyword.quoted) null
-      else getInsertHandler(keyword).getOrElse(QuoteInsertHandler)
+    protected def insertHandler(element: PsiElement, le: BaseLookupElement, getInsertHandler: InsertHandlerFinder) = {
+      if(!le.quoted) null
+      else getInsertHandler(le).getOrElse(QuoteInsertHandler)
     }
   }
 
-  class ParametersDependantCompletionProvider(loadKeywords: CompletionParameters => Seq[String]) extends AbstractCompletionProvider {
+  class ParametersDependantCompletionProvider(loadElements: CompletionParameters => Seq[BaseLookupElement]) extends AbstractCompletionProvider {
     override def addCompletions(parameters: CompletionParameters, context: ProcessingContext, result: CompletionResultSet): Unit = {
-      val keywords = loadKeywords(parameters).map(Keyword(_))
+      val es = loadElements(parameters)
 
-      addKeywordsToResult(keywords)(parameters, mapResult(result))
+      addLookupElementsToResult(es)(parameters, mapResult(result))
     }
 
     protected def mapResult(result: CompletionResultSet) = result
@@ -150,7 +155,7 @@ protected[idea] object CompletionContributor {
       rootDir <- Option(parameters.getOriginalFile.getParent)
       subDir <- findDir(rootDir, dirPath)
     } yield {
-      subDir.getFiles.map(_.getName).toList ++ subDir.getSubdirectories.map(_.getName+"/")
+      subDir.getFiles.map(BaseLookupElement(_)).toList ++ subDir.getSubdirectories.map(BaseLookupElement(_))
     }
 
     result.getOrElse(List())
@@ -163,16 +168,16 @@ protected[idea] object CompletionContributor {
     }
   }
 
-  class KeywordsCompletionProvider(keywords: Keywords, getInsertHandler: InsertHandlerFinder = _ => None)
+  class LookupElementsCompletionProvider(es: LookupElements, getInsertHandler: InsertHandlerFinder = _ => None)
     extends AbstractCompletionProvider {
 
     override def addCompletions(parameters: CompletionParameters, context: ProcessingContext, result: CompletionResultSet): Unit = {
-      addKeywordsToResult(keywords(), getInsertHandler)(parameters, result)
+      addLookupElementsToResult(es(), getInsertHandler)(parameters, result)
     }
   }
 
   import VersionCompletionProvider._
-  class VersionCompletionProvider(loadKeywords: Context => Seq[String]) extends ParametersDependantCompletionProvider(psiBased(loadKeywords)) {
+  class VersionCompletionProvider(loadElements: Context => Seq[BaseLookupElement]) extends ParametersDependantCompletionProvider(psiBased(loadElements)) {
     override protected def mapResult(result: CompletionResultSet): CompletionResultSet = {
       val prefix = result.getPrefixMatcher.getPrefix
       val matcher = createCharContainsMatcher(' ' || '~' || '^' || ',' || '>' || '<' || '=')(prefix)
@@ -184,7 +189,7 @@ protected[idea] object CompletionContributor {
   object VersionCompletionProvider {
     case class Context(propertyName: String, typedQuery: String)
 
-    def psiBased(f: Context => Seq[String]): CompletionParameters => Seq[String] = parameters => {
+    def psiBased(f: Context => Seq[BaseLookupElement]): CompletionParameters => Seq[BaseLookupElement] = parameters => {
       val typedQuery = getTypedText(parameters.getPosition).getOrElse("")
       firstNamedProperty(parameters.getPosition).map(p => Context(p.getName, typedQuery)).map(f).getOrElse(List())
     }

@@ -1,13 +1,13 @@
 package org.psliwa.idea.composer.idea.completionContributor
 
-import org.psliwa.idea.composer.idea.Keyword
+import org.psliwa.idea.composer.idea.BaseLookupElement
 
 class PackagesCompletionTest extends TestCase {
-  def testPackageNameCompletion_quotesShouldBeFixed() = {
+  def testPackageNameCompletion_versionQuotesShouldBeFixed() = {
     val contributor = getCompletionContributor
 
     val pkg = "ps/image-optimizer"
-    contributor.setPackagesLoader(() => List(Keyword(pkg)))
+    contributor.setPackagesLoader(() => List(BaseLookupElement(pkg)))
 
     completion(
       """
@@ -27,10 +27,34 @@ class PackagesCompletionTest extends TestCase {
     )
   }
 
+  def testPackageNameCompletion_startTypingWithoutQuotes_quotesShouldBeFixed() = {
+    val contributor = getCompletionContributor
+
+    val pkg = "ps/image-optimizer"
+    contributor.setPackagesLoader(() => List(BaseLookupElement(pkg)))
+
+    completion(
+      """
+        |{
+        | "require": {
+        |   ps/image-opti<caret>
+        | }
+        |}
+      """.stripMargin,
+      """
+        |{
+        | "require": {
+        |   "ps/image-optimizer": "<caret>"
+        | }
+        |}
+      """.stripMargin
+    )
+  }
+
   def testVersionCompletion_givenPrefix_quotesShouldBeStillValid() = {
     val pkg = "ps/image-optimizer"
 
-    setCompletionPackageLoader(() => List(Keyword(pkg)))
+    setCompletionPackageLoader(() => List(BaseLookupElement(pkg)))
     setCompletionVersionsLoader(_ => List("1.2.3"))
 
     completion(

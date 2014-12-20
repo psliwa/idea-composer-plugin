@@ -28,5 +28,5 @@ class PackagesLoader extends ApplicationComponent {
 }
 
 object PackagesLoader {
-  lazy val loadPackages = Packagist.loadPackages().right.getOrElse(List()).map(Keyword(_))
+  lazy val loadPackages = Packagist.loadPackages().right.getOrElse(List()).map(BaseLookupElement(_))
 }

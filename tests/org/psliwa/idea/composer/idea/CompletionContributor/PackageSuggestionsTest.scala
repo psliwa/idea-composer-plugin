@@ -1,7 +1,7 @@
 package org.psliwa.idea.composer.idea.completionContributor
 
 import org.junit.Assert._
-import org.psliwa.idea.composer.idea.Keyword
+import org.psliwa.idea.composer.idea.BaseLookupElement
 
 //TODO: rages support (>, <, >= etc)
 //TODO: Better Custom matcher and tests for it
@@ -9,7 +9,7 @@ class PackageSuggestionsTest extends TestCase {
 
   def testPackageSuggestions() = {
     val packages = List("some/package1", "some/package2")
-    setCompletionPackageLoader(() => packages.map(Keyword(_)))
+    setCompletionPackageLoader(() => packages.map(BaseLookupElement(_)))
 
     suggestions(
       """
@@ -30,7 +30,7 @@ class PackageSuggestionsTest extends TestCase {
 
     val map = Map(pkg -> versions)
 
-    setCompletionPackageLoader(() => List(Keyword(pkg)))
+    setCompletionPackageLoader(() => List(BaseLookupElement(pkg)))
     setCompletionVersionsLoader(map.getOrElse(_, List()))
 
     suggestions(

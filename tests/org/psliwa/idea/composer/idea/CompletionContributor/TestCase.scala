@@ -3,7 +3,7 @@ package org.psliwa.idea.composer.idea.completionContributor
 import com.intellij._
 import com.intellij.json.JsonLanguage
 import com.intellij.testFramework.fixtures.LightPlatformCodeInsightFixtureTestCase
-import org.psliwa.idea.composer.idea.{Keyword, CompletionContributor}
+import org.psliwa.idea.composer.idea.{BaseLookupElement, CompletionContributor}
 import org.junit.Assert._
 
 abstract class TestCase extends LightPlatformCodeInsightFixtureTestCase {
@@ -19,7 +19,7 @@ abstract class TestCase extends LightPlatformCodeInsightFixtureTestCase {
       .map(_.asInstanceOf[CompletionContributor])
   }
 
-  def setCompletionPackageLoader(f: () => Seq[Keyword]) = {
+  def setCompletionPackageLoader(f: () => Seq[BaseLookupElement]) = {
     getCompletionContributors.foreach(_.setPackagesLoader(f))
   }
 
