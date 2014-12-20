@@ -7,11 +7,12 @@ import com.intellij.json.psi._
 import com.intellij.patterns.PlatformPatterns._
 import com.intellij.patterns.StandardPatterns._
 import com.intellij.patterns.{PsiElementPattern, PatternCondition}
-import com.intellij.psi.PsiElement
+import com.intellij.psi.{PsiDirectory, PsiElement}
 import com.intellij.psi.impl.source.tree.LeafPsiElement
 import com.intellij.util.ProcessingContext
 import org.psliwa.idea.composer.packagist.Packagist
 import org.psliwa.idea.composer.schema._
+import org.psliwa.idea.composer.util.CharType
 import org.psliwa.idea.composer.util.Funcs._
 import org.psliwa.idea.composer._
 import org.psliwa.idea.composer.version._
@@ -44,21 +45,22 @@ class CompletionContributor extends com.intellij.codeInsight.completion.Completi
       propertyCompletionProvider(parent, () => m.keys.map(Keyword(_)), (k) => insertHandlerFor(m.get(k.text).get)) ++
         m.flatMap(t => completionProvidersForSchema(t._2, psiElement().and(propertyCapture(parent)).withName(t._1)))
     }
-    case SStringChoice(m) => List((psiElement().withSuperParent(2, parent), KeywordsCompletionProvider(() => m.map(Keyword(_)))))
+    case SStringChoice(m) => List((psiElement().withSuperParent(2, parent), new KeywordsCompletionProvider(() => m.map(Keyword(_)))))
     case SOr(l) => l.flatMap(completionProvidersForSchema(_, parent))
     case SArray(i) => completionProvidersForSchema(i, psiElement(classOf[JsonArray]).withParent(parent))
-    case SBoolean => List((psiElement().withSuperParent(2, parent).afterLeaf(":"), KeywordsCompletionProvider(() => List("true", "false").map(Keyword(_, quoted = false)))))
+    case SBoolean => List((psiElement().withSuperParent(2, parent).afterLeaf(":"), new KeywordsCompletionProvider(() => List("true", "false").map(Keyword(_, quoted = false)))))
     case SPackages => {
       propertyCompletionProvider(parent, loadPackages, _ => Some(StringPropertyValueInsertHandler)) ++
         List((
-          psiElement().withSuperParent(2, psiElement().and(propertyCapture(parent))),
+          psiElement().withSuperParent(2, psiElement().and(propertyCapture(parent))).afterLeaf(":"),
           new VersionCompletionProvider(c => loadVersions(c.propertyName).flatMap(Version.alternativesForPrefix(c.typedQuery)))
         ))
     }
     case SFilePath => {
-      List((psiElement().withSuperParent(2, parent), new PositionDependantCompletionProvider(element => {
-        List()
-      })))
+      List((psiElement().withSuperParent(2, parent), FilePathProvider))
+    }
+    case SFilePaths => {
+      List((psiElement().withSuperParent(2, psiElement().and(propertyCapture(parent))).afterLeaf(":"), FilePathProvider))
     }
     case _ => List()
   }
@@ -76,14 +78,14 @@ class CompletionContributor extends com.intellij.codeInsight.completion.Completi
           psiElement().and(propertyCapture(parent))
             .withName(stringContains(emptyNamePlaceholder))
         ),
-      KeywordsCompletionProvider(keywords, getInsertHandler)
+      new KeywordsCompletionProvider(keywords, getInsertHandler)
     ))
   }
 
   @tailrec
   private def insertHandlerFor(schema: Schema): Option[InsertHandler[LookupElement]] = schema match {
     case SString | SStringChoice(_) => Some(StringPropertyValueInsertHandler)
-    case SObject(_) | SPackages => Some(ObjectPropertyValueInsertHandler)
+    case SObject(_) | SPackages | SFilePaths => Some(ObjectPropertyValueInsertHandler)
     case SArray(_) => Some(ArrayPropertyValueInsertHandler)
     case SBoolean | SNumber => Some(EmptyPropertyValueInsertHandler)
     case SOr(h::_) => insertHandlerFor(h)
@@ -131,9 +133,9 @@ protected[idea] object CompletionContributor {
     }
   }
 
-  class PositionDependantCompletionProvider(loadKeywords: PsiElement => Seq[String]) extends AbstractCompletionProvider {
+  class ParametersDependantCompletionProvider(loadKeywords: CompletionParameters => Seq[String]) extends AbstractCompletionProvider {
     override def addCompletions(parameters: CompletionParameters, context: ProcessingContext, result: CompletionResultSet): Unit = {
-      val keywords = loadKeywords(parameters.getPosition).map(Keyword(_))
+      val keywords = loadKeywords(parameters).map(Keyword(_))
 
       addKeywordsToResult(keywords)(parameters, mapResult(result))
     }
@@ -141,7 +143,27 @@ protected[idea] object CompletionContributor {
     protected def mapResult(result: CompletionResultSet) = result
   }
 
-  case class KeywordsCompletionProvider(keywords: Keywords, getInsertHandler: InsertHandlerFinder = _ => None)
+  object FilePathProvider extends ParametersDependantCompletionProvider(parameters => {
+    val result = for {
+      text <- getTypedText(parameters.getPosition).map(stripQuotes).orElse(Some(""))
+      dirPath <- dirPath(text)
+      rootDir <- Option(parameters.getOriginalFile.getParent)
+      subDir <- findDir(rootDir, dirPath)
+    } yield {
+      subDir.getFiles.map(_.getName).toList ++ subDir.getSubdirectories.map(_.getName+"/")
+    }
+
+    result.getOrElse(List())
+  }){
+    override protected def mapResult(result: CompletionResultSet): CompletionResultSet = {
+      val prefix = result.getPrefixMatcher.getPrefix
+      val matcher = createCharContainsMatcher('/')(prefix)
+
+      result.withPrefixMatcher(matcher)
+    }
+  }
+
+  class KeywordsCompletionProvider(keywords: Keywords, getInsertHandler: InsertHandlerFinder = _ => None)
     extends AbstractCompletionProvider {
 
     override def addCompletions(parameters: CompletionParameters, context: ProcessingContext, result: CompletionResultSet): Unit = {
@@ -150,28 +172,33 @@ protected[idea] object CompletionContributor {
   }
 
   import VersionCompletionProvider._
-  case class VersionCompletionProvider(loadKeywords: Context => Seq[String]) extends PositionDependantCompletionProvider(psiBased(loadKeywords)) {
+  class VersionCompletionProvider(loadKeywords: Context => Seq[String]) extends ParametersDependantCompletionProvider(psiBased(loadKeywords)) {
     override protected def mapResult(result: CompletionResultSet): CompletionResultSet = {
       val prefix = result.getPrefixMatcher.getPrefix
+      val matcher = createCharContainsMatcher(' ' || '~' || '^' || ',' || '>' || '<' || '=')(prefix)
 
-      val fixedPrefix = findOffsetReverse(' ' || '~' || '^' || ',' || '>' || '<' || '=')(prefix.length-1)(prefix)
-        .map(offset => prefix.substring(offset + 1))
-        .getOrElse(prefix)
-
-      result.withPrefixMatcher(new CharContainsMatcher(fixedPrefix))
+      result.withPrefixMatcher(matcher)
     }
   }
 
   object VersionCompletionProvider {
     case class Context(propertyName: String, typedQuery: String)
 
-    def psiBased(f: Context => Seq[String]): PsiElement => Seq[String] = element => {
-      val typedQuery = getTypedText(element).getOrElse("")
-      firstNamedProperty(element).map(p => Context(p.getName, typedQuery)).map(f).getOrElse(List())
+    def psiBased(f: Context => Seq[String]): CompletionParameters => Seq[String] = parameters => {
+      val typedQuery = getTypedText(parameters.getPosition).getOrElse("")
+      firstNamedProperty(parameters.getPosition).map(p => Context(p.getName, typedQuery)).map(f).getOrElse(List())
     }
   }
 
   //utility functions
+
+  private def createCharContainsMatcher(stopChar: CharType)(prefix: String) = {
+    val fixedPrefix = findOffsetReverse(stopChar)(prefix.length-1)(prefix)
+      .map(offset => prefix.substring(offset + 1))
+      .getOrElse(prefix)
+
+    new CharContainsMatcher(fixedPrefix)
+  }
 
   private def getTypedText(e: PsiElement): Option[String] = e match {
     case LeafPsiElement(text) => Some(text).map(removeEmptyPalceholder)
@@ -195,5 +222,30 @@ protected[idea] object CompletionContributor {
 
   private object LeafPsiElement {
     def unapply(x: LeafPsiElement): Option[(String)] = Some(x.getText)
+  }
+
+  private def stripQuotes(s: String) = s.stripPrefix("\"").stripSuffix("\"")
+
+  private def dirPath(s: String): Option[String] = {
+    findOffsetReverse('/')(s.length-1)(s)
+      .map(s.substring(0, _))
+      .orElse(Some(""))
+  }
+
+  private def findDir(rootDir: PsiDirectory, path: String): Option[PsiDirectory] = {
+    @tailrec
+    def loop(rootDir: PsiDirectory, paths: List[String]): Option[PsiDirectory] = {
+      paths match {
+        case Nil => Some(rootDir)
+        case h::t => {
+          val subDir = rootDir.findSubdirectory(h)
+
+          if(subDir == null) None
+          else loop(subDir, t)
+        }
+      }
+    }
+
+    loop(rootDir, path.split("/").toList.filter(!_.isEmpty))
   }
 }

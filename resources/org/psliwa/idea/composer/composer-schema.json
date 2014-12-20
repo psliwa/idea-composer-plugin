@@ -107,10 +107,10 @@
           ]
         },
         "vendor-dir": {
-          "type": "string"
+          "type": "filePath"
         },
         "bin-dir": {
-          "type": "string"
+          "type": "filePath"
         },
         "cache-dir": {
           "type": "string"
@@ -166,16 +166,22 @@
       "type": "object",
       "properties": {
         "psr-0": {
-          "type": "object"
+          "type": "filePaths"
         },
         "psr-4": {
-          "type": "object"
+          "type": "filePaths"
         },
         "classmap": {
-          "type": "array"
+          "type": "array",
+          "items": {
+            "type": "filePath"
+          }
         },
         "files": {
-          "type": "array"
+          "type": "array",
+          "items": {
+            "type": "filePath"
+          }
         }
       }
     },
@@ -183,16 +189,22 @@
       "type": "object",
       "properties": {
         "psr-0": {
-          "type": "object"
+          "type": "filePaths"
         },
         "psr-4": {
-          "type": "object"
+          "type": "filePaths"
         },
         "classmap": {
-          "type": "array"
+          "type": "array",
+          "items": {
+            "type": "filePath"
+          }
         },
         "files": {
-          "type": "array"
+          "type": "array",
+          "items": {
+            "type": "filePath"
+          }
         }
       }
     },
@@ -201,7 +213,7 @@
       "properties": {
         "exclude": {
           "type": "array",
-          "items": { "type": "string" }
+          "items": { "type": "filePath" }
         }
       }
     },
@@ -217,13 +229,13 @@
     "bin": {
       "type": "array",
       "items": {
-        "type": "path"
+        "type": "filePath"
       }
     },
     "include-path": {
       "type": "array",
       "items": {
-        "type": "string"
+        "type": "filePath"
       }
     },
     "scripts": {

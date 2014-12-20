@@ -284,7 +284,7 @@ class SchemaTest {
           | {
           |   "type": "object",
           |   "properties": {
-          |     "name": { "type": "path" }
+          |     "name": { "type": "filePath" }
           |   }
           | }
         """.stripMargin

@@ -1,5 +1,6 @@
 package org.psliwa.idea.composer.idea.completionContributor
 
+import org.junit.Assert._
 import org.psliwa.idea.composer.idea.Keyword
 
 //TODO: rages support (>, <, >= etc)
@@ -196,5 +197,20 @@ class PackageSuggestionsTest extends TestCase {
         Array("dev-master", "1.2.*")
       )
     }
+  }
+
+  def testPackageSuggestion_versionLoaderShouldNotBeCalled() = {
+    setCompletionVersionsLoader(_ => { fail("version loader should not be called"); List() })
+
+    suggestions(
+      """
+        |{
+        | "require": {
+        |   "<caret>"
+        | }
+        |}
+      """.stripMargin,
+      Array()
+    )
   }
 }
