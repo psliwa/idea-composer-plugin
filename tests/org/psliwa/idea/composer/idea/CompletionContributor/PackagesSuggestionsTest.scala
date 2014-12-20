@@ -84,4 +84,78 @@ class PackagesSuggestionsTest extends SuggestionsTest {
       versions.toArray
     )
   }
+
+  def testVersionsSuggestions_givenAsterixInPrefix_suggestAsterixWildcards() = {
+    val versions = List("1.2.1", "1.3.2", "dev-master")
+    setCompletionVersionsLoader(_ => versions)
+
+    suggestions(
+      """
+        |{
+        | "require": {
+        |   "ps/image-optimizer": "1*<caret>"
+        | }
+        |}
+      """.stripMargin,
+      Array("1.*", "1.2.*", "1.3.*"),
+      Array("1.2.1", "1.3.2")
+    )
+  }
+
+  def testVersionsSuggestions_givenSuggestionAfterSpace_allVersionsShouldBeSuggested() = {
+    val versions = List("1.2.1", "1.3.2", "dev-master")
+    setCompletionVersionsLoader(_ => versions)
+
+    suggestions(
+      """
+        |{
+        | "require": {
+        |   "ps/image-optimizer": "1.2.1 <caret>"
+        | }
+        |}
+      """.stripMargin,
+      versions.toArray
+    )
+  }
+
+  def testVersionsSuggestions_givenSuggestionAfterSpaceAndSomePrefix_validVersionsShouldBeSuggested() = {
+    val versions = List("1.2.1", "1.3.1", "dev-master")
+    setCompletionVersionsLoader(_ => versions)
+
+
+
+  }
+
+  def testVersionsSuggestions_givenSuggestionsAfterSpaceWithTilda_semanticVersionsShouldBeSuggested() = {
+    val versions = List("1.2.1", "1.3.1", "dev-master")
+    setCompletionVersionsLoader(_ => versions)
+
+    suggestions(
+      """
+        |{
+        | "require": {
+        |   "ps/image-optimizer": "1.2.1 ~<caret>"
+        | }
+        |}
+      """.stripMargin,
+      Array("1.2", "1.3"),
+      versions.toArray
+    )
+  }
+
+  def testVersionsSuggestions_givenSuggestionsAfterComma_allVersionsShouldBeSuggested() = {
+    val versions = List("1.2.1", "1.3.1", "dev-master")
+    setCompletionVersionsLoader(_ => versions)
+
+    suggestions(
+      """
+        |{
+        | "require": {
+        |   "ps/image-optimizer": "1.2.1,<caret>"
+        | }
+        |}
+      """.stripMargin,
+      versions.toArray
+    )
+  }
 }

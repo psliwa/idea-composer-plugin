@@ -228,6 +228,69 @@ class CompletionTest extends LightPlatformCodeInsightFixtureTestCase with TestCa
     )
   }
 
+  def testCompletionPackageVersion_givenPrefixWithSpace_completeVersion() = {
+    setCompletionVersionsLoader(_ => List("1.2.3"))
+
+    completion(
+      """
+        |{
+        | "require": {
+        |   "ps/image-optimizer": "1.2.2 123<caret>"
+        | }
+        |}
+      """.stripMargin,
+      """
+        |{
+        | "require": {
+        |   "ps/image-optimizer": "1.2.2 1.2.3"
+        | }
+        |}
+      """.stripMargin
+    )
+  }
+
+  def testCompletionPackageVersion_givenPrefixWithSpaceAndTilda_completeVersion() = {
+    setCompletionVersionsLoader(_ => List("1.2.3"))
+
+    completion(
+      """
+        |{
+        | "require": {
+        |   "ps/image-optimizer": "1.2.2 ~12<caret>"
+        | }
+        |}
+      """.stripMargin,
+      """
+        |{
+        | "require": {
+        |   "ps/image-optimizer": "1.2.2 ~1.2"
+        | }
+        |}
+      """.stripMargin
+    )
+  }
+
+  def testCompletionPackageVersion_givenPrefixWithComma_completeVersion() = {
+    setCompletionVersionsLoader(_ => List("1.2.3"))
+
+    completion(
+      """
+        |{
+        | "require": {
+        |   "ps/image-optimizer": "1.2.2,123<caret>"
+        | }
+        |}
+      """.stripMargin,
+      """
+        |{
+        | "require": {
+        |   "ps/image-optimizer": "1.2.2,1.2.3"
+        | }
+        |}
+      """.stripMargin
+    )
+  }
+
   def testCompletionBooleanProperty_colonShouldBeAdded() = {
     completion(
       """

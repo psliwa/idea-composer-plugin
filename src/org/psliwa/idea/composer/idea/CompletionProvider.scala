@@ -1,12 +1,14 @@
 package org.psliwa.idea.composer.idea
 
-import com.intellij.codeInsight.completion.{CompletionResultSet, CompletionParameters, CompletionProvider}
+import com.intellij.codeInsight.completion.{PrefixMatcher, CompletionResultSet, CompletionParameters, CompletionProvider}
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.json.psi.{JsonFile, JsonProperty}
 import com.intellij.psi.PsiElement
 import com.intellij.psi.impl.source.tree.LeafPsiElement
 import com.intellij.util.ProcessingContext
 import ContextAwareCompletionProvider._
+import org.psliwa.idea.composer.util.CharType._
+import org.psliwa.idea.composer.util.CharType.ImplicitConversions._
 
 import scala.annotation.tailrec
 import scala.collection.Seq
@@ -16,7 +18,13 @@ protected[idea] case class ContextAwareCompletionProvider(loadKeywords: Context 
     val typedQuery = getTypedText(parameters.getPosition).getOrElse("")
     val keywords = firstNamedProperty(parameters.getPosition).map(p => Context(p.getName, typedQuery)).map(loadKeywords).getOrElse(List()).map(Keyword(_))
 
-    addKeywordsToResult(keywords)(parameters, result)
+    val prefix = result.getPrefixMatcher.getPrefix
+
+    val fixedPrefix = findOffsetReverse(' ' || '~' || '^' || ',')(prefix.length-1)(prefix)
+      .map(offset => prefix.substring(offset + 1))
+      .getOrElse(prefix)
+
+    addKeywordsToResult(keywords)(parameters, result.withPrefixMatcher(new Matcher(fixedPrefix)))
   }
 
   private def getTypedText(e: PsiElement): Option[String] = e match {
@@ -43,7 +51,10 @@ protected[idea] case class ContextAwareCompletionProvider(loadKeywords: Context 
     def unapply(x: LeafPsiElement): Option[(String)] = Some(x.getText)
   }
 
-
+  private class Matcher(prefix: String) extends PrefixMatcher(prefix) {
+    override def cloneWithPrefix(prefix: String): PrefixMatcher = new Matcher(prefix)
+    override def prefixMatches(name: String): Boolean = myPrefix.toCharArray.forall(c => name.contains(c))
+  }
 }
 
 protected[idea] object ContextAwareCompletionProvider {

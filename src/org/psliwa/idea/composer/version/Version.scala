@@ -17,7 +17,11 @@ object Version {
       .getOrElse(List())
   }
 
-  private def semanticVersionRequired(text: String) = findOffset('~' || '^' || ' ')(0)(text).flatMap(ensure(not(' '))(_)(text)).isDefined
+  private def semanticVersionRequired(text: String) = {
+    findOffsetReverse('~' || '^' || ' ')(text.length-1)(text)
+      .flatMap(ensure(not(' '))(_)(text))
+      .isDefined
+  }
 
   private def trySemantic(s: String): Option[SemanticVersion] = "^v?(\\d)(\\.\\d)+$".r.findFirstIn(s)
 
