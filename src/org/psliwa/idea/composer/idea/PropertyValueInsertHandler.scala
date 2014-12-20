@@ -4,7 +4,9 @@ import com.intellij.codeInsight.AutoPopupController
 import com.intellij.codeInsight.completion.{InsertionContext, InsertHandler}
 import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.openapi.editor.{Editor, Document}
-import scala.annotation.tailrec
+import org.psliwa.idea.composer.util.CharType
+import org.psliwa.idea.composer.util.CharType._
+import org.psliwa.idea.composer.util.CharType.ImplicitConversions._
 import scala.language.implicitConversions
 
 protected[idea] case class PropertyValueInsertHandler(wrapper: String) extends InsertHandler[LookupElement] {
@@ -19,6 +21,7 @@ protected[idea] case class PropertyValueInsertHandler(wrapper: String) extends I
 
     implicit val editor = context.getEditor
     implicit val document = editor.getDocument
+    implicit val text = document.getCharsSequence
 
     val trailingOffset = editor.getCaretModel.getOffset + 1
 
@@ -32,7 +35,7 @@ protected[idea] case class PropertyValueInsertHandler(wrapper: String) extends I
     }
   }
 
-  private def findExistingValueRange(offset: Int)(implicit document: Document): Option[Range] = {
+  private def findExistingValueRange(offset: Int)(implicit text: CharSequence): Option[Range] = {
     for {
       colonOffset <- findOffset(OpenControlChar || ':')(offset)
       _ <- ensure(':')(colonOffset)
@@ -59,18 +62,14 @@ protected[idea] case class PropertyValueInsertHandler(wrapper: String) extends I
 
   private def fixTrailingComma(trailingOffset: Int)(implicit document: Document) {
     for {
-      offset <- findOffset('"', ',', '}')(trailingOffset)
-      _ <- ensure('"')(offset)
+      offset <- findOffset('"', ',', '}')(trailingOffset)(document.getCharsSequence)
+      _ <- ensure('"')(offset)(document.getCharsSequence)
     } yield {
       document.insertString(trailingOffset, ",")
     }
   }
 
-  private def findOffset(strings: CharType*)(offset: Int)(implicit doc: Document): Option[Int] = {
-    findOffset(CharType(c => strings.exists(_ is c)))(offset)
-  }
-
-  private def findCloseCharOffset(openChar: CharType, closeChar: CharType)(offset: Int)(implicit doc: Document): Option[Int] = {
+  private def findCloseCharOffset(openChar: CharType, closeChar: CharType)(offset: Int)(implicit text: CharSequence): Option[Int] = {
     def loop(offset: Int, deep: Int): Option[Int] = {
       val foundOffset = findOffset(openChar || closeChar)(offset)
       val success = foundOffset.map(ensure(closeChar)(_).isDefined)
@@ -84,31 +83,6 @@ protected[idea] case class PropertyValueInsertHandler(wrapper: String) extends I
     }
 
     loop(offset, 0)
-  }
-
-  private def findOffset(expectedChar: CharType)(offset: Int)(implicit doc: Document): Option[Int] = {
-    val text = doc.getCharsSequence
-
-    @tailrec
-    def loop(offset: Int): Option[Int] = {
-      if(offset >= text.length()) {
-        None
-      } else {
-        val char = text.subSequence(offset, offset+1).charAt(0)
-
-        if(expectedChar is char) Some(offset)
-        else loop(offset + 1)
-      }
-    }
-
-    loop(offset)
-  }
-
-  private def ensure(s: CharType*)(offset: Int)(implicit doc: Document) = {
-    val char = doc.getCharsSequence.subSequence(offset, offset + 1).charAt(0)
-
-    if(s.exists(_ is char)) Some(char)
-    else None
   }
 
   private def replaceCharIf(char: Char, is: CharType, replacement: Char): Option[Char] = {
@@ -142,12 +116,6 @@ private object PropertyValueInsertHandler {
     def eatWrapper = Range(ho, to, None, None)
     def eatWrapperIf(b: Boolean) = if(b) eatWrapper else this
   }
-  case class CharType(is: Char => Boolean) {
-    def &&(c: CharType) = CharType(char => is(char) && c.is(char))
-    def ||(c: CharType) = CharType(char => is(char) || c.is(char))
-  }
-  implicit def charToCharType(c: Char): CharType = CharType(_ == c)
-  def not(c: CharType) = CharType(!c.is(_))
 
   val Whitespace = CharType(_.isWhitespace)
   val Alphnum = CharType(_.isLetterOrDigit)

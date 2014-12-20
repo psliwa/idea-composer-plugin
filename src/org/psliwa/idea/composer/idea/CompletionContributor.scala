@@ -12,6 +12,7 @@ import org.psliwa.idea.composer.packagist.Packagist
 import org.psliwa.idea.composer.schema._
 import org.psliwa.idea.composer.util.Funcs._
 import org.psliwa.idea.composer._
+import org.psliwa.idea.composer.version._
 
 import scala.annotation.tailrec
 
@@ -42,7 +43,10 @@ class CompletionContributor extends com.intellij.codeInsight.completion.Completi
     case SBoolean => List((psiElement().withSuperParent(2, parent).afterLeaf(":"), KeywordsCompletionProvider(() => List("true", "false").map(Keyword(_, quoted = false)))))
     case SPackages => {
       propertyCompletionProvider(parent, loadPackages, _ => Some(StringPropertyValueInsertHandler)) ++
-        List((psiElement().withSuperParent(2, psiElement().and(propertyCapture(parent))), new ContextAwareCompletionProvider(loadVersions)))
+        List((
+          psiElement().withSuperParent(2, psiElement().and(propertyCapture(parent))),
+          new ContextAwareCompletionProvider(c => loadVersions(c.propertyName).flatMap(Version.alternativesForPrefix(c.typedQuery)))
+        ))
     }
     case _ => List()
   }

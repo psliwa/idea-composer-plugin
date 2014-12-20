@@ -41,4 +41,47 @@ class PackagesSuggestionsTest extends SuggestionsTest {
       versions.toArray
     )
   }
+
+  def testVersionSuggestions_includeVersionWildcards() = {
+    val pkg = "ps/image-optimizer"
+    val versions = List("1.2.1")
+
+    val map = Map(pkg -> versions)
+
+    setCompletionPackageLoader(() => List(pkg).map(Keyword(_)))
+    setCompletionVersionsLoader(map.getOrElse(_, List()))
+
+    suggestions(
+      """
+        |{
+        | "require": {
+        |   "ps/image-optimizer": "<caret>"
+        | }
+        |}
+      """.stripMargin,
+      Array("1.2.1", "1.2.*", "1.*")
+    )
+  }
+
+  def testVersionsSuggestions_tildeGiven_suggestOnlySemanticVersionWithTwoNumbers() = {
+    val pkg = "ps/image-optimizer"
+    val versions = List("1.2.1", "1.2.2", "v1.2.3", "dev-master")
+
+    val map = Map(pkg -> versions)
+
+    setCompletionPackageLoader(() => List(pkg).map(Keyword(_)))
+    setCompletionVersionsLoader(map.getOrElse(_, List()))
+
+    suggestions(
+      """
+        |{
+        | "require": {
+        |   "ps/image-optimizer": "~<caret>"
+        | }
+        |}
+      """.stripMargin,
+      Array("1.2"),
+      versions.toArray
+    )
+  }
 }

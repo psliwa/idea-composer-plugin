@@ -204,6 +204,30 @@ class CompletionTest extends LightPlatformCodeInsightFixtureTestCase with TestCa
     )
   }
 
+  def testCompletionPackageVersion_givenPrefix_quotesShouldBeStillValid() = {
+    val pkg = "ps/image-optimizer"
+
+    setCompletionPackageLoader(() => List(Keyword(pkg)))
+    setCompletionVersionsLoader(_ => List("1.2.3"))
+
+    completion(
+      """
+        |{
+        | "require": {
+        |   "ps/image-optimizer": "~1<caret>"
+        | }
+        |}
+      """.stripMargin,
+      """
+        |{
+        | "require": {
+        |   "ps/image-optimizer": "~1.2<caret>"
+        | }
+        |}
+      """.stripMargin
+    )
+  }
+
   def testCompletionBooleanProperty_colonShouldBeAdded() = {
     completion(
       """

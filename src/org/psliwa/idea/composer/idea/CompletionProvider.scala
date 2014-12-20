@@ -1,20 +1,30 @@
 package org.psliwa.idea.composer.idea
 
-import com.intellij.codeInsight.completion.{InsertHandler, CompletionResultSet, CompletionParameters, CompletionProvider}
-import com.intellij.codeInsight.lookup.{LookupElement, LookupElementBuilder}
-import com.intellij.json.psi.{JsonStringLiteral, JsonFile, JsonProperty}
+import com.intellij.codeInsight.completion.{CompletionResultSet, CompletionParameters, CompletionProvider}
+import com.intellij.codeInsight.lookup.LookupElementBuilder
+import com.intellij.json.psi.{JsonFile, JsonProperty}
 import com.intellij.psi.PsiElement
+import com.intellij.psi.impl.source.tree.LeafPsiElement
 import com.intellij.util.ProcessingContext
+import ContextAwareCompletionProvider._
 
 import scala.annotation.tailrec
 import scala.collection.Seq
 
-protected[idea] case class ContextAwareCompletionProvider(loadKeywords: (String) => Seq[String]) extends CompletionProvider[CompletionParameters] with CompletionProviderMixin {
+protected[idea] case class ContextAwareCompletionProvider(loadKeywords: Context => Seq[String]) extends CompletionProvider[CompletionParameters] with CompletionProviderMixin {
   override def addCompletions(parameters: CompletionParameters, context: ProcessingContext, result: CompletionResultSet): Unit = {
-    val keywords = firstNamedProperty(parameters.getPosition).map(_.getName).map(loadKeywords).getOrElse(List()).map(Keyword(_))
+    val typedQuery = getTypedText(parameters.getPosition).getOrElse("")
+    val keywords = firstNamedProperty(parameters.getPosition).map(p => Context(p.getName, typedQuery)).map(loadKeywords).getOrElse(List()).map(Keyword(_))
 
     addKeywordsToResult(keywords)(parameters, result)
   }
+
+  private def getTypedText(e: PsiElement): Option[String] = e match {
+    case LeafPsiElement(text) => Some(text).map(removeEmptyPalceholder)
+    case _ => None
+  }
+
+  private def removeEmptyPalceholder(s: String) = s.replace(emptyNamePlaceholder+" ", "").replace(emptyNamePlaceholder, "")
 
   @tailrec
   private def firstNamedProperty(element: PsiElement): Option[JsonProperty] = {
@@ -28,6 +38,16 @@ protected[idea] case class ContextAwareCompletionProvider(loadKeywords: (String)
   private object JsonProperty {
     def unapply(x: JsonProperty): Option[(String)] = if(x.getName.contains(emptyNamePlaceholder)) None else Some(x.getName)
   }
+
+  private object LeafPsiElement {
+    def unapply(x: LeafPsiElement): Option[(String)] = Some(x.getText)
+  }
+
+
+}
+
+protected[idea] object ContextAwareCompletionProvider {
+  case class Context(propertyName: String, typedQuery: String)
 }
 
 protected[idea] case class KeywordsCompletionProvider(keywords: Keywords, getInsertHandler: InsertHandlerFinder = _ => None)
