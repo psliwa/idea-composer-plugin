@@ -6,13 +6,14 @@ import com.intellij.codeInsight.completion.{InsertionContext, InsertHandler}
 import com.intellij.codeInsight.lookup.{LookupElementPresentation, LookupElement}
 import com.intellij.openapi.fileTypes.FileTypeManager
 import com.intellij.openapi.util.Iconable
-import com.intellij.psi.{PsiFile, PsiDirectory}
+import com.intellij.psi.{PsiElement, PsiFile, PsiDirectory}
 
 protected[idea] case class BaseLookupElement (
   name: String,
   icon: Option[Icon] = None,
   quoted: Boolean = true,
-  insertHandler: Option[InsertHandler[LookupElement]] = None
+  insertHandler: Option[InsertHandler[LookupElement]] = None,
+  psiElement: Option[PsiElement] = None
 ) extends LookupElement {
 
   private val presentation = new LookupElementPresentation
@@ -24,8 +25,12 @@ protected[idea] case class BaseLookupElement (
   override def handleInsert(context: InsertionContext): Unit = insertHandler.foreach(_.handleInsert(context, this))
 
   def withInsertHandler(insertHandler: InsertHandler[LookupElement]) = {
-    new BaseLookupElement(name, icon, quoted, Some(insertHandler))
+    new BaseLookupElement(name, icon, quoted, Some(insertHandler), psiElement)
   }
+
+  def withPsiElement(psiElement: PsiElement) = new BaseLookupElement(name, icon, quoted, insertHandler, Some(psiElement))
+
+  override def getObject: AnyRef = psiElement.getOrElse(this)
 }
 
 protected[idea] object BaseLookupElement {

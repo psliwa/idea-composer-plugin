@@ -30,21 +30,21 @@ class PackagesCompletionTest extends TestCase {
   def testPackageNameCompletion_startTypingWithoutQuotes_quotesShouldBeFixed() = {
     val contributor = getCompletionContributor
 
-    val pkg = "ps/image-optimizer"
+    val pkg = "symfony/symfony"
     contributor.setPackagesLoader(() => List(BaseLookupElement(pkg)))
 
     completion(
       """
         |{
         | "require": {
-        |   ps/image-opti<caret>
+        |   symsym<caret>
         | }
         |}
       """.stripMargin,
       """
         |{
         | "require": {
-        |   "ps/image-optimizer": "<caret>"
+        |   "symfony/symfony": "<caret>"
         | }
         |}
       """.stripMargin
@@ -153,6 +153,27 @@ class PackagesCompletionTest extends TestCase {
         |{
         | "require": {
         |   "ps/image-optimizer": ">=1.2.2,<1.2.3"
+        | }
+        |}
+      """.stripMargin
+    )
+  }
+
+  def testVersionCompletion_givenVersionRange_completeFirstMember() = {
+    setCompletionVersionsLoader(_ => List("1.2.3"))
+
+    completion(
+      """
+        |{
+        | "require": {
+        |   "ps/image-optimizer": ">=123<caret>,<1.2.4"
+        | }
+        |}
+      """.stripMargin,
+      """
+        |{
+        | "require": {
+        |   "ps/image-optimizer": ">=1.2.3,<1.2.4"
         | }
         |}
       """.stripMargin

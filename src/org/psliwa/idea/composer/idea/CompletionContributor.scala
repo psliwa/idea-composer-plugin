@@ -1,13 +1,9 @@
 package org.psliwa.idea.composer.idea
 
-import javax.swing.Icon
-
 import com.intellij.codeInsight.completion._
-import com.intellij.codeInsight.lookup.{LookupElementBuilder, LookupElement}
+import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.json.JsonLanguage
 import com.intellij.json.psi._
-import com.intellij.openapi.fileTypes.FileTypeManager
-import com.intellij.openapi.util.Iconable
 import com.intellij.patterns.PlatformPatterns._
 import com.intellij.patterns.StandardPatterns._
 import com.intellij.patterns.{PsiElementPattern, PatternCondition}
@@ -128,7 +124,7 @@ protected[idea] object CompletionContributor {
         (parameters: CompletionParameters, result: CompletionResultSet) {
 
       es.foreach(e => {
-        result.addElement(e.withInsertHandler(insertHandler(parameters.getPosition, e, getInsertHandler)))
+        result.addElement(e.withPsiElement(parameters.getPosition).withInsertHandler(insertHandler(parameters.getPosition, e, getInsertHandler)))
       })
     }
 

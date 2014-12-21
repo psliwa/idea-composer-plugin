@@ -226,7 +226,7 @@ class StructureCompletionTest extends TestCase {
     )
   }
 
-  def testCompletionBooleanPropertyIsNotLast_colonShouldBeAdded() = {
+  def testCompletionBooleanPropertyIsNotLast_commaShouldBeAdded() = {
     completion(
       """
         |{
@@ -238,6 +238,23 @@ class StructureCompletionTest extends TestCase {
         |{
         | "prefer-stable": <caret>,
         | "library": "MIT"
+        |}
+      """.stripMargin
+    )
+  }
+
+  def testCompletionStringPropertyOutsideQuotes_givenPropertyHasPreviousSiblingStringProperty_quotesShouldBeFixed() = {
+    completion(
+      """
+        |{
+        | "library": "MIT",
+        | nam<caret>
+        |}
+      """.stripMargin,
+      """
+        |{
+        | "library": "MIT",
+        | "name": "<caret>"
         |}
       """.stripMargin
     )
