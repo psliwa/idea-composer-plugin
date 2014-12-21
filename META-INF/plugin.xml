@@ -38,12 +38,12 @@ This plugin adds auto completion feature for composer.json file in PHP projects.
   <depends>com.intellij.modules.platform</depends>
 
   <extensions defaultExtensionNs="com.intellij">
-    <completion.contributor language="JSON" implementationClass="org.psliwa.idea.composer.idea.CompletionContributor" />
+    <completion.contributor language="JSON" implementationClass="org.psliwa.idea.composerJson.completion.CompletionContributor" />
   </extensions>
 
   <application-components>
     <component>
-      <implementation-class>org.psliwa.idea.composer.idea.PackagesLoader</implementation-class>
+      <implementation-class>org.psliwa.idea.composerJson.completion.PackagesLoader</implementation-class>
     </component>
   </application-components>
 

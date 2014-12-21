@@ -2,5 +2,5 @@
 -dontoptimize
 -dontwarn scala.**
 
--keep class org.psliwa.idea.composer.idea.CompletionContributor
--keep class org.psliwa.idea.composer.idea.PackagesLoader
+-keep class org.psliwa.idea.composerJson.completion.CompletionContributor
+-keep class org.psliwa.idea.composerJson.completion.PackagesLoader

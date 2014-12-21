@@ -1,0 +1,29 @@
+package org.psliwa.idea.composerJson
+
+import com.intellij.codeInsight.completion.{InsertionContext, InsertHandler}
+import com.intellij.codeInsight.lookup.LookupElement
+import com.intellij.patterns.PsiElementPattern
+import com.intellij.psi.PsiElement
+import org.psliwa.idea.composerJson.util.CharType._
+import org.psliwa.idea.composerJson.util.CharType.ImplicitConversions._
+
+package object completion {
+  val ComposerSchemaFilepath = "/org/psliwa/idea/composerJson/completion/composer-schema.json"
+
+  protected[completion] val EmptyNamePlaceholder = "IntellijIdeaRulezzz"
+
+  protected[completion] type Capture = PsiElementPattern.Capture[_ <: PsiElement]
+  protected[completion] type LookupElements = () => Iterable[BaseLookupElement]
+
+  protected[completion] type InsertHandlerFinder = BaseLookupElement => Option[InsertHandler[LookupElement]]
+
+  private val autoPopupCondition = (context: InsertionContext) => {
+    val text = context.getEditor.getDocument.getCharsSequence
+    ensure('"' || ' ')(context.getEditor.getCaretModel.getOffset-1)(text).isDefined
+  }
+
+  protected[completion] val StringPropertyValueInsertHandler = new AutoPopupInsertHandler(Some(new PropertyValueInsertHandler("\"\"")), autoPopupCondition)
+  protected[completion] val ObjectPropertyValueInsertHandler = new AutoPopupInsertHandler(Some(new PropertyValueInsertHandler("{}")), autoPopupCondition)
+  protected[completion] val ArrayPropertyValueInsertHandler = new AutoPopupInsertHandler(Some(new PropertyValueInsertHandler("[]")), autoPopupCondition)
+  protected[completion] val EmptyPropertyValueInsertHandler = new AutoPopupInsertHandler(Some(new PropertyValueInsertHandler("")), autoPopupCondition)
+}
