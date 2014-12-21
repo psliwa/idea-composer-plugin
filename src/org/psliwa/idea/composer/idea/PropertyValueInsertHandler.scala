@@ -29,10 +29,6 @@ protected[idea] case class PropertyValueInsertHandler(wrapper: String) extends I
       case Some(range) => selectRange(range)
       case None => completeValue(trailingOffset)
     }
-
-    ensure('"' || ' ')(editor.getCaretModel.getOffset-1).foreach {
-      _ => AutoPopupController.getInstance(editor.getProject).scheduleAutoPopup(editor)
-    }
   }
 
   private def findExistingValueRange(offset: Int)(implicit text: CharSequence): Option[Range] = {

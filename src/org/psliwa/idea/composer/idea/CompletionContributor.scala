@@ -53,7 +53,7 @@ class CompletionContributor extends com.intellij.codeInsight.completion.Completi
         List((
           psiElement().withSuperParent(2, psiElement().and(propertyCapture(parent))).afterLeaf(":"),
           new VersionCompletionProvider(c => {
-            loadVersions(c.propertyName).flatMap(Version.alternativesForPrefix(c.typedQuery)).map(BaseLookupElement(_))
+            loadVersions(c.propertyName).flatMap(Version.alternativesForPrefix(c.typedQuery)).map(BaseLookupElement(_, Option(Icons.Packagist)))
           })
         ))
     }
@@ -161,6 +161,12 @@ protected[idea] object CompletionContributor {
       val matcher = createCharContainsMatcher('/')(prefix)
 
       result.withPrefixMatcher(matcher)
+    }
+
+    override protected def insertHandler(element: PsiElement, le: BaseLookupElement,getInsertHandler: InsertHandlerFinder) = {
+      Option(super.insertHandler(element, le, getInsertHandler))
+        .map(handler => new AutoPopupInsertHandler(Some(handler)))
+        .orNull
     }
   }
 
