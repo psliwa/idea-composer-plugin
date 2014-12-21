@@ -1,4 +1,4 @@
-# Idea Composer Plugin
+# PHP Composer AutoComplete
 
 Adds code completion to composer.json file.
 
@@ -25,5 +25,5 @@ This plugin provides completion for:
 * more completion enhancements
 * and more ;)
 
-[1]: https://plugins.jetbrains.com/files/7631/screenshot_14835.png
+[1]: https://plugins.jetbrains.com/files/7631/screenshot_14847.png
 [2]: https://plugins.jetbrains.com/plugin/7631
