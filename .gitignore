@@ -4,3 +4,4 @@ shrink.properties
 target/*
 !target/.gitkeep
 composer-json-plugin.zip
+IDEAS.md

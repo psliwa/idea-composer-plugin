@@ -5,8 +5,13 @@ Adds code completion to composer.json file.
 PhpStorm 8.0.2+ and 139+ version Intellij are supported, because in that version json language support is natively in
 intellij sdk.
 
-Code completion is based on composer.json schema, but there is also package names and version completion in require,
-require-dev etc properties.
+This plugin provides completion for:
+
+* composer.json schema
+* package names and version (in require, require-dev etc)
+* filepath completion (in bin, autoload etc)
+
+[There][2] you can find plugin homepage.
 
 ## This plugin in work
 
@@ -17,6 +22,8 @@ require-dev etc properties.
 * schema validation and error checker
 * inspections
 * show current installed version from `composer.lock`
-* completion enhancements
+* more completion enhancements
+* and more ;)
 
-[1]: doc/screen.gif
+[1]: https://plugins.jetbrains.com/files/7631/screenshot_14835.png
+[2]: https://plugins.jetbrains.com/plugin/7631
