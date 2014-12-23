@@ -9,14 +9,30 @@ import scala.language.implicitConversions
 class SchemaTest {
 
   @Test
-  def parseEmptySchema() = {
+  def parseEmptyObject() = {
     assertSchemaEquals(
-      SObject(Map()),
+      SObject(Map(), additionalProperties = true),
       Schema.parse(
         """
           {
             "type":"object",
             "properties":{}
+          }
+        """
+      )
+    )
+  }
+
+  @Test
+  def parseEmptyObject_additionalPropertiesAreNotAllowed() = {
+    assertSchemaEquals(
+      SObject(Map(), additionalProperties = false),
+      Schema.parse(
+        """
+          {
+            "type":"object",
+            "properties":{},
+            "additionalProperties": false
           }
         """
       )
@@ -47,11 +63,30 @@ class SchemaTest {
   }
 
   @Test
+  def parseSchemaWithRequiredProperties() = {
+    assertSchemaEquals(
+      SObject(
+        Map(
+          "stringProp" -> Property(SString(), required=true)
+        )
+      ),
+      Schema.parse("""
+        {
+         "type": "object",
+         "properties": {
+           "stringProp": {"type":"string", "required": true }
+         }
+        }
+       """)
+    )
+  }
+
+  @Test
   def parseSchemaWithScalarArrayValues() = {
     assertSchemaEquals(
       SObject(Map(
         "arrayNumberProp" -> SArray(SNumber),
-        "arrayStringProp" -> SArray(SString),
+        "arrayStringProp" -> SArray(SString()),
         "arrayBooleanProp" -> SArray(SBoolean)
       )),
       Schema.parse(
@@ -73,6 +108,25 @@ class SchemaTest {
           |     }
           |   }
           | }
+        """.stripMargin
+      )
+    )
+  }
+
+  @Test
+  def parseStringSchemaWithFormat() = {
+    assertSchemaEquals(
+      SObject(Map(
+        "property" -> SString(UriFormat)
+      )),
+      Schema.parse(
+        """
+          |{
+          |  "type": "object",
+          |  "properties": {
+          |    "property": { "type": "string", "format": "uri" }
+          |  }
+          |}
         """.stripMargin
       )
     )
@@ -172,7 +226,7 @@ class SchemaTest {
   def parseSchemaWithOr() = {
     assertSchemaEquals(
       SObject(Map(
-        "orProp" -> SOr(List(SBoolean, SString))
+        "orProp" -> SOr(List(SBoolean, SString()))
       )),
       Schema.parse(
         """
@@ -196,7 +250,7 @@ class SchemaTest {
   def parseSchemaWithInlineOr() = {
     assertSchemaEquals(
       SObject(Map(
-        "orProp" -> SOr(List(SString, SNumber))
+        "orProp" -> SOr(List(SString(), SNumber))
       )),
       Schema.parse(
         """
@@ -229,7 +283,7 @@ class SchemaTest {
   def parseSchemaWithWildcardArray() = {
     assertSchemaEquals(
       SObject(Map(
-        "arrProp" -> SArray(SObject(Map()))
+        "arrProp" -> SArray(SAny)
       )),
       Schema.parse(
         """

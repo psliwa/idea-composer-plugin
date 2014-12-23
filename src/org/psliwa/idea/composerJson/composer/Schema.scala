@@ -1,23 +1,56 @@
 package org.psliwa.idea.composerJson.composer
 
+import java.net.{MalformedURLException, URL}
+
 import scala.language.{higherKinds, implicitConversions}
 import scala.util.parsing.json.{JSON, JSONArray, JSONObject, JSONType}
 
 sealed trait Schema
 
-case class SObject(children: Map[String, Schema]) extends Schema
+case class SObject(properties: Map[String, Property], additionalProperties: Boolean = true) extends Schema {
+  lazy val requiredProperties = properties.filter(_._2.required)
+}
 case class SArray(child: Schema) extends Schema
 case class SStringChoice(choices: List[String]) extends Schema
 case class SOr(alternatives: List[Schema]) extends Schema
+case class SString(format: Format = AnyFormat) extends Schema
 
 object SBoolean extends Schema
-object SString extends Schema
 object SNumber extends Schema
 object SPackages extends Schema
 object SFilePath extends Schema
 object SFilePaths extends Schema
+object SAny extends Schema
+
+trait Format {
+  def isValid(s: String): Boolean
+}
+object EmailFormat extends Format {
+  override def isValid(s: String): Boolean = "^(?i)[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,4}$".r.findFirstMatchIn(s).isDefined
+}
+object UriFormat extends Format {
+  override def isValid(s: String): Boolean = {
+    try {
+      new URL(s)
+      true
+    } catch {
+      case _: MalformedURLException => false
+    }
+  }
+}
+object AnyFormat extends Format{
+  override def isValid(s: String) = true
+}
+
+case class Property(schema: Schema, required: Boolean)
 
 object Schema {
+
+  private val SAnyString = SString(AnyFormat)
+  private val SEmailString = SString(EmailFormat)
+  private val SUriString = SString(UriFormat)
+
+  private val stringsForFormat = Map("email" -> SEmailString, "uri" -> SUriString)
 
   def parse(s: String): Option[Schema] = JSON.parseRaw(s).flatMap(jsonTypeToSchema)
 
@@ -31,11 +64,19 @@ object Schema {
 
   import org.psliwa.idea.composerJson.composer.Schema.OptionOps._
 
-  private def jsonObjectToStringSchema: Converter[JSONObject] = jsonObjectTo(SString, "string")
+  private def jsonObjectToStringSchema: Converter[JSONObject] = (o) => {
+    for {
+      o <- ensureType(o, "string")
+      format <- o.obj.get("format").orElse(Some("any"))
+    } yield stringsForFormat.getOrElse(format.toString, SAnyString)
+  }
+
   private def jsonObjectToNumberSchema: Converter[JSONObject] = jsonObjectTo(SNumber, "integer")
   private def jsonObjectToBooleanSchema: Converter[JSONObject] = jsonObjectTo(SBoolean, "boolean")
 
-  private def jsonObjectTo(s: Schema, t: String)(o: JSONObject): Option[Schema] = o.obj.get("type").filter(_ == t).map(_ => s)
+
+  private def jsonObjectTo(s: Schema, t: String)(o: JSONObject): Option[Schema] = ensureType(o, t).map(_ => s)
+  private def ensureType(o: JSONObject, t: String) = o.obj.get("type").filter(_ == t).map(_ => o)
 
   private def jsonObjectToSchema: Converter[JSONObject] = (
     jsonObjectToObjectSchema | jsonObjectToStringSchema | jsonObjectToNumberSchema | jsonObjectToBooleanSchema
@@ -82,23 +123,42 @@ object Schema {
       for {
         jsonObject <- tryJsonObject(maybeJsonObject)
         properties <- traverseMap(jsonObject.obj){
-          case o@JSONObject(_) => jsonObjectToSchema(o)
+          case o@JSONObject(_) => for{
+            required <- booleanProperty("required")(o.obj).orElse(Some(false))
+            schema <- jsonObjectToSchema(o).map(Property(_, required))
+          } yield schema
           case _ => None
         }
-      } yield SObject(properties)
+        additionalProperties <- booleanProperty("additionalProperties")(t.obj).orElse(Some(true))
+      } yield SObject(properties, additionalProperties)
     } else {
       None
     }
   }
 
+  private def booleanProperty(k: String)(map: Map[String,Any]): Option[Boolean] = {
+    map.get(k).flatMap(toBoolean)
+  }
+
+  private def toBoolean(o: Any): Option[Boolean] = {
+    try {
+      Some(o.toString.toBoolean)
+    } catch {
+      case _: IllegalArgumentException => None
+    }
+  }
+
   private def jsonObjectToArraySchema: Converter[JSONObject] = t => {
     if(t.obj.get("type").exists(_ == "array")) {
-      val maybeJsonObject = t.obj.getOrElse("items", JSONObject(Map("type" -> "object")))
+      val maybeItems = t.obj.get("items")
 
-      for {
-        rawItems <- tryJsonObject(maybeJsonObject)
+      val maybeItemsType = for {
+        items <- maybeItems
+        rawItems <- tryJsonObject(items)
         itemsType <- jsonObjectToSchema(rawItems)
-      } yield SArray(itemsType)
+      } yield itemsType
+
+      Some(SArray(maybeItemsType.getOrElse(SAny)))
     } else {
       None
     }

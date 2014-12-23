@@ -38,9 +38,9 @@ class CompletionContributor extends com.intellij.codeInsight.completion.Completi
 
   import CompletionContributor._
   private def completionProvidersForSchema(s: Schema, parent: Capture): List[(Capture, CompletionProvider[CompletionParameters])] = s match {
-    case SObject(m) => {
-      propertyCompletionProvider(parent, () => m.keys.map(BaseLookupElement(_)), (k) => insertHandlerFor(m.get(k.name).get)) ++
-        m.flatMap(t => completionProvidersForSchema(t._2, psiElement().and(propertyCapture(parent)).withName(t._1)))
+    case SObject(m, _) => {
+      propertyCompletionProvider(parent, () => m.keys.map(BaseLookupElement(_)), (k) => insertHandlerFor(m.get(k.name).get.schema)) ++
+        m.flatMap(t => completionProvidersForSchema(t._2.schema, psiElement().and(propertyCapture(parent)).withName(t._1)))
     }
     case SStringChoice(m) => List((psiElement().withSuperParent(2, parent), new LookupElementsCompletionProvider(() => m.map(BaseLookupElement(_)))))
     case SOr(l) => l.flatMap(completionProvidersForSchema(_, parent))
@@ -82,8 +82,8 @@ class CompletionContributor extends com.intellij.codeInsight.completion.Completi
 
   @tailrec
   private def insertHandlerFor(schema: Schema): Option[InsertHandler[LookupElement]] = schema match {
-    case SString | SStringChoice(_) => Some(StringPropertyValueInsertHandler)
-    case SObject(_) | SPackages | SFilePaths => Some(ObjectPropertyValueInsertHandler)
+    case SString(_) | SStringChoice(_) => Some(StringPropertyValueInsertHandler)
+    case SObject(_, _) | SPackages | SFilePaths => Some(ObjectPropertyValueInsertHandler)
     case SArray(_) => Some(ArrayPropertyValueInsertHandler)
     case SBoolean | SNumber => Some(EmptyPropertyValueInsertHandler)
     case SOr(h::_) => insertHandlerFor(h)

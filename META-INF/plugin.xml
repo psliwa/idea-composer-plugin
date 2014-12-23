@@ -39,6 +39,15 @@ This plugin adds auto completion feature for composer.json file in PHP projects.
 
   <extensions defaultExtensionNs="com.intellij">
     <completion.contributor language="JSON" implementationClass="org.psliwa.idea.composerJson.completion.CompletionContributor" />
+    <localInspection
+            bundle="org.psliwa.idea.composerJson.messages.ComposerBundle"
+            language="JSON"
+            implementationClass="org.psliwa.idea.composerJson.inspection.SchemaInspection"
+            displayName="JSON schema"
+            enabledByDefault="true"
+            level="ERROR"
+            groupKey="inspection.group"
+            />
   </extensions>
 
   <application-components>
