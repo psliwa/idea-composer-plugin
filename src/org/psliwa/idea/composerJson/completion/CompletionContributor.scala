@@ -23,7 +23,7 @@ import scala.collection.Seq
 
 class CompletionContributor extends com.intellij.codeInsight.completion.CompletionContributor {
 
-  private lazy val schema = SchemaLoader.load(ComposerSchemaFilepath)
+  private lazy val schema = ComposerSchema
 
   //vars only for testability
   private var packagesLoader: () => Seq[BaseLookupElement] = () => PackagesLoader.loadPackages

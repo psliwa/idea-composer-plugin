@@ -8,8 +8,6 @@ import org.psliwa.idea.composerJson.util.CharType._
 import org.psliwa.idea.composerJson.util.CharType.ImplicitConversions._
 
 package object completion {
-  val ComposerSchemaFilepath = "/org/psliwa/idea/composerJson/completion/composer-schema.json"
-
   protected[completion] val EmptyNamePlaceholder = "IntellijIdeaRulezzz"
 
   protected[completion] type Capture = PsiElementPattern.Capture[_ <: PsiElement]

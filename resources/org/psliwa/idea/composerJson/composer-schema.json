@@ -42,7 +42,9 @@
     "license": {
       "oneOf": [
         { "type": "string" },
-        { "type": "array", "items": { "type": "string" } }
+        { "type": "array", "items": { "type": "string" } },
+        { "enum": [ "MIT", "BSD", "BSD-2.0", "Apache-2.0", "LGPL-3.0", "LGPL-2.1", "GPL-2.0", "GPL-3.0" ] },
+        { "type": "array", "items": { "enum": [ "MIT", "BSD", "BSD-2.0", "Apache-2.0", "LGPL-3.0", "LGPL-2.1", "GPL-2.0", "GPL-3.0" ] } }
       ],
       "description": "License name. Or an array of license names."
     },
@@ -76,32 +78,32 @@
       }
     },
     "require": {
-      "type": "object",
+      "type": "packages",
       "description": "This is a hash of package name (keys) and version constraints (values) that are required to run this package.",
       "additionalProperties": true
     },
     "replace": {
-      "type": "object",
+      "type": "packages",
       "description": "This is a hash of package name (keys) and version constraints (values) that can be replaced by this package.",
       "additionalProperties": true
     },
     "conflict": {
-      "type": "object",
+      "type": "packages",
       "description": "This is a hash of package name (keys) and version constraints (values) that conflict with this package.",
       "additionalProperties": true
     },
     "provide": {
-      "type": "object",
+      "type": "packages",
       "description": "This is a hash of package name (keys) and version constraints (values) that this package provides in addition to this package's name.",
       "additionalProperties": true
     },
     "require-dev": {
-      "type": "object",
+      "type": "packages",
       "description": "This is a hash of package name (keys) and version constraints (values) that this package requires for developing it (testing tools and such).",
       "additionalProperties": true
     },
     "suggest": {
-      "type": "object",
+      "type": "packages",
       "description": "This is a hash of package name (keys) and descriptions (values) that this package suggests work well with it (this will be suggested to the user during installation).",
       "additionalProperties": true
     },
@@ -127,10 +129,10 @@
         },
         "github-protocols": {
           "type": "array",
-          "description": "A list of protocols to use for github.com clones, in priority order, defaults to [\"git\", \"https\", \"http\"].",
           "items": {
-            "type": "string"
-          }
+            "enum": [ "git", "https", "http" ]
+          },
+          "description": "A list of protocols to use for github.com clones, in priority order, defaults to [\"git\", \"https\", \"http\"]."
         },
         "github-oauth": {
           "type": "object",
@@ -150,11 +152,11 @@
           "description": "What to do after prompting for authentication, one of: true (store), false (do not store) or \"prompt\" (ask every time), defaults to prompt."
         },
         "vendor-dir": {
-          "type": "string",
+          "type": "filePath",
           "description": "The location where all packages are installed, defaults to \"vendor\"."
         },
         "bin-dir": {
-          "type": "string",
+          "type": "filePath",
           "description": "The location where all binaries are linked, defaults to \"vendor/bin\"."
         },
         "cache-dir": {
@@ -233,21 +235,27 @@
       "description": "Description of how the package can be autoloaded.",
       "properties": {
         "psr-0": {
-          "type": "object",
+          "type": "filePaths",
           "description": "This is a hash of namespaces (keys) and the directories they can be found into (values, can be arrays of paths) by the autoloader.",
           "additionalProperties": true
         },
         "psr-4": {
-          "type": "object",
+          "type": "filePaths",
           "description": "This is a hash of namespaces (keys) and the PSR-4 directories they can map to (values, can be arrays of paths) by the autoloader.",
           "additionalProperties": true
         },
         "classmap": {
           "type": "array",
+          "items": {
+            "type": "filePath"
+          },
           "description": "This is an array of directories that contain classes to be included in the class-map generation process."
         },
         "files": {
           "type": "array",
+          "items": {
+            "type": "filePath"
+          },
           "description": "This is an array of files that are always required on every request."
         }
       }
@@ -257,21 +265,27 @@
       "description": "Description of additional autoload rules for development purpose (eg. a test suite).",
       "properties": {
         "psr-0": {
-          "type": "object",
+          "type": "filePaths",
           "description": "This is a hash of namespaces (keys) and the directories they can be found into (values, can be arrays of paths) by the autoloader.",
           "additionalProperties": true
         },
         "psr-4": {
-          "type": "object",
+          "type": "filePaths",
           "description": "This is a hash of namespaces (keys) and the PSR-4 directories they can map to (values, can be arrays of paths) by the autoloader.",
           "additionalProperties": true
         },
         "classmap": {
           "type": "array",
+          "items": {
+            "type": "filePath"
+          },
           "description": "This is an array of directories that contain classes to be included in the class-map generation process."
         },
         "files": {
           "type": "array",
+          "items": {
+            "type": "filePath"
+          },
           "description": "This is an array of files that are always required on every request."
         }
       }
@@ -282,6 +296,9 @@
       "properties": {
         "exclude": {
           "type": "array",
+          "items": {
+            "type": "filePath"
+          },
           "description": "A list of patterns for paths to exclude or include if prefixed with an exclamation mark."
         }
       }
@@ -308,14 +325,14 @@
       "type": "array",
       "description": "A set of files that should be treated as binaries and symlinked into bin-dir (from config).",
       "items": {
-        "type": "string"
+        "type": "filePath"
       }
     },
     "include-path": {
       "type": "array",
       "description": "DEPRECATED: A list of directories which should get added to PHP's include path. This is only present to support legacy projects, and all new code should preferably use autoloading.",
       "items": {
-        "type": "string"
+        "type": "filePath"
       }
     },
     "scripts": {

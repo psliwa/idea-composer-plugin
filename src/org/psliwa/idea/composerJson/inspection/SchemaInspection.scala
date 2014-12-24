@@ -2,14 +2,14 @@ package org.psliwa.idea.composerJson.inspection
 
 import com.intellij.codeInspection.{ProblemsHolder, ProblemDescriptor, InspectionManager, LocalInspectionTool}
 import com.intellij.json.psi._
-import com.intellij.psi.{PsiElementVisitor, PsiElement, PsiFile}
+import com.intellij.psi.{PsiElement, PsiFile}
 import org.psliwa.idea.composerJson.json._
 import org.psliwa.idea.composerJson.{ComposerBundle, ComposerJson}
-import org.psliwa.idea.composerJson.composer._
+import org.psliwa.idea.composerJson.ComposerSchema
 
 class SchemaInspection extends LocalInspectionTool {
 
-  val schema = SchemaInspection.schema
+  val schema = ComposerSchema
   val vowels = "aeiou"
 
   override def checkFile(file: PsiFile, manager: InspectionManager, isOnTheFly: Boolean): Array[ProblemDescriptor] = {
@@ -134,7 +134,7 @@ class SchemaInspection extends LocalInspectionTool {
     case SBoolean => "boolean"
     case SString(_) | SFilePath | SStringChoice(_) => "string"
     case SNumber => "integer"
-    case SOr(as) => as.map(readableType).mkString(" or ")
+    case SOr(as) => as.map(readableType).distinct.mkString(" or ")
     case _ => "unknown"
   }
 
@@ -188,8 +188,4 @@ class SchemaInspection extends LocalInspectionTool {
   private object JsonNumberLiteral {
     def unapply(x: JsonNumberLiteral): Option[(Unit)] = Some(())
   }
-}
-
-private object SchemaInspection {
-  lazy val schema = SchemaLoader.load(ComposerSchemaFilepath)
 }
