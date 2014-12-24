@@ -1,8 +1,7 @@
-package org.psliwa.idea.composerJson.composer
+package org.psliwa.idea.composerJson.json
 
 import org.junit.Assert._
 import org.junit.Test
-
 import org.psliwa.idea.composerJson.completion.ComposerSchemaFilepath
 
 class SchemaLoadingTest {

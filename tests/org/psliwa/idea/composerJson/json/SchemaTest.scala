@@ -1,10 +1,10 @@
-package org.psliwa.idea.composerJson.composer
+package org.psliwa.idea.composerJson.json
 
 import org.junit.Assert._
 import org.junit.Test
-import org.psliwa.idea.composerJson.composer.SchemaConversions._
 
 import scala.language.implicitConversions
+import SchemaConversions._
 
 class SchemaTest {
 

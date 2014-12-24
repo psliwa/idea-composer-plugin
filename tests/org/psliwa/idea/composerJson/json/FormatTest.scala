@@ -1,9 +1,9 @@
-package org.psliwa.idea.composerJson.composer
+package org.psliwa.idea.composerJson.json
 
 import org.junit.Assert._
 import org.junit.Test
 
-class SchemaFormatTest {
+class FormatTest {
   @Test
   def givenValidUrl_itShouldBeValidUri() = {
     assertTrue(UriFormat.isValid("http://somevalid.url.com/some?query=123"))

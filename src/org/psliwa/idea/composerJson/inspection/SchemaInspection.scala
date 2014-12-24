@@ -3,6 +3,7 @@ package org.psliwa.idea.composerJson.inspection
 import com.intellij.codeInspection.{ProblemsHolder, ProblemDescriptor, InspectionManager, LocalInspectionTool}
 import com.intellij.json.psi._
 import com.intellij.psi.{PsiElementVisitor, PsiElement, PsiFile}
+import org.psliwa.idea.composerJson.json._
 import org.psliwa.idea.composerJson.{ComposerBundle, ComposerJson}
 import org.psliwa.idea.composerJson.composer._
 

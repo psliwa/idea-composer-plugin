@@ -11,6 +11,7 @@ import com.intellij.psi.{PsiDirectory, PsiElement}
 import com.intellij.psi.impl.source.tree.LeafPsiElement
 import com.intellij.util.ProcessingContext
 import org.psliwa.idea.composerJson.composer._
+import org.psliwa.idea.composerJson.json._
 import org.psliwa.idea.composerJson.util.CharType
 import org.psliwa.idea.composerJson.util.Funcs._
 import org.psliwa.idea.composerJson._

@@ -1,6 +1,4 @@
-package org.psliwa.idea.composerJson.composer
-
-import java.net.{MalformedURLException, URL}
+package org.psliwa.idea.composerJson.json
 
 import scala.language.{higherKinds, implicitConversions}
 import scala.util.parsing.json.{JSON, JSONArray, JSONObject, JSONType}
@@ -22,26 +20,6 @@ object SFilePath extends Schema
 object SFilePaths extends Schema
 object SAny extends Schema
 
-trait Format {
-  def isValid(s: String): Boolean
-}
-object EmailFormat extends Format {
-  override def isValid(s: String): Boolean = "^(?i)[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,4}$".r.findFirstMatchIn(s).isDefined
-}
-object UriFormat extends Format {
-  override def isValid(s: String): Boolean = {
-    try {
-      new URL(s)
-      true
-    } catch {
-      case _: MalformedURLException => false
-    }
-  }
-}
-object AnyFormat extends Format{
-  override def isValid(s: String) = true
-}
-
 case class Property(schema: Schema, required: Boolean)
 
 object Schema {
@@ -62,7 +40,7 @@ object Schema {
     case _ => None
   }
 
-  import org.psliwa.idea.composerJson.composer.Schema.OptionOps._
+  import OptionOps._
 
   private def jsonObjectToStringSchema: Converter[JSONObject] = (o) => {
     for {
