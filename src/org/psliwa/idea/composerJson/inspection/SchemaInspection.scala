@@ -1,16 +1,20 @@
 package org.psliwa.idea.composerJson.inspection
 
-import com.intellij.codeInspection.{ProblemsHolder, ProblemDescriptor, InspectionManager, LocalInspectionTool}
+import com.intellij.codeInspection._
 import com.intellij.json.psi._
 import com.intellij.psi.{PsiElement, PsiFile}
 import org.psliwa.idea.composerJson.json._
 import org.psliwa.idea.composerJson.{ComposerBundle, ComposerJson}
 import org.psliwa.idea.composerJson.ComposerSchema
 
+import scala.util.matching.Regex
+
 class SchemaInspection extends LocalInspectionTool {
 
   val schema = ComposerSchema
   val vowels = "aeiou"
+  val numberPattern = "^\"-?\\d+(\\.\\d+)?\"$".r
+  val booleanPattern = "^\"(true|false)\"$".r
 
   override def checkFile(file: PsiFile, manager: InspectionManager, isOnTheFly: Boolean): Array[ProblemDescriptor] = {
     if(file.getName != ComposerJson) Array()
@@ -36,6 +40,7 @@ class SchemaInspection extends LocalInspectionTool {
 
   private def collectProblems(element: PsiElement, schema: Schema, problems: ProblemsHolder): Unit = {
     import scala.collection.JavaConversions._
+    import PsiExtractors._
 
     schema match {
       case so@SObject(schemaProperties, additionalProperties) => element match {
@@ -44,8 +49,9 @@ class SchemaInspection extends LocalInspectionTool {
             schemaProperties.get(property.getName) match {
               case Some(schemaProperty) => Option(property.getValue).foreach(collectProblems(_, schemaProperty.schema, problems))
               case None if !additionalProperties => problems.registerProblem(
-                property.getNameElement,
-                ComposerBundle.message("inspection.schema.notAllowedProperty", property.getName)
+                property.getNameElement.getContext,
+                ComposerBundle.message("inspection.schema.notAllowedProperty", property.getName),
+                new RemovePropertyQuickFix(property.getNameElement)
               )
               case _ =>
             }
@@ -92,8 +98,7 @@ class SchemaInspection extends LocalInspectionTool {
       case SBoolean => element match {
         case JsonBooleanLiteral(_) =>
         case _ => {
-          //TODO: add fix - remove quotes if string inside is "true" or "false"
-          registerInvalidTypeProblem(problems, element, schema)
+          registerInvalidTypeProblem(problems, element, schema, removeQuotesQuickFixWhenMatches(element, booleanPattern):_*)
         }
       }
       case SArray(item) => element match {
@@ -113,18 +118,26 @@ class SchemaInspection extends LocalInspectionTool {
       case SNumber => element match {
         case JsonNumberLiteral(_) =>
         case _ => {
-          //TODO: add fix - remove quotes when string inside quotes is numeric
-          registerInvalidTypeProblem(problems, element, schema)
+          registerInvalidTypeProblem(problems, element, schema, removeQuotesQuickFixWhenMatches(element, numberPattern):_*)
         }
       }
       case _ =>
     }
   }
 
-  private def registerInvalidTypeProblem(problems: ProblemsHolder, element: PsiElement, schema: Schema) {
+  private def removeQuotesQuickFixWhenMatches(e: PsiElement, pattern: Regex): List[LocalQuickFix] = {
+    if(pattern.findFirstMatchIn(e.getText).isDefined) {
+      List(new RemoveQuotesQuickFix(e))
+    } else {
+      Nil
+    }
+  }
+
+  private def registerInvalidTypeProblem(problems: ProblemsHolder, element: PsiElement, schema: Schema, quickFixes: LocalQuickFix*) {
     problems.registerProblem(
       element,
-      ComposerBundle.message("inspection.schema.type", prependPrefix(readableType(schema)), readableType(element))
+      ComposerBundle.message("inspection.schema.type", prependPrefix(readableType(schema)), readableType(element)),
+      quickFixes: _*
     )
   }
 
@@ -155,37 +168,4 @@ class SchemaInspection extends LocalInspectionTool {
 
   private def prependPrefix(s: String) = prefix(s)+" "+s
   private def prefix(s: String) = if(vowels.contains(s(0))) "an" else "a"
-
-  private object JsonFile {
-    def unapply(x: JsonFile): Option[(JsonValue)] = Option(x.getTopLevelValue)
-  }
-
-  private object JsonObject {
-    def unapply(x: JsonObject): Option[(java.util.List[JsonProperty])] = Some(x.getPropertyList)
-  }
-
-  private object JsonProperty {
-    def unapply(x: JsonProperty): Option[(String, JsonValue)] = Some((x.getName, x.getValue))
-  }
-
-  private object JsonArray {
-    def unapply(x: JsonArray): Option[(java.util.List[JsonValue])] = Some(x.getValueList)
-  }
-
-  private object JsonValue {
-    def unapply(x: JsonValue): Option[(String)] = Option(x.getText)
-  }
-
-  private object JsonStringLiteral {
-    import scala.collection.JavaConversions._
-    def unapply(x: JsonStringLiteral): Option[(String)] = x.getTextFragments.headOption.map(_.second).orElse(Some(""))
-  }
-
-  private object JsonBooleanLiteral {
-    def unapply(x: JsonBooleanLiteral): Option[(Boolean)] = Some(x.getText.toBoolean)
-  }
-
-  private object JsonNumberLiteral {
-    def unapply(x: JsonNumberLiteral): Option[(Unit)] = Some(())
-  }
 }

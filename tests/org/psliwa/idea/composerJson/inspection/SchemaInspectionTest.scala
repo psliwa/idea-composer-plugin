@@ -1,12 +1,15 @@
 package org.psliwa.idea.composerJson.inspection
 
+import a.j.se
+import com.intellij.codeInspection.LocalQuickFix
+import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.util.Computable
 import com.intellij.testFramework.fixtures.LightPlatformCodeInsightFixtureTestCase
 import org.junit.ComparisonFailure
 import org.psliwa.idea.composerJson.ComposerJson
 
 class SchemaInspectionTest extends LightPlatformCodeInsightFixtureTestCase {
 
-  private val Unsupported = """<error descr="The 'unsupported' property is not allowed here.">"unsupported"</error>"""
   private val RequiredProperties =
     """
       |"name": "vendor/pkg",
@@ -23,7 +26,7 @@ class SchemaInspectionTest extends LightPlatformCodeInsightFixtureTestCase {
       s"""
         |{
         |  $RequiredProperties
-        |  $Unsupported: "value"
+        |  <error descr="The 'unsupported' property is not allowed here.">"unsupported": "value"</error>
         |}
       """.stripMargin
     )
@@ -37,23 +40,7 @@ class SchemaInspectionTest extends LightPlatformCodeInsightFixtureTestCase {
         |  "authors": [
         |    {
         |      "name": "some name",
-        |      $Unsupported: "value"
-        |    }
-        |  ]
-        |}
-      """.stripMargin
-    )
-  }
-
-  def testReportNotAllowedPropertyInNestedArray() = {
-    checkInspection(
-      s"""
-        |{
-        |  $RequiredProperties
-        |  "authors": [
-        |    {
-        |      "name": "psliwa",
-        |      $Unsupported: "value"
+        |      <error descr="The 'unsupported' property is not allowed here.">"unsupported": "value"</error>
         |    }
         |  ]
         |}
@@ -340,10 +327,168 @@ class SchemaInspectionTest extends LightPlatformCodeInsightFixtureTestCase {
     checkInspection("")
   }
 
+  def testQuickFixForQuotedNumber() = {
+    checkQuickFix(
+      s"""
+        |{
+        |  $RequiredProperties
+        |  "config": {
+        |    "cache-files-ttl": "123"
+        |  }
+        |}
+      """.stripMargin,
+      s"""
+        |{
+        |  $RequiredProperties
+        |  "config": {
+        |    "cache-files-ttl": 123
+        |  }
+        |}
+      """.stripMargin
+    )
+  }
+
+  def testDoesNotRunRemoveQuotesQuickFixWhenTextIsNotValidLiteral() = {
+    checkQuickFix(
+      s"""
+        |{
+        |  $RequiredProperties
+        |  "config": {
+        |    "cache-files-ttl": "some invalid"
+        |  }
+        |}
+      """.stripMargin,
+      s"""
+        |{
+        |  $RequiredProperties
+        |  "config": {
+        |    "cache-files-ttl": "some invalid"
+        |  }
+        |}
+      """.stripMargin
+    )
+  }
+
+  def testRemovePropertyQuickFixWhenPropertyDoesNotExist() = {
+    checkQuickFix(
+      s"""
+        |{
+        |  $RequiredProperties
+        |  "require": {},
+        |  "authors": [
+        |    {
+        |      "unsupported": "value",
+        |      "name": "psliwa"
+        |    }
+        |  ]
+        |}
+      """.stripMargin,
+      s"""
+        |{
+        |  $RequiredProperties
+        |  "require": {},
+        |  "authors": [
+        |    {
+        |      "name": "psliwa"
+        |    }
+        |  ]
+        |}
+      """.stripMargin
+    )
+  }
+
+  def testRemovePropertyQuickFix_removeCommaWhenPropertyIsTheLastOne() = {
+    checkQuickFix(
+      s"""
+        |{
+        |  $RequiredProperties
+        |  "require": {},
+        |  "unsupported": {
+        |    "prop": "value"
+        |  }
+        |}
+      """.stripMargin,
+      s"""
+        |{
+        |  $RequiredProperties
+        |  "require": {}
+        |}
+      """.stripMargin
+    )
+  }
+
+  def testRemovePropertyQuickFix_givenObjectProperty_doesNotRemoveCommaWhenPropertyIsNotTheLastOne() = {
+    checkQuickFix(
+      s"""
+        |{
+        |  $RequiredProperties
+        |  "require": {},
+        |  "unsupported": {
+        |    "prop": "value"
+        |  },
+        |  "require-dev": {}
+        |}
+      """.stripMargin,
+      s"""
+        |{
+        |  $RequiredProperties
+        |  "require": {},
+        |  "require-dev": {}
+        |}
+      """.stripMargin
+    )
+  }
+
+  def testRemovePropertyQuickFix_givenStringProperty_doesNotRemoveCommaWhenPropertyIsNotTheLastOne() = {
+    checkQuickFix(
+      s"""
+        |{
+        |  $RequiredProperties
+        |  "require": {},
+        |  "unsupported": "value",
+        |  "require-dev": {}
+        |}
+      """.stripMargin,
+      s"""
+        |{
+        |  $RequiredProperties
+        |  "require": {},
+        |  "require-dev": {}
+        |}
+      """.stripMargin
+    )
+  }
+
+//  TODO: Quick fix is not shown on top level, why?
+//  def testQuickFixForQuotedBooleans() = {
+//    checkQuickFix(
+//      s"""
+//        |{
+//        |  $RequiredProperties
+//        |  "prefer-stable": "true"
+//        |}
+//      """.stripMargin,
+//      s"""
+//        |{
+//        |  $RequiredProperties
+//        |  "prefer-stable": true
+//        |}
+//      """.stripMargin
+//    )
+//  }
+
   override def isWriteActionRequired: Boolean = false
 
   def checkInspection(s: String): Unit = {
     myFixture.configureByText(ComposerJson, s.replace("\r", ""))
     myFixture.checkHighlighting()
+  }
+
+  def checkQuickFix[QuickFix >: LocalQuickFix](actual: String, expected: String) = {
+    import scala.collection.JavaConversions._
+
+    myFixture.configureByText(ComposerJson, actual.replace("\r", ""))
+    myFixture.getAllQuickFixes(ComposerJson).foreach(myFixture.launchAction)
+    myFixture.checkResult(expected.replace("\r", ""))
   }
 }
