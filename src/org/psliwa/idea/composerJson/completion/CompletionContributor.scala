@@ -40,7 +40,7 @@ class CompletionContributor extends com.intellij.codeInsight.completion.Completi
   import CompletionContributor._
   private def completionProvidersForSchema(s: Schema, parent: Capture): List[(Capture, CompletionProvider[CompletionParameters])] = s match {
     case SObject(m, _) => {
-      propertyCompletionProvider(parent, () => m.keys.map(BaseLookupElement(_)), (k) => insertHandlerFor(m.get(k.name).get.schema)) ++
+      propertyCompletionProvider(parent, () => m.map(x => BaseLookupElement(x._1, description = x._2.description)), (k) => insertHandlerFor(m.get(k.name).get.schema)) ++
         m.flatMap(t => completionProvidersForSchema(t._2.schema, psiElement().and(propertyCapture(parent)).withName(t._1)))
     }
     case SStringChoice(m) => List((psiElement().withSuperParent(2, parent), new LookupElementsCompletionProvider(() => m.map(BaseLookupElement(_)))))

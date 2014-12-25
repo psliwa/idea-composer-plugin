@@ -20,7 +20,7 @@ object SFilePath extends Schema
 object SFilePaths extends Schema
 object SAny extends Schema
 
-case class Property(schema: Schema, required: Boolean)
+case class Property(schema: Schema, required: Boolean, description: String)
 
 object Schema {
 
@@ -103,7 +103,8 @@ object Schema {
         properties <- traverseMap(jsonObject.obj){
           case o@JSONObject(_) => for{
             required <- booleanProperty("required")(o.obj).orElse(Some(false))
-            schema <- jsonObjectToSchema(o).map(Property(_, required))
+            description <- stringProperty("description")(o.obj).orElse(Some(""))
+            schema <- jsonObjectToSchema(o).map(Property(_, required, description))
           } yield schema
           case _ => None
         }
@@ -114,9 +115,8 @@ object Schema {
     }
   }
 
-  private def booleanProperty(k: String)(map: Map[String,Any]): Option[Boolean] = {
-    map.get(k).flatMap(toBoolean)
-  }
+  private def booleanProperty(k: String)(map: Map[String,Any]): Option[Boolean] = map.get(k).flatMap(toBoolean)
+  private def stringProperty(k: String)(map: Map[String,Any]): Option[String] = map.get(k).map(_.toString)
 
   private def toBoolean(o: Any): Option[Boolean] = {
     try {

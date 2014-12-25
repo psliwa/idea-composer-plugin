@@ -63,18 +63,18 @@ class SchemaTest {
   }
 
   @Test
-  def parseSchemaWithRequiredProperties() = {
+  def parseSchemaWithRequiredAndDescribedProperties() = {
     assertSchemaEquals(
       SObject(
         Map(
-          "stringProp" -> Property(SString(), required=true)
+          "stringProp" -> Property(SString(), required=true, "some description")
         )
       ),
       Schema.parse("""
         {
          "type": "object",
          "properties": {
-           "stringProp": {"type":"string", "required": true }
+           "stringProp": {"type":"string", "required": true, "description": "some description" }
          }
         }
        """)
