@@ -9,7 +9,7 @@ import org.psliwa.idea.composerJson.ComposerBundle
 
 import scala.annotation.tailrec
 
-class RemoveQuotesQuickFix(element: PsiElement) extends LocalQuickFixOnPsiElement(element){
+private[inspection] class RemoveQuotesQuickFix(element: PsiElement) extends LocalQuickFixOnPsiElement(element){
 
   def documentFor(project: Project, file: PsiFile): Option[Document] = {
     Option(PsiDocumentManager.getInstance(project).getDocument(file))

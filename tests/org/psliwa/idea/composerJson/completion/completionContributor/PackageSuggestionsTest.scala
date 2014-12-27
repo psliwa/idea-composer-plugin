@@ -3,8 +3,6 @@ package org.psliwa.idea.composerJson.completion.completionContributor
 import org.junit.Assert._
 import org.psliwa.idea.composerJson.completion.BaseLookupElement
 
-//TODO: rages support (>, <, >= etc)
-//TODO: Better Custom matcher and tests for it
 class PackageSuggestionsTest extends TestCase {
 
   def testPackageSuggestions() = {

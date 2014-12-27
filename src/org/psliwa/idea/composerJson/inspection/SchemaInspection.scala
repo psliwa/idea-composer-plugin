@@ -28,7 +28,7 @@ class SchemaInspection extends Inspection {
               case None if !additionalProperties => problems.registerProblem(
                 property.getNameElement.getContext,
                 ComposerBundle.message("inspection.schema.notAllowedProperty", property.getName),
-                new RemovePropertyQuickFix(property.getNameElement)
+                removeJsonPropertyQuickFix(property)
               )
               case _ =>
             }
@@ -100,6 +100,10 @@ class SchemaInspection extends Inspection {
       }
       case _ =>
     }
+  }
+
+  private def removeJsonPropertyQuickFix(property: JsonProperty): RemoveJsonElementQuickFix = {
+    new RemoveJsonElementQuickFix(property, ComposerBundle.message("inspection.quickfix.removeProperty"))
   }
 
   private def removeQuotesQuickFixWhenMatches(e: PsiElement, pattern: Regex): List[LocalQuickFix] = {

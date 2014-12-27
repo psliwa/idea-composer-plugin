@@ -1,6 +1,7 @@
 package org.psliwa.idea.composerJson.inspection
 
 import org.junit.ComparisonFailure
+import org.psliwa.idea.composerJson.ComposerBundle
 
 class SchemaInspectionTest extends InspectionTest {
 
@@ -8,6 +9,9 @@ class SchemaInspectionTest extends InspectionTest {
     """
       |"name": "vendor/pkg",
     """.stripMargin
+
+  private val RemovePropertyQuickFix = ComposerBundle.message("inspection.quickfix.removeProperty")
+  private val RemoveQuotesQuickFix = ComposerBundle.message("inspection.quickfix.removeQuotes")
 
   override def setUp(): Unit = {
     super.setUp()
@@ -322,7 +326,7 @@ class SchemaInspectionTest extends InspectionTest {
   }
 
   def testQuickFixForQuotedNumber() = {
-    checkQuickFix(
+    checkQuickFix(RemoveQuotesQuickFix)(
       s"""
         |{
         |  $RequiredProperties
@@ -343,7 +347,7 @@ class SchemaInspectionTest extends InspectionTest {
   }
 
   def testDoesNotRunRemoveQuotesQuickFixWhenTextIsNotValidLiteral() = {
-    checkQuickFix(
+    checkQuickFix(RemoveQuotesQuickFix, 0)(
       s"""
         |{
         |  $RequiredProperties
@@ -364,7 +368,7 @@ class SchemaInspectionTest extends InspectionTest {
   }
 
   def testRemovePropertyQuickFixWhenPropertyDoesNotExist() = {
-    checkQuickFix(
+    checkQuickFix(RemovePropertyQuickFix)(
       s"""
         |{
         |  $RequiredProperties
@@ -392,7 +396,7 @@ class SchemaInspectionTest extends InspectionTest {
   }
 
   def testRemovePropertyQuickFix_removeCommaWhenPropertyIsTheLastOne() = {
-    checkQuickFix(
+    checkQuickFix(RemovePropertyQuickFix)(
       s"""
         |{
         |  $RequiredProperties
@@ -412,7 +416,7 @@ class SchemaInspectionTest extends InspectionTest {
   }
 
   def testRemovePropertyQuickFix_givenObjectProperty_doesNotRemoveCommaWhenPropertyIsNotTheLastOne() = {
-    checkQuickFix(
+    checkQuickFix(RemovePropertyQuickFix)(
       s"""
         |{
         |  $RequiredProperties
@@ -434,7 +438,7 @@ class SchemaInspectionTest extends InspectionTest {
   }
 
   def testRemovePropertyQuickFix_givenStringProperty_doesNotRemoveCommaWhenPropertyIsNotTheLastOne() = {
-    checkQuickFix(
+    checkQuickFix(RemovePropertyQuickFix)(
       s"""
         |{
         |  $RequiredProperties

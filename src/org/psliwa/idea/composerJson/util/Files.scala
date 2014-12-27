@@ -32,4 +32,11 @@ object Files {
 
     loop(rootDir, path.split("/").toList.filter(!_.isEmpty))
   }
+
+  def findFile(rootDir: PsiDirectory, path: String): Option[PsiFile] = {
+    findPath(rootDir, path) match {
+      case Some(x: PsiFile) => Some(x)
+      case _ => None
+    }
+  }
 }

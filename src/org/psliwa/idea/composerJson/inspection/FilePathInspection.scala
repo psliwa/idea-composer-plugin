@@ -31,9 +31,13 @@ class FilePathInspection extends Inspection {
         case _ =>
       }
       case SFilePath(true) => element match {
-        case JsonStringLiteral(value) => {
+        case jsl@JsonStringLiteral(value) => {
           if(!pathExists(rootDir, value)) {
-            problems.registerProblem(element, ComposerBundle.message("inspection.filePath.fileMissing", value))
+            problems.registerProblem(
+              element,
+              ComposerBundle.message("inspection.filePath.fileMissing", value),
+              CreateFilesystemItemQuickFix.file(jsl), CreateFilesystemItemQuickFix.directory(jsl), removeValueQuickFix(element)
+            )
           }
         }
         case _ =>
@@ -42,14 +46,26 @@ class FilePathInspection extends Inspection {
         case JsonObject(properties) => for(property <- properties) {
           Option(property.getValue).foreach(collectProblems(_, schema, problems))
         }
-        case JsonStringLiteral(value) => {
+        case jsl@JsonStringLiteral(value) => {
           if(!pathExists(rootDir, value)) {
-            problems.registerProblem(element, ComposerBundle.message("inspection.filePath.fileMissing", value))
+            problems.registerProblem(
+              element,
+              ComposerBundle.message("inspection.filePath.fileMissing", value),
+              CreateFilesystemItemQuickFix.file(jsl) :: CreateFilesystemItemQuickFix.directory(jsl) :: Option(element.getContext).map(removePropertyQuickFix).toList:_*
+            )
           }
         }
       }
       case _ =>
     }
+  }
+
+  def removePropertyQuickFix(element: PsiElement): RemoveJsonElementQuickFix = {
+    new RemoveJsonElementQuickFix(element, ComposerBundle.message("inspection.quickfix.removeProperty"))
+  }
+
+  private def removeValueQuickFix(element: PsiElement): RemoveJsonElementQuickFix = {
+    new RemoveJsonElementQuickFix(element, ComposerBundle.message("inspection.quickfix.removeValue"))
   }
 
   private def pathExists(rootDir: PsiDirectory, path: String): Boolean = {

@@ -6,7 +6,7 @@ import com.intellij.psi.{PsiElement, PsiFile}
 import org.psliwa.idea.composerJson._
 import org.psliwa.idea.composerJson.json.Schema
 
-abstract class Inspection extends LocalInspectionTool {
+private[inspection] abstract class Inspection extends LocalInspectionTool {
   val schema = ComposerSchema
 
   override final def checkFile(file: PsiFile, manager: InspectionManager, isOnTheFly: Boolean): Array[ProblemDescriptor] = {

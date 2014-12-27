@@ -1,10 +1,9 @@
 package org.psliwa.idea.composerJson.inspection
 
-import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.util.Computable
 import org.junit.ComparisonFailure
 
 class FilePathInspectionTest extends InspectionTest {
+
   override def setUp(): Unit = {
     super.setUp()
 
@@ -31,12 +30,6 @@ class FilePathInspectionTest extends InspectionTest {
         |}
       """.stripMargin
     )
-  }
-
-  private def writeAction(f: () => Unit) = {
-    ApplicationManager.getApplication.runWriteAction(new Computable[Unit] {
-      override def compute = f()
-    })
   }
 
   def testGivenFilePathElement_givenElementDoesNotRequireExistingPath_warningShouldNotBeNeverReported() = {

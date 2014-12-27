@@ -5,29 +5,28 @@ import com.intellij.codeInspection.LocalQuickFixOnPsiElement
 import com.intellij.openapi.project.Project
 import com.intellij.psi.{PsiFile, PsiElement}
 import org.psliwa.idea.composerJson.ComposerBundle
+import org.psliwa.idea.composerJson.inspection.PsiExtractors.JsonStringLiteral
 
 import scala.annotation.tailrec
 
-class RemovePropertyQuickFix(element: PsiElement) extends LocalQuickFixOnPsiElement(element) {
+private[inspection] class RemoveJsonElementQuickFix(element: PsiElement, text: String) extends LocalQuickFixOnPsiElement(element) {
 
   import PsiExtractors.JsonProperty
   import PsiExtractors.LeafPsiElement
 
   override def invoke(project: Project, file: PsiFile, startElement: PsiElement, endElement: PsiElement): Unit = {
-    val maybeElement = Option(startElement.getContext)
-
-    if(maybeElement.flatMap(nextPropertyElement).isEmpty) {
-      maybeElement.flatMap(previousCommaElement).foreach(_.delete())
+    if(nextPropertyElementOf(startElement).isEmpty) {
+      previousCommaElementOf(startElement).foreach(_.delete())
     }
 
-    maybeElement.flatMap(nextCommaElement).foreach(_.delete())
+    nextCommaElementOf(startElement).foreach(_.delete())
 
-    maybeElement.foreach(_.delete())
+    startElement.delete()
   }
   
-  private def nextCommaElement = findSibling(isCommaElement, x => Option(x.getNextSibling), isJsonProperty) _
-  private def previousCommaElement = findSibling(isCommaElement, x => Option(x.getPrevSibling), isJsonProperty) _
-  private def nextPropertyElement = findSibling(isJsonProperty, x => Option(x.getNextSibling)) _
+  private def nextCommaElementOf = findSibling(isCommaElement, x => Option(x.getNextSibling), isJsonProperty) _
+  private def previousCommaElementOf = findSibling(isCommaElement, x => Option(x.getPrevSibling), isJsonProperty) _
+  private def nextPropertyElementOf = findSibling(isJsonProperty, x => Option(x.getNextSibling)) _
 
   private def isCommaElement(e: PsiElement): Boolean = e match {
     case LeafPsiElement(",") => true
@@ -35,7 +34,7 @@ class RemovePropertyQuickFix(element: PsiElement) extends LocalQuickFixOnPsiElem
   }
 
   private def isJsonProperty(e: PsiElement): Boolean = e match {
-    case JsonProperty(_, _) => true
+    case JsonProperty(_, _) | JsonStringLiteral(_) => true
     case _ => false
   }
 
@@ -57,6 +56,6 @@ class RemovePropertyQuickFix(element: PsiElement) extends LocalQuickFixOnPsiElem
     loop(nextSibling(e))
   }
 
-  override def getText: String = ComposerBundle.message("inspection.quickfix.removeProperty")
+  override def getText: String = text
   override def getFamilyName: String = ComposerBundle.message("inspection.group")
 }
