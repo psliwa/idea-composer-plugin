@@ -7,7 +7,7 @@ import com.intellij.json.psi._
 import com.intellij.patterns.PlatformPatterns._
 import com.intellij.patterns.StandardPatterns._
 import com.intellij.patterns.{PsiElementPattern, PatternCondition}
-import com.intellij.psi.{PsiDirectory, PsiElement}
+import com.intellij.psi.PsiElement
 import com.intellij.psi.impl.source.tree.LeafPsiElement
 import com.intellij.util.ProcessingContext
 import org.psliwa.idea.composerJson.composer._
@@ -15,6 +15,7 @@ import org.psliwa.idea.composerJson.json._
 import org.psliwa.idea.composerJson.util.CharType
 import org.psliwa.idea.composerJson.util.Funcs._
 import org.psliwa.idea.composerJson._
+import org.psliwa.idea.composerJson.util.Files._
 import org.psliwa.idea.composerJson.util.CharType._
 import org.psliwa.idea.composerJson.util.CharType.ImplicitConversions._
 
@@ -55,10 +56,10 @@ class CompletionContributor extends com.intellij.codeInsight.completion.Completi
           })
         ))
     }
-    case SFilePath => {
+    case SFilePath(_) => {
       List((psiElement().withSuperParent(2, parent), FilePathProvider))
     }
-    case SFilePaths => {
+    case SFilePaths(_) => {
       List((psiElement().withSuperParent(2, psiElement().and(propertyCapture(parent))).afterLeaf(":"), FilePathProvider))
     }
     case _ => List()
@@ -84,7 +85,7 @@ class CompletionContributor extends com.intellij.codeInsight.completion.Completi
   @tailrec
   private def insertHandlerFor(schema: Schema): Option[InsertHandler[LookupElement]] = schema match {
     case SString(_) | SStringChoice(_) => Some(StringPropertyValueInsertHandler)
-    case SObject(_, _) | SPackages | SFilePaths => Some(ObjectPropertyValueInsertHandler)
+    case SObject(_, _) | SPackages | SFilePaths(_) => Some(ObjectPropertyValueInsertHandler)
     case SArray(_) => Some(ArrayPropertyValueInsertHandler)
     case SBoolean | SNumber => Some(EmptyPropertyValueInsertHandler)
     case SOr(h::_) => insertHandlerFor(h)
@@ -235,22 +236,5 @@ protected[completion] object CompletionContributor {
     findOffsetReverse('/')(s.length-1)(s)
       .map(s.substring(0, _))
       .orElse(Some(""))
-  }
-
-  private def findDir(rootDir: PsiDirectory, path: String): Option[PsiDirectory] = {
-    @tailrec
-    def loop(rootDir: PsiDirectory, paths: List[String]): Option[PsiDirectory] = {
-      paths match {
-        case Nil => Some(rootDir)
-        case h::t => {
-          val subDir = rootDir.findSubdirectory(h)
-
-          if(subDir == null) None
-          else loop(subDir, t)
-        }
-      }
-    }
-
-    loop(rootDir, path.split("/").toList.filter(!_.isEmpty))
   }
 }

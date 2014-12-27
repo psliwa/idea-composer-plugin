@@ -9,36 +9,13 @@ import org.psliwa.idea.composerJson.ComposerSchema
 
 import scala.util.matching.Regex
 
-class SchemaInspection extends LocalInspectionTool {
+class SchemaInspection extends Inspection {
 
-  val schema = ComposerSchema
   val vowels = "aeiou"
   val numberPattern = "^\"-?\\d+(\\.\\d+)?\"$".r
   val booleanPattern = "^\"(true|false)\"$".r
 
-  override def checkFile(file: PsiFile, manager: InspectionManager, isOnTheFly: Boolean): Array[ProblemDescriptor] = {
-    if(file.getName != ComposerJson) Array()
-    else doCheckFile(file, manager, isOnTheFly)
-  }
-
-  private def doCheckFile(file: PsiFile, manager: InspectionManager, isOnTheFly: Boolean): Array[ProblemDescriptor] = {
-    val problems = new ProblemsHolder(manager, file, isOnTheFly)
-
-    for {
-      file <- ensureJsonFile(file)
-      schema <- schema
-      topLevelValue <- Option(file.getTopLevelValue)
-    } yield collectProblems(topLevelValue, schema, problems)
-
-    problems.getResultsArray
-  }
-
-  private def ensureJsonFile(file: PsiFile) = file match {
-    case x: JsonFile => Some(x)
-    case _ => None
-  }
-
-  private def collectProblems(element: PsiElement, schema: Schema, problems: ProblemsHolder): Unit = {
+  override protected def collectProblems(element: PsiElement, schema: Schema, problems: ProblemsHolder): Unit = {
     import scala.collection.JavaConversions._
     import PsiExtractors._
 
@@ -68,7 +45,7 @@ class SchemaInspection extends LocalInspectionTool {
         }
         case _ => registerInvalidTypeProblem(problems, element, schema)
       }
-      case SPackages | SFilePaths => element match {
+      case SPackages | SFilePaths(_) => element match {
         case JsonObject(_) =>
         case _ => registerInvalidTypeProblem(problems, element, schema)
       }
@@ -81,7 +58,7 @@ class SchemaInspection extends LocalInspectionTool {
         }
         case _ => registerInvalidTypeProblem(problems, element, schema)
       }
-      case SFilePath => element match {
+      case SFilePath(_) => element match {
         case JsonStringLiteral(_) =>
         case _ => registerInvalidTypeProblem(problems, element, schema)
       }
@@ -142,10 +119,10 @@ class SchemaInspection extends LocalInspectionTool {
   }
 
   private def readableType(s: Schema): String = s match {
-    case SObject(_, _) | SPackages | SFilePaths => "object"
+    case SObject(_, _) | SPackages | SFilePaths(_) => "object"
     case SArray(_) => "array"
     case SBoolean => "boolean"
-    case SString(_) | SFilePath | SStringChoice(_) => "string"
+    case SString(_) | SFilePath(_) | SStringChoice(_) => "string"
     case SNumber => "integer"
     case SOr(as) => as.map(readableType).distinct.mkString(" or ")
     case _ => "unknown"

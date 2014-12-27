@@ -48,6 +48,15 @@ This plugin adds auto completion feature for composer.json file in PHP projects.
             level="ERROR"
             groupKey="inspection.group"
             />
+      <localInspection
+              bundle="org.psliwa.idea.composerJson.messages.ComposerBundle"
+              language="JSON"
+              implementationClass="org.psliwa.idea.composerJson.inspection.FilePathInspection"
+              displayName="File paths"
+              enabledByDefault="true"
+              level="WARNING"
+              groupKey="inspection.group"
+              />
   </extensions>
 
   <application-components>

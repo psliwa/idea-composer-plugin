@@ -1,14 +1,8 @@
 package org.psliwa.idea.composerJson.inspection
 
-import a.j.se
-import com.intellij.codeInspection.LocalQuickFix
-import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.util.Computable
-import com.intellij.testFramework.fixtures.LightPlatformCodeInsightFixtureTestCase
 import org.junit.ComparisonFailure
-import org.psliwa.idea.composerJson.ComposerJson
 
-class SchemaInspectionTest extends LightPlatformCodeInsightFixtureTestCase {
+class SchemaInspectionTest extends InspectionTest {
 
   private val RequiredProperties =
     """
@@ -476,19 +470,4 @@ class SchemaInspectionTest extends LightPlatformCodeInsightFixtureTestCase {
 //      """.stripMargin
 //    )
 //  }
-
-  override def isWriteActionRequired: Boolean = false
-
-  def checkInspection(s: String): Unit = {
-    myFixture.configureByText(ComposerJson, s.replace("\r", ""))
-    myFixture.checkHighlighting()
-  }
-
-  def checkQuickFix[QuickFix >: LocalQuickFix](actual: String, expected: String) = {
-    import scala.collection.JavaConversions._
-
-    myFixture.configureByText(ComposerJson, actual.replace("\r", ""))
-    myFixture.getAllQuickFixes(ComposerJson).foreach(myFixture.launchAction)
-    myFixture.checkResult(expected.replace("\r", ""))
-  }
 }

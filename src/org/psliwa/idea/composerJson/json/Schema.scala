@@ -12,12 +12,12 @@ case class SArray(child: Schema) extends Schema
 case class SStringChoice(choices: List[String]) extends Schema
 case class SOr(alternatives: List[Schema]) extends Schema
 case class SString(format: Format = AnyFormat) extends Schema
+case class SFilePath(existingFilePath: Boolean = true) extends Schema
+case class SFilePaths(existingFilePath: Boolean = true) extends Schema
 
 object SBoolean extends Schema
 object SNumber extends Schema
 object SPackages extends Schema
-object SFilePath extends Schema
-object SFilePaths extends Schema
 object SAny extends Schema
 
 case class Property(schema: Schema, required: Boolean, description: String)
@@ -150,21 +150,17 @@ object Schema {
     }
   }
 
-  private def jsonObjectToFilePathSchema: Converter[JSONObject] = t => {
-    if(t.obj.get("type").exists(_ == "filePath")) {
-      Some(SFilePath)
+  private def jsonObjectToFilePathSchema = jsonObjectToSchemaWithBooleanArg(SFilePath, "filePath", "existingFilePath") _
+
+  private def jsonObjectToSchemaWithBooleanArg(f: Boolean => Schema, typeProp: String, booleanProp: String)(jsonObject: JSONObject): Option[Schema] = {
+    if(jsonObject.obj.get("type").exists(_ == typeProp)) {
+      Some(f(booleanProperty(booleanProp)(jsonObject.obj).getOrElse(true)))
     } else {
       None
     }
   }
 
-  private def jsonObjectToFilePathsSchema: Converter[JSONObject] = t => {
-    if(t.obj.get("type").exists(_ == "filePaths")) {
-      Some(SFilePaths)
-    } else {
-      None
-    }
-  }
+  private def jsonObjectToFilePathsSchema = jsonObjectToSchemaWithBooleanArg(SFilePaths, "filePaths", "existingFilePath") _
 
   private object OptionOps {
     def traverseMap[K,A,B](as: Map[K,A])(f: A => Option[B]): Option[Map[K,B]] = {

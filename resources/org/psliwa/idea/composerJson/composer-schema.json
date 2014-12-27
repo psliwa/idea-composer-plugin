@@ -153,10 +153,12 @@
         },
         "vendor-dir": {
           "type": "filePath",
+          "existingFilePath": false,
           "description": "The location where all packages are installed, defaults to \"vendor\"."
         },
         "bin-dir": {
           "type": "filePath",
+          "existingFilePath": false,
           "description": "The location where all binaries are linked, defaults to \"vendor/bin\"."
         },
         "cache-dir": {
@@ -297,7 +299,8 @@
         "exclude": {
           "type": "array",
           "items": {
-            "type": "filePath"
+            "type": "filePath",
+            "existingFilePath": false
           },
           "description": "A list of patterns for paths to exclude or include if prefixed with an exclamation mark."
         }

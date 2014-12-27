@@ -330,7 +330,7 @@ class SchemaTest {
   def parseSchemaWithPathProperty() = {
     assertSchemaEquals(
       SObject(Map(
-        "name" -> SFilePath
+        "name" -> SFilePath(existingFilePath = true)
       )),
       Schema.parse(
         """
@@ -338,6 +338,25 @@ class SchemaTest {
           |   "type": "object",
           |   "properties": {
           |     "name": { "type": "filePath" }
+          |   }
+          | }
+        """.stripMargin
+      )
+    )
+  }
+
+  @Test
+  def parseSchemaWithPathProperty_filePathCouldNotExist() = {
+    assertSchemaEquals(
+      SObject(Map(
+        "name" -> SFilePath(existingFilePath = false)
+      )),
+      Schema.parse(
+        """
+          | {
+          |   "type": "object",
+          |   "properties": {
+          |     "name": { "type": "filePath", "existingFilePath": false }
           |   }
           | }
         """.stripMargin
