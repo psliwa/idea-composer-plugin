@@ -1,16 +1,24 @@
 <idea-plugin version="2">
   <id>org.psliwa.idea.composer</id>
-  <name>PHP Composer AutoComplete</name>
-  <version>0.1.2</version>
+  <name>PHP Composer.json Support</name>
+  <version>0.2.0</version>
   <vendor email="me@psliwa.org" url="http://github.org/psliwa/idea-composer-plugin">psliwa</vendor>
 
   <description><![CDATA[
-<h1>PHP Composer AutoComplete</h1>
+<h1>PHP Composer.json Support</h1>
 
 This plugin adds auto completion feature for composer.json file in PHP projects.
     ]]></description>
 
   <change-notes><![CDATA[
+<h2>0.2.0</h2>
+<ul>
+  <li>Inspections</li>
+  <li>composer.json schema validation + related "quick fixes"</li>
+  <li>Inspections for filepath existence (for "bin" etc properties) + related "quick fixes": remove entry, create file/directory</li>
+  <li>Display property description in completion list</li>
+</ul>
+
 <h2>0.1.2</h2>
 <ul>
   <li>Generic completion usability improvements</li>
