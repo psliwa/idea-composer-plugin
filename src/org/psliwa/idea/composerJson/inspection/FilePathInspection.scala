@@ -1,6 +1,7 @@
 package org.psliwa.idea.composerJson.inspection
 
 import com.intellij.codeInspection.ProblemsHolder
+import com.intellij.json.psi.JsonProperty
 import com.intellij.psi.{PsiDirectory, PsiElement}
 import org.psliwa.idea.composerJson.ComposerBundle
 import org.psliwa.idea.composerJson.inspection.PsiExtractors.{JsonStringLiteral, JsonArray, JsonObject}
@@ -51,21 +52,32 @@ class FilePathInspection extends Inspection {
             problems.registerProblem(
               element,
               ComposerBundle.message("inspection.filePath.fileMissing", value),
-              CreateFilesystemItemQuickFix.file(jsl) :: CreateFilesystemItemQuickFix.directory(jsl) :: Option(element.getContext).map(removePropertyQuickFix).toList:_*
+              CreateFilesystemItemQuickFix.file(jsl),
+              CreateFilesystemItemQuickFix.directory(jsl),
+              removePropertyQuickFix(getPropertyIfPossible(element))
             )
           }
         }
+        case JsonArray(values) => for(value <- values) {
+          collectProblems(value, schema, problems)
+        }
+        case _ =>
       }
       case _ =>
     }
   }
 
-  def removePropertyQuickFix(element: PsiElement): RemoveJsonElementQuickFix = {
-    new RemoveJsonElementQuickFix(element, ComposerBundle.message("inspection.quickfix.removeProperty"))
+  private def getPropertyIfPossible(e: PsiElement): PsiElement = e.getContext match {
+    case x: JsonProperty => x
+    case _ => e
+  }
+
+  private def removePropertyQuickFix(element: PsiElement): RemoveJsonElementQuickFix = {
+    new RemoveJsonElementQuickFix(element, ComposerBundle.message("inspection.quickfix.removeEntry"))
   }
 
   private def removeValueQuickFix(element: PsiElement): RemoveJsonElementQuickFix = {
-    new RemoveJsonElementQuickFix(element, ComposerBundle.message("inspection.quickfix.removeValue"))
+    new RemoveJsonElementQuickFix(element, ComposerBundle.message("inspection.quickfix.removeEntry"))
   }
 
   private def pathExists(rootDir: PsiDirectory, path: String): Boolean = {

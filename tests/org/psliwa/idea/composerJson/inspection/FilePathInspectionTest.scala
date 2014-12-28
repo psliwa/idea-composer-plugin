@@ -58,6 +58,20 @@ class FilePathInspectionTest extends InspectionTest {
     )
   }
 
+  def testGivenFilePathsElement_givenArrayOfUnexistingFilePaths_warningShouldBeReported() = {
+    checkInspection(
+      """
+        |{
+        |  "autoload": {
+        |    "psr-0": {
+        |      "": [<warning descr="File 'some/unexisting' does not exist.">"some/unexisting"</warning>]
+        |    }
+        |  }
+        |}
+      """.stripMargin
+    )
+  }
+
   def testGivenFilePathsElement_givenExistingFilePath_warningShouldNotBeReported() = {
     writeAction(() => myFixture.getTempDirFixture.findOrCreateDir("some").createChildData(this, "existing"))
 
@@ -67,6 +81,22 @@ class FilePathInspectionTest extends InspectionTest {
         |  "autoload": {
         |    "psr-0": {
         |      "": "some/existing"
+        |    }
+        |  }
+        |}
+      """.stripMargin
+    )
+  }
+
+  def testGivenFilePathsElement_givenArrayOfExistingFilePaths_warningShouldNotBeReported() = {
+    writeAction(() => myFixture.getTempDirFixture.findOrCreateDir("some").createChildData(this, "existing"))
+
+    checkInspection(
+      """
+        |{
+        |  "autoload": {
+        |    "psr-0": {
+        |      "": [ "some/existing" ]
         |    }
         |  }
         |}

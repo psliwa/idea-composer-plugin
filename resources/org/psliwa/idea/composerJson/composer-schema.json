@@ -9,7 +9,10 @@
     },
     "type": {
       "description": "Package type, either 'library' for common packages, 'composer-plugin' for plugins, 'metapackage' for empty packages, or a custom type ([a-z0-9-]+) defined by whatever project this package applies to.",
-      "enum": [ "library", "project", "metapackage", "composer-plugin"]
+      "oneOf": [
+        { "enum": [ "library", "project", "metapackage", "composer-plugin"] },
+        { "type": "string" }
+      ]
     },
     "target-dir": {
       "description": "DEPRECATED: Forces the package to be installed into the given subdirectory path. This is used for autoloading PSR-0 packages that do not contain their full path. Use forward slashes for cross-platform compatibility.",
@@ -33,7 +36,7 @@
     },
     "version": {
       "type": "string",
-      "description": "Package version, see http://getcomposer.org/doc/04-schema.md#version for more info on valid schemes."
+      "description": "Package version."
     },
     "time": {
       "type": "string",
@@ -481,8 +484,7 @@
         },
         "irc": {
           "type": "string",
-          "description": "IRC channel for support, as irc://server/channel.",
-          "format": "uri"
+          "description": "IRC channel for support, as irc://server/channel."
         },
         "source": {
           "type": "string",

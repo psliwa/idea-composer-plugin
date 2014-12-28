@@ -5,8 +5,7 @@ import org.psliwa.idea.composerJson.ComposerBundle
 
 class FilePathQuickFixesTest extends InspectionTest {
 
-  private val RemoveValueQuickFix = ComposerBundle.message("inspection.quickfix.removeValue")
-  private val RemovePropertyQuickFix = ComposerBundle.message("inspection.quickfix.removeProperty")
+  private val RemoveEntryQuickFix = ComposerBundle.message("inspection.quickfix.removeEntry")
   private val CreateDirectoryQuickFix = ComposerBundle.message("inspection.quickfix.createDirectory", _: String)
   private val CreateFileQuickFix = ComposerBundle.message("inspection.quickfix.createFile", _: String)
 
@@ -17,7 +16,7 @@ class FilePathQuickFixesTest extends InspectionTest {
   }
 
   def testRunRemoveValueQuickFix_valueShouldBeRemoved() = {
-    checkQuickFix(RemoveValueQuickFix)(
+    checkQuickFix(RemoveEntryQuickFix)(
       """
         |{
         |  "bin": [
@@ -37,7 +36,7 @@ class FilePathQuickFixesTest extends InspectionTest {
   def testGivenFilePathIsLastOne_runRemoveValueQuickFix_lastCommaShouldBeRemoved() = {
     writeAction(() => myFixture.getTempDirFixture.findOrCreateDir("some").createChildData(this, "existing"))
 
-    checkQuickFix(RemoveValueQuickFix)(
+    checkQuickFix(RemoveEntryQuickFix)(
       """
         |{
         |  "bin": [
@@ -57,7 +56,7 @@ class FilePathQuickFixesTest extends InspectionTest {
   }
 
   def testGivenFilePathsElement_runRemovePropertyQuickFix_propertyShouldBeRemoved() = {
-    checkQuickFix(RemovePropertyQuickFix)(
+    checkQuickFix(RemoveEntryQuickFix)(
       """
         |{
         |  "autoload": {
@@ -71,6 +70,29 @@ class FilePathQuickFixesTest extends InspectionTest {
         |{
         |  "autoload": {
         |    "psr-0": {
+        |    }
+        |  }
+        |}
+      """.stripMargin
+    )
+  }
+
+  def testGivenFilePathsElement_filePathsGivenAsArray_runRemovePropertyQuickFix_propertyShouldBeRemoved() = {
+    checkQuickFix(RemoveEntryQuickFix)(
+      """
+        |{
+        |  "autoload": {
+        |    "psr-0": {
+        |      "": ["some/unexisting"]
+        |    }
+        |  }
+        |}
+      """.stripMargin,
+      """
+        |{
+        |  "autoload": {
+        |    "psr-0": {
+        |      "": []
         |    }
         |  }
         |}

@@ -60,7 +60,11 @@ class CompletionContributor extends com.intellij.codeInsight.completion.Completi
       List((psiElement().withSuperParent(2, parent), FilePathProvider))
     }
     case SFilePaths(_) => {
-      List((psiElement().withSuperParent(2, psiElement().and(propertyCapture(parent))).afterLeaf(":"), FilePathProvider))
+      val superParent = psiElement().and(propertyCapture(parent))
+      List(
+        (psiElement().withSuperParent(2, superParent).afterLeaf(":"), FilePathProvider),
+        (psiElement().withSuperParent(2, psiElement(classOf[JsonArray]).withParent(superParent)), FilePathProvider)
+      )
     }
     case _ => List()
   }

@@ -10,7 +10,7 @@ class SchemaInspectionTest extends InspectionTest {
       |"name": "vendor/pkg",
     """.stripMargin
 
-  private val RemovePropertyQuickFix = ComposerBundle.message("inspection.quickfix.removeProperty")
+  private val RemoveEntryQuickFix = ComposerBundle.message("inspection.quickfix.removeEntry")
   private val RemoveQuotesQuickFix = ComposerBundle.message("inspection.quickfix.removeQuotes")
 
   override def setUp(): Unit = {
@@ -48,13 +48,13 @@ class SchemaInspectionTest extends InspectionTest {
 
   def testReportInvalidPropertyValueInEnum() = {
 
-    val allowed = List("library", "project", "metapackage", "composer-plugin").map("'"+_+"'").mkString(" or ")
+    val allowed = List("dev", "alpha", "beta", "RC", "stable").map("'"+_+"'").mkString(" or ")
 
     checkInspection(
       s"""
         |{
         |  $RequiredProperties
-        |  "type": <error descr="Value 'invalid' is not allowed here, it must be $allowed.">"invalid"</error>
+        |  "minimum-stability": <error descr="Value 'invalid' is not allowed here, it must be $allowed.">"invalid"</error>
         |}
       """.stripMargin
     )
@@ -368,7 +368,7 @@ class SchemaInspectionTest extends InspectionTest {
   }
 
   def testRemovePropertyQuickFixWhenPropertyDoesNotExist() = {
-    checkQuickFix(RemovePropertyQuickFix)(
+    checkQuickFix(RemoveEntryQuickFix)(
       s"""
         |{
         |  $RequiredProperties
@@ -396,7 +396,7 @@ class SchemaInspectionTest extends InspectionTest {
   }
 
   def testRemovePropertyQuickFix_removeCommaWhenPropertyIsTheLastOne() = {
-    checkQuickFix(RemovePropertyQuickFix)(
+    checkQuickFix(RemoveEntryQuickFix)(
       s"""
         |{
         |  $RequiredProperties
@@ -416,7 +416,7 @@ class SchemaInspectionTest extends InspectionTest {
   }
 
   def testRemovePropertyQuickFix_givenObjectProperty_doesNotRemoveCommaWhenPropertyIsNotTheLastOne() = {
-    checkQuickFix(RemovePropertyQuickFix)(
+    checkQuickFix(RemoveEntryQuickFix)(
       s"""
         |{
         |  $RequiredProperties
@@ -438,7 +438,7 @@ class SchemaInspectionTest extends InspectionTest {
   }
 
   def testRemovePropertyQuickFix_givenStringProperty_doesNotRemoveCommaWhenPropertyIsNotTheLastOne() = {
-    checkQuickFix(RemovePropertyQuickFix)(
+    checkQuickFix(RemoveEntryQuickFix)(
       s"""
         |{
         |  $RequiredProperties

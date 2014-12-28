@@ -103,7 +103,7 @@ class SchemaInspection extends Inspection {
   }
 
   private def removeJsonPropertyQuickFix(property: JsonProperty): RemoveJsonElementQuickFix = {
-    new RemoveJsonElementQuickFix(property, ComposerBundle.message("inspection.quickfix.removeProperty"))
+    new RemoveJsonElementQuickFix(property, ComposerBundle.message("inspection.quickfix.removeEntry"))
   }
 
   private def removeQuotesQuickFixWhenMatches(e: PsiElement, pattern: Regex): List[LocalQuickFix] = {

@@ -63,6 +63,23 @@ class FilePathTest extends TestCase {
     )
   }
 
+  def testSuggestionsInAutoloadProperty_givenArrayOfFilePaths_completionShouldWorkAsWell() = {
+    myFixture.getTempDirFixture.findOrCreateDir("dir1")
+
+    suggestions(
+      """
+        |{
+        | "autoload": {
+        |   "psr-0": {
+        |     "Some\\Namespace": [ "<caret>" ]
+        |   }
+        | }
+        |}
+      """.stripMargin,
+      Array("dir1/")
+    )
+  }
+
   def testSuggestionsInAutoload_filePathsShouldNotBeSuggestedAsAutoloadProperties() = {
     myFixture.getTempDirFixture.findOrCreateDir("dir1")
 
