@@ -1,4 +1,4 @@
-# PHP Composer.json Support
+# PHP composer.json support
 
 Adds code completion and inspections to composer.json file.
 
