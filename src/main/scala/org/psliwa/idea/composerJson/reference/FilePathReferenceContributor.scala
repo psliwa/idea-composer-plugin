@@ -4,8 +4,6 @@ import com.intellij.json.JsonLanguage
 import com.intellij.json.psi._
 import com.intellij.patterns.PlatformPatterns._
 import com.intellij.psi._
-import com.intellij.psi.impl.source.resolve.reference.impl.providers.{FileReferenceSet, FileReference}
-import com.intellij.util.ProcessingContext
 import org.psliwa.idea.composerJson._
 import com.intellij.patterns.{ElementPattern, PsiElementPattern}
 import org.psliwa.idea.composerJson.json._
@@ -19,12 +17,12 @@ class FilePathReferenceContributor extends PsiReferenceContributor  {
     schema
       .map(schemaToPatterns)
       .foreach(
-        _.foreach { pattern => registrar.registerReferenceProvider(pattern, psiReferenceProvider) }
+        _.foreach { matcher => registrar.registerReferenceProvider(matcher.pattern, matcher.provider) }
       )
   }
 
-  private def schemaToPatterns(s: Schema): List[ElementPattern[_ <: PsiElement]] = {
-    def loop(s: Schema, parent: Capture): List[ElementPattern[_ <: PsiElement]] = s match {
+  private def schemaToPatterns(s: Schema): List[ReferenceMatcher] = {
+    def loop(s: Schema, parent: Capture): List[ReferenceMatcher] = s match {
       case SObject(properties, _) => {
         properties.toList.flatMap{ case(name, property) => {
           loop(
@@ -37,14 +35,17 @@ class FilePathReferenceContributor extends PsiReferenceContributor  {
         loop(item, psiElement(classOf[JsonArray]).withParent(parent))
       }
       case SFilePath(_) => {
-        List(psiElement(classOf[JsonStringLiteral]).withParent(parent))
+        List(ReferenceMatcher(psiElement(classOf[JsonStringLiteral]).withParent(parent), FilePathReferenceProvider))
       }
       case SFilePaths(_) => {
         val root = psiElement(classOf[JsonProperty]).withParent(psiElement(classOf[JsonObject]).withParent(parent))
         List(
-          psiElement(classOf[JsonStringLiteral]).withParent(root),
-          psiElement(classOf[JsonStringLiteral]).withParent(psiElement(classOf[JsonArray]).withParent(root))
+          ReferenceMatcher(psiElement(classOf[JsonStringLiteral]).withParent(root).afterLeaf(":"), FilePathReferenceProvider),
+          ReferenceMatcher(psiElement(classOf[JsonStringLiteral]).withParent(psiElement(classOf[JsonArray]).withParent(root)), FilePathReferenceProvider)
         )
+      }
+      case SPackages => {
+        List(ReferenceMatcher(psiElement(classOf[JsonProperty]).withParent(psiElement(classOf[JsonObject]).withParent(parent)), PackageReferenceProvider))
       }
       case _ => Nil
     }
@@ -52,15 +53,11 @@ class FilePathReferenceContributor extends PsiReferenceContributor  {
     loop(s, rootPsiElementPattern)
   }
 
-  private val psiReferenceProvider = new PsiReferenceProvider {
-    override def getReferencesByElement(element: PsiElement, context: ProcessingContext): Array[PsiReference] = {
-      new FileReferenceSet(element).getAllReferences.asInstanceOf[Array[PsiReference]]
-    }
-  }
-
   private def rootPsiElementPattern: PsiElementPattern.Capture[JsonFile] = {
     psiElement(classOf[JsonFile])
       .withLanguage(JsonLanguage.INSTANCE)
       .inFile(psiFile(classOf[JsonFile]).withName(ComposerJson))
   }
+
+  private case class ReferenceMatcher(pattern: ElementPattern[_ <: PsiElement], provider: PsiReferenceProvider)
 }

@@ -12,8 +12,8 @@ class FilePathTest extends TestCase {
         | "bin": [ "<caret>" ]
         |}
       """.stripMargin,
-      Array("dir1/", "dir2/", "file3.txt"),
-      Array("dir1/dir1.1/", "./", "../")
+      Array("dir1", "dir2", "file3.txt"),
+      Array("dir1/dir1.1", ".", "..")
     )
   }
 
@@ -28,8 +28,8 @@ class FilePathTest extends TestCase {
         | "bin": [ "dir1/<caret>" ]
         |}
       """.stripMargin,
-      Array("dir1.1/", "file1.txt"),
-      Array("dir2/", "dir2/dir2.1/", "dir2.1/", "dir1/dir1.1/")
+      Array("dir1.1", "file1.txt"),
+      Array("dir2", "dir2/dir2.1", "dir2.1", "dir1/dir1.1")
     )
   }
 
@@ -59,7 +59,7 @@ class FilePathTest extends TestCase {
         | }
         |}
       """.stripMargin,
-      Array("dir1/")
+      Array("dir1")
     )
   }
 
@@ -76,7 +76,7 @@ class FilePathTest extends TestCase {
         | }
         |}
       """.stripMargin,
-      Array("dir1/")
+      Array("dir1")
     )
   }
 
@@ -94,7 +94,7 @@ class FilePathTest extends TestCase {
         |}
       """.stripMargin,
       Array(),
-      Array("dir1/")
+      Array("dir1")
     )
   }
 

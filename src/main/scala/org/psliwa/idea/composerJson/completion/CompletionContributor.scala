@@ -56,16 +56,6 @@ class CompletionContributor extends com.intellij.codeInsight.completion.Completi
           })
         ))
     }
-    case SFilePath(_) => {
-      List((psiElement().withSuperParent(2, parent), FilePathProvider))
-    }
-    case SFilePaths(_) => {
-      val superParent = psiElement().and(propertyCapture(parent))
-      List(
-        (psiElement().withSuperParent(2, superParent).afterLeaf(":"), FilePathProvider),
-        (psiElement().withSuperParent(2, psiElement(classOf[JsonArray]).withParent(superParent)), FilePathProvider)
-      )
-    }
     case _ => List()
   }
 
@@ -145,32 +135,6 @@ protected[completion] object CompletionContributor {
     }
 
     protected def mapResult(result: CompletionResultSet) = result
-  }
-
-  object FilePathProvider extends ParametersDependantCompletionProvider(parameters => {
-    val result = for {
-      text <- getTypedText(parameters.getPosition).map(stripQuotes).orElse(Some(""))
-      dirPath <- dirPath(text)
-      rootDir <- Option(parameters.getOriginalFile.getParent)
-      subDir <- findDir(rootDir, dirPath)
-    } yield {
-      subDir.getFiles.map(BaseLookupElement(_)).toList ++ subDir.getSubdirectories.map(BaseLookupElement(_))
-    }
-
-    result.getOrElse(List())
-  }){
-    override protected def mapResult(result: CompletionResultSet): CompletionResultSet = {
-      val prefix = result.getPrefixMatcher.getPrefix
-      val matcher = createCharContainsMatcher('/')(prefix)
-
-      result.withPrefixMatcher(matcher)
-    }
-
-    override protected def insertHandler(element: PsiElement, le: BaseLookupElement,getInsertHandler: InsertHandlerFinder) = {
-      Option(super.insertHandler(element, le, getInsertHandler))
-        .map(handler => new AutoPopupInsertHandler(Some(handler)))
-        .orNull
-    }
   }
 
   class LookupElementsCompletionProvider(es: LookupElements, getInsertHandler: InsertHandlerFinder = _ => None)

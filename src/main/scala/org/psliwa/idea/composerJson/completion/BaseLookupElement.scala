@@ -4,9 +4,7 @@ import javax.swing.Icon
 
 import com.intellij.codeInsight.completion.{InsertionContext, InsertHandler}
 import com.intellij.codeInsight.lookup.{LookupElementPresentation, LookupElement}
-import com.intellij.openapi.fileTypes.FileTypeManager
-import com.intellij.openapi.util.Iconable
-import com.intellij.psi.{PsiElement, PsiFile, PsiDirectory}
+import com.intellij.psi.PsiElement
 
 protected[completion] case class BaseLookupElement (
   name: String,
@@ -37,9 +35,4 @@ protected[completion] case class BaseLookupElement (
   }
 
   override def getObject: AnyRef = psiElement.getOrElse(this)
-}
-
-protected[completion] object BaseLookupElement {
-  def apply(d: PsiDirectory) = new BaseLookupElement(d.getName+"/", Option(d.getIcon(Iconable.ICON_FLAG_VISIBILITY)))
-  def apply(f: PsiFile) = new BaseLookupElement(f.getName, Option[Icon](FileTypeManager.getInstance().getFileTypeByFileName(f.getName).getIcon))
 }

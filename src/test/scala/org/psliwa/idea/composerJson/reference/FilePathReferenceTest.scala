@@ -1,6 +1,6 @@
 package org.psliwa.idea.composerJson.reference
 
-import com.intellij.psi.PsiFile
+import com.intellij.psi.{PsiFileSystemItem, PsiElement, PsiFile}
 import com.intellij.testFramework.fixtures.LightPlatformCodeInsightFixtureTestCase
 import org.psliwa.idea.composerJson._
 import org.junit.Assert._
@@ -63,21 +63,50 @@ class FilePathReferenceTest extends LightPlatformCodeInsightFixtureTestCase {
     )
   }
 
+  def testGivenRequireProperty_referenceToVendorDirShouldBeCreated() = {
+
+    myFixture.getTempDirFixture
+      .findOrCreateDir("vendor")
+      .createChildDirectory(this, "some-vendor")
+      .createChildDirectory(this, "some-pkg")
+
+    val references =  getResolvedFileReferences(_.contains("vendor"),
+      """
+        |{
+        |  "require": {
+        |    "some-vendor/some-pkg<caret>": ""
+        |  }
+        |}
+      """.stripMargin,
+      e => e.getParent.getParent
+    )
+
+    assertEquals(2, references.length)
+  }
+
   private def checkFileReference(file: String, s: String): Unit = {
-    assertEquals(1, getResolvedFileReferences(file, s).length)
+    myFixture.getTempDirFixture.createFile(file)
+    assertEquals(1, getResolvedFileReferences(endsWith(file), s).length)
   }
 
   private def checkEmptyFileReferences(file: String, s: String): Unit = {
-    assertEquals(0, getResolvedFileReferences(file, s).length)
-  }
-
-  private def getResolvedFileReferences(file: String, s: String) = {
     myFixture.getTempDirFixture.createFile(file)
 
+    assertEquals(0, getResolvedFileReferences(endsWith(file), s).length)
+  }
+
+  private def endsWith(suffix: String)(s: String) = s.endsWith(suffix)
+
+  private def getResolvedFileReferences(fileComparator: String => Boolean, s: String, mapElement: PsiElement => PsiElement = _.getParent) = {
     myFixture.configureByText(ComposerJson, s)
 
-    val element = myFixture.getFile.findElementAt(myFixture.getCaretOffset).getParent
+    val element = mapElement(myFixture.getFile.findElementAt(myFixture.getCaretOffset))
 
-    element.getReferences.map(_.resolve()).filter(ref => ref.isInstanceOf[PsiFile] && ref.asInstanceOf[PsiFile].getName == file)
+    element.getReferences
+      .map(_.resolve())
+      .filter(_.isInstanceOf[PsiFileSystemItem])
+      .map(_.asInstanceOf[PsiFileSystemItem])
+      .map(_.getVirtualFile.getCanonicalPath)
+      .filter(fileComparator)
   }
 }
