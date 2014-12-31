@@ -3,7 +3,7 @@ package org.psliwa.idea.composerJson.completion
 import com.intellij.codeInsight.completion.{InsertionContext, InsertHandler}
 import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.openapi.editor.{Editor, Document}
-import org.psliwa.idea.composerJson.util.CharType
+import org.psliwa.idea.composerJson.util.Matcher
 import org.psliwa.idea.composerJson.util.CharType._
 import org.psliwa.idea.composerJson.util.CharType.ImplicitConversions._
 import scala.language.implicitConversions
@@ -112,8 +112,8 @@ private object PropertyValueInsertHandler {
     def eatWrapperIf(b: Boolean) = if(b) eatWrapper else this
   }
 
-  val Whitespace = CharType(_.isWhitespace)
-  val Alphnum = CharType(_.isLetterOrDigit)
+  val Whitespace: Matcher[Char] = Matcher(_.isWhitespace)
+  val Alphnum: Matcher[Char] = Matcher(_.isLetterOrDigit)
   val OpenControlChar = '"' || '{' || '['
   val CloseControlChar = '"' || '}' || ']'
 }
