@@ -39,7 +39,8 @@ class SchemaInspection extends Inspection {
           for((name, property) <- so.requiredProperties if !propertyNames.contains(name)) {
             problems.registerProblem(
               element,
-              ComposerBundle.message("inspection.schema.required", name)
+              ComposerBundle.message("inspection.schema.required", name),
+              new CreatePropertyQuickFix(element, name, property.schema)
             )
           }
         }
