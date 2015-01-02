@@ -2,9 +2,9 @@ package org.psliwa.idea.composerJson.util
 
 import scala.language.implicitConversions
 
-object CharType extends OffsetFinder[CharSequence, Char] {
+object CharOffsetFinder extends OffsetFinder[CharSequence, Char] {
 
-  type CharType = Matcher[Char]
+  type CharMatcher = Matcher[Char]
 
   protected def objectAt(haystack: CharSequence, offset: Int): Char = {
     haystack.subSequence(offset, offset + 1).charAt(0)

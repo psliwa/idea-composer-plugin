@@ -12,12 +12,12 @@ import com.intellij.psi.impl.source.tree.LeafPsiElement
 import com.intellij.util.ProcessingContext
 import org.psliwa.idea.composerJson.composer._
 import org.psliwa.idea.composerJson.json._
-import org.psliwa.idea.composerJson.util.CharType
+import org.psliwa.idea.composerJson.util.CharOffsetFinder
 import org.psliwa.idea.composerJson.util.Funcs._
 import org.psliwa.idea.composerJson._
 import org.psliwa.idea.composerJson.util.Files._
-import org.psliwa.idea.composerJson.util.CharType._
-import org.psliwa.idea.composerJson.util.CharType.ImplicitConversions._
+import org.psliwa.idea.composerJson.util.CharOffsetFinder._
+import org.psliwa.idea.composerJson.util.OffsetFinder.ImplicitConversions._
 
 import scala.annotation.tailrec
 import scala.collection.Seq
@@ -166,7 +166,7 @@ protected[completion] object CompletionContributor {
 
   //utility functions
 
-  private def createCharContainsMatcher(stopChar: CharType)(prefix: String) = {
+  private def createCharContainsMatcher(stopChar: CharMatcher)(prefix: String) = {
     val fixedPrefix = findOffsetReverse(stopChar)(prefix.length-1)(prefix)
       .map(offset => prefix.substring(offset + 1))
       .getOrElse(prefix)

@@ -1,7 +1,7 @@
 package org.psliwa.idea.composerJson.composer
 
-import org.psliwa.idea.composerJson.util.CharType._
-import org.psliwa.idea.composerJson.util.CharType.ImplicitConversions._
+import org.psliwa.idea.composerJson.util.CharOffsetFinder._
+import org.psliwa.idea.composerJson.util.OffsetFinder.ImplicitConversions._
 
 object Version {
 

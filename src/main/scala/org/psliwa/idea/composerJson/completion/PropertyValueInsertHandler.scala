@@ -4,8 +4,8 @@ import com.intellij.codeInsight.completion.{InsertionContext, InsertHandler}
 import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.openapi.editor.{Editor, Document}
 import org.psliwa.idea.composerJson.util.Matcher
-import org.psliwa.idea.composerJson.util.CharType._
-import org.psliwa.idea.composerJson.util.CharType.ImplicitConversions._
+import org.psliwa.idea.composerJson.util.CharOffsetFinder._
+import org.psliwa.idea.composerJson.util.OffsetFinder.ImplicitConversions._
 import scala.language.implicitConversions
 
 protected[completion] case class PropertyValueInsertHandler(wrapper: String) extends InsertHandler[LookupElement] {
@@ -50,8 +50,8 @@ protected[completion] case class PropertyValueInsertHandler(wrapper: String) ext
     }
   }
 
-  private def oppositeChar(s: Char): Option[(CharType,Int)] = {
-    val map = Map[Char,CharType]('"' -> '"', '{' -> '}', '[' -> ']').mapValues((_,1))
+  private def oppositeChar(s: Char): Option[(CharMatcher,Int)] = {
+    val map = Map[Char,CharMatcher]('"' -> '"', '{' -> '}', '[' -> ']').mapValues((_,1))
     map.get(s).orElse(Some((not(Alphnum || '.'),0)))
   }
 
@@ -64,7 +64,7 @@ protected[completion] case class PropertyValueInsertHandler(wrapper: String) ext
     }
   }
 
-  private def findCloseCharOffset(openChar: CharType, closeChar: CharType)(offset: Int)(implicit text: CharSequence): Option[Int] = {
+  private def findCloseCharOffset(openChar: CharMatcher, closeChar: CharMatcher)(offset: Int)(implicit text: CharSequence): Option[Int] = {
     def loop(offset: Int, deep: Int): Option[Int] = {
       val foundOffset = findOffset(openChar || closeChar)(offset)
       val success = foundOffset.map(ensure(closeChar)(_).isDefined)
@@ -80,7 +80,7 @@ protected[completion] case class PropertyValueInsertHandler(wrapper: String) ext
     loop(offset, 0)
   }
 
-  private def replaceCharIf(char: Char, is: CharType, replacement: Char): Option[Char] = {
+  private def replaceCharIf(char: Char, is: CharMatcher, replacement: Char): Option[Char] = {
     if(is is char) Some(replacement)
     else Some(char)
   }

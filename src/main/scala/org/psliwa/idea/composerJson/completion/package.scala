@@ -4,8 +4,8 @@ import com.intellij.codeInsight.completion.{InsertionContext, InsertHandler}
 import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.patterns.PsiElementPattern
 import com.intellij.psi.PsiElement
-import org.psliwa.idea.composerJson.util.CharType._
-import org.psliwa.idea.composerJson.util.CharType.ImplicitConversions._
+import org.psliwa.idea.composerJson.util.CharOffsetFinder._
+import org.psliwa.idea.composerJson.util.OffsetFinder.ImplicitConversions._
 
 package object completion {
   protected[completion] val EmptyNamePlaceholder = "IntellijIdeaRulezzz"
