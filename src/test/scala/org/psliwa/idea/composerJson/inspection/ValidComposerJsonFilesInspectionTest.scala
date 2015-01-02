@@ -12,6 +12,7 @@ class ValidComposerJsonFilesInspectionTest extends InspectionTest {
 
     myFixture.enableInspections(classOf[SchemaInspection])
     myFixture.enableInspections(classOf[FilePathInspection])
+    myFixture.enableInspections(classOf[MisconfigurationInspection])
   }
 
   def testSymfonyComposerJson(): Unit = {
