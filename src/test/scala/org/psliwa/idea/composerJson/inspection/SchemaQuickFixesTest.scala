@@ -172,7 +172,7 @@ class SchemaQuickFixesTest extends InspectionTest {
   def testCreateProperty_propertyShouldBeCreated() = {
     checkQuickFix(CreatePropertyQuickFix("name"))(
       s"""
-        |{
+        |{<caret>
         |}
       """.stripMargin,
       s"""
@@ -183,10 +183,10 @@ class SchemaQuickFixesTest extends InspectionTest {
     )
   }
 
-  def testCreateProperty_thereAreSomePropertiesAlready_propertyShouldBeCreatedAsLastOne_commaShouldBeCreatedAfterPreviousProp() = {
+  def testCreateProperty_thereAreSomePropertiesAlready_caretIsBeforeExistingProperty_propertyShouldBeCreatedBeforeExistingOne() = {
     checkQuickFix(CreatePropertyQuickFix("name"))(
       s"""
-        |{
+        |{<caret>
         |  "require": {}
         |}
       """.stripMargin,
@@ -199,10 +199,62 @@ class SchemaQuickFixesTest extends InspectionTest {
     )
   }
 
+  def testCreateProperty_thereAreSomePropertiesAlready_caretIsAfterExistingProperty_propertyShouldBeCreatedAfterExistingOne() = {
+    checkQuickFix(CreatePropertyQuickFix("name"))(
+      s"""
+        |{
+        |  "require": {}<caret>
+        |}
+      """.stripMargin,
+      s"""
+        |{
+        |  "require": {},
+        |  "name": "<caret>"
+        |}
+      """.stripMargin
+    )
+  }
+
+  def testCreateProperty_thereAreSomePropertiesAlready_caretIsBetweenExistingProperties_propertyShouldBeCreatedBetweenExistingOne() = {
+    checkQuickFix(CreatePropertyQuickFix("name"))(
+      s"""
+        |{
+        |  "require": {},<caret>
+        |  "require-dev": {}
+        |}
+      """.stripMargin,
+      s"""
+        |{
+        |  "require": {},
+        |  "name": "<caret>",
+        |  "require-dev": {}
+        |}
+      """.stripMargin
+    )
+  }
+
+  def testCreateProperty_thereAreSomePropertiesAlready_caretIsInsideFirstProperty_propertyShouldBeCreatedAfterThatProperty() = {
+    checkQuickFix(CreatePropertyQuickFix("name"))(
+      s"""
+        |{
+        |  "require<caret>": {},
+        |  "require-dev": {}
+        |}
+      """.stripMargin,
+      s"""
+        |{
+        |  "require": {},
+        |  "name": "<caret>",
+        |  "require-dev": {}
+        |}
+      """.stripMargin
+    )
+  }
+
   def testCreateProperty_noneNewLineGiven_newLinesShouldBeFixed() = {
     checkQuickFix(CreatePropertyQuickFix("name"))(
       s"""
-        |{}
+        |{<caret>}
       """.stripMargin,
       s"""
         |{

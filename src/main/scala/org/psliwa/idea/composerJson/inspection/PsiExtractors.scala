@@ -1,6 +1,7 @@
 package org.psliwa.idea.composerJson.inspection
 
 import com.intellij.json.psi._
+import com.intellij.psi.PsiWhiteSpace
 import com.intellij.psi.impl.source.tree.LeafPsiElement
 
 private[inspection] object PsiExtractors {
@@ -39,5 +40,9 @@ private[inspection] object PsiExtractors {
 
   object LeafPsiElement {
     def unapply(x: LeafPsiElement): Option[(String)] = Some(x.getText)
+  }
+
+  object PsiWhiteSpace {
+    def unapply(x: PsiWhiteSpace): Option[(Unit)] = Some(())
   }
 }
