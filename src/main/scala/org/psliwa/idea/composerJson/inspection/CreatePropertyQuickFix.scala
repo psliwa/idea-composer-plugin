@@ -46,20 +46,16 @@ class CreatePropertyQuickFix(element: PsiElement, propertyName: String, property
     val fixedPropertyCode = propertyCode+(if(nextElement.isDefined) "," else "")+"\n"
     document.insertString(offset+prefixText.length, fixedPropertyCode)
 
-    getEditor(project)
+    editorFor(project)
       .foreach(_.getCaretModel.moveToOffset(offset + prefixText.length + propertyCode.length - emptyValue.length/2))
 
     (offset, offset + fixedPropertyCode.length + prefixText.length)
   }
 
-  def getEditor(project: Project): Option[Editor] = {
-    Option(FileEditorManager.getInstance(project).getSelectedTextEditor)
-  }
-
   private def findOffsetToInsert(implicit e: JsonObject): (Option[PsiElement], Int, Option[PsiElement]) = {
 
     val startOffset = e.getTextRange.getStartOffset + 1
-    val headOffset = getEditor(e.getProject).map(_.getCaretModel.getOffset).getOrElse(startOffset)
+    val headOffset = editorFor(e.getProject).map(_.getCaretModel.getOffset).getOrElse(startOffset)
 
     val jsonElement: Matcher[PsiElement] = classOf[JsonElement]
 
@@ -83,15 +79,6 @@ class CreatePropertyQuickFix(element: PsiElement, propertyName: String, property
       case x@PsiExtractors.LeafPsiElement(",") => Some(x)
       case _ => None
     }
-  }
-
-  @tailrec
-  private def getEmptyValue(s: Schema): String = s match {
-    case SObject(_, _) => "{}"
-    case SArray(_) => "[]"
-    case SString(_) | SStringChoice(_) => "\"\""
-    case SOr(h::_) => getEmptyValue(h)
-    case _ => ""
   }
 
   private def ensureJsonObject(e: PsiElement): Option[JsonObject] = e match {

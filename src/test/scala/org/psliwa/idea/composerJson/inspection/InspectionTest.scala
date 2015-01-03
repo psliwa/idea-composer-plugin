@@ -37,8 +37,7 @@ abstract class InspectionTest extends LightPlatformCodeInsightFixtureTestCase {
     )
 
     myFixture.getEditor.getCaretModel.moveToOffset(caretOffset)
-
-    quickFixes.foreach(myFixture.launchAction)
+    quickFixes.take(1).foreach(myFixture.launchAction)
   }
 
   def writeAction(f: () => Unit) = {

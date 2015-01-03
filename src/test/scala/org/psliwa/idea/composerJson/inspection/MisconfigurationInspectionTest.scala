@@ -11,8 +11,8 @@ class MisconfigurationInspectionTest extends InspectionTest {
     checkInspection(
       s"""
         |{
-        |  "type": <weak_warning>"project"</weak_warning>,
-        |  "minimum-stability": <weak_warning>"dev"</weak_warning>
+        |  <weak_warning>"type": "project"</weak_warning>,
+        |  <weak_warning>"minimum-stability": "dev"</weak_warning>
         |}
       """.stripMargin
     )
@@ -22,9 +22,9 @@ class MisconfigurationInspectionTest extends InspectionTest {
     checkInspection(
       s"""
         |{
-        |  "type": <weak_warning>"project"</weak_warning>,
-        |  "minimum-stability": <weak_warning>"dev"</weak_warning>,
-        |  "prefer-stable": <weak_warning>false</weak_warning>
+        |  <weak_warning>"type": "project"</weak_warning>,
+        |  <weak_warning>"minimum-stability": "dev"</weak_warning>,
+        |  <weak_warning>"prefer-stable": false</weak_warning>
         |}
       """.stripMargin
     )
