@@ -7,6 +7,8 @@ class MisconfigurationQuickFixesTest extends InspectionTest {
   val FixPreferStable = ComposerBundle.message("inspection.quickfix.setPropertyValue", "prefer-stable", "true")
   val FixMinimumStability = ComposerBundle.message("inspection.quickfix.setPropertyValue", "minimum-stability", "stable")
 
+  val atLeastOne = new Range(Some(1), None)
+
   override def setUp(): Unit = {
     super.setUp()
 
@@ -14,7 +16,7 @@ class MisconfigurationQuickFixesTest extends InspectionTest {
   }
 
   def testSetPreferStableQuickFix_preferStableIsMissing_createPreferStableProperty() = {
-    checkQuickFix(FixPreferStable, 2)(
+    checkQuickFix(FixPreferStable, atLeastOne)(
       """
         |{
         |  "type": "project",
@@ -32,7 +34,7 @@ class MisconfigurationQuickFixesTest extends InspectionTest {
   }
 
   def testSetPreferStableQuickFix_preferStableIsFalse_setTrueValue() = {
-    checkQuickFix(FixPreferStable, 3)(
+    checkQuickFix(FixPreferStable, atLeastOne)(
       """
         |{
         |  "type": "project",
@@ -51,7 +53,7 @@ class MisconfigurationQuickFixesTest extends InspectionTest {
   }
 
   def testSetPreferStableQuickFix_preferStableHasNoValue_setTrueValue() = {
-    checkQuickFix(FixPreferStable, 2)(
+    checkQuickFix(FixPreferStable, atLeastOne)(
       """
         |{
         |  "type": "project",
@@ -70,7 +72,7 @@ class MisconfigurationQuickFixesTest extends InspectionTest {
   }
 
   def testSetMinimumStabilityQuickFix_setStableMinimumStability() = {
-    checkQuickFix(FixMinimumStability, 2)(
+    checkQuickFix(FixMinimumStability, atLeastOne)(
       """
         |{
         |  "type": "project<caret>",

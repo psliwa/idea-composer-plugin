@@ -7,7 +7,7 @@ class MisconfigurationInspectionTest extends InspectionTest {
     myFixture.enableInspections(classOf[MisconfigurationInspection])
   }
 
-  def testGivenProjectType_givenDevMinimumStability_givenDisabledPreferStable_misconfigurationShouldBeReported() = {
+  def testUnstableProject_givenProjectType_givenDevMinimumStability_givenDisabledPreferStable_misconfigurationShouldBeReported() = {
     checkInspection(
       s"""
         |{
@@ -18,7 +18,7 @@ class MisconfigurationInspectionTest extends InspectionTest {
     )
   }
 
-  def testGivenProjectType_givenDevMinimumStability_givenExplicitlyDisabledPreferStable_misconfigurationShouldBeReported() = {
+  def testUnstableProject_givenProjectType_givenDevMinimumStability_givenExplicitlyDisabledPreferStable_misconfigurationShouldBeReported() = {
     checkInspection(
       s"""
         |{
@@ -30,7 +30,7 @@ class MisconfigurationInspectionTest extends InspectionTest {
     )
   }
 
-  def testGivenProjectType_givenDevMinimumStability_givenEnabledPreferStable_misconfigurationShouldNotBeReported() = {
+  def testUnstableProject_givenProjectType_givenDevMinimumStability_givenEnabledPreferStable_misconfigurationShouldNotBeReported() = {
     checkInspection(
       s"""
         |{
@@ -42,7 +42,7 @@ class MisconfigurationInspectionTest extends InspectionTest {
     )
   }
 
-  def testGivenLibraryType_givenDevMinimumStability_givenDisabledPreferStable_misconfigurationShouldNotBeReported() = {
+  def testUnstableProject_givenLibraryType_givenDevMinimumStability_givenDisabledPreferStable_misconfigurationShouldNotBeReported() = {
     checkInspection(
       s"""
         |{
@@ -54,7 +54,7 @@ class MisconfigurationInspectionTest extends InspectionTest {
     )
   }
 
-  def testGivenProjectType_givenStableMinimumStability_givenDisabledPreferStable_misconfigurationShouldNotBeReported() = {
+  def testUnstableProject_givenProjectType_givenStableMinimumStability_givenDisabledPreferStable_misconfigurationShouldNotBeReported() = {
     checkInspection(
       s"""
         |{
@@ -65,7 +65,7 @@ class MisconfigurationInspectionTest extends InspectionTest {
     )
   }
 
-  def testGivenProjectType_givenMissingMinimumStability_givenDisabledPreferStable_misconfigurationShouldNotBeReported() = {
+  def testUnstableProject_givenProjectType_givenMissingMinimumStability_givenDisabledPreferStable_misconfigurationShouldNotBeReported() = {
     checkInspection(
       s"""
         |{
