@@ -41,7 +41,7 @@ class MisconfigurationInspection extends Inspection {
       }
     })
 
-    problemDescriptions.map(problem => problems.registerProblem(problem.element.getContext, problem.message, problem.quickFixes:_*))
+    problemDescriptions.foreach(problem => problems.registerProblem(problem.element.getContext, problem.message, problem.quickFixes:_*))
   }
 
   private def ensureJsonObject(element: PsiElement) = element match {

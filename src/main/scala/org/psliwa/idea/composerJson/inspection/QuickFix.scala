@@ -1,5 +1,8 @@
 package org.psliwa.idea.composerJson.inspection
 
+import com.intellij.codeInsight.intention.IntentionAction
+import com.intellij.codeInspection
+import com.intellij.codeInspection.ProblemDescriptor
 import com.intellij.openapi.editor.{Editor, Document}
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project

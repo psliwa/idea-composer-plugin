@@ -1,6 +1,6 @@
 package org.psliwa.idea.composerJson.inspection.problem
 
-import com.intellij.codeInspection.LocalQuickFix
+import com.intellij.codeInspection.{LocalQuickFixOnPsiElement, LocalQuickFix}
 import com.intellij.json.psi.JsonObject
 
 import scala.language.implicitConversions
@@ -9,7 +9,7 @@ private[inspection] case class ProblemChecker(
   checker: Checker,
   properties: List[String],
   problem: String,
-  createQuickFixes: JsonObject => List[LocalQuickFix]
+  createQuickFixes: JsonObject => List[LocalQuickFixOnPsiElement]
 ) extends Checker {
   override def check(jsonObject: JsonObject): Boolean = checker.check(jsonObject)
 }
