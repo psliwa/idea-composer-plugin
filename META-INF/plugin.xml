@@ -1,7 +1,7 @@
 <idea-plugin version="2">
   <id>org.psliwa.idea.composer</id>
   <name>PHP composer.json support</name>
-  <version>0.2.0</version>
+  <version>0.2.1</version>
   <vendor email="me@psliwa.org" url="http://github.org/psliwa/idea-composer-plugin">psliwa</vendor>
 
   <description><![CDATA[
@@ -11,6 +11,13 @@ This plugin adds auto completion and inspections support for composer.json file 
     ]]></description>
 
   <change-notes><![CDATA[
+<h2>0.2.1</h2>
+<ul>
+  <li>"go to" feature: filepaths (e.g. in "bin") and packages (e.g. in "require") are clickable (CTRL+LMB)</li>
+  <li>"create property" quick fix for required properties (e.g. name and authors.name)</li>
+  <li>"misconfiguration" inspection - currently there is one misconfiguration detected: not stable project without enabled "prefer-stable" + quick fixes</li>
+</ul>
+
 <h2>0.2.0</h2>
 <ul>
   <li>Inspections</li>
