@@ -23,6 +23,7 @@ object Parsers { self =>
     def |[B>:A](p2: Parser[B]): Parser[B] = Combinators.or(p, p2)
     def or[B>:A](p2: Parser[B]): Parser[B] = Combinators.or(p, p2)
     def many: Parser[List[A]] = Combinators.many(p)
+    def many1: Parser[List[A]] = Combinators.many1(p)
     def map[B](f: A => B): Parser[B] = Combinators.map(p)(f)
     def slice = Combinators.slice(p)
     def flatMap[B](f: A => Parser[B]): Parser[B] = Combinators.flatMap(p)(f)

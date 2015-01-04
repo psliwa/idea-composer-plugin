@@ -6,13 +6,14 @@ import ImplicitConversions._
 object Combinators {
 
   def succeed[A](a: A) : Parser[A] = input => Success(a,0)
+  def fail[A](): Parser[A] = input => Failure
 
   def many[A](p: Parser[A]): Parser[List[A]] = map2(p, many(p))(_ :: _) or succeed(List[A]())
   def many1[A](p: Parser[A]): Parser[List[A]] = map2(p, many(p))(_::_)
   def map[A,B](p: Parser[A])(f: A => B): Parser[B] = flatMap(p)(a => succeed(f(a)))
   def flatMap[A,B](p: Parser[A])(f: A => Parser[B]): Parser[B] = loc => {
     p(loc) match {
-      case Success(a,n) => f(a)(loc.advancedBy(n))
+      case Success(a,n) => f(a)(loc.advancedBy(n)).advanceSuccess(n)
       case Failure => Failure
     }
   }
