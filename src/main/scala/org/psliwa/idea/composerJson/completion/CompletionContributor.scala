@@ -5,18 +5,16 @@ import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.json.JsonLanguage
 import com.intellij.json.psi._
 import com.intellij.patterns.PlatformPatterns._
-import com.intellij.patterns.StandardPatterns._
-import com.intellij.patterns.{PsiElementPattern, PatternCondition}
+import com.intellij.patterns.PsiElementPattern
 import com.intellij.psi.PsiElement
 import com.intellij.psi.impl.source.tree.LeafPsiElement
 import com.intellij.util.ProcessingContext
-import org.psliwa.idea.composerJson.composer._
-import org.psliwa.idea.composerJson.json._
-import org.psliwa.idea.composerJson.util.CharOffsetFinder
-import org.psliwa.idea.composerJson.util.Funcs._
 import org.psliwa.idea.composerJson._
-import org.psliwa.idea.composerJson.util.Files._
+import org.psliwa.idea.composerJson.composer._
+import org.psliwa.idea.composerJson.intellij.Patterns._
+import org.psliwa.idea.composerJson.json._
 import org.psliwa.idea.composerJson.util.CharOffsetFinder._
+import org.psliwa.idea.composerJson.util.Funcs._
 import org.psliwa.idea.composerJson.util.OffsetFinder.ImplicitConversions._
 
 import scala.annotation.tailrec
@@ -38,7 +36,7 @@ class CompletionContributor extends com.intellij.codeInsight.completion.Completi
     }
   }
 
-  import CompletionContributor._
+  import org.psliwa.idea.composerJson.completion.CompletionContributor._
   private def completionProvidersForSchema(s: Schema, parent: Capture): List[(Capture, CompletionProvider[CompletionParameters])] = s match {
     case SObject(m, _) => {
       propertyCompletionProvider(parent, () => m.map(x => BaseLookupElement(x._1, description = x._2.description)), (k) => insertHandlerFor(m.get(k.name).get.schema)) ++
@@ -100,12 +98,6 @@ class CompletionContributor extends com.intellij.codeInsight.completion.Completi
 
   private def loadPackages() = packagesLoader()
   private def loadVersions(s: String) = versionsLoader(s)
-
-  private def stringContains(s: String) = {
-    string().`with`(new PatternCondition[String]("contains") {
-      override def accepts(t: String, context: ProcessingContext): Boolean = t.contains(s)
-    })
-  }
 }
 
 protected[completion] object CompletionContributor {
@@ -145,7 +137,7 @@ protected[completion] object CompletionContributor {
     }
   }
 
-  import VersionCompletionProvider._
+  import org.psliwa.idea.composerJson.completion.CompletionContributor.VersionCompletionProvider._
   class VersionCompletionProvider(loadElements: Context => Seq[BaseLookupElement]) extends ParametersDependantCompletionProvider(psiBased(loadElements)) {
     override protected def mapResult(result: CompletionResultSet): CompletionResultSet = {
       val prefix = result.getPrefixMatcher.getPrefix

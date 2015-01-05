@@ -5,8 +5,10 @@ import com.intellij.json.psi._
 import com.intellij.lang.annotation.{AnnotationHolder, Annotator}
 import com.intellij.psi.PsiElement
 import org.psliwa.idea.composerJson._
+import org.psliwa.idea.composerJson.composer.version.{Constraint, Parser}
 import org.psliwa.idea.composerJson.inspection.problem.ProblemDescriptor
 import com.intellij.patterns.PlatformPatterns._
+import org.psliwa.idea.composerJson.intellij.Patterns._
 
 class PackageVersionAnnotator extends Annotator {
 
@@ -15,9 +17,9 @@ class PackageVersionAnnotator extends Annotator {
     .withLanguage(JsonLanguage.INSTANCE)
     .afterLeaf(":")
     .withParent(
-      psiElement(classOf[JsonProperty]).withParent(
+      psiElement(classOf[JsonProperty]).withName(stringContains("/")).withParent(
         psiElement(classOf[JsonObject]).withParent(
-          psiElement(classOf[JsonProperty]).withName("require", "require-dev")
+          psiElement(classOf[JsonProperty]).withName("require")
         )
       )
     )
@@ -37,8 +39,12 @@ class PackageVersionAnnotator extends Annotator {
   }
 
   private def detectProblemsInVersion(version: String): Seq[String] = {
-    List()
-//    List(ComposerBundle.message("inspection.version.unboundVersion"))
+    import PackageVersionAnnotator._
+
+    parseVersion(version)
+      .filter(!_.isBounded)
+      .map(_ => ComposerBundle.message("inspection.version.unboundVersion"))
+      .toList
   }
 
   private def getStringValue(value: PsiElement): Option[String] = {
@@ -49,4 +55,9 @@ class PackageVersionAnnotator extends Annotator {
       case _ => None
     }
   }
+}
+
+private object PackageVersionAnnotator {
+  import org.psliwa.idea.composerJson.util.Funcs._
+  val parseVersion: (String) => Option[Constraint] = memorize(40)(Parser.parse)
 }

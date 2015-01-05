@@ -121,6 +121,16 @@ class ConstraintTest {
     List(DateConstraint("20101010"), HashConstraint("abcde")).foreach(checkBounded(_))
   }
 
+  @Test
+  def semanticVersionAcceptsZeros(): Unit = {
+    SemanticVersion(0, Some(0, Some(1, None)))
+  }
+
+  @Test(expected = classOf[IllegalArgumentException])
+  def semanticVersionsDoesNotAcceptNegativeInts(): Unit = {
+    SemanticVersion(-1, Some(1, None))
+  }
+
   private def checkBounded(constraint: Constraint, expected: Boolean = true): Unit = {
     assertEquals(constraint.toString, expected, constraint.isBounded)
   }

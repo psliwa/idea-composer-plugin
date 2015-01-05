@@ -5,10 +5,10 @@ case class SemanticVersion(major: Int, private val other: Option[(Int,Option[(In
   val patch: Option[Int] = other.flatMap(_._2.map(_._1))
   val minorPatch: Option[Int] = other.flatMap(_._2.flatMap(_._2))
 
-  assert(major > 0)
-  minor.foreach(i => assert(i >= 0))
-  patch.foreach(i => assert(i >= 0))
-  minorPatch.foreach(i => assert(i >= 0))
+  ensure(major >= 0)
+  minor.foreach(i => ensure(i >= 0))
+  patch.foreach(i => ensure(i >= 0))
+  minorPatch.foreach(i => ensure(i >= 0))
 
   def this(major: Int) = {
     this(major, None)
@@ -29,6 +29,8 @@ case class SemanticVersion(major: Int, private val other: Option[(Int,Option[(In
   def this(versions: Array[Int]) = {
     this(SemanticVersion.getOrThrow(versions)(0), SemanticVersion.getOther(versions))
   }
+
+  private def ensure(b: Boolean): Unit = if(!b) throw new IllegalArgumentException
 }
 
 private object SemanticVersion {
