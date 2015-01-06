@@ -37,7 +37,7 @@ abstract class InspectionTest extends LightPlatformCodeInsightFixtureTestCase {
     val caretOffset = myFixture.getEditor.getCaretModel.getOffset
 
     //side effect of getAllQuickFixes - caret is moved to "0" offset
-    val quickFixes = myFixture.getAllQuickFixes(ComposerJson).filter(_.getFamilyName == quickFix)
+    val quickFixes = myFixture.getAllQuickFixes(ComposerJson).filter(qf => qf.getFamilyName == quickFix || qf.getText == quickFix)
     val quickFixesCount = quickFixes.length
 
     val msg = s"Expected $expectedQuickFixCount '$quickFix' quick fix, $quickFixesCount found"

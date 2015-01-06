@@ -1,5 +1,6 @@
 package org.psliwa.idea.composerJson.inspection
 
+import com.intellij.codeInsight.intention.IntentionAction
 import com.intellij.json.JsonLanguage
 import com.intellij.json.psi._
 import com.intellij.lang.annotation.{AnnotationHolder, Annotator}
@@ -14,7 +15,6 @@ import com.intellij.patterns.PlatformPatterns._
 import com.intellij.patterns.StandardPatterns._
 import org.psliwa.idea.composerJson.intellij.Patterns._
 import org.psliwa.idea.composerJson.settings.ComposerJsonSettings
-import scala.collection.mutable
 
 class PackageVersionAnnotator extends Annotator {
   import PackageVersionAnnotator._
@@ -26,22 +26,33 @@ class PackageVersionAnnotator extends Annotator {
     if(pattern.accepts(element)) {
       val problemDescriptors = for {
         version <- getStringValue(element).toList
-        problem <- detectProblemsInVersion(version)
-      } yield ProblemDescriptor(element, problem, List())
+        pkg <- ensureProperty(element.getParent).map(_.getName).toList
+        problem <- detectProblemsInVersion(pkg, version)
+      } yield ProblemDescriptor(element, problem._1, problem._2)
 
       problemDescriptors.foreach(problem => {
         val annotation = annotations.createWarningAnnotation(problem.element.getContext, problem.message)
-        problem.quickFixes.foreach(fix => annotation.registerFix(new QuickFixIntentionActionAdapter(fix)))
+        problem.quickFixes.foreach(fix => annotation.registerFix(fix))
       })
     }
   }
 
-  private def detectProblemsInVersion(version: String): Seq[String] = {
+  private def ensureProperty(element: PsiElement): Option[JsonProperty] = element match {
+    case x: JsonProperty => Some(x)
+    case _ => None
+  }
+
+  private def detectProblemsInVersion(pkg: String, version: String): Seq[(String, Seq[IntentionAction])] = {
     parseVersion(version)
       .filter(!_.isBounded)
-      .map(_ => ComposerBundle.message("inspection.version.unboundVersion"))
+      .map(_ => (
+        ComposerBundle.message("inspection.version.unboundVersion"),
+        List(new ExcludePatternAction(pkg)) ++ packageVendorPattern(pkg).map(new ExcludePatternAction(_)).toList
+      ))
       .toList
   }
+
+  private def packageVendorPattern(pkg: String): Option[String] = pkg.split('/').headOption.map(_ + "/*")
 
   private def getStringValue(value: PsiElement): Option[String] = {
     import PsiExtractors.JsonStringLiteral

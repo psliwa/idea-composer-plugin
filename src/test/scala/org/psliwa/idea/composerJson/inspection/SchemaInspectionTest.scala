@@ -1,7 +1,6 @@
 package org.psliwa.idea.composerJson.inspection
 
 import org.junit.ComparisonFailure
-import org.psliwa.idea.composerJson.ComposerBundle
 
 class SchemaInspectionTest extends InspectionTest {
 
