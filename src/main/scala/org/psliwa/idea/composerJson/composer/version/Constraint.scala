@@ -16,6 +16,21 @@ sealed trait Constraint {
     case DevConstraint(_) => false
     case _ => false
   }
+
+  def replace(f: Constraint => Option[Constraint]): Constraint = {
+    f(this).getOrElse( this match {
+      case WrappedConstraint(constraint, prefix, suffix) => WrappedConstraint(constraint.replace(f), prefix, suffix)
+      case WildcardConstraint(Some(constraint)) => constraint.replace(f) match {
+        case sc@SemanticConstraint(_) => WildcardConstraint(Some(sc))
+        case _ => this
+      }
+      case OperatorConstraint(operator, constraint) => OperatorConstraint(operator, constraint.replace(f))
+      case AliasedConstraint(constraint, alias) => AliasedConstraint(constraint.replace(f), alias)
+      case HyphenRangeConstraint(from, to) => HyphenRangeConstraint(from.replace(f), to.replace(f))
+      case LogicalConstraint(constraints, operator) => LogicalConstraint(constraints.map(_.replace(f)), operator)
+      case _ => this
+    })
+  }
 }
 
 case class SemanticConstraint(version: SemanticVersion) extends Constraint

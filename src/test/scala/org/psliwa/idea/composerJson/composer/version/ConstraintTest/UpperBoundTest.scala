@@ -1,9 +1,10 @@
-package org.psliwa.idea.composerJson.composer.version
+package org.psliwa.idea.composerJson.composer.version.ConstraintTest
 
 import org.junit.Assert._
 import org.junit.Test
+import org.psliwa.idea.composerJson.composer.version._
 
-class ConstraintTest {
+class UpperBoundTest {
 
   val boundedConstraint = new SemanticConstraint(new SemanticVersion(1, 0))
   val unboundedConstraint = new WildcardConstraint(None)
@@ -32,7 +33,7 @@ class ConstraintTest {
   
   @Test
   def givenBoundedConstraintWithComparisonOperatorWithoutUpperBound_itShouldBeUnbounded() = {
-    import ConstraintOperator._
+    import org.psliwa.idea.composerJson.composer.version.ConstraintOperator._
 
     List(>=, >, ConstraintOperator.!=).foreach(operator => {
       checkUnbounded(new OperatorConstraint(operator, boundedConstraint))
@@ -41,8 +42,8 @@ class ConstraintTest {
 
   @Test
   def givenLogicalConstraintWithFewOperatorConstraintsWithoutUpperBound_itShouldBeUnbounded(): Unit = {
-    import LogicalOperator._
-    import ConstraintOperator._
+    import org.psliwa.idea.composerJson.composer.version.ConstraintOperator._
+    import org.psliwa.idea.composerJson.composer.version.LogicalOperator._
 
     for {
       operators <- List(List(>=, >=), List(>=, >), List(ConstraintOperator.!=, ConstraintOperator.!=))
@@ -52,8 +53,8 @@ class ConstraintTest {
 
   @Test
   def givenLogicalAndConstraintWithTwoUpperBoundedOperatorConstraint_itShouldBeBounded(): Unit = {
-    import LogicalOperator._
-    import ConstraintOperator._
+    import org.psliwa.idea.composerJson.composer.version.ConstraintOperator._
+    import org.psliwa.idea.composerJson.composer.version.LogicalOperator._
 
     List(List(>, <), List(>=, <), List(>, <=), List(>=, <=), List(<=, <=), List(<, <=), List(<, ConstraintOperator.!=)).foreach(operators => {
       checkBounded(LogicalConstraint(operators.map(OperatorConstraint(_, boundedConstraint)), AND))
@@ -82,53 +83,43 @@ class ConstraintTest {
 
   @Test
   def givenLogicalAndConstraint_givenInternalConstraintsAreAllUnbounded_outerConstraintShouldBeUnbounded(): Unit = {
-    import LogicalOperator._
+    import org.psliwa.idea.composerJson.composer.version.LogicalOperator._
     checkUnbounded(LogicalConstraint(List(unboundedConstraint, unboundedConstraint), AND))
   }
 
   @Test
   def givenLogicalAndConstraint_givenInternalConstraintsAreAllBounded_outerConstraintShouldBounded(): Unit = {
-    import LogicalOperator._
+    import org.psliwa.idea.composerJson.composer.version.LogicalOperator._
     checkBounded(LogicalConstraint(List(boundedConstraint, boundedConstraint), AND))
   }
 
   @Test
   def givenLogicalAndConstraint_givenOneInternalConstraintIsBounded_outerConstraintShouldBounded(): Unit = {
-    import LogicalOperator._
+    import org.psliwa.idea.composerJson.composer.version.LogicalOperator._
     checkBounded(LogicalConstraint(List(boundedConstraint, unboundedConstraint), AND))
   }
 
   @Test
   def givenLogicalOrConstraint_givenInternalConstraintAreAllUnbounded_outerConstraintShouldBeUnbounded(): Unit = {
-    import LogicalOperator._
+    import org.psliwa.idea.composerJson.composer.version.LogicalOperator._
     checkUnbounded(LogicalConstraint(List(unboundedConstraint, unboundedConstraint), OR))
   }
 
   @Test
   def givenLogicalOrConstraint_givenInternalConstraintAreAllBounded_outerConstraintShouldBeBounded(): Unit = {
-    import LogicalOperator._
+    import org.psliwa.idea.composerJson.composer.version.LogicalOperator._
     checkBounded(LogicalConstraint(List(boundedConstraint, boundedConstraint), OR))
   }
 
   @Test
   def givenLogicalOrConstraint_givenOneInternalConstraintIsUnbounded_outerConstraintShouldUnbounded(): Unit = {
-    import LogicalOperator._
+    import org.psliwa.idea.composerJson.composer.version.LogicalOperator._
     checkUnbounded(LogicalConstraint(List(boundedConstraint, unboundedConstraint), OR))
   }
 
   @Test
   def givenSpecificConstraint_isShouldBeBounded(): Unit = {
     List(DateConstraint("20101010"), HashConstraint("abcde")).foreach(checkBounded(_))
-  }
-
-  @Test
-  def semanticVersionAcceptsZeros(): Unit = {
-    SemanticVersion(0, Some(0, Some(1, None)))
-  }
-
-  @Test(expected = classOf[IllegalArgumentException])
-  def semanticVersionsDoesNotAcceptNegativeInts(): Unit = {
-    SemanticVersion(-1, Some(1, None))
   }
 
   private def checkBounded(constraint: Constraint, expected: Boolean = true): Unit = {
