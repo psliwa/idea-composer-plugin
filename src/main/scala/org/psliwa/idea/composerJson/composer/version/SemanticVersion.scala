@@ -30,6 +30,12 @@ case class SemanticVersion(major: Int, private val other: Option[(Int,Option[(In
     this(SemanticVersion.getOrThrow(versions)(0), SemanticVersion.getOther(versions))
   }
 
+  override def toString: String = {
+    def partToString(p: Option[Int]) = p.map("."+_).getOrElse("")
+
+    ""+major+partToString(minor)+partToString(patch)+partToString(minorPatch)
+  }
+
   private def ensure(b: Boolean): Unit = if(!b) throw new IllegalArgumentException
 }
 

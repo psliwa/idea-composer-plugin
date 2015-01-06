@@ -31,6 +31,21 @@ sealed trait Constraint {
       case _ => this
     })
   }
+
+  override def toString: String = this match {
+    case SemanticConstraint(version) => version.toString
+    case DevConstraint(version) => "dev-"+version
+    case WildcardConstraint(maybeConstraint) => maybeConstraint.map(_.toString+".").getOrElse("")+"*"
+    case WrappedConstraint(constraint, prefix, suffix) => prefix.map(_.toString).getOrElse("")+constraint+suffix.map(_.toString).getOrElse("")
+    case OperatorConstraint(operator, constraint) => operator.toString+constraint
+    case DateConstraint(version) => version
+    case HashConstraint(version) => version
+    case HyphenRangeConstraint(from, to) => from.toString+" - "+to
+    case AliasedConstraint(constraint, alias) => constraint.toString+" as "+alias
+    case LogicalConstraint(constraints, LogicalOperator.AND) => constraints.map(_.toString).mkString(", ")
+    case LogicalConstraint(constraints, LogicalOperator.OR) => constraints.map(_.toString).mkString(" || ")
+    case _ => super.toString
+  }
 }
 
 case class SemanticConstraint(version: SemanticVersion) extends Constraint
