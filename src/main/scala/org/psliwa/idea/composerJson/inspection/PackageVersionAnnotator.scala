@@ -5,15 +5,16 @@ import com.intellij.json.JsonLanguage
 import com.intellij.json.psi._
 import com.intellij.lang.annotation.{AnnotationHolder, Annotator}
 import com.intellij.openapi.project.Project
-import com.intellij.patterns.{ElementPattern, PatternCondition, StringPattern}
+import com.intellij.patterns.{PatternCondition, StringPattern}
 import com.intellij.psi.PsiElement
 import com.intellij.util.ProcessingContext
 import org.psliwa.idea.composerJson._
-import org.psliwa.idea.composerJson.composer.version.{Constraint, Parser}
+import org.psliwa.idea.composerJson.composer.version._
 import org.psliwa.idea.composerJson.inspection.problem.ProblemDescriptor
 import com.intellij.patterns.PlatformPatterns._
 import com.intellij.patterns.StandardPatterns._
 import org.psliwa.idea.composerJson.intellij.Patterns._
+import org.psliwa.idea.composerJson.json.SString
 import org.psliwa.idea.composerJson.settings.ComposerJsonSettings
 
 class PackageVersionAnnotator extends Annotator {
@@ -26,8 +27,8 @@ class PackageVersionAnnotator extends Annotator {
     if(pattern.accepts(element)) {
       val problemDescriptors = for {
         version <- getStringValue(element).toList
-        pkg <- ensureProperty(element.getParent).map(_.getName).toList
-        problem <- detectProblemsInVersion(pkg, version)
+        pkg <- ensureJsonProperty(element.getParent).map(_.getName).toList
+        problem <- detectProblemsInVersion(pkg, version, element)
       } yield ProblemDescriptor(element, problem._1, problem._2)
 
       problemDescriptors.foreach(problem => {
@@ -37,19 +38,62 @@ class PackageVersionAnnotator extends Annotator {
     }
   }
 
-  private def ensureProperty(element: PsiElement): Option[JsonProperty] = element match {
+  private def ensureJsonProperty(element: PsiElement): Option[JsonProperty] = element match {
     case x: JsonProperty => Some(x)
     case _ => None
   }
 
-  private def detectProblemsInVersion(pkg: String, version: String): Seq[(String, Seq[IntentionAction])] = {
+  private def ensureJsonObject(element: PsiElement): Option[JsonObject] = element match {
+    case x: JsonObject => Some(x)
+    case _ => None
+  }
+
+  private def detectProblemsInVersion(pkg: String, version: String, element: PsiElement): Seq[(String, Seq[IntentionAction])] = {
     parseVersion(version)
       .filter(!_.isBounded)
-      .map(_ => (
+      .map(versionConstraint => (
         ComposerBundle.message("inspection.version.unboundVersion"),
-        List(new ExcludePatternAction(pkg)) ++ packageVendorPattern(pkg).map(new ExcludePatternAction(_)).toList
+        fixUnboundVersion(pkg, versionConstraint, element) ++ List(new ExcludePatternAction(pkg)) ++
+          packageVendorPattern(pkg).map(new ExcludePatternAction(_)).toList
       ))
       .toList
+  }
+
+  private def fixUnboundVersion(pkg: String, version: Constraint, element: PsiElement): Seq[IntentionAction] = {
+    for {
+      property <- ensureJsonProperty(element.getParent).toList
+      jsonObject <- ensureJsonObject(property.getParent).toList
+      fix <- fixUnboundVersion(pkg, version, jsonObject)
+    } yield fix
+  }
+
+  private def fixUnboundVersion(pkg: String, version: Constraint, jsonObject: JsonObject): Seq[IntentionAction] = {
+    getUnboundVersionFixers
+      .map(version.replace)
+      .filter(_ != version)
+      .map(fixedVersion => changePackageVersionQuickFix(pkg, fixedVersion, jsonObject))
+  }
+
+  private def getUnboundVersionFixers: Seq[Constraint => Option[Constraint]] = List(ConstraintOperator.~, ConstraintOperator.^).flatMap(operator => {
+    List(
+      (c: Constraint) => c match {
+        case OperatorConstraint(ConstraintOperator.>=, constraint) => Some(OperatorConstraint(operator, constraint))
+        case _ => None
+      },
+      (c: Constraint) => c match {
+        case OperatorConstraint(ConstraintOperator.>, constraint) => Some(OperatorConstraint(operator, constraint.replace {
+          case SemanticConstraint(version) => Some(SemanticConstraint(version.incrementLast))
+          case _ => None
+        }))
+        case _ => None
+      }
+    )
+  })
+
+  private def changePackageVersionQuickFix(pkg: String, fixedVersion: Constraint, jsonObject: JsonObject): IntentionAction = {
+    new QuickFixIntentionActionAdapter(new SetPropertyValueQuickFix(jsonObject, pkg, SString(), fixedVersion.toString) {
+      override def getText: String = ComposerBundle.message("inspection.quickfix.setPackageVersion", fixedVersion.toString)
+    })
   }
 
   private def packageVendorPattern(pkg: String): Option[String] = pkg.split('/').headOption.map(_ + "/*")

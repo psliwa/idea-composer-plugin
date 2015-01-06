@@ -10,7 +10,12 @@ import org.psliwa.idea.composerJson.ComposerBundle
 import org.psliwa.idea.composerJson.json.Schema
 import QuickFix._
 
-class SetPropertyValueQuickFix(element: JsonObject, propertyName: String, propertySchema: Schema, propertyValue: String) extends LocalQuickFixOnPsiElement(element) {
+private[inspection] class SetPropertyValueQuickFix(
+  element: JsonObject,
+  propertyName: String,
+  propertySchema: Schema,
+  propertyValue: String
+) extends LocalQuickFixOnPsiElement(element) {
   override def getText: String = ComposerBundle.message("inspection.quickfix.setPropertyValue", propertyName, propertyValue)
 
   override def invoke(project: Project, file: PsiFile, startElement: PsiElement, endElement: PsiElement): Unit = {

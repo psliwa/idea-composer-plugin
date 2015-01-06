@@ -30,6 +30,11 @@ case class SemanticVersion(major: Int, private val other: Option[(Int,Option[(In
     this(SemanticVersion.getOrThrow(versions)(0), SemanticVersion.getOther(versions))
   }
 
+  def incrementLast: SemanticVersion = {
+    val reversedParts = List(Some(major), minor, patch, minorPatch).takeWhile(_ != None).map(_.get).reverse
+    new SemanticVersion(((reversedParts.head+1) :: reversedParts.tail).reverse.toArray)
+  }
+
   override def toString: String = {
     def partToString(p: Option[Int]) = p.map("."+_).getOrElse("")
 

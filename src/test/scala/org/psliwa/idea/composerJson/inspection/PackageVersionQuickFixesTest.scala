@@ -6,6 +6,7 @@ import org.junit.Assert._
 
 class PackageVersionQuickFixesTest extends InspectionTest {
   val ExcludePatternQuickFix = ComposerBundle.message("inspection.quickfix.excludePackagePattern", _: String)
+  val SetPackageVersionQuickFix = ComposerBundle.message("inspection.quickfix.setPackageVersion", _: String)
 
   override def setUp(): Unit = {
     super.setUp()
@@ -15,7 +16,7 @@ class PackageVersionQuickFixesTest extends InspectionTest {
 
   def testExcludePatternQuickFix_givenExactPattern() = {
     val pkg = "vendor/pkg321"
-    checkQuickFix(ExcludePatternQuickFix(pkg))(
+    checkQuickFix(ExcludePatternQuickFix(pkg),
       s"""
         |{
         |  "require": {
@@ -30,7 +31,7 @@ class PackageVersionQuickFixesTest extends InspectionTest {
 
   def testExcludePatternQuickFix_givenVendorWildcardPattern() = {
     val pkg = "vendor/pkg321"
-    checkQuickFix(ExcludePatternQuickFix("vendor/*"))(
+    checkQuickFix(ExcludePatternQuickFix("vendor/*"),
       s"""
         |{
         |  "require": {
@@ -43,13 +44,108 @@ class PackageVersionQuickFixesTest extends InspectionTest {
     assertPatternExcluded("vendor/*")
   }
 
+  def testSetVersionQuickFix_givenGtOperator_replaceByNsrOperator() = {
+    checkQuickFix(SetPackageVersionQuickFix("~1.3"))(
+      """
+        |{
+        |  "require": {
+        |    "vendor/pkg": ">1.2"
+        |  }
+        |}
+      """.stripMargin,
+      """
+        |{
+        |  "require": {
+        |    "vendor/pkg": "~1.3"
+        |  }
+        |}
+      """.stripMargin
+    )
+  }
+
+  def testSetVersionQuickFix_givenGteOperator_replaceByNsrOperator() = {
+    checkQuickFix(SetPackageVersionQuickFix("~1.2"))(
+      """
+        |{
+        |  "require": {
+        |    "vendor/pkg": ">=1.2"
+        |  }
+        |}
+      """.stripMargin,
+      """
+        |{
+        |  "require": {
+        |    "vendor/pkg": "~1.2"
+        |  }
+        |}
+      """.stripMargin
+    )
+  }
+
+  def testSetVersionQuickFix_givenGteOperator_givenInnerConstraintIsComposed_replaceByNsrOperator() = {
+    checkQuickFix(SetPackageVersionQuickFix("~1.2-beta"))(
+      """
+        |{
+        |  "require": {
+        |    "vendor/pkg": ">=1.2-beta"
+        |  }
+        |}
+      """.stripMargin,
+      """
+        |{
+        |  "require": {
+        |    "vendor/pkg": "~1.2-beta"
+        |  }
+        |}
+      """.stripMargin
+    )
+  }
+
+  def testSetVersionQuickFix_givenLogicalConstraint_logicalSeparatorShouldBeTheSameAsOriginal() = {
+    checkQuickFix(SetPackageVersionQuickFix("~1.2|1.2.3"))(
+      """
+        |{
+        |  "require": {
+        |    "vendor/pkg": ">=1.2|1.2.3"
+        |  }
+        |}
+      """.stripMargin,
+      """
+        |{
+        |  "require": {
+        |    "vendor/pkg": "~1.2|1.2.3"
+        |  }
+        |}
+      """.stripMargin
+    )
+  }
+
+  def testSetVersionQuickFix_givenLogicalConstraint_givenDefaultSeparator_logicalSeparatorShouldBeTheSameAsOriginal() = {
+    checkQuickFix(SetPackageVersionQuickFix("~1.2 || 1.2.3"))(
+      """
+        |{
+        |  "require": {
+        |    "vendor/pkg": ">=1.2 || 1.2.3"
+        |  }
+        |}
+      """.stripMargin,
+      """
+        |{
+        |  "require": {
+        |    "vendor/pkg": "~1.2 || 1.2.3"
+        |  }
+        |}
+      """.stripMargin
+    )
+  }
+
   private def assertPatternExcluded(pkg: String) {
     assertTrue(
       ComposerJsonSettings(myFixture.getProject).getUnboundedVersionInspectionSettings.getExcludedPatterns.exists(_.getPattern == pkg)
     )
   }
 
-  private def checkQuickFix(quickFix: String)(actual: String): Unit = {
-    super.checkQuickFix(quickFix)(actual, actual)
+  private def checkQuickFix(quickFix: String, actual: String): Unit = {
+    checkQuickFix(quickFix)(actual, actual)
   }
 }
