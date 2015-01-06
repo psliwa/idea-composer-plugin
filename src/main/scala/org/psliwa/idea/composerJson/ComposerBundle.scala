@@ -12,4 +12,6 @@ object ComposerBundle {
   def message(@PropertyKey(resourceBundle = BundleName) key: String, params: AnyRef*): String = {
     CommonBundle.message(Bundle, key, params:_*)
   }
+
+  def message(@PropertyKey(resourceBundle = BundleName) key: String): String = message(key, Nil:_*)
 }

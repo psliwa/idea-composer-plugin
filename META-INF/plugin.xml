@@ -54,6 +54,8 @@ This plugin adds auto completion and inspections support for composer.json file 
   <depends>com.intellij.modules.platform</depends>
 
   <extensions defaultExtensionNs="com.intellij">
+    <projectConfigurable instance="org.psliwa.idea.composerJson.settings.ComposerJsonSettingsConfigurable" id="ComposerJson.settings" />
+    <projectService serviceImplementation="org.psliwa.idea.composerJson.settings.ComposerJsonSettings" />
     <completion.contributor language="JSON" implementationClass="org.psliwa.idea.composerJson.completion.CompletionContributor" />
     <localInspection
         bundle="org.psliwa.idea.composerJson.messages.ComposerBundle"
