@@ -67,13 +67,13 @@ object Parser {
 
   private val hyphenRange = for {
     from <- date | semantic
-    _ <- ignoreSpaces(string("-"))
+    _ <- ignoreSpaces("-")
     to <- date | semantic
   } yield HyphenRangeConstraint(from, to)
 
   private val singleVersion = hyphenRange | alias | operatorVersion | primitiveVersion
 
-  private val whiteSpaces = string(" ").many
+  private val whiteSpaces = " ".many
   private def ignoreSpaces[A](p: Parser[A]): Parser[A] = {
     for {
       _ <- whiteSpaces
@@ -84,12 +84,12 @@ object Parser {
 
   private val and = for {
     first <- singleVersion
-    other <- (ignoreSpaces(string(",")) | string(" ").many1).flatMap(_ => singleVersion).many1
+    other <- (ignoreSpaces(",") | " ".many1).flatMap(_ => singleVersion).many1
   } yield LogicalConstraint(first::other, LogicalOperator.AND)
 
   private val or = for {
     first <- and | singleVersion
-    other <- ignoreSpaces(string("||")).flatMap(_ => and | singleVersion).many1
+    other <- ignoreSpaces("||" | "|").flatMap(_ => and | singleVersion).many1
   } yield LogicalConstraint(first::other, LogicalOperator.OR)
 
   private val parser = or | and | singleVersion

@@ -59,6 +59,8 @@ object ComposerJsonSettings {
   class UnboundedVersionInspectionSettings private[ComposerJsonSettings]() {
     private val excludedPatterns: mutable.Set[PatternItem] = mutable.Set()
 
+    def isExcluded(s: String): Boolean = excludedPatterns.exists(_.matches(s))
+
     def getExcludedPatterns: Array[PatternItem] = excludedPatterns.map(_.clone).toArray
 
     def setExcludedPatterns(@NotNull patterns: Array[PatternItem]) {
@@ -69,5 +71,7 @@ object ComposerJsonSettings {
     def addExcludedPattern(@NotNull pattern: PatternItem) {
       excludedPatterns.add(pattern.clone)
     }
+
+    def clear(): Unit = excludedPatterns.clear()
   }
 }

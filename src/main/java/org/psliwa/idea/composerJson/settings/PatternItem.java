@@ -3,21 +3,54 @@ package org.psliwa.idea.composerJson.settings;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
+
 public final class PatternItem implements Comparable<PatternItem>, Cloneable {
     @NotNull
     private String pattern = "";
+
+    private Pattern regexPattern;
 
     public PatternItem(String pattern) {
         setPattern(pattern);
     }
 
     @NotNull
-    public final String getPattern() {
+    public String getPattern() {
         return pattern;
     }
 
-    public final void setPattern(@Nullable String pattern) {
+    public void setPattern(@Nullable String pattern) {
         this.pattern = pattern == null ? "" : pattern;
+    }
+
+    public boolean matches(String text) {
+        try {
+            return getRegexPattern().matcher(text).matches();
+        } catch(PatternSyntaxException e) {
+            return false;
+        }
+    }
+
+    private Pattern getRegexPattern() {
+        if(regexPattern == null) {
+            int index, previousIndex = 0;
+            StringBuilder product = new StringBuilder("^");
+
+            while((index = pattern.indexOf('*', previousIndex)) >= 0) {
+                product.append(Pattern.quote(pattern.substring(previousIndex, index)))
+                    .append(".*");
+                previousIndex = index + 1;
+            }
+
+            product.append(Pattern.quote(pattern.substring(previousIndex)));
+            product.append("$");
+
+            regexPattern = Pattern.compile(product.toString());
+        }
+
+        return regexPattern;
     }
 
     @Override

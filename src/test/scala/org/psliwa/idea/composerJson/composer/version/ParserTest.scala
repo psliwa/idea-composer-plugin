@@ -149,7 +149,7 @@ class ParserTest {
 
   @Test
   def parseLogicalOrConstraint() = {
-    List("||", " || ").foreach(separator => {
+    List("||", " || ", "|", " | ").foreach(separator => {
       assertConstraintEquals(
         LogicalConstraint(List(DevConstraint("master"), DevConstraint("trunk")), LogicalOperator.OR),
         "dev-master"+separator+"dev-trunk"
