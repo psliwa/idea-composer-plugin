@@ -108,8 +108,8 @@ class ReplaceTest {
   def givenLogicalConstraint_givenFuncChangesInnerConstraints() = {
     List(LogicalOperator.AND, LogicalOperator.OR).foreach(operator => {
       assertEquals(
-        LogicalConstraint(List(semVer121, semVer121), operator),
-        LogicalConstraint(List(semVer120, semVer121), operator).replace{
+        LogicalConstraint(List(semVer121, semVer121), operator, " "),
+        LogicalConstraint(List(semVer120, semVer121), operator, " ").replace{
           case SemanticConstraint(_) => Some(semVer121)
           case _ => None
         }

@@ -53,9 +53,9 @@ object Parser {
 
   private val alias = for {
     version <- primitiveVersion
-    _ <- string(" as ") | string(" AS ")
+    separator <- string(" as ") | string(" AS ")
     as <- primitiveVersion
-  } yield AliasedConstraint(version, as)
+  } yield AliasedConstraint(version, as, separator)
 
   private val sortedOperators = ConstraintOperator.values.toList.sortWith(_.toString.length < _.toString.length)
   private val operator = sortedOperators.map(operator => string(operator.toString).map(_ => operator)).foldLeft(fail[ConstraintOperator]())((f, o) => o | f)
@@ -67,30 +67,37 @@ object Parser {
 
   private val hyphenRange = for {
     from <- date | semantic
-    _ <- ignoreSpaces("-")
+    separator <- spaceWrapper("-")
     to <- date | semantic
-  } yield HyphenRangeConstraint(from, to)
+  } yield HyphenRangeConstraint(from, to, separator)
 
   private val singleVersion = hyphenRange | alias | operatorVersion | primitiveVersion
 
-  private val whiteSpaces = " ".many
-  private def ignoreSpaces[A](p: Parser[A]): Parser[A] = {
+  private val whiteSpaces = " ".many.map(_.mkString)
+  private def spaceWrapper(p: Parser[String]): Parser[String] = {
     for {
-      _ <- whiteSpaces
-      a <- p
-      _ <- whiteSpaces
-    } yield a
+      prefix <- whiteSpaces
+      value <- p
+      suffix <- whiteSpaces
+    } yield prefix + value + suffix
   }
+
+  private val andSeparator: Parser[String] = spaceWrapper("," | "")
+  private val orSeparator: Parser[String] = spaceWrapper("||" | "|")
 
   private val and = for {
     first <- singleVersion
-    other <- (ignoreSpaces(",") | " ".many1).flatMap(_ => singleVersion).many1
-  } yield LogicalConstraint(first::other, LogicalOperator.AND)
+    separator <- andSeparator
+    second <- singleVersion
+    other <- andSeparator.flatMap(_ => singleVersion).many
+  } yield LogicalConstraint(first::second::other, LogicalOperator.AND, separator)
 
   private val or = for {
     first <- and | singleVersion
-    other <- ignoreSpaces("||" | "|").flatMap(_ => and | singleVersion).many1
-  } yield LogicalConstraint(first::other, LogicalOperator.OR)
+    separator <- orSeparator
+    second <- and | singleVersion
+    other <- orSeparator.flatMap(_ => and | singleVersion).many
+  } yield LogicalConstraint(first::second::other, LogicalOperator.OR, separator)
 
   private val parser = or | and | singleVersion
 }

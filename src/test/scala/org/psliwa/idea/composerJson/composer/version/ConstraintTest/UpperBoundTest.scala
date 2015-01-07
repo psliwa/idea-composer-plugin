@@ -48,7 +48,7 @@ class UpperBoundTest {
     for {
       operators <- List(List(>=, >=), List(>=, >), List(ConstraintOperator.!=, ConstraintOperator.!=))
       logicalOp <- List(OR, AND)
-    } yield checkUnbounded(LogicalConstraint(operators.map(OperatorConstraint(_, boundedConstraint)), logicalOp))
+    } yield checkUnbounded(LogicalConstraint(operators.map(OperatorConstraint(_, boundedConstraint)), logicalOp, ""))
   }
 
   @Test
@@ -57,7 +57,7 @@ class UpperBoundTest {
     import org.psliwa.idea.composerJson.composer.version.LogicalOperator._
 
     List(List(>, <), List(>=, <), List(>, <=), List(>=, <=), List(<=, <=), List(<, <=), List(<, ConstraintOperator.!=)).foreach(operators => {
-      checkBounded(LogicalConstraint(operators.map(OperatorConstraint(_, boundedConstraint)), AND))
+      checkBounded(LogicalConstraint(operators.map(OperatorConstraint(_, boundedConstraint)), AND, " "))
     })
   }
 
@@ -84,37 +84,37 @@ class UpperBoundTest {
   @Test
   def givenLogicalAndConstraint_givenInternalConstraintsAreAllUnbounded_outerConstraintShouldBeUnbounded(): Unit = {
     import org.psliwa.idea.composerJson.composer.version.LogicalOperator._
-    checkUnbounded(LogicalConstraint(List(unboundedConstraint, unboundedConstraint), AND))
+    checkUnbounded(LogicalConstraint(List(unboundedConstraint, unboundedConstraint), AND, " "))
   }
 
   @Test
   def givenLogicalAndConstraint_givenInternalConstraintsAreAllBounded_outerConstraintShouldBounded(): Unit = {
     import org.psliwa.idea.composerJson.composer.version.LogicalOperator._
-    checkBounded(LogicalConstraint(List(boundedConstraint, boundedConstraint), AND))
+    checkBounded(LogicalConstraint(List(boundedConstraint, boundedConstraint), AND, " "))
   }
 
   @Test
   def givenLogicalAndConstraint_givenOneInternalConstraintIsBounded_outerConstraintShouldBounded(): Unit = {
     import org.psliwa.idea.composerJson.composer.version.LogicalOperator._
-    checkBounded(LogicalConstraint(List(boundedConstraint, unboundedConstraint), AND))
+    checkBounded(LogicalConstraint(List(boundedConstraint, unboundedConstraint), AND, " "))
   }
 
   @Test
   def givenLogicalOrConstraint_givenInternalConstraintAreAllUnbounded_outerConstraintShouldBeUnbounded(): Unit = {
     import org.psliwa.idea.composerJson.composer.version.LogicalOperator._
-    checkUnbounded(LogicalConstraint(List(unboundedConstraint, unboundedConstraint), OR))
+    checkUnbounded(LogicalConstraint(List(unboundedConstraint, unboundedConstraint), OR, "|"))
   }
 
   @Test
   def givenLogicalOrConstraint_givenInternalConstraintAreAllBounded_outerConstraintShouldBeBounded(): Unit = {
     import org.psliwa.idea.composerJson.composer.version.LogicalOperator._
-    checkBounded(LogicalConstraint(List(boundedConstraint, boundedConstraint), OR))
+    checkBounded(LogicalConstraint(List(boundedConstraint, boundedConstraint), OR, "|"))
   }
 
   @Test
   def givenLogicalOrConstraint_givenOneInternalConstraintIsUnbounded_outerConstraintShouldUnbounded(): Unit = {
     import org.psliwa.idea.composerJson.composer.version.LogicalOperator._
-    checkUnbounded(LogicalConstraint(List(boundedConstraint, unboundedConstraint), OR))
+    checkUnbounded(LogicalConstraint(List(boundedConstraint, unboundedConstraint), OR, "|"))
   }
 
   @Test

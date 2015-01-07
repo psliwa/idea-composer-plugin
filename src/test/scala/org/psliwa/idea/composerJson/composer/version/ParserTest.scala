@@ -88,10 +88,10 @@ class ParserTest {
 
   @Test
   def parseAlias() = {
-    List("as", "AS").foreach(as => {
+    List(" as ", " AS ").foreach(as => {
       assertConstraintEquals(
-        AliasedConstraint(DevConstraint("master"), SemanticConstraint(new SemanticVersion(1, 2, 0))),
-        s"dev-master $as 1.2.0"
+        AliasedConstraint(DevConstraint("master"), SemanticConstraint(new SemanticVersion(1, 2, 0)), as),
+        "dev-master"+as+"1.2.0"
       )
     })
   }
@@ -126,7 +126,7 @@ class ParserTest {
   def parseLogicalAndConstraint() = {
     List(",", ", ", " ").foreach(separator => {
       assertConstraintEquals(
-        LogicalConstraint(List(DevConstraint("master"), DevConstraint("trunk")), LogicalOperator.AND),
+        LogicalConstraint(List(DevConstraint("master"), DevConstraint("trunk")), LogicalOperator.AND, separator),
         "dev-master"+separator+"dev-trunk"
       )
     })
@@ -136,7 +136,7 @@ class ParserTest {
   def parseHyphenRangeConstraint() = {
     List("-", " - ").foreach(separator => {
       assertConstraintEquals(
-        HyphenRangeConstraint(SemanticConstraint(new SemanticVersion(1, 2)), SemanticConstraint(new SemanticVersion(2, 0))),
+        HyphenRangeConstraint(SemanticConstraint(new SemanticVersion(1, 2)), SemanticConstraint(new SemanticVersion(2, 0)), separator),
         "1.2"+separator+"2.0"
       )
     })
@@ -151,7 +151,7 @@ class ParserTest {
   def parseLogicalOrConstraint() = {
     List("||", " || ", "|", " | ").foreach(separator => {
       assertConstraintEquals(
-        LogicalConstraint(List(DevConstraint("master"), DevConstraint("trunk")), LogicalOperator.OR),
+        LogicalConstraint(List(DevConstraint("master"), DevConstraint("trunk")), LogicalOperator.OR, separator),
         "dev-master"+separator+"dev-trunk"
       )
     })
@@ -163,9 +163,10 @@ class ParserTest {
       LogicalConstraint(
         List(
           DevConstraint("master"),
-          LogicalConstraint(List(DevConstraint("trunk"), DevConstraint("abc")), LogicalOperator.AND)
+          LogicalConstraint(List(DevConstraint("trunk"), DevConstraint("abc")), LogicalOperator.AND, ", ")
         ),
-        LogicalOperator.OR
+        LogicalOperator.OR,
+        " || "
       ),
       "dev-master || dev-trunk, dev-abc"
     )
@@ -176,10 +177,11 @@ class ParserTest {
     assertConstraintEquals(
       LogicalConstraint(
         List(
-          LogicalConstraint(List(DevConstraint("trunk"), DevConstraint("abc")), LogicalOperator.AND),
+          LogicalConstraint(List(DevConstraint("trunk"), DevConstraint("abc")), LogicalOperator.AND, ", "),
           DevConstraint("master")
         ),
-        LogicalOperator.OR
+        LogicalOperator.OR,
+        " || "
       ),
       "dev-trunk, dev-abc || dev-master"
     )

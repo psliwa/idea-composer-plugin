@@ -6,13 +6,13 @@ sealed trait Constraint {
     case WildcardConstraint(None) => false
     case WildcardConstraint(Some(constraint)) => constraint.isBounded
     case WrappedConstraint(constraint, _, _) => constraint.isBounded
-    case OperatorConstraint(operator, constraint) => operator.isBounded && constraint.isBounded
-    case LogicalConstraint(constraints, operator) => operator match {
+    case OperatorConstraint(operator, constraint, _) => operator.isBounded && constraint.isBounded
+    case LogicalConstraint(constraints, operator, _) => operator match {
       case LogicalOperator.AND => constraints.exists(_.isBounded)
       case LogicalOperator.OR => constraints.forall(_.isBounded)
     }
-    case AliasedConstraint(constraint, _) => constraint.isBounded
-    case HashConstraint(_) | HyphenRangeConstraint(_, _) | DateConstraint(_) => true
+    case AliasedConstraint(constraint, _, _) => constraint.isBounded
+    case HashConstraint(_) | HyphenRangeConstraint(_, _, _) | DateConstraint(_) => true
     case DevConstraint(_) => false
     case _ => false
   }
@@ -24,40 +24,40 @@ sealed trait Constraint {
         case sc@SemanticConstraint(_) => WildcardConstraint(Some(sc))
         case _ => this
       }
-      case OperatorConstraint(operator, constraint) => OperatorConstraint(operator, constraint.replace(f))
-      case AliasedConstraint(constraint, alias) => AliasedConstraint(constraint.replace(f), alias)
-      case HyphenRangeConstraint(from, to) => HyphenRangeConstraint(from.replace(f), to.replace(f))
-      case LogicalConstraint(constraints, operator) => LogicalConstraint(constraints.map(_.replace(f)), operator)
+      case OperatorConstraint(operator, constraint, ps) => OperatorConstraint(operator, constraint.replace(f), ps)
+      case AliasedConstraint(constraint, alias, ps) => AliasedConstraint(constraint.replace(f), alias, ps)
+      case HyphenRangeConstraint(from, to, ps) => HyphenRangeConstraint(from.replace(f), to.replace(f), ps)
+      case LogicalConstraint(constraints, operator, ps) => LogicalConstraint(constraints.map(_.replace(f)), operator, ps)
       case _ => this
     })
   }
 
-  override def toString: String = this match {
+  def presentation: String = this match {
     case SemanticConstraint(version) => version.toString
     case DevConstraint(version) => "dev-"+version
-    case WildcardConstraint(maybeConstraint) => maybeConstraint.map(_.toString+".").getOrElse("")+"*"
-    case WrappedConstraint(constraint, prefix, suffix) => prefix.map(_.toString).getOrElse("")+constraint+suffix.map(_.toString).getOrElse("")
-    case OperatorConstraint(operator, constraint) => operator.toString+constraint
+    case WildcardConstraint(maybeConstraint) => maybeConstraint.map(_.presentation+".").getOrElse("")+"*"
+    case WrappedConstraint(constraint, prefix, suffix) => prefix.map(_.toString).getOrElse("")+constraint.presentation+suffix.map(_.toString).getOrElse("")
+    case OperatorConstraint(operator, constraint, separator) => operator.toString+constraint.presentation
     case DateConstraint(version) => version
     case HashConstraint(version) => version
-    case HyphenRangeConstraint(from, to) => from.toString+" - "+to
-    case AliasedConstraint(constraint, alias) => constraint.toString+" as "+alias
-    case LogicalConstraint(constraints, LogicalOperator.AND) => constraints.map(_.toString).mkString(", ")
-    case LogicalConstraint(constraints, LogicalOperator.OR) => constraints.map(_.toString).mkString(" || ")
-    case _ => super.toString
+    case HyphenRangeConstraint(from, to, separator) => from.presentation+separator+to.presentation
+    case AliasedConstraint(constraint, alias, separator) => constraint.presentation+separator+alias.presentation
+    case LogicalConstraint(constraints, LogicalOperator.AND, separator) => constraints.map(_.presentation).mkString(separator)
+    case LogicalConstraint(constraints, LogicalOperator.OR, separator) => constraints.map(_.presentation).mkString(separator)
+    case _ => "<unknown>"
   }
 }
 
 case class SemanticConstraint(version: SemanticVersion) extends Constraint
 case class WildcardConstraint(constraint: Option[SemanticConstraint]) extends Constraint
 case class WrappedConstraint(constraint: Constraint, prefix: Option[String], suffix: Option[String]) extends Constraint
-case class OperatorConstraint(operator: ConstraintOperator, constraint: Constraint) extends Constraint
-case class LogicalConstraint(constraints: List[Constraint], operator: LogicalOperator) extends Constraint
-case class AliasedConstraint(constraint: Constraint, as: Constraint) extends Constraint
+case class OperatorConstraint(operator: ConstraintOperator, constraint: Constraint, presentationPadding: String = "") extends Constraint
+case class LogicalConstraint(constraints: List[Constraint], operator: LogicalOperator, presentationSeparator: String) extends Constraint
+case class AliasedConstraint(constraint: Constraint, as: Constraint, presentationSeparator: String = " as ") extends Constraint
 case class HashConstraint(version: String) extends Constraint
 case class DateConstraint(version: String) extends Constraint
 case class DevConstraint(version: String) extends Constraint
-case class HyphenRangeConstraint(from: Constraint, to: Constraint) extends Constraint
+case class HyphenRangeConstraint(from: Constraint, to: Constraint, presentationSeparator: String = " - ") extends Constraint
 
 sealed trait ConstraintOperator {
   def isBounded = true

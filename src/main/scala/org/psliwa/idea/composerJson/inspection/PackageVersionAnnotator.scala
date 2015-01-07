@@ -77,22 +77,22 @@ class PackageVersionAnnotator extends Annotator {
   private def getUnboundVersionFixers: Seq[Constraint => Option[Constraint]] = List(ConstraintOperator.~, ConstraintOperator.^).flatMap(operator => {
     List(
       (c: Constraint) => c match {
-        case OperatorConstraint(ConstraintOperator.>=, constraint) => Some(OperatorConstraint(operator, constraint))
+        case OperatorConstraint(ConstraintOperator.>=, constraint, separator) => Some(OperatorConstraint(operator, constraint, separator))
         case _ => None
       },
       (c: Constraint) => c match {
-        case OperatorConstraint(ConstraintOperator.>, constraint) => Some(OperatorConstraint(operator, constraint.replace {
+        case OperatorConstraint(ConstraintOperator.>, constraint, separator) => Some(OperatorConstraint(operator, constraint.replace {
           case SemanticConstraint(version) => Some(SemanticConstraint(version.incrementLast))
           case _ => None
-        }))
+        }, separator))
         case _ => None
       }
     )
   })
 
   private def changePackageVersionQuickFix(pkg: String, fixedVersion: Constraint, jsonObject: JsonObject): IntentionAction = {
-    new QuickFixIntentionActionAdapter(new SetPropertyValueQuickFix(jsonObject, pkg, SString(), fixedVersion.toString) {
-      override def getText: String = ComposerBundle.message("inspection.quickfix.setPackageVersion", fixedVersion.toString)
+    new QuickFixIntentionActionAdapter(new SetPropertyValueQuickFix(jsonObject, pkg, SString(), fixedVersion.presentation) {
+      override def getText: String = ComposerBundle.message("inspection.quickfix.setPackageVersion", fixedVersion.presentation)
     })
   }
 
