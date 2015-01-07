@@ -113,13 +113,16 @@ class ParserTest {
   }
 
   @Test
-  def parseOperatorConstraint() = {
-    ConstraintOperator.values.foreach(operator => {
+  def parseOperatorConstraint(): Unit = {
+    for {
+      operator <- ConstraintOperator.values
+      separator <- List("", " ")
+    } yield {
       assertConstraintEquals(
-        OperatorConstraint(operator, SemanticConstraint(new SemanticVersion(1, 2))),
-        operator+"1.2"
+        OperatorConstraint(operator, SemanticConstraint(new SemanticVersion(1, 2)), separator),
+        operator+separator+"1.2"
       )
-    })
+    }
   }
 
   @Test
@@ -184,6 +187,14 @@ class ParserTest {
         " || "
       ),
       "dev-trunk, dev-abc || dev-master"
+    )
+  }
+
+  @Test
+  def parseOperatorWithWrappedWildcard() = {
+    assertConstraintEquals(
+      OperatorConstraint(ConstraintOperator.>, WrappedConstraint(WildcardConstraint(Some(SemanticConstraint(new SemanticVersion(1, 2)))), None, Some("@dev"))),
+      ">1.2.*@dev"
     )
   }
 

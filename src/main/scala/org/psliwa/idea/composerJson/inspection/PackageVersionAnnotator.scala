@@ -49,30 +49,41 @@ class PackageVersionAnnotator extends Annotator {
   }
 
   private def detectProblemsInVersion(pkg: String, version: String, element: PsiElement): Seq[(String, Seq[IntentionAction])] = {
-    parseVersion(version)
+    val versionConstraint = parseVersion(version)
+
+    detectUnboundedVersionProblem(versionConstraint, pkg, element) ++ detectWildcardAndOperatorCombo(versionConstraint, pkg, element)
+  }
+
+  private def detectUnboundedVersionProblem(version: Option[Constraint], pkg: String, element: PsiElement): Seq[(String, Seq[IntentionAction])] = {
+    version
       .filter(!_.isBounded)
       .map(versionConstraint => (
-        ComposerBundle.message("inspection.version.unboundVersion"),
-        fixUnboundVersion(pkg, versionConstraint, element) ++ List(new ExcludePatternAction(pkg)) ++
-          packageVendorPattern(pkg).map(new ExcludePatternAction(_)).toList
+      ComposerBundle.message("inspection.version.unboundVersion"),
+      versionQuickFixes(getUnboundVersionFixers)(pkg, versionConstraint, element) ++ List(new ExcludePatternAction(pkg)) ++
+        packageVendorPattern(pkg).map(new ExcludePatternAction(_)).toList
       ))
       .toList
   }
 
-  private def fixUnboundVersion(pkg: String, version: Constraint, element: PsiElement): Seq[IntentionAction] = {
+  private def versionQuickFixes(fixers: Seq[Constraint => Option[Constraint]])(
+    pkg: String,
+    version: Constraint,
+    element: PsiElement
+  ): Seq[IntentionAction] = {
+    def createQuickFixes(jsonObject: JsonObject) = {
+      fixers
+        .map(version.replace)
+        .filter(_ != version)
+        .map(fixedVersion => changePackageVersionQuickFix(pkg, fixedVersion, jsonObject))
+    }
+
     for {
       property <- ensureJsonProperty(element.getParent).toList
       jsonObject <- ensureJsonObject(property.getParent).toList
-      fix <- fixUnboundVersion(pkg, version, jsonObject)
+      fix <- createQuickFixes(jsonObject)
     } yield fix
   }
 
-  private def fixUnboundVersion(pkg: String, version: Constraint, jsonObject: JsonObject): Seq[IntentionAction] = {
-    getUnboundVersionFixers
-      .map(version.replace)
-      .filter(_ != version)
-      .map(fixedVersion => changePackageVersionQuickFix(pkg, fixedVersion, jsonObject))
-  }
 
   private def getUnboundVersionFixers: Seq[Constraint => Option[Constraint]] = List(ConstraintOperator.~, ConstraintOperator.^).flatMap(operator => {
     List(
@@ -89,6 +100,39 @@ class PackageVersionAnnotator extends Annotator {
       }
     )
   })
+
+  private def detectWildcardAndOperatorCombo(version: Option[Constraint], pkg: String, element: PsiElement) = {
+    version
+      .filter(_ contains wildcardAndOperatorCombination)
+      .map(versionConstraint => (
+        ComposerBundle.message("inspection.version.wildcardAndComparison"),
+        versionQuickFixes(getWildcardAndOperatorComboFixers)(pkg, versionConstraint, element)
+      ))
+      .toList
+  }
+
+  private def wildcardAndOperatorCombination(constraint: Constraint) = constraint match {
+    case OperatorConstraint(_, WildcardConstraint(_), _) => true
+    case OperatorConstraint(_, WrappedConstraint(WildcardConstraint(_), _, _), _) => true
+    case _ => false
+  }
+
+  private def getWildcardAndOperatorComboFixers: Seq[Constraint => Option[Constraint]] = {
+    List(
+      (c: Constraint) => c match {
+        case OperatorConstraint(operator, WildcardConstraint(Some(constraint)), separator) => {
+          Some(OperatorConstraint(operator, constraint, separator))
+        }
+        case _ => None
+      },
+      (c: Constraint) => c match {
+        case OperatorConstraint(operator, WrappedConstraint(WildcardConstraint(Some(constraint)), prefix, suffix), separator) => {
+          Some(OperatorConstraint(operator, WrappedConstraint(constraint, prefix, suffix), separator))
+        }
+        case _ => None
+      }
+    )
+  }
 
   private def changePackageVersionQuickFix(pkg: String, fixedVersion: Constraint, jsonObject: JsonObject): IntentionAction = {
     new QuickFixIntentionActionAdapter(new SetPropertyValueQuickFix(jsonObject, pkg, SString(), fixedVersion.presentation) {

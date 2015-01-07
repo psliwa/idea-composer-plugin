@@ -32,12 +32,25 @@ sealed trait Constraint {
     })
   }
 
+  def contains(f: Constraint => Boolean): Boolean = {
+    if(f(this)) true
+    else this match {
+      case WrappedConstraint(constraint, _, _) => constraint.contains(f)
+      case WildcardConstraint(Some(constraint)) => constraint.contains(f)
+      case OperatorConstraint(_, constraint, _) => constraint.contains(f)
+      case AliasedConstraint(constraint, alias, _) => constraint.contains(f) || alias.contains(f)
+      case HyphenRangeConstraint(from, to, _) => from.contains(f) || to.contains(f)
+      case LogicalConstraint(constraints, _, _) => constraints.exists(f)
+      case _ => false
+    }
+  }
+
   def presentation: String = this match {
     case SemanticConstraint(version) => version.toString
     case DevConstraint(version) => "dev-"+version
     case WildcardConstraint(maybeConstraint) => maybeConstraint.map(_.presentation+".").getOrElse("")+"*"
     case WrappedConstraint(constraint, prefix, suffix) => prefix.map(_.toString).getOrElse("")+constraint.presentation+suffix.map(_.toString).getOrElse("")
-    case OperatorConstraint(operator, constraint, separator) => operator.toString+constraint.presentation
+    case OperatorConstraint(operator, constraint, separator) => operator.toString+separator+constraint.presentation
     case DateConstraint(version) => version
     case HashConstraint(version) => version
     case HyphenRangeConstraint(from, to, separator) => from.presentation+separator+to.presentation

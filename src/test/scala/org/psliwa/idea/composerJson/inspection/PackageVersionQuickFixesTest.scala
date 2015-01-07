@@ -139,6 +139,44 @@ class PackageVersionQuickFixesTest extends InspectionTest {
     )
   }
 
+  def testSetVersionQuickFix_givenWildcardAndComparisonCombination() = {
+    checkQuickFix(SetPackageVersionQuickFix("<=1.2"))(
+      """
+        |{
+        |  "require": {
+        |    "vendor/pkg": "<=1.2.*"
+        |  }
+        |}
+      """.stripMargin,
+      """
+        |{
+        |  "require": {
+        |    "vendor/pkg": "<=1.2"
+        |  }
+        |}
+      """.stripMargin
+    )
+  }
+
+  def testSetVersionQuickFix_givenWrappedWildcardAndComparisonCombination() = {
+    checkQuickFix(SetPackageVersionQuickFix("<=1.2@dev"))(
+      """
+        |{
+        |  "require": {
+        |    "vendor/pkg": "<=1.2.*@dev"
+        |  }
+        |}
+      """.stripMargin,
+      """
+        |{
+        |  "require": {
+        |    "vendor/pkg": "<=1.2@dev"
+        |  }
+        |}
+      """.stripMargin
+    )
+  }
+
   private def assertPatternExcluded(pkg: String) {
     assertTrue(
       ComposerJsonSettings(myFixture.getProject).getUnboundedVersionInspectionSettings.getExcludedPatterns.exists(_.getPattern == pkg)

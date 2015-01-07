@@ -18,6 +18,7 @@ class PresentationStringTest {
       (WildcardConstraint(None), "*"),
       (WrappedConstraint(semVer120, Some("prefix-"), Some("-suffix")), "prefix-1.2.0-suffix"),
       (OperatorConstraint(ConstraintOperator.<=, semVer120), "<=1.2.0"),
+      (OperatorConstraint(ConstraintOperator.<=, semVer120, " "), "<= 1.2.0"),
       (HashConstraint("afafaf"), "afafaf"),
       (DateConstraint("20101010"), "20101010"),
       (HyphenRangeConstraint(semVer120, semVer120, " - "), "1.2.0 - 1.2.0"),

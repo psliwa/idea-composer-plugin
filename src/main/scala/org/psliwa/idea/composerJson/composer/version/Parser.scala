@@ -21,6 +21,7 @@ object Parser {
     }
   }
 
+  private val whiteSpaces = " ".many.map(_.mkString)
   private val dateSeparator = "^(\\.|\\-)".r | succeed("")
   private val datePart = "^\\d{2}".r | succeed("")
 
@@ -49,7 +50,7 @@ object Parser {
     suffix <- "^([@\\-]?[a-z0-9]+)".r
   } yield WrappedConstraint(version, prefix, Some(suffix))
 
-  private val primitiveVersion = dev | hash | date | wildcard | wrapped | semantic
+  private val primitiveVersion = dev | hash | date | wrapped | wildcard | semantic
 
   private val alias = for {
     version <- primitiveVersion
@@ -62,8 +63,9 @@ object Parser {
 
   private val operatorVersion = for {
     op <- operator
+    separator <- whiteSpaces
     version <- primitiveVersion
-  } yield OperatorConstraint(op, version)
+  } yield OperatorConstraint(op, version, separator)
 
   private val hyphenRange = for {
     from <- date | semantic
@@ -73,7 +75,6 @@ object Parser {
 
   private val singleVersion = hyphenRange | alias | operatorVersion | primitiveVersion
 
-  private val whiteSpaces = " ".many.map(_.mkString)
   private def spaceWrapper(p: Parser[String]): Parser[String] = {
     for {
       prefix <- whiteSpaces
