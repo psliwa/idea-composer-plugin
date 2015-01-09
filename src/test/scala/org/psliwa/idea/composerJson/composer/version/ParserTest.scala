@@ -198,6 +198,11 @@ class ParserTest {
     )
   }
 
+  @Test
+  def givenVersionWithValidBegining_butEndingIsMalformed_noneExpected() = {
+    assertEquals(None, Parser.parse(">1.2 someInvalid"))
+  }
+
   private def assertConstraintEquals(expected: Constraint, actual: String) = {
     assertEquals(s"parsing: '$actual'", Some(expected), Parser.parse(actual))
   }

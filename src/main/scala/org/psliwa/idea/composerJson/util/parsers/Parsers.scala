@@ -11,6 +11,8 @@ object Parsers { self =>
     else Failure
   }
 
+  def whole(): Parser[String] = loc => Success(loc.input, loc.input.length)
+
   def regex(r: Regex): Parser[String] = loc => {
     r.findFirstMatchIn(loc.input)
       .map(m => Success(m.toString(),m.end))

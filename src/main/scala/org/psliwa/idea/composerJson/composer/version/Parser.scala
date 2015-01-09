@@ -1,6 +1,6 @@
 package org.psliwa.idea.composerJson.composer.version
 
-import org.psliwa.idea.composerJson.util.parsers.Parser
+import org.psliwa.idea.composerJson.util.parsers.{Parsers, Parser}
 import org.psliwa.idea.composerJson.util.parsers.Combinators._
 import org.psliwa.idea.composerJson.util.parsers.ImplicitConversions._
 
@@ -100,5 +100,6 @@ object Parser {
     other <- orSeparator.flatMap(_ => and | singleVersion).many
   } yield LogicalConstraint(first::second::other, LogicalOperator.OR, separator)
 
-  private val parser = or | and | singleVersion
+  private def guard[A](value: A) = Parsers.whole().flatMap(s => if(s.isEmpty) succeed(value) else fail())
+  private val parser = (or | and | singleVersion).flatMap(guard)
 }
