@@ -11,6 +11,8 @@ import com.intellij.psi.impl.source.tree.LeafPsiElement
 import com.intellij.util.ProcessingContext
 import org.psliwa.idea.composerJson._
 import org.psliwa.idea.composerJson.composer._
+import org.psliwa.idea.composerJson.composer.repository.Packagist
+import org.psliwa.idea.composerJson.composer.version.Version
 import org.psliwa.idea.composerJson.intellij.Patterns._
 import org.psliwa.idea.composerJson.json._
 import org.psliwa.idea.composerJson.util.CharOffsetFinder._

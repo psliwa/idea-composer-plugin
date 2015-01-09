@@ -1,4 +1,4 @@
-package org.psliwa.idea.composerJson.composer
+package org.psliwa.idea.composerJson.composer.repository
 
 import scala.io.Source
 import scala.util.parsing.json.{JSON, JSONArray, JSONObject}

@@ -1,4 +1,4 @@
-package org.psliwa.idea.composerJson.composer
+package org.psliwa.idea.composerJson.composer.repository
 
 import org.junit.Assert._
 import org.junit.Test

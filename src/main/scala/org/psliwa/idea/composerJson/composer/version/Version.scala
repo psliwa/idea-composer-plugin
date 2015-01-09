@@ -1,4 +1,4 @@
-package org.psliwa.idea.composerJson.composer
+package org.psliwa.idea.composerJson.composer.version
 
 import org.psliwa.idea.composerJson.util.CharOffsetFinder._
 import org.psliwa.idea.composerJson.util.OffsetFinder.ImplicitConversions._

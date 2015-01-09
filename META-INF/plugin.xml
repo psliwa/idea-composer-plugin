@@ -58,6 +58,7 @@ This plugin adds auto completion and inspections support for composer.json file 
   <idea-version since-build="139.0"/>
 
   <depends>com.intellij.modules.platform</depends>
+  <depends optional="true">com.jetbrains.php</depends>
 
   <extensions defaultExtensionNs="com.intellij">
     <projectConfigurable instance="org.psliwa.idea.composerJson.settings.ComposerJsonSettingsConfigurable" id="ComposerJson.settings" />

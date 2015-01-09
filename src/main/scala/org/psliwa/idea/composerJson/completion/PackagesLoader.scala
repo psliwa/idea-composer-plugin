@@ -5,7 +5,7 @@ import com.intellij.openapi.components.ApplicationComponent
 import com.intellij.openapi.fileEditor.{FileEditorManager, FileEditorManagerAdapter, FileEditorManagerListener}
 import com.intellij.openapi.vfs.VirtualFile
 import org.psliwa.idea.composerJson._
-import org.psliwa.idea.composerJson.composer.Packagist
+import org.psliwa.idea.composerJson.composer.repository.Packagist
 
 class PackagesLoader extends ApplicationComponent {
   override def initComponent(): Unit = {
