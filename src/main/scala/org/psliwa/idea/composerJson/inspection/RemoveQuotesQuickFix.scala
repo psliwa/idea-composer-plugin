@@ -1,11 +1,11 @@
 package org.psliwa.idea.composerJson.inspection
 
 import com.intellij.codeInspection.LocalQuickFixOnPsiElement
-import com.intellij.json.psi.JsonStringLiteral
 import com.intellij.openapi.project.Project
 import com.intellij.psi.{PsiFile, PsiElement}
 import org.psliwa.idea.composerJson.ComposerBundle
 import org.psliwa.idea.composerJson.inspection.QuickFix._
+import org.psliwa.idea.composerJson.util.PsiElements._
 
 private[inspection] class RemoveQuotesQuickFix(element: PsiElement) extends LocalQuickFixOnPsiElement(element){
 
@@ -20,11 +20,6 @@ private[inspection] class RemoveQuotesQuickFix(element: PsiElement) extends Loca
       document.replaceString(headOffset, headOffset+1, "")
       document.replaceString(trailingOffset, trailingOffset+1, "")
     }
-  }
-
-  private def ensureJsonStringLiteral(e: PsiElement): Option[JsonStringLiteral] = e match {
-    case x: JsonStringLiteral => Some(x)
-    case _ => None
   }
 
   override def getText: String = ComposerBundle.message("inspection.quickfix.removeQuotes")

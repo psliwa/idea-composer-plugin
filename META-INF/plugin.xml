@@ -4,7 +4,7 @@
   <version>0.2.2</version>
   <vendor email="me@psliwa.org" url="http://github.org/psliwa/idea-composer-plugin">psliwa</vendor>
 
-  <description><![CDATA[
+    <description><![CDATA[
 <h1>PHP composer.json support</h1>
 
 This plugin adds auto completion and inspections support for composer.json file in PHP projects.
@@ -55,62 +55,73 @@ This plugin adds auto completion and inspections support for composer.json file 
 </ul>
   ]]></change-notes>
 
-  <idea-version since-build="139.0"/>
+    <idea-version since-build="139.0"/>
 
-  <depends>com.intellij.modules.platform</depends>
-  <depends optional="true">com.jetbrains.php</depends>
+    <depends>com.intellij.modules.platform</depends>
+    <depends optional="true">com.jetbrains.php</depends>
 
-  <extensions defaultExtensionNs="com.intellij">
-    <projectConfigurable instance="org.psliwa.idea.composerJson.settings.ComposerJsonSettingsConfigurable" id="ComposerJson.settings" />
-    <projectService serviceImplementation="org.psliwa.idea.composerJson.settings.ComposerJsonSettings" />
-    <completion.contributor language="JSON" implementationClass="org.psliwa.idea.composerJson.completion.CompletionContributor" />
-    <localInspection
-        bundle="org.psliwa.idea.composerJson.messages.ComposerBundle"
-        language="JSON"
-        implementationClass="org.psliwa.idea.composerJson.inspection.SchemaInspection"
-        displayName="JSON schema"
-        enabledByDefault="true"
-        level="ERROR"
-        groupKey="inspection.group"
-        />
-    <localInspection
-        bundle="org.psliwa.idea.composerJson.messages.ComposerBundle"
-        language="JSON"
-        implementationClass="org.psliwa.idea.composerJson.inspection.FilePathInspection"
-        displayName="File paths"
-        enabledByDefault="true"
-        level="WARNING"
-        groupKey="inspection.group"
-        />
-    <localInspection
-        bundle="org.psliwa.idea.composerJson.messages.ComposerBundle"
-        language="JSON"
-        implementationClass="org.psliwa.idea.composerJson.inspection.MisconfigurationInspection"
-        displayName="Misconfigurations"
-        enabledByDefault="true"
-        level="WEAK WARNING"
-        groupKey="inspection.group"
-        />
-    <annotator
-        language="JSON"
-        implementationClass="org.psliwa.idea.composerJson.inspection.PackageVersionAnnotator"
-        />
-    <psi.referenceContributor
-        language="JSON"
-        implementation="org.psliwa.idea.composerJson.reference.FilePathReferenceContributor"
-        />
-  </extensions>
+    <extensions defaultExtensionNs="com.intellij">
+        <projectConfigurable instance="org.psliwa.idea.composerJson.settings.ComposerJsonSettingsConfigurable"
+                             id="ComposerJson.settings"/>
+        <projectService serviceImplementation="org.psliwa.idea.composerJson.settings.ComposerJsonSettings"/>
+        <completion.contributor language="JSON"
+                                implementationClass="org.psliwa.idea.composerJson.completion.CompletionContributor"/>
+        <localInspection
+                bundle="org.psliwa.idea.composerJson.messages.ComposerBundle"
+                language="JSON"
+                implementationClass="org.psliwa.idea.composerJson.inspection.SchemaInspection"
+                displayName="JSON schema"
+                enabledByDefault="true"
+                level="ERROR"
+                groupKey="inspection.group"
+                />
+        <localInspection
+                bundle="org.psliwa.idea.composerJson.messages.ComposerBundle"
+                language="JSON"
+                implementationClass="org.psliwa.idea.composerJson.inspection.FilePathInspection"
+                displayName="File paths"
+                enabledByDefault="true"
+                level="WARNING"
+                groupKey="inspection.group"
+                />
+        <localInspection
+                bundle="org.psliwa.idea.composerJson.messages.ComposerBundle"
+                language="JSON"
+                implementationClass="org.psliwa.idea.composerJson.inspection.MisconfigurationInspection"
+                displayName="Misconfigurations"
+                enabledByDefault="true"
+                level="WEAK WARNING"
+                groupKey="inspection.group"
+                />
+        <localInspection
+                bundle="org.psliwa.idea.composerJson.messages.ComposerBundle"
+                language="JSON"
+                implementationClass="org.psliwa.idea.composerJson.inspection.NotInstalledPackageInspection"
+                displayName="Not installed package"
+                enabledByDefault="true"
+                level="WEAK WARNING"
+                groupKey="inspection.group"
+                />
+        <annotator
+                language="JSON"
+                implementationClass="org.psliwa.idea.composerJson.inspection.PackageVersionAnnotator"
+                />
+        <psi.referenceContributor
+                language="JSON"
+                implementation="org.psliwa.idea.composerJson.reference.FilePathReferenceContributor"
+                />
+    </extensions>
 
-  <application-components>
-    <component>
-      <implementation-class>org.psliwa.idea.composerJson.completion.PackagesLoader</implementation-class>
-    </component>
-    <component>
-      <implementation-class>org.psliwa.idea.composerJson.composer.InstalledPackagesWatcher</implementation-class>
-    </component>
-  </application-components>
+    <application-components>
+        <component>
+            <implementation-class>org.psliwa.idea.composerJson.completion.PackagesLoader</implementation-class>
+        </component>
+        <component>
+            <implementation-class>org.psliwa.idea.composerJson.composer.InstalledPackagesWatcher</implementation-class>
+        </component>
+    </application-components>
 
-  <actions>
-  </actions>
+    <actions>
+    </actions>
 
 </idea-plugin>

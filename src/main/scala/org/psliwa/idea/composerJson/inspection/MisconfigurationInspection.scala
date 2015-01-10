@@ -8,6 +8,7 @@ import org.psliwa.idea.composerJson.inspection.problem._
 import org.psliwa.idea.composerJson.inspection.problem.Checker._
 import org.psliwa.idea.composerJson.inspection.problem.ImplicitConversions._
 import org.psliwa.idea.composerJson.json.{SString, SBoolean, Schema}
+import org.psliwa.idea.composerJson.util.PsiElements._
 
 class MisconfigurationInspection extends Inspection {
 
@@ -42,10 +43,5 @@ class MisconfigurationInspection extends Inspection {
     })
 
     problemDescriptions.foreach(problem => problems.registerProblem(problem.element.getContext, problem.message, problem.quickFixes:_*))
-  }
-
-  private def ensureJsonObject(element: PsiElement) = element match {
-    case x: JsonObject => Some(x)
-    case _ => None
   }
 }

@@ -1,11 +1,10 @@
 package org.psliwa.idea.composerJson.composer
 
-import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.util.Computable
-import com.intellij.openapi.vfs.{VfsUtil, VirtualFile}
+import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.testFramework.fixtures.LightPlatformCodeInsightFixtureTestCase
 import org.junit.Assert._
-import org.psliwa.idea.composerJson
+import org.psliwa.idea.composerJson.fixtures.ComposerFixtures
+import org.psliwa.idea.composerJson.fixtures.ComposerFixtures._
 
 class InstalledPackagesTest extends LightPlatformCodeInsightFixtureTestCase {
 
@@ -78,40 +77,6 @@ class InstalledPackagesTest extends LightPlatformCodeInsightFixtureTestCase {
     assertEquals(packages, installedPackages(composerJson))
   }
 
-  private def createComposerLock(packages: Packages, dir: String = ".") = {
-    val packagesJson = packages.map{ case(name,version) =>
-      s"""{
-        |  "name": "$name",
-        |  "version": "$version"
-        |}
-      """.stripMargin
-    }.mkString(",\n")
-
-    val file = writeAction(() => myFixture.getTempDirFixture.findOrCreateDir(dir).createChildData(this, composerJson.ComposerLock))
-    saveText(file, s"""
-        |{
-        |  "packages": [ $packagesJson ]
-        |}
-      """.stripMargin
-    )
-
-    file
-  }
-
-  private def createComposerJson(dir: String = ".") = {
-    val file = writeAction(() => myFixture.getTempDirFixture.findOrCreateDir(dir).createChildData(this, composerJson.ComposerJson))
-    saveText(file, "{}")
-
-    file
-  }
-
-  private def saveText(file: VirtualFile, text: String) = {
-    writeAction(() => VfsUtil.saveText(file, text))
-  }
-
-  private def writeAction[A](f: () => A): A = {
-    ApplicationManager.getApplication.runWriteAction(new Computable[A] {
-      override def compute = f()
-    })
-  }
+  private def createComposerLock(packages: Packages, dir: String = ".") = ComposerFixtures.createComposerLock(myFixture, packages, dir)
+  private def createComposerJson(dir: String = ".") = ComposerFixtures.createComposerJson(myFixture, dir)
 }

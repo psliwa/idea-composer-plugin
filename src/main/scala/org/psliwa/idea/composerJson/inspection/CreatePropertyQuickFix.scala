@@ -3,20 +3,18 @@ package org.psliwa.idea.composerJson.inspection
 import com.intellij.codeInspection.LocalQuickFixOnPsiElement
 import com.intellij.json.psi.{JsonElement, JsonObject}
 import com.intellij.lang.ASTNode
-import com.intellij.openapi.editor.{Editor, Document}
-import com.intellij.openapi.fileEditor.FileEditorManager
+import com.intellij.openapi.editor.Document
 import com.intellij.openapi.project.Project
 import com.intellij.psi.codeStyle.CodeStyleManager
 import com.intellij.psi.impl.source.tree.LeafPsiElement
-import com.intellij.psi.{PsiFile, PsiElement}
+import com.intellij.psi.{PsiElement, PsiFile}
 import org.psliwa.idea.composerJson.ComposerBundle
+import org.psliwa.idea.composerJson.inspection.QuickFix._
 import org.psliwa.idea.composerJson.json._
 import org.psliwa.idea.composerJson.util.Matcher
-import org.psliwa.idea.composerJson.util.PsiElementOffsetFinder._
 import org.psliwa.idea.composerJson.util.PsiElementOffsetFinder.ImplicitConversions._
-import org.psliwa.idea.composerJson.inspection.QuickFix._
-
-import scala.annotation.tailrec
+import org.psliwa.idea.composerJson.util.PsiElementOffsetFinder._
+import org.psliwa.idea.composerJson.util.PsiElements._
 
 class CreatePropertyQuickFix(element: PsiElement, propertyName: String, propertySchema: Schema) extends LocalQuickFixOnPsiElement(element) {
   override def getText: String = ComposerBundle.message("inspection.quickfix.createProperty", propertyName)
@@ -79,11 +77,6 @@ class CreatePropertyQuickFix(element: PsiElement, propertyName: String, property
       case x@PsiExtractors.LeafPsiElement(",") => Some(x)
       case _ => None
     }
-  }
-
-  private def ensureJsonObject(e: PsiElement): Option[JsonObject] = e match {
-    case x: JsonObject => Some(x)
-    case _ => None
   }
 
   override def getFamilyName: String = ComposerBundle.message("inspection.group")

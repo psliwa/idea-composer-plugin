@@ -5,6 +5,7 @@ import com.intellij.openapi.util.TextRange
 import com.intellij.psi.impl.source.resolve.reference.impl.providers.{FileReference, FileReferenceSet}
 import com.intellij.psi.{ElementManipulators, PsiReference, PsiElement, PsiReferenceProvider}
 import com.intellij.util.ProcessingContext
+import org.psliwa.idea.composerJson.util.PsiElements._
 
 private[reference] object PackageReferenceProvider extends PsiReferenceProvider {
   private val EmptyReferences: Array[PsiReference] = Array()
@@ -39,10 +40,5 @@ private[reference] object PackageReferenceProvider extends PsiReferenceProvider 
       case Array(vendor, pkg) => Some((vendor, pkg))
       case _ => None
     }
-  }
-
-  private def ensureJsonProperty(element: PsiElement): Option[JsonProperty] = element match {
-    case x: JsonProperty => Some(x)
-    case _ => None
   }
 }

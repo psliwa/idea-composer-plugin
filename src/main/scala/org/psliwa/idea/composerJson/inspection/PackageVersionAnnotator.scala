@@ -16,6 +16,7 @@ import com.intellij.patterns.StandardPatterns._
 import org.psliwa.idea.composerJson.intellij.Patterns._
 import org.psliwa.idea.composerJson.json.SString
 import org.psliwa.idea.composerJson.settings.ComposerJsonSettings
+import org.psliwa.idea.composerJson.util.PsiElements._
 
 class PackageVersionAnnotator extends Annotator {
   import PackageVersionAnnotator._
@@ -36,16 +37,6 @@ class PackageVersionAnnotator extends Annotator {
         problem.quickFixes.foreach(fix => annotation.registerFix(fix))
       })
     }
-  }
-
-  private def ensureJsonProperty(element: PsiElement): Option[JsonProperty] = element match {
-    case x: JsonProperty => Some(x)
-    case _ => None
-  }
-
-  private def ensureJsonObject(element: PsiElement): Option[JsonObject] = element match {
-    case x: JsonObject => Some(x)
-    case _ => None
   }
 
   private def detectProblemsInVersion(pkg: String, version: String, element: PsiElement): Seq[(String, Seq[IntentionAction])] = {
