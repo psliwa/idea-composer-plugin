@@ -2,6 +2,7 @@ package org.psliwa.idea.composerJson.json
 
 import scala.language.{higherKinds, implicitConversions}
 import scala.util.parsing.json.{JSON, JSONArray, JSONObject, JSONType}
+import org.psliwa.idea.composerJson.util.OptionOps._
 
 sealed trait Schema
 
@@ -163,16 +164,6 @@ object Schema {
   private def jsonObjectToFilePathsSchema = jsonObjectToSchemaWithBooleanArg(SFilePaths, "filePaths", "existingFilePath") _
 
   private object OptionOps {
-    def traverseMap[K,A,B](as: Map[K,A])(f: A => Option[B]): Option[Map[K,B]] = {
-      as.foldLeft(Option(Map[K, B]()))((obs, ka) => map2(f(ka._2), obs)((b, m) => m + (ka._1 -> b)))
-    }
-
-    def traverse[A,B](as: List[A])(f: A => Option[B]): Option[List[B]] = {
-      as.foldLeft(Option(List[B]()))((obs, a) => map2(obs, f(a))(_ :+ _))
-    }
-
-    def map2[A,B,C](o1: Option[A], o2: Option[B])(f: (A,B) => C) = o1.flatMap(a => o2.map(b => f(a, b)))
-
     def tryJsonObject(a: Any): Option[JSONObject] = a match {
       case o@JSONObject(_) => Some(o)
       case _ => None

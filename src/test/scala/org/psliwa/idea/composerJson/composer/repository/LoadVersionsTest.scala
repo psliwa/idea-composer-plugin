@@ -6,53 +6,6 @@ import org.junit.Test
 class LoadVersionsTest {
 
   @Test
-  def loadFromString_givenValidJson_expectList() = {
-    val json =
-      """
-        |{
-        | "package": {
-        |   "name": "ps/image-optimizer",
-        |   "versions": {
-        |     "dev-master": {},
-        |     "1.0.0": {},
-        |     "1.0.1": {}
-        |   }
-        | }
-        |}
-      """.stripMargin
-
-    val result = Packagist.loadVersionsFromString(json)
-
-    assertTrue(result.isRight)
-    assertEquals(List("dev-master", "1.0.0", "1.0.1"), result.right.get)
-  }
-
-  @Test
-  def loadFromString_versionsAreMissing_expectError() = {
-    val json =
-      """
-        |{
-        | "package": {
-        |   "name": "ps/image-optimizer"
-        | }
-        |}
-      """.stripMargin
-
-    val result = Packagist.loadVersionsFromString(json)
-
-    assertTrue(result.isLeft)
-  }
-
-  @Test
-  def loadFromString_givenInvalidJson_expectError() = {
-    val json = "invalid json"
-
-    val result = Packagist.loadVersionsFromString(json)
-
-    assertTrue(result.isLeft)
-  }
-
-  @Test
   def loadFromPackagist_givenValidPackage_expectSomeVersions() = {
     val result = Packagist.loadVersions("symfony/symfony")
 
