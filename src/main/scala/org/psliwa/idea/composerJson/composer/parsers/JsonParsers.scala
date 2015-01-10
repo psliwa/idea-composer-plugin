@@ -1,6 +1,6 @@
 package org.psliwa.idea.composerJson.composer.parsers
 
-import org.psliwa.idea.composerJson.composer.Package
+import org.psliwa.idea.composerJson.composer._
 import scala.util.parsing.json.{JSONArray, JSONObject, JSON}
 
 object JsonParsers {
@@ -41,7 +41,7 @@ object JsonParsers {
     versions.map(Right(_)).getOrElse(Left("Json parse error"))
   }
 
-  def parsePackages(data: String): Either[Error,Seq[Package]] = {
+  def parsePackages(data: String): Either[Error,Packages] = {
     import org.psliwa.idea.composerJson.util.OptionOps._
 
     val packages = for {
@@ -50,7 +50,7 @@ object JsonParsers {
       packagesElement <- o.obj.get("packages")
       packagesArray <- tryJsonArray(packagesElement)
       packages <- traverse(packagesArray.list)(createPackage)
-    } yield packages
+    } yield Packages(packages:_*)
 
     packages.map(Right(_)).getOrElse(Left("Json parse error"))
   }

@@ -15,3 +15,4 @@
 -keepclassmembers class org.psliwa.idea.composerJson.settings.ComposerJsonSettingsConfigurable {
     public <init>(***);
 }
+-keep class org.psliwa.idea.composerJson.composer.InstalledPackagesWatcher

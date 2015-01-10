@@ -105,6 +105,9 @@ This plugin adds auto completion and inspections support for composer.json file 
     <component>
       <implementation-class>org.psliwa.idea.composerJson.completion.PackagesLoader</implementation-class>
     </component>
+    <component>
+      <implementation-class>org.psliwa.idea.composerJson.composer.InstalledPackagesWatcher</implementation-class>
+    </component>
   </application-components>
 
   <actions>
