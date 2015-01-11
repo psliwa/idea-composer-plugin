@@ -2,7 +2,9 @@ package org.psliwa.idea.composerJson.composer.command
 
 import com.intellij.openapi.project.Project
 
-final case class Configuration(phpPath: String, composerPath: String)
+final case class Configuration(phpPath: String, composerPath: String) {
+  lazy val executable = phpPath+" "+composerPath
+}
 
 object Configuration {
 

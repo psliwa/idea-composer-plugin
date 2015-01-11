@@ -49,10 +49,11 @@ class PackageVersionAnnotator extends Annotator {
     version
       .filter(!_.isBounded)
       .map(versionConstraint => (
-      ComposerBundle.message("inspection.version.unboundVersion"),
-      versionQuickFixes(getUnboundVersionFixers)(pkg, versionConstraint, element) ++ List(new ExcludePatternAction(pkg)) ++
-        packageVendorPattern(pkg).map(new ExcludePatternAction(_)).toList
-      ))
+        ComposerBundle.message("inspection.version.unboundVersion"),
+        versionQuickFixes(getUnboundVersionFixers)(pkg, versionConstraint, element) ++ List(new ExcludePatternAction(pkg)) ++
+          packageVendorPattern(pkg).map(new ExcludePatternAction(_)).toList
+        )
+      )
       .toList
   }
 
