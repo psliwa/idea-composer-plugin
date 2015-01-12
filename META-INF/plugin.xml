@@ -1,7 +1,7 @@
 <idea-plugin version="2">
   <id>org.psliwa.idea.composer</id>
   <name>PHP composer.json support</name>
-  <version>0.2.1</version>
+  <version>0.2.2</version>
   <vendor email="me@psliwa.org" url="http://github.org/psliwa/idea-composer-plugin">psliwa</vendor>
 
   <description><![CDATA[
@@ -11,6 +11,12 @@ This plugin adds auto completion and inspections support for composer.json file 
     ]]></description>
 
   <change-notes><![CDATA[
+<h2>0.2.2</h2>
+<ul>
+  <li>detect unbound version constraints (as inspection) + quick fixes (<a href="https://getcomposer.org/doc/faqs/why-are-unbound-version-constraints-a-bad-idea.md">composer faq</a>)</li>
+  <li>detect version constraints combining wildcard and comparisons (as inspection) + quick fixes (<a href="https://getcomposer.org/doc/faqs/why-are-version-constraints-combining-comparisons-and-wildcards-a-bad-idea.md">composer faq</a>)</li>
+</ul>
+
 <h2>0.2.1</h2>
 <ul>
   <li>"go to" feature: filepaths (e.g. in "bin") and packages (e.g. in "require") are clickable (CTRL+LMB)</li>

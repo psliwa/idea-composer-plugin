@@ -16,6 +16,7 @@ This plugin provides:
     * composer.json schema + quick fixes (remove entry / property, create property)
     * filepath existence (in bin, autoload etc) + quick fixes (remove entry, create file / directory)
     * misconfiguration + quick fixes
+    * version constraints misconfiguration + quick fixes
 
 [There][2] you can find plugin homepage.
 
