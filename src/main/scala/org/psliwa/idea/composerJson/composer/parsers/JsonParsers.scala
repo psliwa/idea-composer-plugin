@@ -44,22 +44,30 @@ object JsonParsers {
   def parsePackages(data: String): Either[Error,Packages] = {
     import org.psliwa.idea.composerJson.util.OptionOps._
 
-    val packages = for {
+    def parse(property: String, dev: Boolean) = for {
       result <- JSON.parseRaw(data)
       o <- tryJsonObject(result)
-      packagesElement <- o.obj.get("packages")
+      packagesElement <- o.obj.get(property)
       packagesArray <- tryJsonArray(packagesElement)
-      packages <- traverse(packagesArray.list)(createPackage)
-    } yield Packages(packages:_*)
+      packages <- traverse(packagesArray.list)(createPackage(dev))
+    } yield packages
 
-    packages.map(Right(_)).getOrElse(Left("Json parse error"))
+    val packages = for {
+      prodPackages <- parse("packages", dev = false).orElse(Some(List()))
+      devPackages <- parse("packages-dev", dev = true).orElse(Some(List()))
+    } yield prodPackages ++ devPackages
+
+    packages match {
+      case Some(pkgs) if pkgs.nonEmpty => Right(Packages(pkgs: _*))
+      case _ => Left("Json parse error")
+    }
   }
 
-  private def createPackage(maybeJsonObject: Any): Option[Package] = {
+  private def createPackage(dev: Boolean)(maybeJsonObject: Any): Option[Package] = {
     for {
       jsonObject <- tryJsonObject(maybeJsonObject)
       name <- jsonObject.obj.get("name").map(_.toString)
       version <- jsonObject.obj.get("version").map(_.toString)
-    } yield Package(name, version)
+    } yield Package(name, version, dev)
   }
 }

@@ -18,19 +18,28 @@ object ComposerFixtures {
     writeAction(() => VfsUtil.saveText(file, text))
   }
 
-  def createComposerLock(fixture: CodeInsightTestFixture, packages: Packages, dir: String = ".") = {
-    val packagesJson = packages.map{ case(name,version) =>
+  private def makePackagesJson(pkgs: Iterable[Package]): String = {
+    pkgs.map( pkg =>
       s"""{
-        |  "name": "$name",
-        |  "version": "$version"
-        |}
-      """.stripMargin
-    }.mkString(",\n")
+          |  "name": "${pkg.name}",
+          |  "version": "${pkg.version}"
+          |}
+        """.stripMargin
+    ).mkString(",\n")
+  }
+
+  def createComposerLock(fixture: CodeInsightTestFixture, packages: Packages, dir: String = ".") = {
+
+    val (devPackages, prodPackages) = packages.values.partition(_.isDev)
+
+    val devPackagesJson = makePackagesJson(devPackages)
+    val prodPackagesJson = makePackagesJson(prodPackages)
 
     val file = writeAction(() => fixture.getTempDirFixture.findOrCreateDir(dir).createChildData(this, composerJson.ComposerLock))
     saveText(file, s"""
         |{
-        |  "packages": [ $packagesJson ]
+        |  "packages": [ $prodPackagesJson ],
+        |  "packages-dev": [ $devPackagesJson ]
         |}
       """.stripMargin
     )

@@ -85,26 +85,29 @@ class JsonParsersTest {
 
   @Test
   def parsePackages_givenValidJson_expectList() = {
-    val json =
-      """
-        |{
-        |  "packages": [
-        |    {
-        |      "name": "ps/image-optimizer",
-        |      "version": "1.0.0"
-        |    },
-        |    {
-        |      "name": "ps/fluent-traversable",
-        |      "version": "0.3.0"
-        |    }
-        |  ]
-        |}
-      """.stripMargin
+    List(true, false).foreach(dev => {
+      val packagesKey = "packages"+(if(dev) "-dev" else "")
+      val json =
+        s"""
+          |{
+          |  "$packagesKey": [
+          |    {
+          |      "name": "ps/image-optimizer",
+          |      "version": "1.0.0"
+          |    },
+          |    {
+          |      "name": "ps/fluent-traversable",
+          |      "version": "0.3.0"
+          |    }
+          |  ]
+          |}
+        """.stripMargin
 
-    val result = JsonParsers.parsePackages(json)
+      val result = JsonParsers.parsePackages(json)
 
-    assertTrue(result.isRight)
-    assertEquals(Packages(Package("ps/image-optimizer", "1.0.0"), Package("ps/fluent-traversable", "0.3.0")), result.right.get)
+      assertTrue(packagesKey, result.isRight)
+      assertEquals(packagesKey, Packages(Package("ps/image-optimizer", "1.0.0", dev), Package("ps/fluent-traversable", "0.3.0", dev)), result.right.get)
+    })
   }
 
   @Test

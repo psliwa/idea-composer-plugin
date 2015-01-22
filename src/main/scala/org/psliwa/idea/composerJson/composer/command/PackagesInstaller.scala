@@ -23,13 +23,13 @@ class DefaultPackagesInstaller(project: Project, config: Configuration, file: Ps
   override def install(packages: List[Package]) = {
     val task = new Backgroundable(project, ComposerBundle.message("inspection.notInstalledPackage.installing"), true, PerformInBackgroundOption.DEAF) {
       override def run(indicator: ProgressIndicator): Unit = {
-        val packageNames = packages.map(_._1).mkString(", ")
+        val packageNames = packages.map(_.name).mkString(", ")
 
         doInstall(indicator) match {
           case Left(message) => {
             val installationFailed = ComposerBundle.message(
               "inspection.notInstalledPackage.errorTitle",
-              packages.map(pkg => pkg._1+" ("+pkg._2+")").mkString(", ")
+              packages.map(pkg => pkg.name+" ("+pkg.version+")").mkString(", ")
             )
 
             ApplicationManager.getApplication.invokeLater(new Runnable{
@@ -58,7 +58,7 @@ class DefaultPackagesInstaller(project: Project, config: Configuration, file: Ps
       private def doInstall(indicator: ProgressIndicator): Either[String, String] = {
         indicator.setIndeterminate(true)
 
-        val packagesParams = packages.map(pkg => pkg._1)
+        val packagesParams = packages.map(pkg => pkg.name)
         val commandParams = (config.composerPath :: "update" :: packagesParams).toArray
         indicator.setText("composer update "+packagesParams.mkString(" "))
 

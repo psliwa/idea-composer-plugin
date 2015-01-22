@@ -9,15 +9,17 @@ import scala.collection.JavaConversions._
 private object NotInstalledPackages {
   def getNotInstalledPackageProperties(element: PsiElement, installedPackages: Packages): Seq[JsonProperty] = for {
     jsonObject <- ensureJsonObject(element).toList
-    propertyName <- List("require", "require-dev")
+    (propertyName, devPred) <- List("require" -> pred(_ == false), "require-dev" -> pred(_ => true))
     property <- Option(jsonObject.findProperty(propertyName)).toList
     packagesObject <- Option(property.getValue).toList
     packagesObject <- ensureJsonObject(packagesObject).toList
-    packageProperty <- packagesObject.getPropertyList if isNotInstalled(packageProperty, installedPackages)
+    packageProperty <- packagesObject.getPropertyList if isNotInstalled(packageProperty, devPred, installedPackages)
   } yield packageProperty
 
-  private def isNotInstalled(property: JsonProperty, installedPackages: Packages): Boolean = {
-    property.getName.contains("/") && !getPackageVersion(property).isEmpty && !installedPackages.contains(property.getName)
+  private def pred(f: Boolean => Boolean) = f
+
+  private def isNotInstalled(property: JsonProperty, devPred: Boolean => Boolean, installedPackages: Packages): Boolean = {
+    property.getName.contains("/") && !getPackageVersion(property).isEmpty && !installedPackages.get(property.getName).map(_.isDev).exists(devPred)
   }
 
   def getPackageVersion(property: JsonProperty): String = {

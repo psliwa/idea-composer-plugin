@@ -56,4 +56,54 @@ class NotInstalledPackageInspectionTest extends InspectionTest {
         |}
       """.stripMargin)
   }
+
+  def testGivenInstalledProdPackage_thatPackageIsOnlyInRequireDev_thatShouldNotBeReported() = {
+    createComposerLock(myFixture, composer.Packages(composer.Package("vendor/pkg", "1.0.2")))
+
+    checkInspection(
+      """
+        |{
+        |  "require-dev": {
+        |    "vendor/pkg": "1.0.2"
+        |  }
+        |}
+      """.stripMargin)
+  }
+
+  def testGivenUninstalledPackage_givenPackageIsInRequireDev_thatShouldBeReported() = {
+    checkInspection(
+      """
+        |{
+        |  "require-dev": {
+        |    <weak_warning>"vendor/pkg": "1.0.2"</weak_warning>
+        |  }
+        |}
+      """.stripMargin)
+  }
+
+  def testGivenInstalledDevPackage_thatPackageIsOnlyInRequireDev_thatShouldNotBeReported() = {
+    createComposerLock(myFixture, composer.Packages(composer.Package("vendor/pkg", "1.0.2", isDev = true)))
+
+    checkInspection(
+      """
+        |{
+        |  "require-dev": {
+        |    "vendor/pkg": "1.0.2"
+        |  }
+        |}
+      """.stripMargin)
+  }
+
+  def testGivenInstalledDevPackage_thatPackageIsOnlyInRequire_thatShouldBeReported() = {
+    createComposerLock(myFixture, composer.Packages(composer.Package("vendor/pkg", "1.0.2", isDev = true)))
+
+    checkInspection(
+      """
+        |{
+        |  "require": {
+        |    <weak_warning>"vendor/pkg": "1.0.2"</weak_warning>
+        |  }
+        |}
+      """.stripMargin)
+  }
 }
