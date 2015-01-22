@@ -1,7 +1,7 @@
 <idea-plugin version="2">
   <id>org.psliwa.idea.composer</id>
   <name>PHP composer.json support</name>
-  <version>0.2.2</version>
+  <version>0.3.0</version>
   <vendor email="me@psliwa.org" url="http://github.org/psliwa/idea-composer-plugin">psliwa</vendor>
 
     <description><![CDATA[
@@ -11,6 +11,11 @@ This plugin adds auto completion and inspections support for composer.json file 
     ]]></description>
 
   <change-notes><![CDATA[
+<h2>0.3.0</h2>
+<ul>
+  <li>detect not installed packages + install quick fix - so new packages could be installed from composer.json file</li>
+</ul>
+
 <h2>0.2.2</h2>
 <ul>
   <li>detect unbound version constraints (as inspection) + quick fixes (<a href="https://getcomposer.org/doc/faqs/why-are-unbound-version-constraints-a-bad-idea.md">composer faq</a>)</li>

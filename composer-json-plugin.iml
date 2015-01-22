@@ -14,7 +14,7 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="scala-sdk-2.10.2" level="project" />
-    <orderEntry type="library" name="php-openapi" level="project" />
-    <orderEntry type="library" name="php" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="php-openapi" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="php" level="project" />
   </component>
 </module>

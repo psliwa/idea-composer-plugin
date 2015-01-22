@@ -17,6 +17,7 @@ This plugin provides:
     * filepath existence (in bin, autoload etc) + quick fixes (remove entry, create file / directory)
     * misconfiguration + quick fixes
     * version constraints misconfiguration + quick fixes
+    * not installed packages + install quick fix
 
 [There][2] you can find plugin homepage.
 
@@ -27,7 +28,7 @@ This plugin provides:
 ## Whats next?
 
 * improve completion (support for custom repositories, namespace completion in autoload, class completion for scripts)
-* improve inspections (detect doubled properties, detect misconfiguration, detect packages that are not installed yet + install as quick fix)
+* improve inspections (detect doubled properties, detect misconfiguration)
 * show current installed version from `composer.lock`
 * and more ;)
 
