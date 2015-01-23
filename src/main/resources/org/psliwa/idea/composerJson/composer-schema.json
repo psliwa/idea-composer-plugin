@@ -228,9 +228,24 @@
       }
     },
     "extra": {
-      "type": [
-        "object",
-        "array"
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": true,
+          "properties": {
+            "branch-alias": {
+              "type": "object",
+              "properties": {
+                "dev-master": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "array"
+        }
       ],
       "description": "Arbitrary extra data that can be used by plugins, for example, package of type composer-plugin may have a 'class' key defining an installer class name.",
       "additionalProperties": true
