@@ -78,7 +78,7 @@ class CompletionContributor extends com.intellij.codeInsight.completion.Completi
 
   @tailrec
   private def insertHandlerFor(schema: Schema): Option[InsertHandler[LookupElement]] = schema match {
-    case SString(_) | SStringChoice(_) => Some(StringPropertyValueInsertHandler)
+    case SString(_) | SStringChoice(_) | SFilePath(_) => Some(StringPropertyValueInsertHandler)
     case SObject(_, _) | SPackages | SFilePaths(_) => Some(ObjectPropertyValueInsertHandler)
     case SArray(_) => Some(ArrayPropertyValueInsertHandler)
     case SBoolean | SNumber => Some(EmptyPropertyValueInsertHandler)

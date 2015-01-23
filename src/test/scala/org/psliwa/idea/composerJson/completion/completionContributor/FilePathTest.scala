@@ -116,4 +116,23 @@ class FilePathTest extends TestCase {
       """.stripMargin
     )
   }
+
+  def testFilepathPropertyCompletion_completePropertyAsString() = {
+    completion(
+      """
+        |{
+        | "config": {
+        |   "vend<caret>"
+        | }
+        |}
+      """.stripMargin,
+      """
+        |{
+        | "config": {
+        |   "vendor-dir": "<caret>"
+        | }
+        |}
+      """.stripMargin
+    )
+  }
 }
