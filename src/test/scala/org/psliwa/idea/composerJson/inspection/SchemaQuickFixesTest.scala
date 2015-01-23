@@ -18,6 +18,7 @@ class SchemaQuickFixesTest extends InspectionTest {
   private val RemoveEntryQuickFix = ComposerBundle.message("inspection.quickfix.removeEntry")
   private val RemoveQuotesQuickFix = ComposerBundle.message("inspection.quickfix.removeQuotes")
   private val CreatePropertyQuickFix = ComposerBundle.message("inspection.quickfix.createProperty", _: String)
+  private val ShowValidValuesQuickFix = ComposerBundle.message("inspection.quickfix.chooseValidValue")
 
   def testRemoveQuotes_givenQuotedNumber_quotesShouldBeRemoved() = {
     checkQuickFix(RemoveQuotesQuickFix)(
@@ -259,6 +260,21 @@ class SchemaQuickFixesTest extends InspectionTest {
       s"""
         |{
         |  "name": "<caret>"
+        |}
+      """.stripMargin
+    )
+  }
+
+  def testFixEnum_valueShouldBeSelected() = {
+    checkQuickFix(ShowValidValuesQuickFix)(
+      """
+        |{
+        |  "minimum-stability": "invalid<caret>"
+        |}
+      """.stripMargin,
+      """
+        |{
+        |  "minimum-stability": "<selection>invalid</selection>"
         |}
       """.stripMargin
     )

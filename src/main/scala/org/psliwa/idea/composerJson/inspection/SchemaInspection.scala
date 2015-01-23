@@ -64,10 +64,11 @@ class SchemaInspection extends Inspection {
         case _ => registerInvalidTypeProblem(problems, element, schema)
       }
       case SStringChoice(choices) => element match {
-        case JsonStringLiteral(value) if !choices.contains(value) => {
+        case x@JsonStringLiteral(value) if !choices.contains(value) => {
           problems.registerProblem(
             element,
-            ComposerBundle.message("inspection.schema.notAllowedPropertyValue", value, choices.map("'"+_+"'").mkString(" or "))
+            ComposerBundle.message("inspection.schema.notAllowedPropertyValue", value, choices.map("'"+_+"'").mkString(" or ")),
+            new ShowValidValuesQuickFix(x)
           )
         }
         case JsonStringLiteral(_) =>
