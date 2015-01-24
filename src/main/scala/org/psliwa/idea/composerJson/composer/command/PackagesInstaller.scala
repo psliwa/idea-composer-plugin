@@ -44,6 +44,7 @@ class DefaultPackagesInstaller(project: Project, config: Configuration, file: Ps
             //refresh parent directory and composer.lock file in order to inter alia reanalyze composer.json
             val parentDir = file.getVirtualFile.getParent
             parentDir.refresh(true, false)
+            Option(parentDir.findChild("vendor")).foreach(_.refresh(true, true))
             Option(parentDir.findChild(composerJson.ComposerLock)).foreach(_.refresh(true, false))
 
             Notifications.info(

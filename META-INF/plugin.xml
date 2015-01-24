@@ -119,6 +119,10 @@ This plugin adds auto completion and inspections support for composer.json file 
                 language="JSON"
                 implementation="org.psliwa.idea.composerJson.reference.UrlReferenceContributor"
                 />
+        <psi.referenceContributor
+                language="JSON"
+                implementation="org.psliwa.idea.composerJson.reference.php.PhpReferenceContributor"
+                />
     </extensions>
 
     <application-components>

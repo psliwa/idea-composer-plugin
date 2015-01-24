@@ -7,6 +7,7 @@ import com.intellij.patterns.{ElementPattern, PsiElementPattern}
 import com.intellij.psi.{PsiReferenceProvider, PsiReferenceRegistrar, PsiElement, PsiReferenceContributor}
 import org.psliwa.idea.composerJson._
 import org.psliwa.idea.composerJson.json.{SArray, SObject, Schema}
+import org.psliwa.idea.composerJson.util.PsiElements.rootPsiElementPattern
 
 abstract class AbstractReferenceContributor extends PsiReferenceContributor {
   private[reference] val schema = ComposerSchema
@@ -41,12 +42,6 @@ abstract class AbstractReferenceContributor extends PsiReferenceContributor {
   }
 
   protected def schemaToPatterns(s: Schema, parent: Capture): List[ReferenceMatcher]
-
-  private def rootPsiElementPattern: PsiElementPattern.Capture[JsonFile] = {
-    psiElement(classOf[JsonFile])
-      .withLanguage(JsonLanguage.INSTANCE)
-      .inFile(psiFile(classOf[JsonFile]).withName(ComposerJson))
-  }
 
   protected case class ReferenceMatcher(pattern: ElementPattern[_ <: PsiElement], provider: PsiReferenceProvider)
 }
