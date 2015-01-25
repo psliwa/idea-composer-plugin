@@ -11,8 +11,9 @@ import PhpReferenceContributor._
 class PhpReferenceContributor extends PsiReferenceContributor {
 
   override def registerReferenceProviders(registrar: PsiReferenceRegistrar): Unit = {
-    if(phpPluginEnabled) {
+    if(isPhpPluginEnabled) {
       registerCallbackProvider(registrar)
+      registerNamespaceProvider(registrar)
     }
   }
 
@@ -32,10 +33,29 @@ class PhpReferenceContributor extends PsiReferenceContributor {
       PhpCallbackReferenceProvider
     )
   }
+
+  private def registerNamespaceProvider(registrar: PsiReferenceRegistrar) = {
+    val rootElement = psiElement(classOf[JsonProperty])
+      .withName("autoload", "autoload-dev")
+      .withSuperParent(2, rootPsiElementPattern)
+
+    registrar.registerReferenceProvider(
+      psiElement(classOf[JsonStringLiteral])
+        .beforeLeaf(psiElement().withText(":"))
+        .withParent(classOf[JsonProperty])
+        .withSuperParent(
+          3,
+          psiElement(classOf[JsonProperty])
+            .withName("psr-0", "psr-4")
+            .withSuperParent(2, rootElement)
+        ),
+      PhpNamespaceReferenceProvider
+    )
+  }
 }
 
 private object PhpReferenceContributor {
-  private lazy val phpPluginEnabled = try {
+  private lazy val isPhpPluginEnabled = try {
     Class.forName("com.jetbrains.php.PhpIndex", false, getClass.getClassLoader)
     true
   } catch {
@@ -49,6 +69,18 @@ private object PhpCallbackReferenceProvider extends PsiReferenceProvider {
       stringElement <- ensureJsonStringLiteral(element)
     } yield {
       Array[PsiReference](new PhpCallbackReference(stringElement))
+    }
+
+    maybeReferences.getOrElse(Array())
+  }
+}
+
+private object PhpNamespaceReferenceProvider extends PsiReferenceProvider {
+  override def getReferencesByElement(element: PsiElement, context: ProcessingContext): Array[PsiReference] = {
+    val maybeReferences = for {
+      property <- ensureJsonStringLiteral(element)
+    } yield {
+      Array[PsiReference](new PhpNamespaceReference(property))
     }
 
     maybeReferences.getOrElse(Array())

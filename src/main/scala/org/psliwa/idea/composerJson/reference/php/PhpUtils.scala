@@ -7,5 +7,9 @@ private object PhpUtils {
 
   def getFixedFQN(phpClass: PhpClass) = escapeSlashes(phpClass.getFQN.stripPrefix("\\"))
 
-  private def escapeSlashes(s: String) = s.replace("\\", "\\\\")
+  def getFixedReferenceName(s: String) = s.replace("IntellijIdeaRulezzz ", "").replace("\\\\", "\\").stripPrefix("\"").stripSuffix("\"")
+
+  def ensureLandingSlash(s: String) = if(s.isEmpty || s.charAt(0) != '\\') "\\"+s else s
+
+  def escapeSlashes(s: String) = s.replace("\\", "\\\\")
 }

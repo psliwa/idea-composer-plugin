@@ -16,7 +16,7 @@ import PhpCallbackReference._
 import PhpUtils._
 
 private class PhpCallbackReference(element: JsonStringLiteral) extends PsiPolyVariantReferenceBase[JsonStringLiteral](element) {
-  private val referenceName = element.getText.replace("IntellijIdeaRulezzz ", "").replace("\\\\", "\\").stripPrefix("\"").stripSuffix("\"")
+  private val referenceName = getFixedReferenceName(element.getText)
   private val methodExists = referenceName.indexOf("::") > 0
   private val (className, methodName) = referenceName.replace("::", "").splitAt(
     positive(referenceName.indexOf("::"), referenceName.size))
