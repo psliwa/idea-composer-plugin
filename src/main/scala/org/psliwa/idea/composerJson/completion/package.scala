@@ -8,7 +8,7 @@ import org.psliwa.idea.composerJson.util.CharOffsetFinder._
 import org.psliwa.idea.composerJson.util.OffsetFinder.ImplicitConversions._
 
 package object completion {
-  protected[completion] val EmptyNamePlaceholder = "IntellijIdeaRulezzz"
+  protected[completion] val EmptyNamePlaceholder = org.psliwa.idea.composerJson.EmptyPsiElementNamePlaceholder
 
   protected[completion] type Capture = PsiElementPattern.Capture[_ <: PsiElement]
   protected[completion] type LookupElements = () => Iterable[BaseLookupElement]

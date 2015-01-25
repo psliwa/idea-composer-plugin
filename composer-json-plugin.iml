@@ -16,5 +16,10 @@
     <orderEntry type="library" name="scala-sdk-2.10.2" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="php-openapi" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="php" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="resources_en" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="css-openapi" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="css" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="java-i18n" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="properties" level="project" />
   </component>
 </module>

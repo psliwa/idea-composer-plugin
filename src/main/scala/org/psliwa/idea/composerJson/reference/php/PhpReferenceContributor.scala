@@ -6,15 +6,14 @@ import com.intellij.patterns.PlatformPatterns._
 import com.intellij.patterns.StandardPatterns._
 import com.intellij.util.ProcessingContext
 import org.psliwa.idea.composerJson.util.PsiElements._
-import PhpReferenceContributor._
+import org.psliwa.idea.composerJson.EmptyPsiElementNamePlaceholder
+import org.psliwa.idea.composerJson.intellij.Patterns._
 
 class PhpReferenceContributor extends PsiReferenceContributor {
 
   override def registerReferenceProviders(registrar: PsiReferenceRegistrar): Unit = {
-    if(isPhpPluginEnabled) {
-      registerCallbackProvider(registrar)
-      registerNamespaceProvider(registrar)
-    }
+    registerCallbackProvider(registrar)
+    registerNamespaceProvider(registrar)
   }
 
   private def registerCallbackProvider(registrar: PsiReferenceRegistrar) {
@@ -41,7 +40,11 @@ class PhpReferenceContributor extends PsiReferenceContributor {
 
     registrar.registerReferenceProvider(
       psiElement(classOf[JsonStringLiteral])
-        .beforeLeaf(psiElement().withText(":"))
+        .and(or(
+          psiElement().beforeLeaf(psiElement().withText(":")),
+          //1 element is property name, second PsiErrorElement
+          psiElement().withParent(psiElement().withChildren(collection().last(psiElement(classOf[PsiErrorElement]))))
+        ))
         .withParent(classOf[JsonProperty])
         .withSuperParent(
           3,
@@ -51,15 +54,6 @@ class PhpReferenceContributor extends PsiReferenceContributor {
         ),
       PhpNamespaceReferenceProvider
     )
-  }
-}
-
-private object PhpReferenceContributor {
-  private lazy val isPhpPluginEnabled = try {
-    Class.forName("com.jetbrains.php.PhpIndex", false, getClass.getClassLoader)
-    true
-  } catch {
-    case _: Throwable => false
   }
 }
 
