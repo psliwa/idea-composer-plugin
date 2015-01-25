@@ -58,10 +58,10 @@ def writeProps(map: Map[String,String]): Unit = {
 
 //at least shrinking combinators
 
-def shrink(pluginPkg: String, ideaSdk: String, javaRt: String, proguard: String): Either[Error,String] = {
+def shrink(pluginPkg: String, ideaSdk: String, phpPlugin: String, javaRt: String, proguard: String): Either[Error,String] = {
   for {
     _ <- ensureExists(pluginPkg).right
-    out <- runProguard(proguard, pluginPkg, ideaSdk, javaRt).right
+    out <- runProguard(proguard, pluginPkg, ideaSdk, phpPlugin, javaRt).right
   } yield out
 }
 
@@ -70,7 +70,7 @@ def ensureExists(f: String): Either[Error,String] = {
   else Left("File "+f+" not found")
 }
 
-def runProguard(proguard: String, inJars: String, ideaSdk: String, javaRt: String): Either[Error,String] = {
+def runProguard(proguard: String, inJars: String, ideaSdk: String, phpPlugin: String, javaRt: String): Either[Error,String] = {
   import sys.process._
 
   val outJars = inJars.split("/").dropRight(1).mkString("/")+"/target/"+inJars.split("/").last.split("\\.").head+"-shrinked.zip"
@@ -79,7 +79,7 @@ def runProguard(proguard: String, inJars: String, ideaSdk: String, javaRt: Strin
 
   val cmd = Seq(
     "java", "-jar", escape(proguard), "@proguard.pro", "-injars", escape(inJars), "-outjars", escape(outJars),
-    "-libraryjars", escape(javaRt)+";"+escape(ideaSdk)
+    "-libraryjars", escape(javaRt)+";"+escape(ideaSdk)+";"+escape(phpPlugin)
   )
 
   val result = cmd !
@@ -118,10 +118,11 @@ val result = for {
   pluginPkg <- tryFindOut("composer-json-plugin.zip").right
   ideaSdk <- props.get("ideaSdk").orElse(askFor("ideaSdk fullpath")).right
   javaRt <- props.get("javaRt").orElse(askFor("fullpath to rt.jar")).right
+  phpPlugin <- props.get("phpPlugin").orElse(askFor("fullpath to php plugin dir (dir containig php.jar and php-openapi.jar)")).right
   proguard <- tryFindOut("target/proguard.jar").left.flatMap(_ => download(proguardUrl)).right
 } yield {
-  writeProps(Map("ideaSdk" -> ideaSdk, "javaRt" -> javaRt))
-  shrink(pluginPkg, ideaSdk, javaRt, proguard)
+  writeProps(Map("ideaSdk" -> ideaSdk, "javaRt" -> javaRt, "phpPlugin" -> phpPlugin))
+  shrink(pluginPkg, ideaSdk, phpPlugin, javaRt, proguard)
 }
 
 //and make output

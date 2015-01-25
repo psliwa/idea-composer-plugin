@@ -1,7 +1,7 @@
 <idea-plugin version="2">
   <id>org.psliwa.idea.composer</id>
   <name>PHP composer.json support</name>
-  <version>0.3.0</version>
+  <version>1.0.0</version>
   <vendor email="me@psliwa.org" url="http://github.org/psliwa/idea-composer-plugin">psliwa</vendor>
 
     <description><![CDATA[
@@ -11,9 +11,14 @@ This plugin adds auto completion and inspections support for composer.json file 
     ]]></description>
 
   <change-notes><![CDATA[
-<h2>0.3.0</h2>
+<h2>1.0.0</h2>
 <ul>
-  <li>detect not installed packages + install quick fix - so new packages could be installed from composer.json file</li>
+  <li>detect not installed packages + install quick fix - so new packages could be installed from composer.json file. Inspection analyses proper composer.lock file, not "vendor" dir content.</li>
+  <li>[#2] completion + reference support for class and static method names in "scripts" property</li>
+  <li>completion + reference support for namespaces eg. in "autoload.psr-0" property</li>
+  <li>minior enhancements and fixes for schema completion</li>
+  <li>new quick fix for invalid "enum" property value</li>
+  <li>support for go to urls and emails eg. in "homepage"</li>
 </ul>
 
 <h2>0.2.2</h2>
