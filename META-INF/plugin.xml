@@ -75,11 +75,13 @@ This plugin adds auto completion and inspections support for composer.json file 
                              id="ComposerJson.settings"/>
         <projectService serviceImplementation="org.psliwa.idea.composerJson.settings.ComposerJsonSettings"/>
         <completion.contributor language="JSON"
-                                implementationClass="org.psliwa.idea.composerJson.completion.CompletionContributor"/>
+                                implementationClass="org.psliwa.idea.composerJson.intellij.codeAssist.schema.CompletionContributor"/>
+        <completion.contributor language="JSON"
+                                implementationClass="org.psliwa.idea.composerJson.intellij.codeAssist.composer.CompletionContributor"/>
         <localInspection
                 bundle="org.psliwa.idea.composerJson.messages.ComposerBundle"
                 language="JSON"
-                implementationClass="org.psliwa.idea.composerJson.inspection.SchemaInspection"
+                implementationClass="org.psliwa.idea.composerJson.intellij.codeAssist.schema.SchemaInspection"
                 displayName="JSON schema"
                 enabledByDefault="true"
                 level="ERROR"
@@ -88,7 +90,7 @@ This plugin adds auto completion and inspections support for composer.json file 
         <localInspection
                 bundle="org.psliwa.idea.composerJson.messages.ComposerBundle"
                 language="JSON"
-                implementationClass="org.psliwa.idea.composerJson.inspection.FilePathInspection"
+                implementationClass="org.psliwa.idea.composerJson.intellij.codeAssist.file.FilePathInspection"
                 displayName="File paths"
                 enabledByDefault="true"
                 level="WARNING"
@@ -97,7 +99,7 @@ This plugin adds auto completion and inspections support for composer.json file 
         <localInspection
                 bundle="org.psliwa.idea.composerJson.messages.ComposerBundle"
                 language="JSON"
-                implementationClass="org.psliwa.idea.composerJson.inspection.MisconfigurationInspection"
+                implementationClass="org.psliwa.idea.composerJson.intellij.codeAssist.composer.MisconfigurationInspection"
                 displayName="Misconfigurations"
                 enabledByDefault="true"
                 level="WEAK WARNING"
@@ -106,7 +108,7 @@ This plugin adds auto completion and inspections support for composer.json file 
         <localInspection
                 bundle="org.psliwa.idea.composerJson.messages.ComposerBundle"
                 language="JSON"
-                implementationClass="org.psliwa.idea.composerJson.inspection.NotInstalledPackageInspection"
+                implementationClass="org.psliwa.idea.composerJson.intellij.codeAssist.composer.NotInstalledPackageInspection"
                 displayName="Not installed package"
                 enabledByDefault="true"
                 level="WEAK WARNING"
@@ -114,25 +116,25 @@ This plugin adds auto completion and inspections support for composer.json file 
                 />
         <annotator
                 language="JSON"
-                implementationClass="org.psliwa.idea.composerJson.inspection.PackageVersionAnnotator"
+                implementationClass="org.psliwa.idea.composerJson.intellij.codeAssist.composer.PackageVersionAnnotator"
                 />
         <psi.referenceContributor
                 language="JSON"
-                implementation="org.psliwa.idea.composerJson.reference.FilePathReferenceContributor"
+                implementation="org.psliwa.idea.composerJson.intellij.codeAssist.file.FilePathReferenceContributor"
                 />
         <psi.referenceContributor
                 language="JSON"
-                implementation="org.psliwa.idea.composerJson.reference.UrlReferenceContributor"
+                implementation="org.psliwa.idea.composerJson.intellij.codeAssist.file.UrlReferenceContributor"
                 />
         <psi.referenceContributor
                 language="JSON"
-                implementation="org.psliwa.idea.composerJson.reference.php.PhpReferenceContributor"
+                implementation="org.psliwa.idea.composerJson.intellij.codeAssist.php.PhpReferenceContributor"
                 />
     </extensions>
 
     <application-components>
         <component>
-            <implementation-class>org.psliwa.idea.composerJson.completion.PackagesLoader</implementation-class>
+            <implementation-class>org.psliwa.idea.composerJson.intellij.codeAssist.composer.PackagesLoader</implementation-class>
         </component>
         <component>
             <implementation-class>org.psliwa.idea.composerJson.composer.InstalledPackagesWatcher</implementation-class>
