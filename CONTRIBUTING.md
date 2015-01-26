@@ -12,16 +12,16 @@ that file, using for instance `git checkout composer-json-plugin.iml` command
 - add following libraries in "File -> Project Structure -> Project Settings -> Libraries":
 
     - click "+" and add "Scala SDK" - required 2.10.x version, 2.10.2 is preferred
-    - <PhpStorm-dir>/plugins/php/lib/php.jar
-    - <PhpStorm-dir>/plugins/php/lib/php-openapi.jar
+    - &lt;PhpStorm-dir&gt;/plugins/php/lib/php.jar
+    - &lt;PhpStorm-dir&gt;/plugins/php/lib/php-openapi.jar
 
 - *(optional - required to run tests)* add following libraries in "File -> Project Structure -> Project Settings -> Libraries"
 
-    - <PhpStorm-dir>/plugins/php/lib/resources_en.jar
-    - <PhpStorm-dir>/plugins/CSS/lib/css.jar
-    - <PhpStorm-dir>/plugins/CSS/lib/css-openapi.jar
-    - <Intellij-dir>/plugins/java-i18n/lib/java-i18n.jar
-    - <Intellij-dir>/plugins/properties/lib/properties.jar
+    - &lt;PhpStorm-dir&gt;/plugins/php/lib/resources_en.jar
+    - &lt;PhpStorm-dir&gt;/plugins/CSS/lib/css.jar
+    - &lt;PhpStorm-dir&gt;/plugins/CSS/lib/css-openapi.jar
+    - &lt;Intellij-dir&gt;/plugins/java-i18n/lib/java-i18n.jar
+    - &lt;Intellij-dir&gt;/plugins/properties/lib/properties.jar
 
 
 [1]: https://plugins.jetbrains.com/plugin/?id=1347
