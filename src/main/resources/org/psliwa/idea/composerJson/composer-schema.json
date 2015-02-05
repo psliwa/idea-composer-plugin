@@ -517,7 +517,7 @@
     }
   },
   "definitions": {
-    "license": { "enum": [ "MIT", "BSD", "BSD-2.0", "Apache-2.0", "LGPL-3.0", "LGPL-2.1", "GPL-2.0", "GPL-3.0" ] },
+    "license": { "enum": [ "MIT", "BSD", "BSD-2.0", "Apache-2.0", "LGPL-3.0", "LGPL-2.1", "GPL-2.0", "GPL-3.0", "proprietary" ] },
     "package": {
       "type": "object",
       "additionalProperties": true
