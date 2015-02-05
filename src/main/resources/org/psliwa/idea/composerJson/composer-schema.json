@@ -46,8 +46,8 @@
       "oneOf": [
         { "type": "string" },
         { "type": "array", "items": { "type": "string" } },
-        { "enum": [ "MIT", "BSD", "BSD-2.0", "Apache-2.0", "LGPL-3.0", "LGPL-2.1", "GPL-2.0", "GPL-3.0" ] },
-        { "type": "array", "items": { "enum": [ "MIT", "BSD", "BSD-2.0", "Apache-2.0", "LGPL-3.0", "LGPL-2.1", "GPL-2.0", "GPL-3.0" ] } }
+        { "$ref": "#/definitions/license" },
+        { "type": "array", "items": { "$ref": "#/definitions/license" } }
       ],
       "description": "License name. Or an array of license names."
     },
@@ -329,54 +329,7 @@
         {
           "type": "array",
           "items": {
-            "type": "object",
-            "additionalProperties": true,
-            "properties": {
-              "packagist": {
-                "type": "boolean"
-              },
-//              TODO: type coś psuje
-              "type": {
-                "oneOf": [
-                  { "type": "string" },
-                  {
-                    "type": {
-                      "enum": [ "vcs", "pear", "git", "svn", "package", "perforce", "hg", "artifact", "composer" ]
-                    }
-                  }
-                ]
-              },
-              "url": {
-                "oneOf": [
-                  {
-                    "type": "string",
-                    "format": "uri"
-                  },
-                  {
-                    "type": "filePath"
-                  }
-                ]
-              },
-              "trunk-path": {
-                "type": "string"
-              },
-              "branches-path": {
-                "type": "string"
-              },
-              "tags-path": {
-                "type": "string"
-              },
-              "svn-cache-credentials": {
-                "type": "boolean"
-              },
-              "vendor-alias": {
-                "type": "string"
-              },
-              "package": {
-                "type": "object",
-                "additionalProperties": true
-              }
-            }
+            "$ref": "#/definitions/repository"
           }
         },
         {
@@ -559,6 +512,73 @@
           "type": "string",
           "description": "URL to browse or download the sources.",
           "format": "uri"
+        }
+      }
+    }
+  },
+  "definitions": {
+    "license": { "enum": [ "MIT", "BSD", "BSD-2.0", "Apache-2.0", "LGPL-3.0", "LGPL-2.1", "GPL-2.0", "GPL-3.0" ] },
+    "package": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "repository": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "packagist": {
+          "type": "boolean",
+          "description": "Packagist repository could be disabled by passing \"false\" value"
+        },
+        "type": {
+          "description": "Repository type, could be composer, vcs, package etc",
+          "oneOf": [
+            { "type": "string" },
+            {
+              "enum": [ "vcs", "pear", "git", "svn", "package", "perforce", "hg", "artifact", "composer" ]
+            }
+          ]
+        },
+        "url": {
+          "description": "Url to vcs, pear, artifact or composer repository",
+          "oneOf": [
+            {
+              "type": "string",
+              "format": "uri"
+            },
+            {
+              "type": "filePath"
+            }
+          ]
+        },
+        "trunk-path": {
+          "description": "Only for svn repository",
+          "type": "string"
+        },
+        "branches-path": {
+          "description": "Only for svn repository",
+          "type": "string"
+        },
+        "tags-path": {
+          "description": "Only for svn repository",
+          "type": "string"
+        },
+        "svn-cache-credentials": {
+          "type": "boolean"
+        },
+        "vendor-alias": {
+          "description": "Vendor alias for PEAR channel - only for \"pear\" repository",
+          "type": "string"
+        },
+        "package": {
+          "description": "Package definition - only for \"package\" repository",
+          "type": "object",
+          "additionalProperties": true
+        },
+        "packages": {
+          "description": "Packages definition - only for \"composer\" repository",
+          "type": "object",
+          "additionalProperties": true
         }
       }
     }

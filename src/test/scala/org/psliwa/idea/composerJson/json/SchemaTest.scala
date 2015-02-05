@@ -418,5 +418,27 @@ class SchemaTest {
     ))
   }
 
+  @Test
+  def parseObjectSchema_givenEnumRef_expectedValidObject() = {
+    assertSchemaEquals(
+      SObject(Map(
+        "license" -> SStringChoice(List("a", "b"))
+      )),
+      Schema.parse(
+        """
+          | {
+          |   "type": "object",
+          |   "properties": {
+          |     "license": { "$ref": "#/definitions/license" }
+          |   },
+          |   "definitions": {
+          |     "license": { "enum": [ "a", "b" ] }
+          |   }
+          | }
+        """.stripMargin
+      )
+    )
+  }
+
   def assertSchemaEquals(expected: Schema, actual: Option[Schema]) = assertEquals(Some(expected), actual)
 }

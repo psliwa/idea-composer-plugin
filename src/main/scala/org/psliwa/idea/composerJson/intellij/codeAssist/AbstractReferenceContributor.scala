@@ -6,7 +6,7 @@ import com.intellij.patterns.PlatformPatterns._
 import com.intellij.psi.{PsiElement, PsiReferenceContributor, PsiReferenceProvider, PsiReferenceRegistrar}
 import org.psliwa.idea.composerJson._
 import org.psliwa.idea.composerJson.intellij.PsiElements
-import org.psliwa.idea.composerJson.json.{SArray, SObject, Schema}
+import org.psliwa.idea.composerJson.json.{SOr, SArray, SObject, Schema}
 import PsiElements.rootPsiElementPattern
 
 abstract class AbstractReferenceContributor extends PsiReferenceContributor {
@@ -33,6 +33,7 @@ abstract class AbstractReferenceContributor extends PsiReferenceContributor {
       case SArray(item) => {
         loop(item, psiElement(classOf[JsonArray]).withParent(parent))
       }
+      case SOr(items) => items.flatMap(loop(_, parent))
       case _ => schemaToPatterns(s, parent)
     }
 

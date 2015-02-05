@@ -53,6 +53,20 @@ class UrlReferenceTest extends LightPlatformCodeInsightFixtureTestCase {
     )
   }
 
+  def testGivenUrlProperty_givenUrlPropertyIsInFactOrProperty_givenValidUrl_valueShouldBeUrlReference() = {
+    checkUrlReference(
+      """
+        |{
+        |  "repositories": [
+        |    {
+        |      "url": "http://psliwa.org<caret>"
+        |    }
+        |  ]
+        |}
+      """.stripMargin
+    )
+  }
+
   private def checkUrlReference(s: String, expectedCount: Int = 1) = {
     myFixture.configureByText(ComposerJson, s)
 

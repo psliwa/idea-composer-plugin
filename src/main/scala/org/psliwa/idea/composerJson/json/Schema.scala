@@ -62,7 +62,7 @@ object Schema {
     jsonObject.obj.flatMap{ case(name, definition) => {
       val maybeSchema = for {
         obj <- ensureJsonObject(definition)
-        schema <- jsonTypeToSchema(obj, Map())
+        schema <- jsonObjectToSchema(obj, Map())
       } yield schema
 
       maybeSchema.map(schema => Map(name -> schema)).getOrElse(Map())
