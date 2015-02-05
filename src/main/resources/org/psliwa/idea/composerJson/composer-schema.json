@@ -325,12 +325,66 @@
       }
     },
     "repositories": {
-      "type": [
-        "object",
-        "array"
+      "oneOf": [
+        {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": true,
+            "properties": {
+              "packagist": {
+                "type": "boolean"
+              },
+//              TODO: type coś psuje
+              "type": {
+                "oneOf": [
+                  { "type": "string" },
+                  {
+                    "type": {
+                      "enum": [ "vcs", "pear", "git", "svn", "package", "perforce", "hg", "artifact", "composer" ]
+                    }
+                  }
+                ]
+              },
+              "url": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  {
+                    "type": "filePath"
+                  }
+                ]
+              },
+              "trunk-path": {
+                "type": "string"
+              },
+              "branches-path": {
+                "type": "string"
+              },
+              "tags-path": {
+                "type": "string"
+              },
+              "svn-cache-credentials": {
+                "type": "boolean"
+              },
+              "vendor-alias": {
+                "type": "string"
+              },
+              "package": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": true
+        }
       ],
-      "description": "A set of additional repositories where packages can be found.",
-      "additionalProperties": true
+      "description": "A set of additional repositories where packages can be found."
     },
     "minimum-stability": {
       "enum": [ "dev", "alpha", "beta", "RC", "stable" ],
