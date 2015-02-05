@@ -364,5 +364,59 @@ class SchemaTest {
     )
   }
 
+  @Test
+  def parseSchemaWithRefs_refsShouldBeResolved() = {
+    assertSchemaEquals(
+      SObject(Map(
+        "name" -> SObject(Map(
+          "street" -> SString(),
+          "number" -> SNumber
+        ))
+      )),
+      Schema.parse(
+        """
+          | {
+          |   "type": "object",
+          |   "properties": {
+          |     "name": { "$ref": "#/definitions/address" }
+          |   },
+          |   "definitions": {
+          |     "address": {
+          |       "type": "object",
+          |       "properties": {
+          |         "street": { "type": "string" },
+          |         "number": { "type": "integer" }
+          |       }
+          |     }
+          |   }
+          | }
+        """.stripMargin
+      )
+    )
+  }
+
+  @Test
+  def parseSchemaWithRefs_givenInvalidRef_parsingShouldFail() = {
+    assertEquals(None, Schema.parse(
+      """
+        | {
+        |   "type": "object",
+        |   "properties": {
+        |     "name": { "$ref": "#/definitions/invalid" }
+        |   },
+        |   "definitions": {
+        |     "address": {
+        |       "type": "object",
+        |       "properties": {
+        |         "street": { "type": "string" },
+        |         "number": { "type": "integer" }
+        |       }
+        |     }
+        |   }
+        | }
+      """.stripMargin
+    ))
+  }
+
   def assertSchemaEquals(expected: Schema, actual: Option[Schema]) = assertEquals(Some(expected), actual)
 }
