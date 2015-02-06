@@ -179,4 +179,25 @@ class PackagesCompletionTest extends AbstractPackagesTest {
       """.stripMargin
     )
   }
+
+  def testVersionCompletion_givenStability_completeStability() = {
+    setCompletionVersionsLoader(_ => List("1.2.3"))
+
+    completion(
+      """
+        |{
+        | "require": {
+        |   "ps/image-optimizer": "1.2.*@d<caret>"
+        | }
+        |}
+      """.stripMargin,
+      """
+        |{
+        | "require": {
+        |   "ps/image-optimizer": "1.2.*@dev<caret>"
+        | }
+        |}
+      """.stripMargin
+    )
+  }
 }

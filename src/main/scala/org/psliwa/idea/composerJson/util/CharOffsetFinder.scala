@@ -12,4 +12,7 @@ object CharOffsetFinder extends OffsetFinder[CharSequence, Char] {
 
   protected def stop(haystack: CharSequence)(offset: Int): Boolean = offset >= haystack.length()
   protected def reverseStop(haystack: CharSequence)(offset: Int): Boolean = offset < 0
+
+  val Whitespace: Matcher[Char] = Matcher(_.isWhitespace)
+  val Alphnum: Matcher[Char] = Matcher(_.isLetterOrDigit)
 }

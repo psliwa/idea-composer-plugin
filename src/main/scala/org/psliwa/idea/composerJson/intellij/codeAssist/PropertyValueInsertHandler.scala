@@ -113,8 +113,6 @@ private object PropertyValueInsertHandler {
     def eatWrapperIf(b: Boolean) = if(b) eatWrapper else this
   }
 
-  val Whitespace: Matcher[Char] = Matcher(_.isWhitespace)
-  val Alphnum: Matcher[Char] = Matcher(_.isLetterOrDigit)
   val OpenControlChar = '"' || '{' || '['
   val CloseControlChar = '"' || '}' || ']'
 }

@@ -77,10 +77,6 @@ class VersionTest {
     }
   }
 
-  private def assertVersionAlternatives(expected: List[String], actualAlternatives: List[String]) {
-    assertVersionAlternatives(expected, List(), actualAlternatives)
-  }
-
   private def assertVersionAlternatives(expected: List[String], unexpected: List[String], actualAlternatives: List[String]) {
     expected.foreach(
       expectedVersion => assertTrue(expectedVersion + " should be in "+actualAlternatives, actualAlternatives.contains(expectedVersion))

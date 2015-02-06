@@ -197,6 +197,40 @@ class PackageSuggestionsTest extends AbstractPackagesTest {
     }
   }
 
+  def testVersionSuggestions_givenSuggestionAfterAtMark_stabilityShouldBeSuggested() = {
+    val versions = List("1.2.1")
+    setCompletionVersionsLoader(_ => versions)
+
+    suggestions(
+      """
+        |{
+        |  "require": {
+        |    "vendor/package": "1.2.*@<caret>"
+        |  }
+        |}
+      """.stripMargin,
+      Array("dev", "alpha", "stable"),
+      Array("1.2.1", "1.2.*@dev")
+    )
+  }
+
+  def testVersionSuggestions_givenSuggestionAfterCommaAndAtMark_versionsShouldBeSuggested() = {
+    val versions = List("1.2.1")
+    setCompletionVersionsLoader(_ => versions)
+
+    suggestions(
+      """
+        |{
+        |  "require": {
+        |    "vendor/package": "1.2.*@dev,<caret>"
+        |  }
+        |}
+      """.stripMargin,
+      Array("1.2.1"),
+      Array("dev")
+    )
+  }
+
   def testPackageSuggestion_versionLoaderShouldNotBeCalled() = {
     setCompletionVersionsLoader(_ => { fail("version loader should not be called"); List() })
 

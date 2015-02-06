@@ -12,10 +12,11 @@ import AbstractCompletionContributor.ParametersDependantCompletionProvider
 import org.psliwa.idea.composerJson.intellij.codeAssist.Capture
 import org.psliwa.idea.composerJson.intellij._
 import intellij.codeAssist._
-import org.psliwa.idea.composerJson.json.{SPackages, Schema}
+import org.psliwa.idea.composerJson.json.{SPackages, Schema, SObject, SStringChoice}
 import org.psliwa.idea.composerJson.util.CharOffsetFinder._
 import org.psliwa.idea.composerJson.util.OffsetFinder.ImplicitConversions._
 import org.psliwa.idea.composerJson.util.Funcs._
+import org.psliwa.idea.composerJson.util.ImplicitConversions._
 
 import scala.annotation.tailrec
 import scala.collection.Seq
@@ -26,6 +27,14 @@ class CompletionContributor extends AbstractCompletionContributor {
   private var packagesLoader: () => Seq[BaseLookupElement] = () => PackagesLoader.loadPackages
   private var versionsLoader: (String) => Seq[String] = memorize(30)(Packagist.loadVersions(_).right.getOrElse(List()))
 
+  lazy private val minimumStabilities: List[String] = for {
+    schema <- maybeSchema.toList
+    obj <- ensureSchemaObject(schema).toList
+    prop <- obj.properties.get("minimum-stability").map(_.schema).toList
+    minimumStabilities <- ensureSchemaChoice(prop).toList
+    minimumStability <- minimumStabilities.choices
+  } yield minimumStability
+
   import CompletionContributor._
 
   override protected def getCompletionProvidersForSchema(s: Schema, parent: Capture): List[(Capture, CompletionProvider[CompletionParameters])] = s match {
@@ -33,8 +42,18 @@ class CompletionContributor extends AbstractCompletionContributor {
       propertyCompletionProvider(parent, loadPackages, _ => Some(StringPropertyValueInsertHandler)) ++
         List((
           psiElement().withSuperParent(2, psiElement().and(propertyCapture(parent))).afterLeaf(":"),
-          new VersionCompletionProvider(c => {
-            loadVersions(c.propertyName).flatMap(Version.alternativesForPrefix(c.typedQuery)).map(BaseLookupElement(_, Option(Icons.Packagist)))
+          new VersionCompletionProvider(context => {
+            val query = context.typedQuery.stripQuotes
+            val pattern = "^.*@[a-z]*$".r
+
+            query match {
+              case pattern() => minimumStabilities.map(BaseLookupElement(_))
+              case _ => {
+                loadVersions(context.propertyName)
+                  .flatMap(Version.alternativesForPrefix(context.typedQuery))
+                  .map(BaseLookupElement(_, Option(Icons.Packagist)))
+              }
+            }
           })
         ))
     }
@@ -52,6 +71,16 @@ class CompletionContributor extends AbstractCompletionContributor {
 
   private def loadPackages() = packagesLoader()
   private def loadVersions(s: String) = versionsLoader(s)
+
+  private def ensureSchemaObject(s: Schema): Option[SObject] = s match {
+    case x: SObject => Some(x)
+    case _ => None
+  }
+
+  private def ensureSchemaChoice(s: Schema): Option[SStringChoice] = s match {
+    case x: SStringChoice => Some(x)
+    case _ => None
+  }
 }
 
 private object CompletionContributor {
@@ -61,7 +90,7 @@ private object CompletionContributor {
   class VersionCompletionProvider(loadElements: Context => Seq[BaseLookupElement]) extends ParametersDependantCompletionProvider(psiBased(loadElements)) {
     override protected def mapResult(result: CompletionResultSet): CompletionResultSet = {
       val prefix = result.getPrefixMatcher.getPrefix
-      val matcher = createCharContainsMatcher(' ' || '~' || '^' || ',' || '>' || '<' || '=')(prefix)
+      val matcher = createCharContainsMatcher(' ' || '~' || '^' || ',' || '>' || '<' || '=' || '@')(prefix)
 
       result.withPrefixMatcher(matcher)
     }

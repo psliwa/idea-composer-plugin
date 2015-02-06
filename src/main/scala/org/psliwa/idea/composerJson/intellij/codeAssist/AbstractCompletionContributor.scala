@@ -16,9 +16,9 @@ import scala.collection.Seq
 
 abstract class AbstractCompletionContributor extends com.intellij.codeInsight.completion.CompletionContributor {
 
-  private lazy val schema = ComposerSchema
+  protected lazy val maybeSchema = ComposerSchema
 
-  schema.foreach(addCompletionProvidersForSchema)
+  maybeSchema.foreach(addCompletionProvidersForSchema)
 
   import org.psliwa.idea.composerJson.intellij.codeAssist.AbstractCompletionContributor._
 
