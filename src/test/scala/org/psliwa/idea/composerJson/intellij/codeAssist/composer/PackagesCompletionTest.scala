@@ -200,4 +200,25 @@ class PackagesCompletionTest extends AbstractPackagesTest {
       """.stripMargin
     )
   }
+
+  def testVersionCompletion_givenRCStability_completeStability() = {
+    setCompletionVersionsLoader(_ => List("1.2.3"))
+
+    completion(
+      """
+        |{
+        | "require": {
+        |   "ps/image-optimizer": "1.2.*@R<caret>"
+        | }
+        |}
+      """.stripMargin,
+      """
+        |{
+        | "require": {
+        |   "ps/image-optimizer": "1.2.*@RC<caret>"
+        | }
+        |}
+      """.stripMargin
+    )
+  }
 }

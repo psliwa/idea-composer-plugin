@@ -44,7 +44,7 @@ class CompletionContributor extends AbstractCompletionContributor {
           psiElement().withSuperParent(2, psiElement().and(propertyCapture(parent))).afterLeaf(":"),
           new VersionCompletionProvider(context => {
             val query = context.typedQuery.stripQuotes
-            val pattern = "^.*@[a-z]*$".r
+            val pattern = "^(?i).*@[a-z]*$".r
 
             query match {
               case pattern() => minimumStabilities.map(BaseLookupElement(_))
