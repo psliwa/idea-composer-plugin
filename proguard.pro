@@ -6,6 +6,8 @@
 -keep class org.psliwa.idea.composerJson.intellij.codeAssist.schema.CompletionContributor
 -keep class org.psliwa.idea.composerJson.intellij.codeAssist.composer.CompletionContributor
 -keep class org.psliwa.idea.composerJson.intellij.codeAssist.composer.PackagesLoader
+-keep class org.psliwa.idea.composerJson.intellij.codeAssist.composer.versionRenderer.PackageVersionInspection
+-keep class org.psliwa.idea.composerJson.intellij.codeAssist.composer.versionRenderer.VersionOverlay
 -keep class org.psliwa.idea.composerJson.intellij.codeAssist.schema.SchemaInspection
 -keep class org.psliwa.idea.composerJson.intellij.codeAssist.file.FilePathInspection
 -keep class org.psliwa.idea.composerJson.intellij.codeAssist.composer.MisconfigurationInspection
