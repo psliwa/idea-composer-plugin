@@ -82,8 +82,9 @@ object AbstractCompletionContributor {
     protected def addLookupElementsToResult(es: Iterable[BaseLookupElement], getInsertHandler: InsertHandlerFinder = _ => None)
         (parameters: CompletionParameters, result: CompletionResultSet) {
 
-      es.foreach(e => {
-        result.addElement(e.withPsiElement(parameters.getPosition).withInsertHandler(insertHandler(parameters.getPosition, e, getInsertHandler)))
+      es.toList.reverse.foreach(e => {
+        val item = e.withPsiElement(parameters.getPosition).withInsertHandler(insertHandler(parameters.getPosition, e, getInsertHandler))
+        result.addElement(item.priority.map(PrioritizedLookupElement.withPriority(item, _)).getOrElse(item))
       })
     }
 

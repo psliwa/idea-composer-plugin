@@ -1,6 +1,6 @@
 package org.psliwa.idea.composerJson.intellij.codeAssist.composer
 
-import com.intellij.codeInsight.completion.{CompletionResultSet, CompletionParameters, CompletionProvider}
+import com.intellij.codeInsight.completion._
 import com.intellij.json.psi.{JsonFile, JsonProperty}
 import com.intellij.patterns.PlatformPatterns._
 import com.intellij.psi.PsiElement
@@ -47,11 +47,15 @@ class CompletionContributor extends AbstractCompletionContributor {
             val pattern = "^(?i).*@[a-z]*$".r
 
             query match {
-              case pattern() => minimumStabilities.map(BaseLookupElement(_))
+              case pattern() => minimumStabilities.map(new BaseLookupElement(_))
               case _ => {
                 loadVersions(context.propertyName)
                   .flatMap(Version.alternativesForPrefix(context.typedQuery))
-                  .map(BaseLookupElement(_, Option(Icons.Packagist)))
+                  .distinct
+                  .view
+                  .sortWith((a,b) => !Version.isGreater(a, b))
+                  .zipWithIndex
+                  .map{ case(version, index) => new BaseLookupElement(version, Option(Icons.Packagist), true, None, None, "", Some(index)) }
               }
             }
           })

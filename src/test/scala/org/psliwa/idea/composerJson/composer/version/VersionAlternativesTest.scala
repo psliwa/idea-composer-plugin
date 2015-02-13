@@ -3,7 +3,7 @@ package org.psliwa.idea.composerJson.composer.version
 import org.junit.Assert._
 import org.junit.Test
 
-class VersionTest {
+class VersionAlternativesTest {
   @Test
   def givenNonSemanticVersion_versionShouldNotHasAnAlternatives() = {
     val version = "dev-master"
@@ -76,6 +76,8 @@ class VersionTest {
       assertVersionAlternatives(List("1.2.3", "1.2"), List("1.2.*"), Version.alternativesForPrefix("1.2.1 "+prefix)(version))
     }
   }
+
+
 
   private def assertVersionAlternatives(expected: List[String], unexpected: List[String], actualAlternatives: List[String]) {
     expected.foreach(

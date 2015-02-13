@@ -17,6 +17,23 @@ object Version {
       .getOrElse(List())
   }
 
+  def isGreater(version1: String, version2: String): Boolean = {
+    def isSemVer(v: String): Boolean = !v.exists(_.isLetter)
+    val version1IsSemVer = isSemVer(version1)
+    val version2IsSemVer = isSemVer(version2)
+
+    if(version1IsSemVer && !version2IsSemVer) true
+    else if(!version1IsSemVer && version2IsSemVer) false
+    else if(version1IsSemVer && version2IsSemVer) {
+      if(version1.length == version2.length) {
+        version1.replace("*", "999999").compareTo(version2.replace("*", "999999")) >= 0
+      } else {
+        version1.length >= version2.length
+      }
+    }
+    else version1.compareTo(version2) >= 0
+  }
+
   private def semanticVersionRequired(text: String) = {
     findOffsetReverse('~' || '^' || '>' || '<' || '=' || ' ')(text.length-1)(text)
       .flatMap(ensure(not(' '))(_)(text))

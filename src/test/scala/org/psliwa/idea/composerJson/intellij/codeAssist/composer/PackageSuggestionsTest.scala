@@ -7,7 +7,7 @@ class PackageSuggestionsTest extends AbstractPackagesTest {
 
   def testPackageSuggestions() = {
     val packages = List("some/package1", "some/package2")
-    setCompletionPackageLoader(() => packages.map(BaseLookupElement(_)))
+    setCompletionPackageLoader(() => packages.map(new BaseLookupElement(_)))
 
     suggestions(
       """
@@ -28,7 +28,7 @@ class PackageSuggestionsTest extends AbstractPackagesTest {
 
     val map = Map(pkg -> versions)
 
-    setCompletionPackageLoader(() => List(BaseLookupElement(pkg)))
+    setCompletionPackageLoader(() => List(new BaseLookupElement(pkg)))
     setCompletionVersionsLoader(map.getOrElse(_, List()))
 
     suggestions(
@@ -123,6 +123,23 @@ class PackageSuggestionsTest extends AbstractPackagesTest {
       """.stripMargin,
       Array("1.2.1"),
       Array("1.3.1")
+    )
+  }
+
+  def testVersionsSuggestions_givenFewSemanticVersions_itShouldBeDescSorted() = {
+    val versions = List("1.2.1", "1.3.1", "dev-master", /*"1.2",*/ "1.0.0")
+
+    setCompletionVersionsLoader(_ => versions)
+
+    orderedSuggestions(
+      """
+        |{
+        | "require": {
+        |   "ps/image-optimizer": "<caret>"
+        | }
+        |}
+      """.stripMargin,
+      Array("1.3.1", "1.2.1", "1.0.0", /*"1.2",*/ "dev-master")
     )
   }
 

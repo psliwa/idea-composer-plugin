@@ -31,7 +31,7 @@ class PackagesLoader extends ApplicationComponent {
 object PackagesLoader {
   lazy val loadPackages = {
     if(isUnitTestMode) Nil
-    else Packagist.loadPackages().right.getOrElse(Nil).map(BaseLookupElement(_, Some(Icons.Packagist)))
+    else Packagist.loadPackages().right.getOrElse(Nil).map(new BaseLookupElement(_, Some(Icons.Packagist)))
   }
 
   private def isUnitTestMode = ApplicationManager.getApplication.isUnitTestMode

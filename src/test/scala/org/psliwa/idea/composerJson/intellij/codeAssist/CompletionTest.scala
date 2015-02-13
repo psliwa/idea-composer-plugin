@@ -6,14 +6,32 @@ import org.psliwa.idea.composerJson.ComposerJson
 
 abstract class CompletionTest extends LightPlatformCodeInsightFixtureTestCase {
 
-  protected def suggestions(contents: String, expectedSuggestions: Array[String], unexpectedSuggestions: Array[String] = Array()) = {
+  protected def suggestions(
+    contents: String,
+    expectedSuggestions: Array[String],
+    unexpectedSuggestions: Array[String] = Array()
+  ): Unit = suggestions(assertContainsElements(_, _:_*))(contents, expectedSuggestions, unexpectedSuggestions)
+
+  protected def orderedSuggestions(
+    contents: String,
+    expectedSuggestions: Array[String],
+    unexpectedSuggestions: Array[String] = Array()
+  ): Unit = suggestions(assertContainsOrdered(_, _:_*))(contents, expectedSuggestions, unexpectedSuggestions)
+
+  protected def suggestions(
+    containsElements: (java.util.List[String], Array[String]) => Unit
+  )(
+    contents: String, 
+    expectedSuggestions: Array[String],
+    unexpectedSuggestions: Array[String]
+  ) = {
     myFixture.configureByText(ComposerJson, contents)
     myFixture.completeBasic()
 
     val lookupElements = myFixture.getLookupElementStrings
 
     assertNotNull(lookupElements)
-    assertContainsElements(lookupElements, expectedSuggestions:_*)
+    containsElements(lookupElements, expectedSuggestions)
     assertDoesntContain(lookupElements, unexpectedSuggestions:_*)
   }
 

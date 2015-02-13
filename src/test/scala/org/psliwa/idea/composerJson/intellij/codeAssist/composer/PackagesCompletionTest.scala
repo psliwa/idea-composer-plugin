@@ -7,7 +7,7 @@ class PackagesCompletionTest extends AbstractPackagesTest {
     val contributor = getCompletionContributor
 
     val pkg = "ps/image-optimizer"
-    contributor.setPackagesLoader(() => List(BaseLookupElement(pkg)))
+    contributor.setPackagesLoader(() => List(new BaseLookupElement(pkg)))
 
     completion(
       """
@@ -31,7 +31,7 @@ class PackagesCompletionTest extends AbstractPackagesTest {
     val contributor = getCompletionContributor
 
     val pkg = "symfony/symfony"
-    contributor.setPackagesLoader(() => List(BaseLookupElement(pkg)))
+    contributor.setPackagesLoader(() => List(new BaseLookupElement(pkg)))
 
     completion(
       """
@@ -54,7 +54,7 @@ class PackagesCompletionTest extends AbstractPackagesTest {
   def testVersionCompletion_givenPrefix_quotesShouldBeStillValid() = {
     val pkg = "ps/image-optimizer"
 
-    setCompletionPackageLoader(() => List(BaseLookupElement(pkg)))
+    setCompletionPackageLoader(() => List(new BaseLookupElement(pkg)))
     setCompletionVersionsLoader(_ => List("1.2.3"))
 
     completion(
