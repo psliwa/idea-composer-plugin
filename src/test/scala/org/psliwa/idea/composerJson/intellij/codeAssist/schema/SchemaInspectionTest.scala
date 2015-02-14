@@ -1,6 +1,7 @@
 package org.psliwa.idea.composerJson.intellij.codeAssist.schema
 
 import org.junit.ComparisonFailure
+import org.psliwa.idea.composerJson.ComposerBundle
 import org.psliwa.idea.composerJson.intellij.codeAssist.InspectionTest
 
 class SchemaInspectionTest extends InspectionTest {
@@ -9,6 +10,8 @@ class SchemaInspectionTest extends InspectionTest {
     """
       |"name": "vendor/pkg",
     """.stripMargin
+
+  val AlreadyDefinedPropertyError = ComposerBundle.message("inspection.schema.alreadyDefinedProperty", _: String)
 
   override def setUp(): Unit = {
     super.setUp()
@@ -242,7 +245,7 @@ class SchemaInspectionTest extends InspectionTest {
         |  $RequiredProperties
         |  "extra": {
         |    "prop1": "value1",
-        |    "prop1": "value1"
+        |    "prop2": "value2"
         |  }
         |}
       """.stripMargin
@@ -320,5 +323,17 @@ class SchemaInspectionTest extends InspectionTest {
 
   def testDoesNotReportAnyErrorsWhenFileIsEmpty() = {
     checkInspection("")
+  }
+
+  def testReportAlreadyDefinedProperty() = {
+    checkInspection(
+      s"""
+        |{
+        |  $RequiredProperties
+        |  "require": {},
+        |  <error descr="${AlreadyDefinedPropertyError("require")}">"require": {}</error>
+        |}
+      """.stripMargin
+    )
   }
 }

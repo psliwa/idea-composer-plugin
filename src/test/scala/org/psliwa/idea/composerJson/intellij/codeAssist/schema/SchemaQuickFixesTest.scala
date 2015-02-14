@@ -153,6 +153,24 @@ class SchemaQuickFixesTest extends InspectionTest {
     )
   }
 
+  def testRemoveProperty_givenAlreadyDefinedProperty_removeIt() = {
+    checkQuickFix(RemoveEntryQuickFix)(
+      s"""
+         |{
+         |  $RequiredProperties
+          |  "require": {},
+          |  "require": {}
+          |}
+      """.stripMargin,
+      s"""
+         |{
+         |  $RequiredProperties
+          |  "require": {}
+          |}
+      """.stripMargin
+    )
+  }
+
   //  TODO: Quick fix is not shown on top level, why?
   //  def testQuickFixForQuotedBooleans() = {
   //    checkQuickFix(

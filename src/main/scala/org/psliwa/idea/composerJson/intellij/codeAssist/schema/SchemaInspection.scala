@@ -1,5 +1,7 @@
 package org.psliwa.idea.composerJson.intellij.codeAssist.schema
 
+import java.util
+
 import com.intellij.codeInspection._
 import com.intellij.json.psi.{JsonNumberLiteral, JsonProperty, _}
 import com.intellij.psi.PsiElement
@@ -34,6 +36,15 @@ class SchemaInspection extends AbstractInspection {
               case _ =>
             }
           }
+
+          getAlreadyDefinedProperties(properties.toList)
+            .foreach(property => {
+              problems.registerProblem(
+                property,
+                ComposerBundle.message("inspection.schema.alreadyDefinedProperty", property.getName),
+                removeJsonPropertyQuickFix(property)
+              )
+            })
 
           lazy val propertyNames = properties.map(_.getName).toSet
 
@@ -103,6 +114,16 @@ class SchemaInspection extends AbstractInspection {
       }
       case _ =>
     }
+  }
+
+  private def getAlreadyDefinedProperties(properties: List[JsonProperty]): Iterable[JsonProperty] = {
+    properties
+      .view
+      .groupBy(_.getName)
+      .filter(_._2.size > 1)
+      .map { case (key, values) => key -> values.tail}
+      .values
+      .flatten
   }
 
   private def removeJsonPropertyQuickFix(property: JsonProperty): RemoveJsonElementQuickFix = {
