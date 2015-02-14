@@ -47,24 +47,18 @@ object Version {
     implicit val text = prefix.reverse
 
     val * = Wildcards.asterix _
-    val tilde = Wildcards.tilde _
-    val peak = Wildcards.peak _
+    val nsr = Wildcards.nsr _
 
-    findOffset('~' || ' ')(0)
-      .flatMap(ensure('~')(_))
-      .map(_ => alternativesForSemantic(version, List(tilde), includeOriginal = false))
-      .orElse(
-        findOffset('^' || '>' || '<' || '=' || ' ')(0)
-          .flatMap(ensure(not(' '))(_))
-          .map(_ => alternativesForSemantic(version, List(peak)))
-      )
-      .getOrElse(alternativesForSemantic(version, List(*, tilde, peak)))
+    findOffset('^' || '~' || '>' || '<' || '=' || ' ')(0)
+      .flatMap(ensure(not(' '))(_))
+      .map(_ => alternativesForSemantic(version, List(nsr), includeNotNormalized = false))
+      .getOrElse(alternativesForSemantic(version, List(*)))
   }
 
-  private def alternativesForSemantic(version: SemanticVersion, providers: List[(String,List[String]) => List[String]], includeOriginal: Boolean = true): List[String] = {
+  private def alternativesForSemantic(version: SemanticVersion, providers: List[(String,List[String]) => List[String]], includeNotNormalized: Boolean = true): List[String] = {
     val normalized = if (version(0) == 'v') version.drop(1) else version
 
-    val originalVersions = if(includeOriginal) uniqList(version, normalized) else List()
+    val originalVersions = if(includeNotNormalized) uniqList(version, normalized) else List(normalized)
 
     originalVersions ++ normalized.split("\\.")
       .foldLeft(List[List[String]]())((aas, a) => {
@@ -86,12 +80,7 @@ object Version {
       else List(subVersion.mkString(".")+".*")
     }
 
-    def tilde(version: String, subVersion: List[String]): List[String] = {
-      if(subVersion.length == 1 || subVersion.length > 2) Nil
-      else List(subVersion.mkString("."))
-    }
-
-    def peak(version: String, subVersion: List[String]): List[String] = {
+    def nsr(version: String, subVersion: List[String]): List[String] = {
       if(subVersion.length == 1 || version.count(_ == '.') + 1 == subVersion.length) Nil
       else List(subVersion.mkString("."))
     }

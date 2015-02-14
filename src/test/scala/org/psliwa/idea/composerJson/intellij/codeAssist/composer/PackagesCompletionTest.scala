@@ -61,14 +61,14 @@ class PackagesCompletionTest extends AbstractPackagesTest {
       """
         |{
         | "require": {
-        |   "ps/image-optimizer": "~1<caret>"
+        |   "ps/image-optimizer": "~123<caret>"
         | }
         |}
       """.stripMargin,
       """
         |{
         | "require": {
-        |   "ps/image-optimizer": "~1.2<caret>"
+        |   "ps/image-optimizer": "~1.2.3<caret>"
         | }
         |}
       """.stripMargin
@@ -103,14 +103,14 @@ class PackagesCompletionTest extends AbstractPackagesTest {
       """
         |{
         | "require": {
-        |   "ps/image-optimizer": "1.2.2 ~12<caret>"
+        |   "ps/image-optimizer": "1.2.2 ~123<caret>"
         | }
         |}
       """.stripMargin,
       """
         |{
         | "require": {
-        |   "ps/image-optimizer": "1.2.2 ~1.2"
+        |   "ps/image-optimizer": "1.2.2 ~1.2.3"
         | }
         |}
       """.stripMargin

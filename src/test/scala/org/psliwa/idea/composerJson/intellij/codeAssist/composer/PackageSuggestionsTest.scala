@@ -59,7 +59,7 @@ class PackageSuggestionsTest extends AbstractPackagesTest {
     )
   }
 
-  def testVersionsSuggestions_tildeGiven_suggestOnlySemanticVersionWithTwoNumbers() = {
+  def testVersionsSuggestions_givenNsrOperator_suggestOnlySemanticVersions() = {
     val versions = List("1.2.1", "1.2.2", "v1.2.3", "dev-master")
     setCompletionVersionsLoader(_ => versions)
 
@@ -71,8 +71,8 @@ class PackageSuggestionsTest extends AbstractPackagesTest {
         | }
         |}
       """.stripMargin,
-      Array("1.2"),
-      versions.toArray
+      Array("1.2", "1.2.1", "1.2.2"),
+      Array("v1.2.3", "dev-master")
     )
   }
 
@@ -155,8 +155,8 @@ class PackageSuggestionsTest extends AbstractPackagesTest {
         | }
         |}
       """.stripMargin,
-      Array("1.2", "1.3"),
-      versions.toArray
+      Array("1.2", "1.3", "1.2.1", "1.3.1"),
+      Array("dev-master")
     )
   }
 

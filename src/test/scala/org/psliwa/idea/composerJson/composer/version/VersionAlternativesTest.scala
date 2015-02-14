@@ -39,24 +39,28 @@ class VersionAlternativesTest {
   }
 
   @Test
-  def givenSemanticVersion_givenTildePrefix_twoDigitsVersionsShouldBeAnAlternative() = {
+  def givenSemanticVersion_givenNsrPrefix_semanticVersionsShouldBeAnAlternative() = {
     val version = "1.2.3"
 
-    assertVersionAlternatives(List("1.2"), List(version, "1.2.*"), Version.alternativesForPrefix("~")(version))
+    List("~", "^").foreach(operator => {
+      assertVersionAlternatives(List("1.2", "1.2.3"), List("1.2.*"), Version.alternativesForPrefix(operator)(version))
+    })
   }
 
   @Test
-  def givenSemanticVersion_givenCaretPrefix_threeAndTwoDigitsVersionsShouldBeAnAlternative() = {
-    val version = "1.2.3"
+  def givenSemanticVersionWithVPrevix_givenNsrPrefix_semanticVersionsShouldBeAnAlternative() = {
+    val version = "v1.2.3"
 
-    assertVersionAlternatives(List("1.2.3", "1.2"), List("1.2.*"), Version.alternativesForPrefix("^")(version))
+    List("~", "^").foreach(operator => {
+      assertVersionAlternatives(List("1.2", "1.2.3"), List("1.2.*", "v1.2.3"), Version.alternativesForPrefix(operator)(version))
+    })
   }
 
   @Test
   def givenSemanticVersion_givenCaretWithVersionAndSpace_allAlternativesAreExpected() = {
     val version = "1.2.3"
 
-    assertVersionAlternatives(List("1.2.3", "1.2", "1.2.*"), List(), Version.alternativesForPrefix("^3.2.1 ")(version))
+    assertVersionAlternatives(List("1.2.3", "1.2.*"), List(), Version.alternativesForPrefix("^3.2.1 ")(version))
   }
 
   @Test
