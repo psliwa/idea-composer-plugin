@@ -25,10 +25,13 @@ object Version {
     if(version1IsSemVer && !version2IsSemVer) true
     else if(!version1IsSemVer && version2IsSemVer) false
     else if(version1IsSemVer && version2IsSemVer) {
-      if(version1.length == version2.length) {
+      val dotsCount1 = version1.count(_ == '.')
+      val dotsCount2 = version2.count(_ == '.')
+
+      if(dotsCount1 == dotsCount2) {
         version1.replace("*", "999999").compareTo(version2.replace("*", "999999")) >= 0
       } else {
-        version1.length >= version2.length
+        dotsCount1 >= dotsCount2
       }
     }
     else version1.compareTo(version2) >= 0
