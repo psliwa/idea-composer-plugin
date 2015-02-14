@@ -1,7 +1,7 @@
 <idea-plugin version="2">
   <id>org.psliwa.idea.composer</id>
   <name>PHP composer.json support</name>
-  <version>1.0.0</version>
+  <version>1.0.1</version>
   <vendor email="me@psliwa.org" url="http://github.org/psliwa/idea-composer-plugin">psliwa</vendor>
 
     <description><![CDATA[
@@ -11,6 +11,16 @@ This plugin adds auto completion and inspections support for composer.json file 
     ]]></description>
 
   <change-notes><![CDATA[
+<h2>1.0.1</h2>
+<ul>
+  <li>desc sorting of package versions in completion</li>
+  <li>improve "next significant release" operators in versions completion</li>
+  <li>[#4] support for stability in versions completion</li>
+  <li>"already defined property" inspection + quick fix</li>
+  <li>completion for repositories in "repositories" property</li>
+  <li>[#3] add "proprietary" license to completion</li>
+</ul>
+
 <h2>1.0.0</h2>
 <ul>
   <li>detect not installed packages + install quick fix - so new packages could be installed from composer.json file. Inspection analyses proper composer.lock file, not "vendor" dir content.</li>

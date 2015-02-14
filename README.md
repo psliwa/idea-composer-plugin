@@ -21,7 +21,7 @@ This plugin provides:
     * version constraints misconfiguration + quick fixes
     * not installed packages + install quick fix
 
-* go to declaration for (eg. by Ctrl+LMB):
+* navigation for (eg. by Ctrl+LMB):
     * class and method names in "scripts" properties
     * files and directories in properties that store file path (eg. "bin")
     * package directory (eg. in "require", "require-dev")
@@ -36,7 +36,7 @@ This plugin provides:
 ## Whats next?
 
 * improve completion (support for custom repositories)
-* improve inspections (detect doubled properties, detect misconfiguration, detect not existing namespaces in "autoload.psr-0", detect invalid callback in "scripts")
+* improve inspections (detect misconfiguration, detect not existing namespaces in "autoload.psr-0", detect invalid callback in "scripts")
 * show current installed version from `composer.lock`
 * and more ;)
 
