@@ -1,6 +1,8 @@
 package org.psliwa.idea.composerJson.intellij.codeAssist.composer.versionRenderer
 
-import java.awt.{Color, Font, Graphics}
+import java.awt.event._
+import java.awt.{Component, Color, Font, Graphics}
+import java.beans.{PropertyChangeEvent, PropertyChangeListener}
 import javax.swing.JComponent
 
 import com.intellij.json.highlighting.JsonSyntaxHighlighterFactory
@@ -17,8 +19,6 @@ import scala.collection.mutable
 import org.psliwa.idea.composerJson.ComposerJson
 import org.psliwa.idea.composerJson.intellij.codeAssist.QuickFix
 
-import scala.util.Random
-
 class VersionOverlay extends ApplicationComponent {
 
   private val packageVersionsMap = mutable.Map[String, List[PackageVersion]]()
@@ -28,16 +28,11 @@ class VersionOverlay extends ApplicationComponent {
     val app = ApplicationManager.getApplication
     val bus = app.getMessageBus.connect(app)
 
-    val rand = new Random()
-
     bus.subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, new FileEditorManagerAdapter{
       override def selectionChanged(event: FileEditorManagerEvent): Unit = {
         Option(event.getNewFile).map(_.getName).getOrElse("") match {
           case ComposerJson => {
-            for {
-              e <- QuickFix.editorFor(event.getManager.getProject)
-              editor = e.asInstanceOf[EditorImpl]
-            } yield {
+            useEditor(event)((editor, innerViewport) => {
               val maybeOverlay = editor.getContentComponent.getComponents.find(_.isInstanceOf[OverlayComponent])
               val overlay = maybeOverlay match {
                 case Some(component) => component
@@ -51,33 +46,34 @@ class VersionOverlay extends ApplicationComponent {
 
                   editor.getContentComponent.add(component)
 
-                  val viewpoint = editor.getScrollPane.getViewport
-                  component.setBounds(0, 0, viewpoint.getWidth, viewpoint.getHeight)
+                  innerViewport.addComponentListener(component)
+                  component.resizeTo(innerViewport)
 
                   component
                 }
               }
 
               overlay.revalidate()
-            }
+            })
           }
           case _ =>
         }
 
         Option(event.getOldFile).map(_.getName).getOrElse("") match {
           case ComposerJson => {
-            for {
-              e <- QuickFix.editorFor(event.getManager.getProject)
-              editor = e.asInstanceOf[EditorImpl]
-            } yield {
+            useEditor(event)((editor, innerViewport) => {
               editor
                 .getContentComponent
                 .getComponents
                 .find(_.isInstanceOf[OverlayComponent])
-                .foreach(editor.getContentComponent.remove)
+                .map(_.asInstanceOf[OverlayComponent])
+                .foreach(component => {
+                  innerViewport.removeComponentListener(component)
+                  editor.getContentComponent.remove(component)
+                })
 
               overlays -= event.getOldFile.getCanonicalPath
-            }
+            })
           }
           case _ =>
         }
@@ -85,8 +81,17 @@ class VersionOverlay extends ApplicationComponent {
     })
   }
 
-  override def disposeComponent(): Unit = {
+  private def useEditor(event: FileEditorManagerEvent)(f: (EditorImpl, Component) => Unit) = {
+    for {
+      e <- QuickFix.editorFor(event.getManager.getProject)
+      editor = e.asInstanceOf[EditorImpl]
+      innerViewport <- Option(editor.getScrollPane.getViewport.getView)
+    } f(editor, innerViewport)
+  }
 
+  override def disposeComponent(): Unit = {
+    packageVersionsMap.clear()
+    overlays.clear()
   }
 
   def setPackageVersions(filePath: String, packageVersions: List[PackageVersion]) = {
@@ -104,7 +109,7 @@ class VersionOverlay extends ApplicationComponent {
 
   override def getComponentName: String = "composer.editorOverlay"
 
-  private class OverlayComponent(filePath: String, color: Color, font: Font, editor: Editor) extends JComponent {
+  private class OverlayComponent(filePath: String, color: Color, font: Font, editor: Editor) extends JComponent with ComponentListener {
     private val horizontalMargin = 40
 
     override def paintComponent(g: Graphics): Unit = {
@@ -112,17 +117,38 @@ class VersionOverlay extends ApplicationComponent {
       g.setFont(font)
 
       val verticalAlignment = editor.getLineHeight - editor.getColorsScheme.getEditorFontSize
+      val caretOffset = endLineOffset(editor.getCaretModel.getOffset)
 
       def versionPresentation(packageVersion: PackageVersion) = {
         if(packageVersion.version.length > 12) packageVersion.version.substring(0, 12) + "..."
         else packageVersion.version
       }
 
-      for(packageVersion <- packageVersionsMap.getOrElse(filePath, List[PackageVersion]())) {
-        val offset = editor.getDocument.getLineEndOffset(StringUtil.offsetToLineNumber(editor.getDocument.getCharsSequence, packageVersion.offset))
+      for{
+        packageVersion <- packageVersionsMap.getOrElse(filePath, List[PackageVersion]())
+        offset = endLineOffset(packageVersion.offset) if offset == caretOffset
+      } {
         val point = editor.visualPositionToXY(editor.offsetToVisualPosition(offset))
         g.drawString(versionPresentation(packageVersion), point.x + horizontalMargin, point.y + editor.getLineHeight - verticalAlignment)
       }
     }
+
+    private def endLineOffset(offset: Int): Int = {
+      editor.getDocument.getLineEndOffset(StringUtil.offsetToLineNumber(editor.getDocument.getCharsSequence, offset))
+    }
+
+    override def componentResized(e: ComponentEvent): Unit = {
+      resizeTo(e.getComponent)
+    }
+
+    def resizeTo(component: Component) = {
+      if(component.getWidth != getWidth || component.getHeight != getHeight) {
+        setBounds(0, 0, component.getWidth, component.getHeight)
+      }
+    }
+
+    override def componentMoved(e: ComponentEvent): Unit = {}
+    override def componentShown(e: ComponentEvent): Unit = {}
+    override def componentHidden(e: ComponentEvent): Unit = {}
   }
 }
