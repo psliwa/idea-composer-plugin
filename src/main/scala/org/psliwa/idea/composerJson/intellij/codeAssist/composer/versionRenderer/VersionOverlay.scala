@@ -2,7 +2,6 @@ package org.psliwa.idea.composerJson.intellij.codeAssist.composer.versionRendere
 
 import java.awt.event._
 import java.awt.{Component, Color, Font, Graphics}
-import java.beans.{PropertyChangeEvent, PropertyChangeListener}
 import javax.swing.JComponent
 
 import com.intellij.json.highlighting.JsonSyntaxHighlighterFactory
@@ -53,7 +52,7 @@ class VersionOverlay extends ApplicationComponent {
                 }
               }
 
-              overlay.revalidate()
+              overlay.invalidate()
             })
           }
           case _ =>

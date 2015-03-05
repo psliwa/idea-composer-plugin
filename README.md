@@ -27,6 +27,9 @@ This plugin provides:
     * package directory (eg. in "require", "require-dev")
     * urls and emails (eg. in "homepage")
 
+* others:
+    * show current installed version from `composer.lock`
+
 [There][2] you can find plugin homepage.
 
 ## This plugin in work
@@ -37,7 +40,6 @@ This plugin provides:
 
 * improve completion (support for custom repositories)
 * improve inspections (detect misconfiguration, detect not existing namespaces in "autoload.psr-0", detect invalid callback in "scripts")
-* show current installed version from `composer.lock`
 * and more ;)
 
 [1]: https://plugins.jetbrains.com/files/7631/screenshot_14847.png
