@@ -240,6 +240,22 @@
                   "type": "string"
                 }
               }
+            },
+            "symfony-app-dir": { "type": "filePath" },
+            "symfony-web-dir": { "type": "filePath" },
+            "symfony-assets-install": { "enum": [ "symlink", "hard", "relative" ] },
+            "incenteev-parameters": {
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/incenteev-parameters"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/incenteev-parameters"
+                  }
+                }
+              ]
             }
           }
         },
@@ -580,6 +596,17 @@
           "type": "object",
           "additionalProperties": true
         }
+      }
+    },
+    "incenteev-parameters": {
+      "type": "object",
+      "properties": {
+        "file": { "type": "filePath" },
+        "dist-file": { "type": "filePath" },
+        "keep-outdated": { "type": "boolean" },
+        "parameter-key": { "type": "string" },
+        "env-map": { "type": "object", "additionalProperties": true },
+        "rename-map": { "type": "object", "additionalProperties": true }
       }
     }
   }
