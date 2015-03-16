@@ -47,6 +47,19 @@ class NotInstalledPackageInspectionTest extends InspectionTest {
       """.stripMargin)
   }
 
+  def testGivenInstalledPackage_givenPackageNameInDifferentCase_thatShouldNotBeReported() = {
+    createComposerLock(myFixture, composer.Packages(composer.Package("veNdor/pkg", "1.0.2")))
+
+    checkInspection(
+      """
+        |{
+        |  "require": {
+        |    "Vendor/Pkg": "1.0.2"
+        |  }
+        |}
+      """.stripMargin)
+  }
+
   def testGivenUninstalledPackage_packageHasNotVersionYet_thatShouldNotBeReported() = {
     checkInspection(
       """

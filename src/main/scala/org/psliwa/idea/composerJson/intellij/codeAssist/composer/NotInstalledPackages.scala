@@ -20,7 +20,9 @@ private object NotInstalledPackages {
   private def pred(f: Boolean => Boolean) = f
 
   private def isNotInstalled(property: JsonProperty, devPred: Boolean => Boolean, installedPackages: Packages): Boolean = {
-    property.getName.contains("/") && !getPackageVersion(property).isEmpty && !installedPackages.get(property.getName).map(_.isDev).exists(devPred)
+    property.getName.contains("/") &&
+      !getPackageVersion(property).isEmpty &&
+      !installedPackages.get(property.getName.toLowerCase).map(_.isDev).exists(devPred)
   }
 
   def getPackageVersion(property: JsonProperty): String = {
