@@ -45,15 +45,23 @@ abstract class AbstractCompletionContributor extends com.intellij.codeInsight.co
 
   protected def getCompletionProvidersForSchema(s: Schema, parent: Capture): List[(Capture, CompletionProvider[CompletionParameters])]
 
-  protected def propertyCompletionProvider(parent: Capture, es: LookupElements, getInsertHandler: InsertHandlerFinder = _ => None) = {
+  protected def propertyCompletionProvider(
+    parent: Capture, completionProvider: CompletionProvider[CompletionParameters]
+  ): List[(Capture, CompletionProvider[CompletionParameters])] = {
     List((
       psiElement()
         .withSuperParent(2,
           psiElement().and(propertyCapture(parent))
             .withName(stringContains(EmptyNamePlaceholder))
         ),
-      PropertyCompletionProvider(es, getInsertHandler)
+      completionProvider
     ))
+  }
+
+  protected def propertyCompletionProvider(
+    parent: Capture, es: LookupElements, getInsertHandler: InsertHandlerFinder = _ => None
+  ): List[(Capture, CompletionProvider[CompletionParameters])] = {
+    propertyCompletionProvider(parent, PropertyCompletionProvider(es, getInsertHandler))
   }
 
   private def rootPsiElementPattern: PsiElementPattern.Capture[JsonFile] = {

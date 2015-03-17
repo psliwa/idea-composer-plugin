@@ -8,7 +8,7 @@ import org.psliwa.idea.composerJson.{intellij, Icons}
 import org.psliwa.idea.composerJson.composer.repository.Packagist
 import org.psliwa.idea.composerJson.composer.version.Version
 import org.psliwa.idea.composerJson.intellij.codeAssist.{BaseLookupElement, AbstractCompletionContributor}
-import AbstractCompletionContributor.ParametersDependantCompletionProvider
+import org.psliwa.idea.composerJson.intellij.codeAssist.AbstractCompletionContributor.{LookupElementsCompletionProvider, ParametersDependantCompletionProvider}
 import org.psliwa.idea.composerJson.intellij.codeAssist.Capture
 import org.psliwa.idea.composerJson.intellij._
 import intellij.codeAssist._
@@ -39,7 +39,7 @@ class CompletionContributor extends AbstractCompletionContributor {
 
   override protected def getCompletionProvidersForSchema(s: Schema, parent: Capture): List[(Capture, CompletionProvider[CompletionParameters])] = s match {
     case SPackages => {
-      propertyCompletionProvider(parent, loadPackages, _ => Some(StringPropertyValueInsertHandler)) ++
+      propertyCompletionProvider(parent, new LookupElementsCompletionProvider(loadPackages, _ => Some(StringPropertyValueInsertHandler))) ++
         List((
           psiElement().withSuperParent(2, psiElement().and(propertyCapture(parent))).afterLeaf(":"),
           new VersionCompletionProvider(context => {
