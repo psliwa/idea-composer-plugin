@@ -161,4 +161,17 @@ class StructureSuggestionsTest extends CompletionTest {
       Array("name", "email", "homepage")
     )
   }
+
+  def testSuggestions_doesNotSuggestAlreadyExistingProperty() = {
+    suggestions(
+      """
+        | {
+        | "require": {},
+        | "r<caret>"
+        | }
+      """.stripMargin,
+      Array("require-dev"),
+      Array("require")
+    )
+  }
 }

@@ -12,6 +12,7 @@ import org.psliwa.idea.composerJson._
 import org.psliwa.idea.composerJson.intellij.Patterns._
 import org.psliwa.idea.composerJson.json._
 
+import scala.annotation.tailrec
 import scala.collection.Seq
 
 abstract class AbstractCompletionContributor extends com.intellij.codeInsight.completion.CompletionContributor {
@@ -51,7 +52,7 @@ abstract class AbstractCompletionContributor extends com.intellij.codeInsight.co
           psiElement().and(propertyCapture(parent))
             .withName(stringContains(EmptyNamePlaceholder))
         ),
-      new LookupElementsCompletionProvider(es, getInsertHandler)
+      PropertyCompletionProvider(es, getInsertHandler)
     ))
   }
 
@@ -68,11 +69,35 @@ abstract class AbstractCompletionContributor extends com.intellij.codeInsight.co
 
 object AbstractCompletionContributor {
 
-  class ParametersDependantCompletionProvider(loadElements: CompletionParameters => Seq[BaseLookupElement]) extends AbstractCompletionProvider {
+  private object PropertyCompletionProvider {
+    def apply(es: LookupElements, getInsertHandler: InsertHandlerFinder) = {
+      new ParametersDependantCompletionProvider(context => {
+        import scala.collection.JavaConversions._
+
+        val existingProperties: Set[String] = for {
+          obj <- firstJsonObject(context.getPosition).toSet[JsonObject]
+          property <- obj.getPropertyList
+        } yield property.getName
+
+        es()
+          .filter(element => !existingProperties.contains(element.getLookupString))
+          .toSeq
+      }, getInsertHandler)
+    }
+  }
+
+  @tailrec
+  private def firstJsonObject(element: PsiElement): Option[JsonObject] = element match {
+    case x: JsonObject => Some(x)
+    case x: PsiElement => firstJsonObject(x.getParent)
+    case null => None
+  }
+
+  class ParametersDependantCompletionProvider(loadElements: CompletionParameters => Seq[BaseLookupElement], getInsertHandler: InsertHandlerFinder = _ => None) extends AbstractCompletionProvider {
     override def addCompletions(parameters: CompletionParameters, context: ProcessingContext, result: CompletionResultSet): Unit = {
       val es = loadElements(parameters)
 
-      addLookupElementsToResult(es)(parameters, mapResult(result))
+      addLookupElementsToResult(es, getInsertHandler)(parameters, mapResult(result))
     }
 
     protected def mapResult(result: CompletionResultSet) = result

@@ -19,7 +19,11 @@ class CompletionContributor extends AbstractCompletionContributor {
   }
 
   override protected def propertyCompletionProvider(parent: Capture, properties: Map[String, Property]) = {
-    propertyCompletionProvider(parent, () => properties.map(x => new BaseLookupElement(x._1, description = x._2.description)), (k) => insertHandlerFor(properties.get(k.name).get.schema))
+    propertyCompletionProvider(
+      parent,
+      () => properties.map(x => new BaseLookupElement(x._1, description = x._2.description)),
+      (k) => insertHandlerFor(properties.get(k.name).get.schema)
+    )
   }
 
   @tailrec
