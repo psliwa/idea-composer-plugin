@@ -24,7 +24,7 @@ private object PsiElements {
   }
 
 
-  def ensureJsonFile(file: PsiFile) = file match {
+  def ensureJsonFile(file: PsiElement) = file match {
     case x: JsonFile => Some(x)
     case _ => None
   }

@@ -45,6 +45,11 @@ class ParserTest {
   }
 
   @Test
+  def givenToLongSemantic_parseError() = {
+    assertEquals(None, Parser.parse("1.2.3.4"))
+  }
+
+  @Test
   def parseSemanticConstraintWithLongParts() = {
     assertConstraintEquals(
       SemanticConstraint(new SemanticVersion(123, 234, 345)),

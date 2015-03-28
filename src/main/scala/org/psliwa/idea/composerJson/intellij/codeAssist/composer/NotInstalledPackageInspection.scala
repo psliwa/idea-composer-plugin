@@ -17,7 +17,7 @@ class NotInstalledPackageInspection extends AbstractInspection {
 
     notInstalledPackageProperties
       .map(createProblem)
-      .foreach(problem => problems.registerProblem(problem.element, problem.message, problem.quickFixes:_*))
+      .foreach(problem => problems.registerProblem(problem.element, problem.message.getOrElse(""), problem.quickFixes:_*))
   }
 
   private def createProblem(property: JsonProperty) = {

@@ -8,6 +8,7 @@ import org.psliwa.idea.composerJson.settings.ComposerJsonSettings
 class PackageVersionQuickFixesTest extends InspectionTest {
   val ExcludePatternQuickFix = ComposerBundle.message("inspection.quickfix.excludePackagePattern", _: String)
   val SetPackageVersionQuickFix = ComposerBundle.message("inspection.quickfix.setPackageVersion", _: String)
+  val SetEquivalentPackageVersionQuickFix = ComposerBundle.message("inspection.quickfix.setPackageEquivalentVersion", _: String)
 
   override def setUp(): Unit = {
     super.setUp()
@@ -172,6 +173,44 @@ class PackageVersionQuickFixesTest extends InspectionTest {
         |{
         |  "require": {
         |    "vendor/pkg": "<=1.2@dev"
+        |  }
+        |}
+      """.stripMargin
+    )
+  }
+
+  def testNormalizeNsrVersionToRange() = {
+    checkQuickFix(SetEquivalentPackageVersionQuickFix(">=1.2.3 <1.3.0"))(
+      """
+        |{
+        |  "require": {
+        |    "vendor/pkg": "~1.2.3"
+        |  }
+        |}
+      """.stripMargin,
+      """
+        |{
+        |  "require": {
+        |    "vendor/pkg": ">=1.2.3 <1.3.0"
+        |  }
+        |}
+      """.stripMargin
+    )
+  }
+
+  def testNormalizeRangeVersionToNsr() = {
+    checkQuickFix(SetEquivalentPackageVersionQuickFix("~1.2.3"))(
+      """
+        |{
+        |  "require": {
+        |    "vendor/pkg": ">=1.2.3,<1.3.0"
+        |  }
+        |}
+      """.stripMargin,
+      """
+        |{
+        |  "require": {
+        |    "vendor/pkg": "~1.2.3"
         |  }
         |}
       """.stripMargin

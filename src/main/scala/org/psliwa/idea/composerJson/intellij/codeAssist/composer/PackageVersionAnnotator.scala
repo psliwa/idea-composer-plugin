@@ -20,8 +20,12 @@ import org.psliwa.idea.composerJson.json.SString
 import org.psliwa.idea.composerJson.settings.ComposerJsonSettings
 import PsiElements._
 
+import scala.collection.GenTraversableOnce
+
 class PackageVersionAnnotator extends Annotator {
   import org.psliwa.idea.composerJson.intellij.codeAssist.composer.PackageVersionAnnotator._
+
+  private type QuickFixGroup = (Option[String], Seq[IntentionAction])
 
   override def annotate(element: PsiElement, annotations: AnnotationHolder): Unit = {
     val pattern = psiElement().and(PackageVersionAnnotator.pattern)
@@ -31,27 +35,34 @@ class PackageVersionAnnotator extends Annotator {
       val problemDescriptors = for {
         version <- getStringValue(element).toList
         pkg <- ensureJsonProperty(element.getParent).map(_.getName).toList
-        problem <- detectProblemsInVersion(pkg, version, element)
-      } yield ProblemDescriptor(element, problem._1, problem._2)
+        (message, quickFixes) <- detectProblemsInVersion(pkg, version, element)
+      } yield ProblemDescriptor(element, message, quickFixes)
 
       problemDescriptors.foreach(problem => {
-        val annotation = annotations.createWarningAnnotation(problem.element.getContext, problem.message)
+        val annotation = problem.message match {
+          case Some(message) => annotations.createWarningAnnotation(problem.element.getContext, message)
+          case _ => annotations.createInfoAnnotation(problem.element, null)
+        }
+
         problem.quickFixes.foreach(fix => annotation.registerFix(fix))
       })
     }
   }
 
-  private def detectProblemsInVersion(pkg: String, version: String, element: PsiElement): Seq[(String, Seq[IntentionAction])] = {
+  private def detectProblemsInVersion(pkg: String, version: String, element: PsiElement): Seq[QuickFixGroup] = {
     val versionConstraint = parseVersion(version)
 
-    detectUnboundedVersionProblem(versionConstraint, pkg, element) ++ detectWildcardAndOperatorCombo(versionConstraint, pkg, element)
+    detectUnboundedVersionProblem(versionConstraint, pkg, element) ++ 
+      detectWildcardAndOperatorCombo(versionConstraint, pkg, element) ++
+      detectEquivalents(versionConstraint, pkg, element)
+      
   }
 
-  private def detectUnboundedVersionProblem(version: Option[Constraint], pkg: String, element: PsiElement): Seq[(String, Seq[IntentionAction])] = {
+  private def detectUnboundedVersionProblem(version: Option[Constraint], pkg: String, element: PsiElement): Seq[QuickFixGroup] = {
     version
       .filter(!_.isBounded)
       .map(versionConstraint => (
-        ComposerBundle.message("inspection.version.unboundVersion"),
+        Some(ComposerBundle.message("inspection.version.unboundVersion")),
         versionQuickFixes(getUnboundVersionFixers)(pkg, versionConstraint, element) ++ List(new ExcludePatternAction(pkg)) ++
           packageVendorPattern(pkg).map(new ExcludePatternAction(_)).toList
         )
@@ -64,20 +75,23 @@ class PackageVersionAnnotator extends Annotator {
     version: Constraint,
     element: PsiElement
   ): Seq[IntentionAction] = {
-    def createQuickFixes(jsonObject: JsonObject) = {
+    def create(jsonObject: JsonObject) = {
       fixers
         .map(version.replace)
         .filter(_ != version)
         .map(fixedVersion => changePackageVersionQuickFix(pkg, fixedVersion, jsonObject))
     }
 
+    createQuickFixes(element, create)
+  }
+
+  private def createQuickFixes(element: PsiElement, f: (JsonObject) => Seq[IntentionAction]): Seq[IntentionAction] = {
     for {
       property <- ensureJsonProperty(element.getParent).toList
       jsonObject <- ensureJsonObject(property.getParent).toList
-      fix <- createQuickFixes(jsonObject)
+      fix <- f(jsonObject)
     } yield fix
   }
-
 
   private def getUnboundVersionFixers: Seq[Constraint => Option[Constraint]] = List(ConstraintOperator.~, ConstraintOperator.^).flatMap(operator => {
     List(
@@ -95,11 +109,11 @@ class PackageVersionAnnotator extends Annotator {
     )
   })
 
-  private def detectWildcardAndOperatorCombo(version: Option[Constraint], pkg: String, element: PsiElement) = {
+  private def detectWildcardAndOperatorCombo(version: Option[Constraint], pkg: String, element: PsiElement): Seq[QuickFixGroup] = {
     version
       .filter(_ contains wildcardAndOperatorCombination)
       .map(versionConstraint => (
-        ComposerBundle.message("inspection.version.wildcardAndComparison"),
+        Some(ComposerBundle.message("inspection.version.wildcardAndComparison")),
         versionQuickFixes(getWildcardAndOperatorComboFixers)(pkg, versionConstraint, element)
       ))
       .toList
@@ -128,9 +142,26 @@ class PackageVersionAnnotator extends Annotator {
     )
   }
 
+  def detectEquivalents(version: Option[Constraint], pkg: String, element: PsiElement): Seq[QuickFixGroup] = {
+    version
+      .toList.view
+      .flatMap(Version.equivalentsFor)
+      .map(equivalentVersion => createQuickFixes(element, jsonObject => List(changeEquivalentPackageVersionQuickFix(pkg, equivalentVersion, jsonObject))))
+      .map(quickFix => (None, quickFix))
+      .toSeq
+  }
+
   private def changePackageVersionQuickFix(pkg: String, fixedVersion: Constraint, jsonObject: JsonObject): IntentionAction = {
+    changePackageVersionQuickFix(pkg, fixedVersion, jsonObject, ComposerBundle.message("inspection.quickfix.setPackageVersion", fixedVersion.presentation))
+  }
+
+  private def changeEquivalentPackageVersionQuickFix(pkg: String, fixedVersion: Constraint, jsonObject: JsonObject): IntentionAction = {
+    changePackageVersionQuickFix(pkg, fixedVersion, jsonObject, ComposerBundle.message("inspection.quickfix.setPackageEquivalentVersion", fixedVersion.presentation))
+  }
+
+  private def changePackageVersionQuickFix(pkg: String, fixedVersion: Constraint, jsonObject: JsonObject, message: String): IntentionAction = {
     new QuickFixIntentionActionAdapter(new SetPropertyValueQuickFix(jsonObject, pkg, SString(), fixedVersion.presentation) {
-      override def getText: String = ComposerBundle.message("inspection.quickfix.setPackageVersion", fixedVersion.presentation)
+      override def getText: String = message
     })
   }
 

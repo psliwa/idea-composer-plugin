@@ -9,7 +9,7 @@ object Parser {
 
   private val dev = string("dev-").flatMap(_ => regex("[a-z0-9]+".r)).map(DevConstraint)
   private val hash = regex("[a-f]{4,40}".r).map(HashConstraint)
-  private val semantic = regex("^(\\d+)(\\.\\d+)?(\\.\\d+)?(\\.\\d+)?".r)
+  private val semantic = regex("^(\\d+)(\\.\\d+)?(\\.\\d+)?".r)
     .flatMap(splitIntegers('.'))
     .map(version => SemanticConstraint(new SemanticVersion(version)))
 

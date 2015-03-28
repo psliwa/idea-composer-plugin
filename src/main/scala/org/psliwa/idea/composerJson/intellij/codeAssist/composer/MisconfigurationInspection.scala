@@ -38,12 +38,12 @@ class MisconfigurationInspection extends AbstractInspection {
           .map(name => Option(jsonObject.findProperty(name)))
           .filter(_ != None)
           .flatMap(value => Option(value.get.getValue))
-          .map(value => ProblemDescriptor(value, checker.problem, checker.createQuickFixes(jsonObject)))
+          .map(value => ProblemDescriptor(value, Some(checker.problem), checker.createQuickFixes(jsonObject)))
       } else {
         List()
       }
     })
 
-    problemDescriptions.foreach(problem => problems.registerProblem(problem.element.getContext, problem.message, problem.quickFixes:_*))
+    problemDescriptions.foreach(problem => problems.registerProblem(problem.element.getContext, problem.message.getOrElse(""), problem.quickFixes:_*))
   }
 }
