@@ -1,7 +1,7 @@
 <idea-plugin version="2">
   <id>org.psliwa.idea.composer</id>
   <name>PHP composer.json support</name>
-  <version>1.0.2</version>
+  <version>1.0.3</version>
   <vendor email="me@psliwa.org" url="http://github.org/psliwa/idea-composer-plugin">psliwa</vendor>
 
     <description><![CDATA[
@@ -11,6 +11,13 @@ This plugin adds auto completion and inspections support for composer.json file 
     ]]></description>
 
   <change-notes><![CDATA[
+<h2>1.0.3</h2>
+<ul>
+  <li>quick fixes that refactor version constraints with "~" and "^" operators to readable equivalents, eg. ~1.2 to >=1.2 <2.0.0. It might be useful when you are not sure what is difference between ~1.2, ~1.2.0 or ^1.2.0 - you can use quick fix to show equivalent version and eventually refactor it.</li>
+  <li>omit already existing properties in completion list</li>
+  <li>add support for symfony specific properties in "extra" property</li>
+</ul>
+
 <h2>1.0.2</h2>
 <ul>
   <li>show installed package version (from composer.lock) for currently focused package</li>
