@@ -167,15 +167,6 @@ class PackageVersionAnnotator extends Annotator {
 
   private def packageVendorPattern(pkg: String): Option[String] = pkg.split('/').headOption.map(_ + "/*")
 
-  private def getStringValue(value: PsiElement): Option[String] = {
-    import PsiExtractors.JsonStringLiteral
-
-    value match {
-      case JsonStringLiteral(x) => Some(x)
-      case _ => None
-    }
-  }
-
   private def excluded(project: Project): StringPattern = {
     string().`with`(new PatternCondition[String]("matches") {
       override def accepts(t: String, context: ProcessingContext): Boolean = {

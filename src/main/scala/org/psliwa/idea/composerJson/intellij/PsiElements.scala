@@ -34,4 +34,13 @@ private object PsiElements {
       .withLanguage(JsonLanguage.INSTANCE)
       .inFile(psiFile(classOf[JsonFile]).withName(ComposerJson))
   }
+
+  def getStringValue(value: PsiElement): Option[String] = {
+    import PsiExtractors.JsonStringLiteral
+
+    value match {
+      case JsonStringLiteral(x) => Some(x)
+      case _ => None
+    }
+  }
 }

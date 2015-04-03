@@ -12,4 +12,13 @@ private object PhpUtils {
   def ensureLandingSlash(s: String) = if(s.isEmpty || s.charAt(0) != '\\') "\\"+s else s
 
   def escapeSlashes(s: String) = s.replace("\\", "\\\\")
+
+  def getCallableInfo(s: String): (String, String) = {
+    s.replace("::", "").splitAt(positive(s.indexOf("::"), s.size))
+  }
+
+  private def positive(i: Int, default: => Int): Int = {
+    if(i >= 0) i
+    else default
+  }
 }

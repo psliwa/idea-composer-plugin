@@ -149,6 +149,10 @@ This plugin adds auto completion and inspections support for composer.json file 
                 language="JSON"
                 implementationClass="org.psliwa.idea.composerJson.intellij.codeAssist.composer.PackageVersionAnnotator"
                 />
+        <annotator
+                language="JSON"
+                implementationClass="org.psliwa.idea.composerJson.intellij.codeAssist.php.PhpCallbackAnnotator"
+                />
         <psi.referenceContributor
                 language="JSON"
                 implementation="org.psliwa.idea.composerJson.intellij.codeAssist.file.FilePathReferenceContributor"

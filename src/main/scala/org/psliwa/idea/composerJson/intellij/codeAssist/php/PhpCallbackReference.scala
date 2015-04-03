@@ -16,15 +16,9 @@ import PhpCallbackReference._
 import PhpUtils._
 
 private class PhpCallbackReference(element: JsonStringLiteral) extends PsiPolyVariantReferenceBase[JsonStringLiteral](element) {
-  private val referenceName = getFixedReferenceName(element.getText)
+  private val referenceName: String = getFixedReferenceName(element.getText)
   private val methodExists = referenceName.indexOf("::") > 0
-  private val (className, methodName) = referenceName.replace("::", "").splitAt(
-    positive(referenceName.indexOf("::"), referenceName.size))
-
-  private def positive(i: Int, default: => Int): Int = {
-    if(i >= 0) i
-    else default
-  }
+  private val (className, methodName) = getCallableInfo(referenceName)
 
   override def multiResolve(incompleteCode: Boolean): Array[ResolveResult] = {
     val phpIndex = PhpIndex.getInstance(element.getProject)
@@ -87,11 +81,13 @@ private class PhpCallbackReference(element: JsonStringLiteral) extends PsiPolyVa
 
 private object PhpCallbackReference {
   lazy val MethodStubIndexKey = StubIndexKey.createIndexKey("org.psliwa.idea.composerJson.phpMethod")
-  private val ComposerEventTypes = List(
+  private[php] val ComposerEventTypes = List(
     "\\Composer\\EventDispatcher\\Event",
     "\\Composer\\Script\\Event",
     "\\Composer\\Script\\PackageEvent",
-    "\\Composer\\Script\\CommandEvent"
+    "\\Composer\\Script\\CommandEvent",
+    "\\Composer\\Plugin\\CommandEvent",
+    "\\Composer\\Plugin\\PreFileDownloadEvent"
   )
 
   private[this] def getMethodFQN(method: Method) = {

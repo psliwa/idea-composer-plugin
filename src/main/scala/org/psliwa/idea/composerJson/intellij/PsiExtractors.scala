@@ -27,7 +27,7 @@ private object PsiExtractors {
 
   object JsonStringLiteral {
     import scala.collection.JavaConversions._
-    def unapply(x: JsonStringLiteral): Option[(String)] = x.getTextFragments.headOption.map(_.second).orElse(Some(""))
+    def unapply(x: JsonStringLiteral): Option[(String)] = Some(x.getTextFragments.foldRight("")((p, s) => p.getSecond+s))//headOption.map(_.second).orElse(Some(""))
   }
 
   object JsonBooleanLiteral {
