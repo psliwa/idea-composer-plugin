@@ -17,7 +17,7 @@ class PackagesLoader extends ApplicationComponent {
     bus.subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, new FileEditorManagerAdapter{
       override def fileOpened(source: FileEditorManager, file: VirtualFile): Unit = file.getName match {
         case ComposerJson => app.executeOnPooledThread(new Runnable {
-          override def run(): Unit = PackagesLoader.loadPackages
+          override def run(): Unit = PackagesLoader.loadPackageLookupElements
         })
         case _ =>
       }
@@ -29,9 +29,11 @@ class PackagesLoader extends ApplicationComponent {
 }
 
 object PackagesLoader {
+  lazy val loadPackageLookupElements = loadPackages.map(new BaseLookupElement(_, Some(Icons.Packagist)))
+
   lazy val loadPackages = {
     if(isUnitTestMode) Nil
-    else Packagist.loadPackages().right.getOrElse(Nil).map(new BaseLookupElement(_, Some(Icons.Packagist)))
+    else Packagist.loadPackages().right.getOrElse(Nil)
   }
 
   private def isUnitTestMode = ApplicationManager.getApplication.isUnitTestMode

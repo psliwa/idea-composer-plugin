@@ -4,6 +4,7 @@ import com.intellij.codeInsight.completion._
 import com.intellij.json.psi.{JsonFile, JsonProperty}
 import com.intellij.patterns.PlatformPatterns._
 import com.intellij.psi.PsiElement
+import org.psliwa.idea.composerJson.composer.Repository
 import org.psliwa.idea.composerJson.{intellij, Icons}
 import org.psliwa.idea.composerJson.composer.repository.Packagist
 import org.psliwa.idea.composerJson.composer.version.Version
@@ -24,8 +25,13 @@ import scala.collection.Seq
 class CompletionContributor extends AbstractCompletionContributor {
 
   //vars only for testability
-  private var packagesLoader: () => Seq[BaseLookupElement] = () => PackagesLoader.loadPackages
+  private var packagesLoader: () => Seq[BaseLookupElement] = () => PackagesLoader.loadPackageLookupElements
   private var versionsLoader: (String) => Seq[String] = memorize(30)(Packagist.loadVersions(_).right.getOrElse(List()))
+
+  private val packagistRepository: Repository[BaseLookupElement] = new Repository[BaseLookupElement] {
+    override def getPackages: Seq[BaseLookupElement] = packagesLoader()
+    override def getPackageVersions(pkg: String) = versionsLoader(pkg)
+  }
 
   lazy private val minimumStabilities: List[String] = for {
     schema <- maybeSchema.toList
@@ -73,8 +79,8 @@ class CompletionContributor extends AbstractCompletionContributor {
     versionsLoader = l
   }
 
-  private def loadPackages() = packagesLoader()
-  private def loadVersions(s: String) = versionsLoader(s)
+  private def loadPackages() = packagistRepository.getPackages
+  private def loadVersions(s: String) = packagistRepository.getPackageVersions(s)
 
   private def ensureSchemaObject(s: Schema): Option[SObject] = s match {
     case x: SObject => Some(x)
