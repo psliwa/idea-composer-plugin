@@ -84,7 +84,7 @@ class JsonParsersTest {
   }
 
   @Test
-  def parsePackages_givenValidJson_expectList() = {
+  def parseLockPackages_givenValidJson_expectList() = {
     List(true, false).foreach(dev => {
       val packagesKey = "packages"+(if(dev) "-dev" else "")
       val json =
@@ -103,7 +103,7 @@ class JsonParsersTest {
           |}
         """.stripMargin
 
-      val result = JsonParsers.parsePackages(json)
+      val result = JsonParsers.parseLockPackages(json)
 
       assertTrue(packagesKey, result.isRight)
       assertEquals(packagesKey, Packages(Package("ps/image-optimizer", "1.0.0", dev), Package("ps/fluent-traversable", "0.3.0", dev)), result.right.get)
@@ -111,11 +111,70 @@ class JsonParsersTest {
   }
 
   @Test
-  def parsePackages_givenInvalidJson_expectError() = {
+  def parseLockPackages_givenInvalidJson_expectError() = {
     val json = "invalid json"
+
+    val result = JsonParsers.parseLockPackages(json)
+
+    assertTrue(result.isLeft)
+  }
+
+  @Test
+  def parsePackages_givenValidJson_expectPackagesWithVersions() = {
+    val json =
+      """
+        |{
+        |  "packages": {
+        |    "some/package": {
+        |      "1.0.0": {},
+        |      "2.0.0": {}
+        |    },
+        |    "some/package2": {
+        |      "3.0.0": {}
+        |    }
+        |  }
+        |}
+      """.stripMargin
+
+    val result = JsonParsers.parsePackages(json)
+
+    assertTrue(result.isRight)
+    assertEquals(RepositoryPackages(Map(
+        "some/package" -> Seq("1.0.0", "2.0.0"),
+        "some/package2" -> Seq("3.0.0")
+      ), List()),
+      result.right.get
+    )
+  }
+
+  @Test
+  def parsePackages_givenInvalidJson_expectError() = {
+    val json =
+      """
+        |{
+        |}
+      """.stripMargin
 
     val result = JsonParsers.parsePackages(json)
 
     assertTrue(result.isLeft)
+  }
+
+  @Test
+  def parsePackages_givenIncludesInJson_expectIncludesInResult() = {
+    val json =
+      """
+        |{
+        |  "packages": {},
+        |  "includes": {
+        |    "some-include.json": {}
+        |  }
+        |}
+      """.stripMargin
+
+    val result = JsonParsers.parsePackages(json)
+
+    assertTrue(result.isRight)
+    assertEquals(RepositoryPackages(Map(), List("some-include.json")), result.right.get)
   }
 }

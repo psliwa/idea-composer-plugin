@@ -6,7 +6,7 @@ import scala.util.parsing.json.{JSONArray, JSONObject, JSON}
 object JsonParsers {
 
   type Error = String
-  
+
   def parsePackageNames(data: String): Either[Error,Seq[String]] = {
     val packages = for {
       result <- JSON.parseRaw(data)
@@ -41,7 +41,7 @@ object JsonParsers {
     versions.map(Right(_)).getOrElse(Left("Json parse error"))
   }
 
-  def parsePackages(data: String): Either[Error,Packages] = {
+  def parseLockPackages(data: String): Either[Error,Packages] = {
     import org.psliwa.idea.composerJson.util.OptionOps._
 
     def parse(property: String, dev: Boolean) = for {
@@ -49,7 +49,7 @@ object JsonParsers {
       o <- tryJsonObject(result)
       packagesElement <- o.obj.get(property)
       packagesArray <- tryJsonArray(packagesElement)
-      packages <- traverse(packagesArray.list)(createPackage(dev))
+      packages <- traverse(packagesArray.list)(createLockPackage(dev))
     } yield packages
 
     val packages = for {
@@ -63,11 +63,45 @@ object JsonParsers {
     }
   }
 
-  private def createPackage(dev: Boolean)(maybeJsonObject: Any): Option[Package] = {
+  private def createLockPackage(dev: Boolean)(maybeJsonObject: Any): Option[Package] = {
     for {
       jsonObject <- tryJsonObject(maybeJsonObject)
       name <- jsonObject.obj.get("name").map(_.toString)
       version <- jsonObject.obj.get("version").map(_.toString)
     } yield Package(name, version, dev)
+  }
+
+  def parsePackages(data: String): Either[Error, RepositoryPackages] = {
+    def getPackagesFrom(obj: JSONObject): Option[Map[String,Seq[String]]] = {
+      val packages: Map[String,Seq[String]] = (for {
+        packageName <- obj.obj.keys
+        packageObject <- obj.obj.get(packageName)
+        packageObject <- tryJsonObject(packageObject)
+        versions <- Option(packageObject.obj.keys.toSeq)
+      } yield packageName -> versions).toMap
+
+      Option(packages)
+    }
+
+    val maybeRoot = for {
+      result <- JSON.parseRaw(data)
+      o <- tryJsonObject(result)
+    } yield o
+
+    val packages = for {
+      root <- maybeRoot
+      packagesElement <- root.obj.get("packages")
+      packagesElement <- tryJsonObject(packagesElement)
+      packages <- getPackagesFrom(packagesElement)
+    } yield packages
+
+    val includes = for {
+      root <- maybeRoot.toList
+      includesElement <- root.obj.get("includes").toList
+      includesElement <- tryJsonObject(includesElement).toList
+      include <- includesElement.obj.keys.toList
+    } yield include
+
+    packages.map(pkgs => Right(RepositoryPackages(pkgs, includes))).getOrElse(Left("parse error"))
   }
 }

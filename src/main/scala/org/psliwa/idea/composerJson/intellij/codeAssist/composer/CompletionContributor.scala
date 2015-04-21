@@ -4,9 +4,8 @@ import com.intellij.codeInsight.completion._
 import com.intellij.json.psi.{JsonFile, JsonProperty}
 import com.intellij.patterns.PlatformPatterns._
 import com.intellij.psi.PsiElement
-import org.psliwa.idea.composerJson.composer.Repository
 import org.psliwa.idea.composerJson.{intellij, Icons}
-import org.psliwa.idea.composerJson.composer.repository.Packagist
+import org.psliwa.idea.composerJson.composer.repository.{Repository, Packagist}
 import org.psliwa.idea.composerJson.composer.version.Version
 import org.psliwa.idea.composerJson.intellij.codeAssist.{BaseLookupElement, AbstractCompletionContributor}
 import org.psliwa.idea.composerJson.intellij.codeAssist.AbstractCompletionContributor.{LookupElementsCompletionProvider, ParametersDependantCompletionProvider}

@@ -1,4 +1,4 @@
-package org.psliwa.idea.composerJson.composer
+package org.psliwa.idea.composerJson.composer.repository
 
 trait Repository[Package] {
   def getPackages: Seq[Package]

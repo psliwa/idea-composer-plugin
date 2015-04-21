@@ -37,7 +37,7 @@ class InstalledPackagesWatcher extends ApplicationComponent {
 
   private[InstalledPackagesWatcher] def loadPackages(file: VirtualFile) = {
     readFile(file)
-      .flatMap(JsonParsers.parsePackages(_).right.toOption)
+      .flatMap(JsonParsers.parseLockPackages(_).right.toOption)
       .getOrElse(Packages())
   }
 
