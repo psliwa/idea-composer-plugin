@@ -7,14 +7,14 @@ import DefaultRepositoryProvider._
 
 class DefaultRepositoryFactoryTest {
 
-  val packagistRepository = new FakeRepository(List("packagist"))
+  val packagistRepository = new InMemoryRepository(List("packagist"))
 
   @Test
   def givenFewUrls_createRepositoryFromFewUrls(): Unit = {
 
     //given
 
-    val factory = new DefaultRepositoryFactory(url => new FakeRepository(List(url)), packagistRepository)
+    val factory = new DefaultRepositoryFactory(url => new InMemoryRepository(List(url)), packagistRepository)
 
     //when
 
@@ -29,7 +29,7 @@ class DefaultRepositoryFactoryTest {
   def givenPackagistRepository_createdRepositoryShouldContainsAlsoPackagistRepo(): Unit = {
     //given
 
-    val factory = new DefaultRepositoryFactory(url => new FakeRepository(List(url)), packagistRepository)
+    val factory = new DefaultRepositoryFactory(url => new InMemoryRepository(List(url)), packagistRepository)
 
     //when
 

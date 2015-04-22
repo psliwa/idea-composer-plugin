@@ -15,7 +15,7 @@ class DefaultRepositoryProviderTest {
 
     val file = "someFile"
     val repositoryInfo = new RepositoryInfo(List("a"), false)
-    val repository = new FakeRepository(List())
+    val repository = new InMemoryRepository[String](List())
 
     repositoryFactory.setRepositories(repositoryInfo, repository)
     provider.updateRepository(file, repositoryInfo)
@@ -37,8 +37,8 @@ class DefaultRepositoryProviderTest {
     val file = "someFile"
     val repositoryInfo = new RepositoryInfo(List("a"), false)
     val changedRepositoryInfo = new RepositoryInfo(List("b"), false)
-    val repository = new FakeRepository(List("package1"))
-    val changedRepository = new FakeRepository(List("package2"))
+    val repository = new InMemoryRepository(List("package1"))
+    val changedRepository = new InMemoryRepository(List("package2"))
 
     repositoryFactory.setRepositories(repositoryInfo, repository)
     repositoryFactory.setRepositories(changedRepositoryInfo, changedRepository)

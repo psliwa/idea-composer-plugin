@@ -11,8 +11,8 @@ class ComposedRepositoryTest {
 
     val repository = new ComposedRepository(
       List(
-        new FakeRepository(List("package1", "package2")),
-        new FakeRepository(List("package3", "package4"))
+        new InMemoryRepository(List("package1", "package2")),
+        new InMemoryRepository(List("package3", "package4"))
       )
     )
 
@@ -32,8 +32,8 @@ class ComposedRepositoryTest {
 
     val repository = new ComposedRepository(
       List(
-        new FakeRepository(List("package1", "package2"), Map("package1" -> List("1.0.0"), "package2" -> List("2.0.0"))),
-        new FakeRepository(List("package1", "package2"), Map("package1" -> List("1.0.1"), "package2" -> List("2.0.1")))
+        new InMemoryRepository(List("package1", "package2"), Map("package1" -> List("1.0.0"), "package2" -> List("2.0.0"))),
+        new InMemoryRepository(List("package1", "package2"), Map("package1" -> List("1.0.1"), "package2" -> List("2.0.1")))
       )
     )
 
