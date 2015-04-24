@@ -1,9 +1,10 @@
 package org.psliwa.idea.composerJson.intellij
 
-import com.intellij.codeInsight.completion.{InsertHandler, InsertionContext}
+import com.intellij.codeInsight.completion.{CompletionParameters, InsertHandler, InsertionContext}
 import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.patterns.PsiElementPattern
 import com.intellij.psi.PsiElement
+import com.intellij.util.ProcessingContext
 import org.psliwa.idea.composerJson.util.CharOffsetFinder._
 import org.psliwa.idea.composerJson.util.OffsetFinder.ImplicitConversions._
 

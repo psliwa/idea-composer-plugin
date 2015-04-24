@@ -5,7 +5,7 @@ import com.intellij.json.psi.{JsonFile, JsonProperty}
 import com.intellij.patterns.PlatformPatterns._
 import com.intellij.psi.PsiElement
 import org.psliwa.idea.composerJson.{intellij, Icons}
-import org.psliwa.idea.composerJson.composer.repository.{Repository, Packagist}
+import org.psliwa.idea.composerJson.composer.repository._
 import org.psliwa.idea.composerJson.composer.version.Version
 import org.psliwa.idea.composerJson.intellij.codeAssist.{BaseLookupElement, AbstractCompletionContributor}
 import org.psliwa.idea.composerJson.intellij.codeAssist.AbstractCompletionContributor.{LookupElementsCompletionProvider, ParametersDependantCompletionProvider}
@@ -21,6 +21,7 @@ import org.psliwa.idea.composerJson.util.ImplicitConversions._
 import scala.annotation.tailrec
 import scala.collection.Seq
 
+//TODO: use repositoryProvider
 class CompletionContributor extends AbstractCompletionContributor {
 
   //vars only for testability
@@ -30,7 +31,9 @@ class CompletionContributor extends AbstractCompletionContributor {
   private val packagistRepository: Repository[BaseLookupElement] = new Repository[BaseLookupElement] {
     override def getPackages: Seq[BaseLookupElement] = packagesLoader()
     override def getPackageVersions(pkg: String) = versionsLoader(pkg)
+    override def map[NewPackage](f: (BaseLookupElement) => NewPackage): Repository[NewPackage] = ???
   }
+  //  private var repositoryProvider: (String) => Repository[BaseLookupElement] = PackagesLoader.repositoryProvider.repositoryFor
 
   lazy private val minimumStabilities: List[String] = for {
     schema <- maybeSchema.toList
@@ -69,6 +72,8 @@ class CompletionContributor extends AbstractCompletionContributor {
     case _ => List()
   }
 
+//  private def loadPackages(context: CompletionParameters) = repositoryProvider(context.getOriginalFile.getVirtualFile.getCanonicalPath).getPackages
+//  private def loadVersions(context: CompletionParameters)(pkg: String) = repositoryProvider(context.getOriginalFile.getVirtualFile.getCanonicalPath).getPackageVersions(pkg)
 
   protected[composer] def setPackagesLoader(l: () => Seq[BaseLookupElement]): Unit = {
     packagesLoader = l
@@ -80,6 +85,28 @@ class CompletionContributor extends AbstractCompletionContributor {
 
   private def loadPackages() = packagistRepository.getPackages
   private def loadVersions(s: String) = packagistRepository.getPackageVersions(s)
+
+  //  protected[composer] def setPackagesLoader(l: () => Seq[BaseLookupElement]): Unit = {
+  //    val previousRepositoryProvider = repositoryProvider
+  //    repositoryProvider = (file: String) => {
+  //      new Repository[BaseLookupElement] {
+  //        override def getPackages: scala.Seq[BaseLookupElement] = l()
+  //        override def getPackageVersions(pkg: String): scala.Seq[String] = previousRepositoryProvider(file).getPackageVersions(pkg)
+  //        override def map[NewPackage](f: (BaseLookupElement) => NewPackage): Repository[NewPackage] = new CallbackRepository(getPackages.map(f), getPackageVersions)
+  //      }
+  //    }
+  //  }
+  //
+  //  protected[composer] def setVersionsLoader(l: (String) => Seq[String]): Unit = {
+  //    val previousRepositoryProvider = repositoryProvider
+  //    repositoryProvider = (file: String) => {
+  //      new Repository[BaseLookupElement] {
+  //        override def getPackages: scala.Seq[BaseLookupElement] = previousRepositoryProvider(file).getPackages
+  //        override def getPackageVersions(pkg: String): scala.Seq[String] = l(pkg)
+  //        override def map[NewPackage](f: (BaseLookupElement) => NewPackage): Repository[NewPackage] = new CallbackRepository(getPackages.map(f), getPackageVersions)
+  //      }
+  //    }
+  //  }
 
   private def ensureSchemaObject(s: Schema): Option[SObject] = s match {
     case x: SObject => Some(x)
@@ -106,11 +133,11 @@ private object CompletionContributor {
   }
 
   object VersionCompletionProvider {
-    case class Context(propertyName: String, typedQuery: String)
+    case class Context(propertyName: String, typedQuery: String, completionParameters: CompletionParameters)
 
     def psiBased(f: Context => Seq[BaseLookupElement]): CompletionParameters => Seq[BaseLookupElement] = parameters => {
       val typedQuery = getTypedText(parameters.getPosition).getOrElse("")
-      firstNamedProperty(parameters.getPosition).map(p => Context(p.getName, typedQuery)).map(f).getOrElse(List())
+      firstNamedProperty(parameters.getPosition).map(p => Context(p.getName, typedQuery, parameters)).map(f).getOrElse(List())
     }
   }
 

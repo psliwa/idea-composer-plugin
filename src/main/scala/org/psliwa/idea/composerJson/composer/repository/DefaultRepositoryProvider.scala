@@ -1,10 +1,23 @@
 package org.psliwa.idea.composerJson.composer.repository
 
-import DefaultRepositoryProvider.RepositoryFactory
-import org.psliwa.idea.composerJson.composer.parsers.RepositoryPackages
+import org.psliwa.idea.composerJson.composer.repository.DefaultRepositoryProvider.{DefaultRepositoryFactory, RepositoryFactory}
+import org.psliwa.idea.composerJson.composer.parsers.{JsonParsers, RepositoryPackages}
+import org.psliwa.idea.composerJson.util.IO
 import scala.collection.mutable
 
 class DefaultRepositoryProvider[Package](repositoryFactory: RepositoryFactory[Package]) extends RepositoryProvider[Package] {
+
+  //simple to use constructor with default RepositoryFactory and default configuration
+  def this(packagistRepository: Repository[Package], mapPackage: String => Package) = {
+    this(
+      new DefaultRepositoryFactory(
+        DefaultRepositoryProvider.repositoryFromUrl(IO.loadUrl, JsonParsers.parsePackages),
+        packagistRepository,
+        mapPackage
+      )
+    )
+  }
+
   private val repositories = mutable.Map[String, Repository[Package]]()
   private val infos = mutable.Map[String, RepositoryInfo]()
 
@@ -34,12 +47,13 @@ object DefaultRepositoryProvider {
   }
 
   private[repository] class DefaultRepositoryFactory[Package](
-    repositoryFromUrl: String => Repository[Package],
-    packagistRepository: Repository[Package]
+    repositoryFromUrl: String => Repository[String],
+    packagistRepository: Repository[Package],
+    mapPackage: String => Package
   ) extends RepositoryFactory[Package] {
     override def repositoryFor(repositoryInfo: RepositoryInfo): Repository[Package] = {
       new ComposedRepository(
-        repositoryInfo.urls.map(repositoryFromUrl) ++ List(packagistRepository).filter(_ => repositoryInfo.packagist)
+        repositoryInfo.urls.map(repositoryFromUrl).map(_.map(mapPackage)) ++ List(packagistRepository).filter(_ => repositoryInfo.packagist)
       )
     }
   }

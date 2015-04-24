@@ -14,7 +14,7 @@ class DefaultRepositoryFactoryTest {
 
     //given
 
-    val factory = new DefaultRepositoryFactory(url => new InMemoryRepository(List(url)), packagistRepository)
+    val factory = new DefaultRepositoryFactory(url => new InMemoryRepository(List(url)), packagistRepository, pkg => pkg)
 
     //when
 
@@ -29,7 +29,7 @@ class DefaultRepositoryFactoryTest {
   def givenPackagistRepository_createdRepositoryShouldContainsAlsoPackagistRepo(): Unit = {
     //given
 
-    val factory = new DefaultRepositoryFactory(url => new InMemoryRepository(List(url)), packagistRepository)
+    val factory = new DefaultRepositoryFactory(url => new InMemoryRepository(List(url)), packagistRepository, pkg => pkg)
 
     //when
 
