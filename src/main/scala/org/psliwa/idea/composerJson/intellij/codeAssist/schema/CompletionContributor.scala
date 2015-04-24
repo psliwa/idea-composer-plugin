@@ -14,14 +14,14 @@ class CompletionContributor extends AbstractCompletionContributor {
   import AbstractCompletionContributor._
 
   override protected def getCompletionProvidersForSchema(s: Schema, parent: Capture): List[(Capture, CompletionProvider[CompletionParameters])] = s match {
-    case SStringChoice(m) => List((psiElement().withSuperParent(2, parent), new LookupElementsCompletionProvider(() => m.map(new BaseLookupElement(_)))))
+    case SStringChoice(m) => List((psiElement().withSuperParent(2, parent), new LookupElementsCompletionProvider(_ => m.map(new BaseLookupElement(_)))))
     case _ => List()
   }
 
   override protected def propertyCompletionProvider(parent: Capture, properties: Map[String, Property]) = {
     propertyCompletionProvider(
       parent,
-      () => properties.map(x => new BaseLookupElement(x._1, description = x._2.description)),
+      (_: CompletionParameters) => properties.map(x => new BaseLookupElement(x._1, description = x._2.description)),
       (k) => insertHandlerFor(properties.get(k.name).get.schema)
     )
   }

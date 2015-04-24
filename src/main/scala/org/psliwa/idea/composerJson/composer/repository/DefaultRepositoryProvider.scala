@@ -5,7 +5,7 @@ import org.psliwa.idea.composerJson.composer.parsers.{JsonParsers, RepositoryPac
 import org.psliwa.idea.composerJson.util.IO
 import scala.collection.mutable
 
-class DefaultRepositoryProvider[Package](repositoryFactory: RepositoryFactory[Package]) extends RepositoryProvider[Package] {
+class DefaultRepositoryProvider[Package](repositoryFactory: RepositoryFactory[Package], defaultRepository: Repository[Package]) extends RepositoryProvider[Package] {
 
   //simple to use constructor with default RepositoryFactory and default configuration
   def this(packagistRepository: Repository[Package], mapPackage: String => Package) = {
@@ -14,7 +14,8 @@ class DefaultRepositoryProvider[Package](repositoryFactory: RepositoryFactory[Pa
         DefaultRepositoryProvider.repositoryFromUrl(IO.loadUrl, JsonParsers.parsePackages),
         packagistRepository,
         mapPackage
-      )
+      ),
+      packagistRepository
     )
   }
 
@@ -33,7 +34,7 @@ class DefaultRepositoryProvider[Package](repositoryFactory: RepositoryFactory[Pa
     val repository = infos
       .get(file)
       .map(repositoryFactory.repositoryFor)
-      .get
+      .getOrElse(defaultRepository)
 
     repositories(file) = repository
 

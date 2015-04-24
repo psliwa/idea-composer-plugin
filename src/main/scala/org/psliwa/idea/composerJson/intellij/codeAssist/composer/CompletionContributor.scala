@@ -15,25 +15,15 @@ import intellij.codeAssist._
 import org.psliwa.idea.composerJson.json.{SPackages, Schema, SObject, SStringChoice}
 import org.psliwa.idea.composerJson.util.CharOffsetFinder._
 import org.psliwa.idea.composerJson.util.OffsetFinder.ImplicitConversions._
-import org.psliwa.idea.composerJson.util.Funcs._
 import org.psliwa.idea.composerJson.util.ImplicitConversions._
 
 import scala.annotation.tailrec
 import scala.collection.Seq
 
-//TODO: use repositoryProvider
 class CompletionContributor extends AbstractCompletionContributor {
 
-  //vars only for testability
-  private var packagesLoader: () => Seq[BaseLookupElement] = () => PackagesLoader.loadPackageLookupElements
-  private var versionsLoader: (String) => Seq[String] = memorize(30)(Packagist.loadVersions(_).right.getOrElse(List()))
-
-  private val packagistRepository: Repository[BaseLookupElement] = new Repository[BaseLookupElement] {
-    override def getPackages: Seq[BaseLookupElement] = packagesLoader()
-    override def getPackageVersions(pkg: String) = versionsLoader(pkg)
-    override def map[NewPackage](f: (BaseLookupElement) => NewPackage): Repository[NewPackage] = ???
-  }
-  //  private var repositoryProvider: (String) => Repository[BaseLookupElement] = PackagesLoader.repositoryProvider.repositoryFor
+  //var only for testability
+  private var repositoryProvider: (String) => Repository[BaseLookupElement] = PackagesLoader.repositoryProvider.repositoryFor
 
   lazy private val minimumStabilities: List[String] = for {
     schema <- maybeSchema.toList
@@ -53,11 +43,10 @@ class CompletionContributor extends AbstractCompletionContributor {
           new VersionCompletionProvider(context => {
             val query = context.typedQuery.stripQuotes
             val pattern = "^(?i).*@[a-z]*$".r
-
             query match {
               case pattern() => minimumStabilities.map(new BaseLookupElement(_))
               case _ => {
-                loadVersions(context.propertyName)
+                loadVersions(context.completionParameters)(context.propertyName)
                   .flatMap(Version.alternativesForPrefix(context.typedQuery))
                   .distinct
                   .view
@@ -72,41 +61,30 @@ class CompletionContributor extends AbstractCompletionContributor {
     case _ => List()
   }
 
-//  private def loadPackages(context: CompletionParameters) = repositoryProvider(context.getOriginalFile.getVirtualFile.getCanonicalPath).getPackages
-//  private def loadVersions(context: CompletionParameters)(pkg: String) = repositoryProvider(context.getOriginalFile.getVirtualFile.getCanonicalPath).getPackageVersions(pkg)
+  private def loadPackages(context: CompletionParameters) = repositoryProvider(context.getOriginalFile.getVirtualFile.getCanonicalPath).getPackages
+  private def loadVersions(context: CompletionParameters)(pkg: String) = repositoryProvider(context.getOriginalFile.getVirtualFile.getCanonicalPath).getPackageVersions(pkg)
 
   protected[composer] def setPackagesLoader(l: () => Seq[BaseLookupElement]): Unit = {
-    packagesLoader = l
+    val previousRepositoryProvider = repositoryProvider
+    repositoryProvider = (file: String) => {
+      createRepository(l, previousRepositoryProvider(file).getPackageVersions)
+    }
+  }
+
+  private def createRepository(packagesLoader: () => Seq[BaseLookupElement], versionsLoader: (String) => Seq[String]) = {
+    new Repository[BaseLookupElement] {
+      override def getPackages: scala.Seq[BaseLookupElement] = packagesLoader()
+      override def getPackageVersions(pkg: String): scala.Seq[String] = versionsLoader(pkg)
+      override def map[NewPackage](f: (BaseLookupElement) => NewPackage): Repository[NewPackage] = new CallbackRepository(getPackages.map(f), getPackageVersions)
+    }
   }
 
   protected[composer] def setVersionsLoader(l: (String) => Seq[String]): Unit = {
-    versionsLoader = l
+    val previousRepositoryProvider = repositoryProvider
+    repositoryProvider = (file: String) => {
+      createRepository(previousRepositoryProvider(file).getPackages _, l)
+    }
   }
-
-  private def loadPackages() = packagistRepository.getPackages
-  private def loadVersions(s: String) = packagistRepository.getPackageVersions(s)
-
-  //  protected[composer] def setPackagesLoader(l: () => Seq[BaseLookupElement]): Unit = {
-  //    val previousRepositoryProvider = repositoryProvider
-  //    repositoryProvider = (file: String) => {
-  //      new Repository[BaseLookupElement] {
-  //        override def getPackages: scala.Seq[BaseLookupElement] = l()
-  //        override def getPackageVersions(pkg: String): scala.Seq[String] = previousRepositoryProvider(file).getPackageVersions(pkg)
-  //        override def map[NewPackage](f: (BaseLookupElement) => NewPackage): Repository[NewPackage] = new CallbackRepository(getPackages.map(f), getPackageVersions)
-  //      }
-  //    }
-  //  }
-  //
-  //  protected[composer] def setVersionsLoader(l: (String) => Seq[String]): Unit = {
-  //    val previousRepositoryProvider = repositoryProvider
-  //    repositoryProvider = (file: String) => {
-  //      new Repository[BaseLookupElement] {
-  //        override def getPackages: scala.Seq[BaseLookupElement] = previousRepositoryProvider(file).getPackages
-  //        override def getPackageVersions(pkg: String): scala.Seq[String] = l(pkg)
-  //        override def map[NewPackage](f: (BaseLookupElement) => NewPackage): Repository[NewPackage] = new CallbackRepository(getPackages.map(f), getPackageVersions)
-  //      }
-  //    }
-  //  }
 
   private def ensureSchemaObject(s: Schema): Option[SObject] = s match {
     case x: SObject => Some(x)

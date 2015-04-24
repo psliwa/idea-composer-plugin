@@ -6,7 +6,8 @@ import org.psliwa.idea.composerJson.composer.repository.DefaultRepositoryProvide
 
 class DefaultRepositoryProviderTest {
   val repositoryFactory = new FakeRepositoryFactory()
-  val provider = new DefaultRepositoryProvider(repositoryFactory)
+  val defaultRepository = new InMemoryRepository(List("some/package123321"))
+  val provider = new DefaultRepositoryProvider(repositoryFactory, defaultRepository)
 
   @Test
   def givenRepositoryInfoForFile_repositoryShouldBeCreatedByFactory(): Unit = {
@@ -54,6 +55,13 @@ class DefaultRepositoryProviderTest {
     //then
 
     assertEquals(changedRepository, actualRepository)
+  }
+
+  @Test
+  def givenFileHasNotRepositoryInfo_defaultRepositoryShouldBeUsed() = {
+    val repository = provider.repositoryFor("some-file")
+
+    assertEquals(defaultRepository, repository)
   }
 }
 

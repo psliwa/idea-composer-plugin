@@ -32,7 +32,7 @@ class PackagesLoader extends ApplicationComponent {
 }
 
 object PackagesLoader {
-  lazy val loadPackageLookupElements = loadPackages.map(new BaseLookupElement(_, Some(Icons.Packagist)))
+  private lazy val loadPackageLookupElements = loadPackages.map(new BaseLookupElement(_, Some(Icons.Packagist)))
 
   private lazy val loadPackages = {
     if(isUnitTestMode) Nil

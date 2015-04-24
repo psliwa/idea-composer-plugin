@@ -87,7 +87,7 @@ object AbstractCompletionContributor {
           property <- obj.getPropertyList
         } yield property.getName
 
-        es()
+        es(context)
           .filter(element => !existingProperties.contains(element.getLookupString))
           .toSeq
       }, getInsertHandler)
@@ -131,7 +131,7 @@ object AbstractCompletionContributor {
     extends AbstractCompletionProvider {
 
     override def addCompletions(parameters: CompletionParameters, context: ProcessingContext, result: CompletionResultSet): Unit = {
-      addLookupElementsToResult(es(), getInsertHandler)(parameters, result)
+      addLookupElementsToResult(es(parameters), getInsertHandler)(parameters, result)
     }
   }
 }
