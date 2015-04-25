@@ -11,7 +11,7 @@ class RepositoryFromUrlTest {
 
     //given
 
-    val url = "some-url"
+    val url = "http://some-url"
     val content = "content"
     val repositoryPackages = new RepositoryPackages(Map("package" -> List("1.0.0")), List())
 
@@ -49,15 +49,16 @@ class RepositoryFromUrlTest {
 
     //given
 
-    val url = "some-url"
-    val includeUrl = "some-include-url"
+    val rootUrl = "http://some-url.com"
+    val url = rootUrl+"/packages.json"
+    val includePath = "some-include-url"
     val content = "some-content"
     val includeContent = "some-include-content"
 
-    val repositoryPackages = new RepositoryPackages(Map("package" -> List("1.0.0")), List(includeUrl))
+    val repositoryPackages = new RepositoryPackages(Map("package" -> List("1.0.0")), List(includePath))
     val includeRepositoryPackages = new RepositoryPackages(Map("package2" -> List("2.0.0")), List())
 
-    val load = loadUrl(Map(url -> content, includeUrl -> includeContent)) _
+    val load = loadUrl(Map(url -> content, rootUrl+"/"+includePath -> includeContent)) _
     val parse = parsePackages(Map(content -> repositoryPackages, includeContent -> includeRepositoryPackages)) _
 
     //when
@@ -74,7 +75,8 @@ class RepositoryFromUrlTest {
   def givenNestedIncludesInContents_includesShouldAlsoBeLoaded() = {
     //given
 
-    val url = "some-url"
+    val rootUrl = "http://some-url.com"
+    val url = rootUrl+"/packages.json"
     val include1Url = "some-include1-url"
     val include2Url = "some-include2-url"
 
@@ -86,7 +88,7 @@ class RepositoryFromUrlTest {
     val include1RepositoryPackages = new RepositoryPackages(Map(), List(include2Url))
     val include2RepositoryPackages = new RepositoryPackages(Map("package" -> Seq("1.0.0")), List())
 
-    val load = loadUrl(Map(url -> content, include1Url -> include1Content, include2Url -> include2Content)) _
+    val load = loadUrl(Map(url -> content, rootUrl+"/"+include1Url -> include1Content, rootUrl+"/"+include2Url -> include2Content)) _
     val parse = parsePackages(Map(content -> repositoryPackages, include1Content -> include1RepositoryPackages, include2Content -> include2RepositoryPackages)) _
 
 

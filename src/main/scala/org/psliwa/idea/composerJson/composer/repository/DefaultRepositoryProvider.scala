@@ -66,6 +66,9 @@ object DefaultRepositoryProvider {
 
     //TODO: par?
 
+    val rootUrl = "http(s?)://[^/]+".r.findFirstIn(url).getOrElse(url)
+    def buildUrl(uri: String): String = rootUrl+"/"+uri
+
     def loadPackages(url: String): Option[RepositoryPackages] = {
       for {
         data <- loadUrl(url).right.toOption
@@ -76,12 +79,12 @@ object DefaultRepositoryProvider {
     def loadPackagesFromUrls(urls: Seq[String]): Map[String,Seq[String]] = {
       urls
         .flatMap(url => loadPackages(url).toList)
-        .flatMap(pkgs => Seq(pkgs, new RepositoryPackages(loadPackagesFromUrls(pkgs.includes), Nil)))
+        .flatMap(pkgs => Seq(pkgs, new RepositoryPackages(loadPackagesFromUrls(pkgs.includes.map(buildUrl)), Nil)))
         .foldLeft(Map[String,Seq[String]]())((map, pkgs) => map ++ pkgs.packages)
     }
 
     val maybeRepository = loadPackages(url)
-      .map(pkgs => pkgs.packages ++ loadPackagesFromUrls(pkgs.includes))
+      .map(pkgs => pkgs.packages ++ loadPackagesFromUrls(pkgs.includes.map(buildUrl)))
       .map(pkgs => new InMemoryRepository(pkgs.keys.toList, pkgs))
 
     maybeRepository.getOrElse(EmptyRepository)

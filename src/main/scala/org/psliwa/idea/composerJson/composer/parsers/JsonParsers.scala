@@ -1,7 +1,7 @@
 package org.psliwa.idea.composerJson.composer.parsers
 
 import org.psliwa.idea.composerJson.composer._
-import scala.util.parsing.json.{JSONArray, JSONObject, JSON}
+import scala.util.parsing.json.{JSONType, JSONArray, JSONObject, JSON}
 
 object JsonParsers {
 
@@ -72,8 +72,9 @@ object JsonParsers {
   }
 
   def parsePackages(data: String): Either[Error, RepositoryPackages] = {
-    def getPackagesFrom(obj: JSONObject): Option[Map[String,Seq[String]]] = {
+    def getPackagesFrom(json: Any): Option[Map[String,Seq[String]]] = {
       val packages: Map[String,Seq[String]] = (for {
+        obj <- tryJsonObject(json).toList
         packageName <- obj.obj.keys
         packageObject <- obj.obj.get(packageName)
         packageObject <- tryJsonObject(packageObject)
@@ -91,7 +92,6 @@ object JsonParsers {
     val packages = for {
       root <- maybeRoot
       packagesElement <- root.obj.get("packages")
-      packagesElement <- tryJsonObject(packagesElement)
       packages <- getPackagesFrom(packagesElement)
     } yield packages
 

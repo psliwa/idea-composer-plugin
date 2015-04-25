@@ -2,6 +2,7 @@ package org.psliwa.idea.composerJson.intellij.codeAssist.composer
 
 import com.intellij.codeInsight.completion._
 import com.intellij.json.psi.{JsonFile, JsonProperty}
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.patterns.PlatformPatterns._
 import com.intellij.psi.PsiElement
 import org.psliwa.idea.composerJson.{intellij, Icons}
@@ -23,7 +24,10 @@ import scala.collection.Seq
 class CompletionContributor extends AbstractCompletionContributor {
 
   //var only for testability
-  private var repositoryProvider: (String) => Repository[BaseLookupElement] = PackagesLoader.repositoryProvider.repositoryFor
+  private var repositoryProvider: (String) => Repository[BaseLookupElement] = getPackagesLoader
+    .map(_.repositoryProvider)
+    .getOrElse(EmptyRepositoryProvider)
+    .repositoryFor
 
   lazy private val minimumStabilities: List[String] = for {
     schema <- maybeSchema.toList
@@ -94,6 +98,10 @@ class CompletionContributor extends AbstractCompletionContributor {
   private def ensureSchemaChoice(s: Schema): Option[SStringChoice] = s match {
     case x: SStringChoice => Some(x)
     case _ => None
+  }
+
+  private def getPackagesLoader: Option[PackagesLoader] = {
+    Option(ApplicationManager.getApplication.getComponent(classOf[PackagesLoader]))
   }
 }
 

@@ -177,4 +177,22 @@ class JsonParsersTest {
     assertTrue(result.isRight)
     assertEquals(RepositoryPackages(Map(), List("some-include.json")), result.right.get)
   }
+
+  @Test
+  def parsePackages_givenPackagesAsArray_givenIncludes_expectIncludesInResult() = {
+    val json =
+      """
+        |{
+        |  "packages": [],
+        |  "includes": {
+        |    "some-include.json": {}
+        |  }
+        |}
+      """.stripMargin
+
+    val result = JsonParsers.parsePackages(json)
+
+    assertTrue(result.isRight)
+    assertEquals(RepositoryPackages(Map(), List("some-include.json")), result.right.get)
+  }
 }
