@@ -9,7 +9,7 @@ This plugin provides:
 
 * completion for:
     * composer.json schema
-    * package names and version (in require, require-dev etc)
+    * package names and version (in require, require-dev etc) from packagist repository and custom repositories defined in composer.json file (only "composer" repository type is supported right now)
     * filepath completion (in bin, autoload etc)
     * class and static method names in "scripts" properties
     * namespaces eg. in "autoload.psr-0" property
@@ -20,6 +20,7 @@ This plugin provides:
     * misconfiguration + quick fixes
     * version constraints misconfiguration + quick fixes
     * not installed packages + install quick fix
+    * scripts callbacks (class names and method signature)
 
 * navigation for (eg. by Ctrl+LMB):
     * class and method names in "scripts" properties
@@ -38,8 +39,8 @@ This plugin provides:
 
 ## Whats next?
 
-* improve completion (support for custom repositories)
-* improve inspections (detect misconfiguration, detect not existing namespaces in "autoload.psr-0", detect invalid callback in "scripts")
+* improve support for custom repositories - support for inline repositories
+* improve inspections (detect misconfiguration, detect not existing namespaces in "autoload.psr-0")
 * and more ;)
 
 [1]: https://plugins.jetbrains.com/files/7631/screenshot_14847.png
