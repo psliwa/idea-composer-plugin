@@ -3,6 +3,7 @@ package org.psliwa.idea.composerJson.intellij.codeAssist.composer
 import com.intellij.codeInsight.completion._
 import com.intellij.json.psi.{JsonFile, JsonProperty}
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.project.Project
 import com.intellij.patterns.PlatformPatterns._
 import com.intellij.psi.PsiElement
 import org.psliwa.idea.composerJson.{intellij, Icons}
@@ -24,10 +25,10 @@ import scala.collection.Seq
 class CompletionContributor extends AbstractCompletionContributor {
 
   //var only for testability
-  private var repositoryProvider: (String) => Repository[BaseLookupElement] = getPackagesLoader
-    .map(_.repositoryProvider)
+  private var repositoryProvider: (Project, String) => Repository[BaseLookupElement] = (project, file) => getPackagesLoader
+    .map(_.repositoryProviderFor(project))
     .getOrElse(EmptyRepositoryProvider)
-    .repositoryFor
+    .repositoryFor(file)
 
   lazy private val minimumStabilities: List[String] = for {
     schema <- maybeSchema.toList
@@ -65,13 +66,17 @@ class CompletionContributor extends AbstractCompletionContributor {
     case _ => List()
   }
 
-  private def loadPackages(context: CompletionParameters) = repositoryProvider(context.getOriginalFile.getVirtualFile.getCanonicalPath).getPackages
-  private def loadVersions(context: CompletionParameters)(pkg: String) = repositoryProvider(context.getOriginalFile.getVirtualFile.getCanonicalPath).getPackageVersions(pkg)
+  private def loadPackages(context: CompletionParameters) = {
+    repositoryProvider(context.getOriginalFile.getProject, context.getOriginalFile.getVirtualFile.getCanonicalPath).getPackages
+  }
+  private def loadVersions(context: CompletionParameters)(pkg: String) = {
+    repositoryProvider(context.getOriginalFile.getProject, context.getOriginalFile.getVirtualFile.getCanonicalPath).getPackageVersions(pkg)
+  }
 
   protected[composer] def setPackagesLoader(l: () => Seq[BaseLookupElement]): Unit = {
     val previousRepositoryProvider = repositoryProvider
-    repositoryProvider = (file: String) => {
-      createRepository(l, previousRepositoryProvider(file).getPackageVersions)
+    repositoryProvider = (project: Project, file: String) => {
+      createRepository(l, previousRepositoryProvider(project, file).getPackageVersions)
     }
   }
 
@@ -85,8 +90,8 @@ class CompletionContributor extends AbstractCompletionContributor {
 
   protected[composer] def setVersionsLoader(l: (String) => Seq[String]): Unit = {
     val previousRepositoryProvider = repositoryProvider
-    repositoryProvider = (file: String) => {
-      createRepository(previousRepositoryProvider(file).getPackages _, l)
+    repositoryProvider = (project: Project, file: String) => {
+      createRepository(previousRepositoryProvider(project, file).getPackages _, l)
     }
   }
 

@@ -53,6 +53,27 @@ class RepositoryUpdaterTest extends InspectionTest {
     assertRepositories(List(), includePackagist = false)
   }
 
+  def testRepositoryInfoShouldBeClearedWhenRepositoriesPropertyWasRemoved() = {
+    checkInspection(
+      s"""{
+         |  "repositories": [
+         |    {
+         |      "type": "composer",
+         |      "url": "http://some-repo.org"
+         |    }
+         |  ]
+         |}""".stripMargin
+    )
+
+    checkInspection(
+      """
+        |{}
+      """.stripMargin
+    )
+
+    assertRepositories(List(), includePackagist = true)
+  }
+
   def testGivenDirectlyIncludedPackagistRepo_thereShouldBeIncludedPackagistRepo() = {
     checkInspection(
       s"""{
@@ -87,13 +108,13 @@ class RepositoryUpdaterTest extends InspectionTest {
 
   private def getRepositoryProvider: TestingRepositoryProvider = {
     Option(ApplicationManager.getApplication.getComponent(classOf[PackagesLoader]))
-      .map(_.repositoryProvider)
+      .map(_.repositoryProviderFor(myFixture.getProject))
       .map(_.asInstanceOf[TestingRepositoryProvider])
       .get
   }
 
   override def tearDown(): Unit = {
-    super.tearDown()
     clearRepositories()
+    super.tearDown()
   }
 }

@@ -218,8 +218,9 @@ class PackageVersionQuickFixesTest extends InspectionTest {
   }
 
   private def assertPatternExcluded(pkg: String) {
+    import scala.collection.JavaConverters._
     assertTrue(
-      ComposerJsonSettings(myFixture.getProject).getUnboundedVersionInspectionSettings.getExcludedPatterns.exists(_.getPattern == pkg)
+      ComposerJsonSettings(myFixture.getProject).getUnboundedVersionInspectionSettings.getValues().asScala.exists(_.getPattern == pkg)
     )
   }
 
