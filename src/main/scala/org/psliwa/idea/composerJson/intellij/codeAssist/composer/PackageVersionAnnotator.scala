@@ -179,18 +179,5 @@ class PackageVersionAnnotator extends Annotator {
 private object PackageVersionAnnotator {
   import org.psliwa.idea.composerJson.util.Funcs._
   val parseVersion: (String) => Option[Constraint] = memorize(40)(Parser.parse)
-  val pattern = psiElement(classOf[JsonStringLiteral])
-    .inFile(psiFile(classOf[JsonFile]).withName(ComposerJson))
-    .withLanguage(JsonLanguage.INSTANCE)
-    .afterLeaf(":")
-    .withParent(
-      psiElement(classOf[JsonProperty]).withParent(
-        psiElement(classOf[JsonObject]).withParent(
-          or(
-            psiElement(classOf[JsonProperty]).withName("require"),
-            psiElement(classOf[JsonProperty]).withName("require-dev")
-          )
-        )
-      )
-    )
+  val pattern = packageElement.afterLeaf(":")
 }

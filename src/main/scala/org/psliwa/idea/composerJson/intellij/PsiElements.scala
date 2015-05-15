@@ -4,6 +4,7 @@ import com.intellij.json.JsonLanguage
 import com.intellij.json.psi._
 import com.intellij.patterns.PlatformPatterns._
 import com.intellij.patterns.PsiElementPattern
+import com.intellij.psi.impl.source.tree.LeafPsiElement
 import com.intellij.psi.{PsiElement, PsiFile}
 import org.psliwa.idea.composerJson._
 
