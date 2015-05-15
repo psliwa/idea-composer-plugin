@@ -198,6 +198,25 @@ class PackageVersionQuickFixesTest extends InspectionTest {
     )
   }
 
+  def testGivenRequireDev_normalizeNsrVersionToRange() = {
+    checkQuickFix(SetEquivalentPackageVersionQuickFix(">=1.2.3 <1.3.0"))(
+      """
+        |{
+        |  "require-dev": {
+        |    "vendor/pkg": "~1.2.3"
+        |  }
+        |}
+      """.stripMargin,
+      """
+        |{
+        |  "require-dev": {
+        |    "vendor/pkg": ">=1.2.3 <1.3.0"
+        |  }
+        |}
+      """.stripMargin
+    )
+  }
+
   def testNormalizeRangeVersionToNsr() = {
     checkQuickFix(SetEquivalentPackageVersionQuickFix("~1.2.3"))(
       """

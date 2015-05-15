@@ -186,7 +186,10 @@ private object PackageVersionAnnotator {
     .withParent(
       psiElement(classOf[JsonProperty]).withParent(
         psiElement(classOf[JsonObject]).withParent(
-          psiElement(classOf[JsonProperty]).withName("require")
+          or(
+            psiElement(classOf[JsonProperty]).withName("require"),
+            psiElement(classOf[JsonProperty]).withName("require-dev")
+          )
         )
       )
     )
