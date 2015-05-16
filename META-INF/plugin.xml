@@ -180,6 +180,8 @@ This plugin adds auto completion and inspections support for composer.json file 
                 />
         <documentationProvider implementation="org.psliwa.idea.composerJson.intellij.codeAssist.composer.PackageDocumentationProvider"
                 />
+        <documentationProvider implementation="org.psliwa.idea.composerJson.intellij.codeAssist.schema.SchemaDocumentationProvider"
+                />
     </extensions>
 
     <application-components>
