@@ -6,7 +6,6 @@ import com.intellij.lang.documentation.DocumentationProvider
 import com.intellij.psi.{PsiManager, PsiElement}
 import org.psliwa.idea.composerJson.json.{SArray, SObject, Property, Schema}
 import org.psliwa.idea.composerJson._
-import org.psliwa.idea.composerJson.intellij.PsiElements._
 
 class SchemaDocumentationProvider extends DocumentationProvider {
   import SchemaDocumentationProvider._
@@ -21,7 +20,12 @@ class SchemaDocumentationProvider extends DocumentationProvider {
   override def getDocumentationElementForLink(psiManager: PsiManager, link: String,
     context: PsiElement): PsiElement = null
 
-  override def getUrlFor(element: PsiElement, originalElement: PsiElement): util.List[String] = null
+  override def getUrlFor(element: PsiElement, originalElement: PsiElement): util.List[String] = {
+    findTokens(originalElement) match {
+      case PropertyToken(name)::_ => util.Arrays.asList("https://getcomposer.org/doc/04-schema.md#"+name)
+      case _ => null
+    }
+  }
 
   override def generateDoc(element: PsiElement, originalElement: PsiElement): String = {
     findProperty(originalElement)

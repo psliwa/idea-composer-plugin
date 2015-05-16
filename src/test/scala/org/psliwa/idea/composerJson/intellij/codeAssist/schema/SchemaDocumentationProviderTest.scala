@@ -44,4 +44,15 @@ class SchemaDocumentationProviderTest extends DocumentationTest {
       "Full name of the author."
     )
   }
+
+  def testGivenPropertyInTopLevel_externalDocUrlShouldExist() = {
+    checkDocumentation(
+      """
+        |{
+        |  "nam<caret>e": ""
+        |}
+      """.stripMargin,
+      List("getcomposer.org/doc/04-schema.md#name")
+    )
+  }
 }
