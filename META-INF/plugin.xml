@@ -1,7 +1,7 @@
 <idea-plugin version="2">
   <id>org.psliwa.idea.composer</id>
   <name>PHP composer.json support</name>
-  <version>1.0.4</version>
+  <version>1.0.5</version>
   <vendor email="me@psliwa.org" url="http://github.org/psliwa/idea-composer-plugin">psliwa</vendor>
 
     <description><![CDATA[
@@ -11,6 +11,13 @@ This plugin adds auto completion and inspections support for composer.json file 
     ]]></description>
 
   <change-notes><![CDATA[
+<h2>1.0.5</h2>
+<ul>
+  <li>[#6] External docs (shift+f1) for packages</li>
+  <li>External docs (shift+f1) and quick docs (ctrl+q) for properties</li>
+  <li>Version inspections also work in require-dev property</li>
+</ul>
+
 <h2>1.0.4</h2>
 <ul>
   <li>BETA: Custom repositories support in packages and versions code completion. "composer" repository type is only supported right now, so satis is supported as well. You should enable this feature explicitly for each composer.json file in notification that would be shown when you define custom repositories.</li>

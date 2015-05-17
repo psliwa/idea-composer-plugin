@@ -28,6 +28,10 @@ This plugin provides:
     * package directory (eg. in "require", "require-dev")
     * urls and emails (eg. in "homepage")
 
+* documentation:
+    * external documentation (`shift+f1`) for packages
+    * quick docs (`ctrl+q`) and external docs (`shift+f1`) for properties
+
 * others:
     * show current installed version from `composer.lock`
 
