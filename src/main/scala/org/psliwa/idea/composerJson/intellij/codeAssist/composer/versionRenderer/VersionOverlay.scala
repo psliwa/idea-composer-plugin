@@ -125,15 +125,24 @@ class VersionOverlay extends ApplicationComponent {
 
       for{
         packageVersion <- packageVersionsMap.getOrElse(filePath, List[PackageVersion]())
-        offset = endLineOffset(packageVersion.offset) if offset == caretOffset
+        offset <- endLineOffset(packageVersion.offset)
+        if caretOffset.exists(_ == offset)
       } {
         val point = editor.visualPositionToXY(editor.offsetToVisualPosition(offset))
         g.drawString(versionPresentation(packageVersion), point.x + horizontalMargin, point.y + editor.getLineHeight - verticalAlignment)
       }
     }
 
-    private def endLineOffset(offset: Int): Int = {
-      editor.getDocument.getLineEndOffset(StringUtil.offsetToLineNumber(editor.getDocument.getCharsSequence, offset))
+    private def endLineOffset(offset: Int): Option[Int] = {
+      lineNumber(editor.getDocument.getCharsSequence, offset)
+        .map(editor.getDocument.getLineEndOffset)
+    }
+
+    private def lineNumber(s: CharSequence, offset: Int): Option[Int] = {
+      val lineNumber = StringUtil.offsetToLineNumber(editor.getDocument.getCharsSequence, offset)
+
+      if(lineNumber >= 0) Option(lineNumber)
+      else None
     }
 
     override def componentResized(e: ComponentEvent): Unit = {

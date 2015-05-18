@@ -14,6 +14,7 @@ This plugin adds auto completion and inspections support for composer.json file 
 <h2>1.0.6</h2>
 <ul>
   <li>[#7] Fix NullPointerException in files other than composer.json</li>
+  <li>Fix NullPointerException while rendering current installed package version in erased file</li>
 </ul>
 
 <h2>1.0.5</h2>
