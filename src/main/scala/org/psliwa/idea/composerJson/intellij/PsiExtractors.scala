@@ -6,7 +6,7 @@ import com.intellij.psi.impl.source.tree.LeafPsiElement
 
 private object PsiExtractors {
   object JsonFile {
-    def unapply(x: JsonFile): Option[(JsonValue)] = Option(x.getTopLevelValue)
+    def unapply(x: JsonFile): Option[(Option[JsonValue])] = Option(Option(x.getTopLevelValue))
   }
 
   object JsonObject {

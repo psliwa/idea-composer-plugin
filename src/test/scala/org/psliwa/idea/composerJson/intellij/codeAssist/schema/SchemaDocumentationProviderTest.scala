@@ -3,6 +3,7 @@ package org.psliwa.idea.composerJson.intellij.codeAssist.schema
 import com.intellij.lang.documentation.DocumentationProvider
 import org.psliwa.idea.composerJson.intellij.codeAssist.DocumentationTest
 import org.junit.Assert._
+import org.psliwa.idea.composerJson._
 
 class SchemaDocumentationProviderTest extends DocumentationTest {
   override protected def documentationProvider: DocumentationProvider = new SchemaDocumentationProvider
@@ -69,5 +70,17 @@ class SchemaDocumentationProviderTest extends DocumentationTest {
       doc => Unit,
       "some.json"
     )
+  }
+
+  def testGivenFileWithNewLine_thereShouldNotBeNullPointerEx(): Unit = {
+    val s =  """
+               |<caret>
+               |
+             """.stripMargin
+    myFixture.configureByText(ComposerJson, s.replace("\r", ""))
+
+    val element = myFixture.getElementAtCaret
+    documentationProvider.getUrlFor(element, element)
+
   }
 }
