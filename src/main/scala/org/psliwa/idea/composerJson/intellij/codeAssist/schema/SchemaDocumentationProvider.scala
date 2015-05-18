@@ -4,6 +4,7 @@ import java.util
 
 import com.intellij.lang.documentation.DocumentationProvider
 import com.intellij.psi.{PsiManager, PsiElement}
+import com.intellij.patterns.PlatformPatterns._
 import org.psliwa.idea.composerJson.json.{SArray, SObject, Property, Schema}
 import org.psliwa.idea.composerJson._
 
@@ -21,16 +22,26 @@ class SchemaDocumentationProvider extends DocumentationProvider {
     context: PsiElement): PsiElement = null
 
   override def getUrlFor(element: PsiElement, originalElement: PsiElement): util.List[String] = {
-    findTokens(originalElement) match {
-      case PropertyToken(name)::_ => util.Arrays.asList("https://getcomposer.org/doc/04-schema.md#"+name)
-      case _ => null
+    ensureInValidFile(originalElement).map(
+      findTokens(_) match {
+        case PropertyToken(name)::_ => util.Arrays.asList("https://getcomposer.org/doc/04-schema.md#"+name)
+        case _ => null
+      }
+    ).orNull
+  }
+
+  private def ensureInValidFile(element: PsiElement): Option[PsiElement] = {
+    if(pattern.accepts(element)) {
+      Some(element)
+    } else {
+      None
     }
   }
 
   override def generateDoc(element: PsiElement, originalElement: PsiElement): String = {
-    findProperty(originalElement)
-      .map(_.description)
-      .orNull
+    ensureInValidFile(originalElement).flatMap(
+      findProperty(_).map(_.description)
+    ).orNull
   }
 
   private def findProperty(element: PsiElement): Option[Property] = {
@@ -75,6 +86,10 @@ class SchemaDocumentationProvider extends DocumentationProvider {
 }
 
 private object SchemaDocumentationProvider {
+  import com.intellij.json.psi.JsonFile
+
+  val pattern = psiElement().inFile(psiFile(classOf[JsonFile]).withName(ComposerJson))
+
   private sealed trait SchemaToken
   private case class PropertyToken(name: String) extends SchemaToken
   private case class ArrayToken() extends SchemaToken
