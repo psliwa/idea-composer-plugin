@@ -1,7 +1,7 @@
 package org.psliwa.idea.composerJson.intellij.codeAssist.composer
 
 import com.intellij.openapi.application.ApplicationManager
-import org.psliwa.idea.composerJson.composer.repository.TestingRepositoryProvider
+import org.psliwa.idea.composerJson.composer.repository.{InMemoryRepository, Repository, TestingRepositoryProvider}
 import org.psliwa.idea.composerJson.intellij.codeAssist.InspectionTest
 import org.junit.Assert._
 
@@ -88,13 +88,66 @@ class RepositoryUpdaterTest extends InspectionTest {
     assertRepositories(List(), includePackagist = true)
   }
 
-  private def assertRepositories(expectedUrls: List[String], includePackagist: Boolean = true): Unit = {
+  def testGivenInlinePackage_thereShouldBeInlinePackageInRepository() = {
+    checkInspection(
+      s"""{
+         |  "repositories": [
+         |    {
+         |      "type": "package",
+         |      "package": {
+         |        "name": "inline/package",
+         |        "version": "1.0.8"
+         |      }
+         |    }
+         |  ]
+         |}""".stripMargin
+    )
+
+    assertRepositories(List(), includePackagist = true, Map("inline/package" -> List("1.0.8")))
+  }
+
+  def testGivenTwoInlinePackageVersions_thereShouldBeBothVersionsInRepository() = {
+    checkInspection(
+      s"""{
+         |  "repositories": [
+         |    {
+         |      "type": "package",
+         |      "package": {
+         |        "name": "inline/package",
+         |        "version": "1.0.8"
+         |      }
+         |    },
+         |    {
+         |      "type": "package",
+         |      "package": {
+         |        "name": "inline/package",
+         |        "version": "1.0.9"
+         |      }
+         |    }
+         |  ]
+         |}""".stripMargin
+    )
+
+    assertRepositories(List(), includePackagist = true, Map("inline/package" -> List("1.0.8", "1.0.9")))
+  }
+
+  private def assertRepositories(expectedUrls: List[String], includePackagist: Boolean = true, expectedPackages: Map[String,List[String]] = Map()): Unit = {
     val infos = getRepositoryProvider.infos.get(myFixture.getFile.getVirtualFile.getCanonicalPath)
 
     assertEquals(1, getRepositoryProvider.infos.size)
     assertTrue(infos.isDefined)
     assertEquals(expectedUrls, infos.get.urls)
     assertEquals(includePackagist, infos.get.packagist)
+    val repository = infos.get.repository.getOrElse(new InMemoryRepository[String](List()))
+    assertRepository(repository, expectedPackages)
+  }
+
+  private def assertRepository[A](repository: Repository[A], expectedPackages: Map[String,List[String]]): Unit = {
+    assertTrue(
+      expectedPackages.forall{case(pkg, versions) => {
+        repository.getPackages.contains(pkg) && versions.forall(repository.getPackageVersions(pkg).contains)
+      }}
+    )
   }
 
   override def setUp() = {

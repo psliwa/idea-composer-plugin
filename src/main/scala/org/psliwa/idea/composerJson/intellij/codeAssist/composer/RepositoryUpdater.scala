@@ -9,7 +9,7 @@ import com.intellij.patterns.PlatformPatterns._
 import com.intellij.psi.PsiElement
 import com.intellij.ui.EditorNotifications
 import org.psliwa.idea.composerJson._
-import org.psliwa.idea.composerJson.composer.repository.{RepositoryInfo, RepositoryProvider}
+import org.psliwa.idea.composerJson.composer.repository.{InMemoryRepository, Repository, RepositoryInfo, RepositoryProvider}
 import org.psliwa.idea.composerJson.intellij.PsiElements._
 
 class RepositoryUpdater extends Annotator {
@@ -19,11 +19,12 @@ class RepositoryUpdater extends Annotator {
     if(pattern.accepts(element)) {
       val notifications = Option(element.getProject.getComponent(classOf[EditorNotifications]))
       val urls = getComposerRepositoryUrls(element)
+      val repository = getInlineRepository(element)
       val packagistEnabled = isPackagistEnabled(element)
 
       getRepositoryProvider(element.getProject)
         .map(
-          _.updateRepository(getFilePath(element), new RepositoryInfo(urls, packagistEnabled))
+          _.updateRepository(getFilePath(element), new RepositoryInfo(urls, packagistEnabled, Some(repository)))
         )
         .filter(_ == true)
         .flatMap(_ => notifications)
@@ -40,6 +41,45 @@ class RepositoryUpdater extends Annotator {
       url <- getRepositoryUrls(repositoriesElement)
     } yield url
     urls
+  }
+
+  private def getJsonPropertyValue(objectElement: JsonObject, propertyName: String): Option[JsonElement] = {
+    for {
+      packageProperty <- Option(objectElement.findProperty(propertyName))
+      packageValue <- Option(packageProperty.getValue)
+    } yield packageValue
+  }
+
+  private def getInlineRepository(element: PsiElement): Repository[String] = {
+    val packages = for {
+      repositoriesElement <- repositoriesJsonArray(element)
+      (pkg, version) <- getPackages(repositoriesElement)
+    } yield (pkg, version)
+
+    def update[A,B](map: Map[A,List[B]], pair: (A,B)): Map[A,List[B]] = {
+      map + (pair._1 -> (pair._2 :: map.getOrElse(pair._1, List[B]())))
+    }
+
+    val packagesMap = packages.foldLeft(Map[String,List[String]]())(update)
+
+    new InMemoryRepository(packagesMap.map(_._1).toSeq, packagesMap)
+  }
+
+  private def getPackages(repositoriesElement: JsonArray): Seq[(String, String)] = {
+    //TODO: refactor
+    for {
+      child <- repositoriesElement.getChildren
+      objectElement <- ensureJsonObject(child).toList
+      typeProperty <- Option(objectElement.findProperty("type")).toList
+      repositoryType <- getStringValue(typeProperty.getValue).toList
+      if repositoryType == "package"
+      packageValue <- getJsonPropertyValue(objectElement, "package").toList
+      packageValue <- ensureJsonObject(packageValue).toList
+      packageNameElement <- getJsonPropertyValue(packageValue, "name").toList
+      packageName <- getStringValue(packageNameElement).toList
+      packageVersionElement <- getJsonPropertyValue(packageValue, "version").toList
+      packageVersion <- getStringValue(packageVersionElement).toList
+    } yield (packageName, packageVersion)
   }
 
   private def isPackagistEnabled(element: PsiElement): Boolean = {
