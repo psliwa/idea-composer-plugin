@@ -50,6 +50,10 @@ class RepositoryUpdater extends Annotator {
     } yield packageValue
   }
 
+  private def getJsonPropertyValue[A](objectElement: JsonObject, propertyName: String, f: JsonElement => Option[A]): Option[A] = {
+    getJsonPropertyValue(objectElement, propertyName).flatMap(f)
+  }
+
   private def getInlineRepository(element: PsiElement): Repository[String] = {
     val packages = for {
       repositoriesElement <- repositoriesJsonArray(element)
@@ -66,20 +70,25 @@ class RepositoryUpdater extends Annotator {
   }
 
   private def getPackages(repositoriesElement: JsonArray): Seq[(String, String)] = {
-    //TODO: refactor
+    def mapPackage(objectElement: JsonObject): Option[(String,String)] = {
+      for {
+        packageValue <- getJsonPropertyValue(objectElement, "package", ensureJsonObject)
+        packageName <- getJsonPropertyValue(packageValue, "name", getStringValue)
+        packageVersion <- getJsonPropertyValue(packageValue, "version", getStringValue)
+      } yield (packageName, packageVersion)
+    }
+
+    mapRepositoryElements(repositoriesElement, "package", mapPackage)
+  }
+
+  private def mapRepositoryElements[A](repositoriesElement: JsonArray, requiredRepositoryType: String, f: JsonObject => Option[A]): Seq[A] = {
     for {
       child <- repositoriesElement.getChildren
       objectElement <- ensureJsonObject(child).toList
-      typeProperty <- Option(objectElement.findProperty("type")).toList
-      repositoryType <- getStringValue(typeProperty.getValue).toList
-      if repositoryType == "package"
-      packageValue <- getJsonPropertyValue(objectElement, "package").toList
-      packageValue <- ensureJsonObject(packageValue).toList
-      packageNameElement <- getJsonPropertyValue(packageValue, "name").toList
-      packageName <- getStringValue(packageNameElement).toList
-      packageVersionElement <- getJsonPropertyValue(packageValue, "version").toList
-      packageVersion <- getStringValue(packageVersionElement).toList
-    } yield (packageName, packageVersion)
+      repositoryType <- getJsonPropertyValue(objectElement, "type", getStringValue).toList
+      if repositoryType == requiredRepositoryType
+      value <- f(objectElement).toList
+    } yield value
   }
 
   private def isPackagistEnabled(element: PsiElement): Boolean = {
@@ -87,8 +96,7 @@ class RepositoryUpdater extends Annotator {
       repositoriesElement <- repositoriesJsonArray(element)
       child <- repositoriesElement.getChildren
       objectElement <- ensureJsonObject(child).toList
-      packagistProperty <- Option(objectElement.findProperty("packagist")).toList
-      packagistEnabled <- getBooleanValue(packagistProperty.getValue)
+      packagistEnabled <- getJsonPropertyValue(objectElement, "packagist", getBooleanValue)
     } yield packagistEnabled
 
     !packagistEnabledFlags.contains(false)
@@ -97,8 +105,7 @@ class RepositoryUpdater extends Annotator {
   private def repositoriesJsonArray(element: PsiElement): List[JsonArray] = {
     for {
       obj <- ensureJsonObject(element).toList
-      repositoriesProperty <- Option(obj.findProperty("repositories")).toList
-      repositoriesElement <- ensureJsonArray(repositoriesProperty.getValue).toList
+      repositoriesElement <- getJsonPropertyValue(obj, "repositories", ensureJsonArray).toList
     } yield repositoriesElement
   }
 
@@ -107,17 +114,11 @@ class RepositoryUpdater extends Annotator {
   }
 
   private def getRepositoryUrls(repositoriesElement: JsonArray): Iterable[String] = {
-    import scala.collection.JavaConversions._
+    def mapUrl(objectElement: JsonObject): Option[String] = {
+      getJsonPropertyValue(objectElement, "url", getStringValue).map(_ + "/packages.json")
+    }
 
-    for {
-      child <- repositoriesElement.getChildren
-      objectElement <- ensureJsonObject(child).toList
-      typeProperty <- Option(objectElement.findProperty("type")).toList
-      repositoryType <- getStringValue(typeProperty.getValue).toList
-      if repositoryType == "composer"
-      urlProperty <- Option(objectElement.findProperty("url")).toList
-      url <- getStringValue(urlProperty.getValue).toList
-    } yield url+"/packages.json"
+    mapRepositoryElements(repositoriesElement, "composer", mapUrl)
   }
 }
 

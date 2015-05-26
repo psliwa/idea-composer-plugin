@@ -1,7 +1,7 @@
 package org.psliwa.idea.composerJson.intellij.codeAssist.composer
 
 import com.intellij.openapi.application.ApplicationManager
-import org.psliwa.idea.composerJson.composer.repository.{InMemoryRepository, Repository, TestingRepositoryProvider}
+import org.psliwa.idea.composerJson.composer.repository.{RepositoryInfo, InMemoryRepository, Repository, TestingRepositoryProvider}
 import org.psliwa.idea.composerJson.intellij.codeAssist.InspectionTest
 import org.junit.Assert._
 
@@ -106,6 +106,27 @@ class RepositoryUpdaterTest extends InspectionTest {
     assertRepositories(List(), includePackagist = true, Map("inline/package" -> List("1.0.8")))
   }
 
+  def testGivenIncompleteInlinePackage_repositoryShouldBeEmpty() = {
+    checkInspection(
+      s"""{
+         |  "repositories": [
+         |    {
+         |      "type": "package",
+         |      "package": {
+         |        "version": "inline/package"
+         |      }
+         |    }
+         |  ]
+         |}""".stripMargin
+    )
+
+    val repoInfos = getRepositoryInfo
+    assertTrue(getRepositoryInfo.isDefined)
+
+    val packages = getRepositoryInfo.get.repository.map(_.getPackages).getOrElse(List())
+    assertEquals(List(), packages)
+  }
+
   def testGivenTwoInlinePackageVersions_thereShouldBeBothVersionsInRepository() = {
     checkInspection(
       s"""{
@@ -132,14 +153,18 @@ class RepositoryUpdaterTest extends InspectionTest {
   }
 
   private def assertRepositories(expectedUrls: List[String], includePackagist: Boolean = true, expectedPackages: Map[String,List[String]] = Map()): Unit = {
-    val infos = getRepositoryProvider.infos.get(myFixture.getFile.getVirtualFile.getCanonicalPath)
+    val repoInfo = getRepositoryInfo
 
     assertEquals(1, getRepositoryProvider.infos.size)
-    assertTrue(infos.isDefined)
-    assertEquals(expectedUrls, infos.get.urls)
-    assertEquals(includePackagist, infos.get.packagist)
-    val repository = infos.get.repository.getOrElse(new InMemoryRepository[String](List()))
+    assertTrue(repoInfo.isDefined)
+    assertEquals(expectedUrls, repoInfo.get.urls)
+    assertEquals(includePackagist, repoInfo.get.packagist)
+    val repository = repoInfo.get.repository.getOrElse(new InMemoryRepository[String](List()))
     assertRepository(repository, expectedPackages)
+  }
+
+  private def getRepositoryInfo: Option[RepositoryInfo] = {
+    getRepositoryProvider.infos.get(myFixture.getFile.getVirtualFile.getCanonicalPath)
   }
 
   private def assertRepository[A](repository: Repository[A], expectedPackages: Map[String,List[String]]): Unit = {
