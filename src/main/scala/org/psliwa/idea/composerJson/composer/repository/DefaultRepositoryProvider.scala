@@ -62,7 +62,9 @@ object DefaultRepositoryProvider {
   ) extends RepositoryFactory[Package] {
     override def repositoryFor(repositoryInfo: RepositoryInfo): Repository[Package] = {
       new ComposedRepository(
-        repositoryInfo.urls.map(repositoryFromUrl).map(_.map(mapPackage)) ++ List(packagistRepository).filter(_ => repositoryInfo.packagist)
+        repositoryInfo.urls.map(repositoryFromUrl).map(_.map(mapPackage)) ++
+          List(packagistRepository).filter(_ => repositoryInfo.packagist) ++
+          repositoryInfo.repository.map(_.map(mapPackage)).toList
       )
     }
   }

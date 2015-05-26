@@ -1,25 +1,22 @@
 package org.psliwa.idea.composerJson.composer.repository
 
 import org.junit.Assert._
-import org.junit.Test
+import org.junit.{Before, Test}
 
 import DefaultRepositoryProvider._
 
 class DefaultRepositoryFactoryTest {
 
   val packagistRepository = new InMemoryRepository(List("packagist"))
+  val factory = new DefaultRepositoryFactory(url => new InMemoryRepository(List(url)), packagistRepository, pkg => pkg)
 
   @Test
   def givenFewUrls_createRepositoryFromFewUrls(): Unit = {
 
-    //given
-
-    val factory = new DefaultRepositoryFactory(url => new InMemoryRepository(List(url)), packagistRepository, pkg => pkg)
-
     //when
 
     val repository = factory.repositoryFor(new RepositoryInfo(List("url1", "url2"), false))
-    Set().toSeq
+
     //then
 
     assertEquals(List("url1", "url2"), repository.getPackages)
@@ -27,9 +24,6 @@ class DefaultRepositoryFactoryTest {
 
   @Test
   def givenPackagistRepository_createdRepositoryShouldContainsAlsoPackagistRepo(): Unit = {
-    //given
-
-    val factory = new DefaultRepositoryFactory(url => new InMemoryRepository(List(url)), packagistRepository, pkg => pkg)
 
     //when
 
@@ -38,5 +32,23 @@ class DefaultRepositoryFactoryTest {
     //then
 
     assertEquals(packagistRepository.getPackages, repository.getPackages)
+  }
+
+  @Test
+  def givenRepository_createdRepositoryShouldContainsGivenOne(): Unit = {
+    //given
+
+    val packageName = "vendor/pkg"
+    val packages = List(packageName)
+    val versions = Map(packageName -> List("1.0.0"))
+
+    //when
+
+    val repository = factory.repositoryFor(new RepositoryInfo(List(), false, Some(new InMemoryRepository[String](packages, versions))))
+
+    //then
+
+    assertEquals(packages, repository.getPackages)
+    assertEquals(versions.getOrElse(packageName, List()), repository.getPackageVersions(packageName))
   }
 }
