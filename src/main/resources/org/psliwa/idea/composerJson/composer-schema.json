@@ -359,7 +359,12 @@
         },
         {
           "type": "object",
-          "additionalProperties": true
+          "additionalProperties": true,
+          "patternProperties": {
+            "(.*)": {
+              "$ref": "#/definitions/repository"
+            }
+          }
         }
       ],
       "description": "A set of additional repositories where packages can be found."

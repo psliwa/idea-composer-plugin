@@ -174,4 +174,19 @@ class StructureSuggestionsTest extends CompletionTest {
       Array("require")
     )
   }
+
+  def testObjectWithPatternProperties() = {
+    suggestions(
+      """
+        | {
+        |   "repositories": {
+        |     "some-repo": {
+        |       "t<caret>"
+        |     }
+        |   }
+        | }
+      """.stripMargin,
+      Array("type")
+    )
+  }
 }
