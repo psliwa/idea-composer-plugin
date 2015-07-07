@@ -1,4 +1,8 @@
 # PHP composer.json support
+[![Version](http://phpstorm.espend.de/badge/7631/version)](https://plugins.jetbrains.com/plugin/7631)
+[![Downloads](http://phpstorm.espend.de/badge/7631/downloads)](https://plugins.jetbrains.com/plugin/7631)
+[![Downloads last month](http://phpstorm.espend.de/badge/7631/last-month)](https://plugins.jetbrains.com/plugin/7631)
+
 
 Adds code completion, inspections and more to composer.json file.
 
