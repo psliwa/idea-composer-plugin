@@ -1,11 +1,10 @@
 package org.psliwa.idea.composerJson.intellij.codeAssist.schema
 
-import java.util
-
-import com.intellij.codeInspection._
+import com.intellij.codeInspection.{ProblemsHolder, LocalQuickFix}
 import com.intellij.json.psi.{JsonNumberLiteral, JsonProperty, _}
 import com.intellij.psi.PsiElement
 import org.psliwa.idea.composerJson.ComposerBundle
+import org.psliwa.idea.composerJson.intellij.codeAssist.problem.ProblemDescriptor
 import org.psliwa.idea.composerJson.intellij.codeAssist.{CreatePropertyQuickFix, AbstractInspection, RemoveJsonElementQuickFix}
 import org.psliwa.idea.composerJson.intellij.PsiExtractors
 import org.psliwa.idea.composerJson.json._
@@ -19,100 +18,111 @@ class SchemaInspection extends AbstractInspection {
   val booleanPattern = "^\"(true|false)\"$".r
 
   override protected def collectProblems(element: PsiElement, schema: Schema, problems: ProblemsHolder): Unit = {
+    collectProblems(element, schema)
+      .foreach(problem => problems.registerProblem(problem.element, problem.message.getOrElse(""), problem.quickFixes:_*))
+  }
+
+  private def collectProblems(element: PsiElement, schema: Schema): Seq[ProblemDescriptor[LocalQuickFix]] = {
     import scala.collection.JavaConversions._
     import PsiExtractors._
+
+    def collectNotAllowedPropertyProblems(property: JsonProperty, schemaProperties: Properties, additionalProperties: Boolean): Seq[ProblemDescriptor[LocalQuickFix]] = {
+      schemaProperties.get(property.getName) match {
+        case Some(schemaProperty) => Option(property.getValue).toList.flatMap(collectProblems(_, schemaProperty.schema))
+        case None if !additionalProperties => List(ProblemDescriptor(
+          property.getNameElement.getContext,
+          ComposerBundle.message("inspection.schema.notAllowedProperty", property.getName),
+          Seq(removeJsonPropertyQuickFix(property))
+        ))
+        case _ => List.empty
+      }
+    }
 
     schema match {
       case so@SObject(schemaProperties, additionalProperties) => element match {
         case JsonObject(properties) => {
-          for(property <- properties) {
-            schemaProperties.get(property.getName) match {
-              case Some(schemaProperty) => Option(property.getValue).foreach(collectProblems(_, schemaProperty.schema, problems))
-              case None if !additionalProperties => problems.registerProblem(
-                property.getNameElement.getContext,
-                ComposerBundle.message("inspection.schema.notAllowedProperty", property.getName),
-                removeJsonPropertyQuickFix(property)
-              )
-              case _ =>
-            }
-          }
+          val notAllowedPropertyProblems = for {
+            property <- properties
+            problem <- collectNotAllowedPropertyProblems(property, schemaProperties, additionalProperties)
+          } yield problem
 
-          getAlreadyDefinedProperties(properties.toList)
-            .foreach(property => {
-              problems.registerProblem(
-                property,
-                ComposerBundle.message("inspection.schema.alreadyDefinedProperty", property.getName),
-                removeJsonPropertyQuickFix(property)
-              )
-            })
+          val alreadyDefinedPropertiesProblems = getAlreadyDefinedProperties(properties.toList)
+            .map(property => ProblemDescriptor(
+              property,
+              ComposerBundle.message("inspection.schema.alreadyDefinedProperty", property.getName),
+              Seq(removeJsonPropertyQuickFix(property))
+            )
+          ).toList
 
           lazy val propertyNames = properties.map(_.getName).toSet
 
-          for((name, property) <- so.requiredProperties if !propertyNames.contains(name)) {
-            problems.registerProblem(
+          val requiredPropertiesProblems = for((name, property) <- so.requiredProperties if !propertyNames.contains(name)) yield {
+            ProblemDescriptor(
               element,
               ComposerBundle.message("inspection.schema.required", name),
-              new CreatePropertyQuickFix(element, name, property.schema)
+              Seq(new CreatePropertyQuickFix(element, name, property.schema): LocalQuickFix)
             )
           }
+
+          notAllowedPropertyProblems.toList ::: alreadyDefinedPropertiesProblems.toList ::: requiredPropertiesProblems.toList
         }
-        case _ => registerInvalidTypeProblem(problems, element, schema)
+        case _ => List(invalidTypeProblem(element, schema))
       }
       case SPackages | SFilePaths(_) => element match {
-        case JsonObject(_) =>
-        case _ => registerInvalidTypeProblem(problems, element, schema)
+        case JsonObject(_) => List.empty
+        case _ => List(invalidTypeProblem(element, schema))
       }
       case SString(format) => element match {
         case JsonStringLiteral(value) => if(!format.isValid(value)) {
-          problems.registerProblem(
+          List(ProblemDescriptor(
             element,
-            ComposerBundle.message("inspection.schema.format", prependPrefix(readableFormat(format)))
-          )
+            ComposerBundle.message("inspection.schema.format", prependPrefix(readableFormat(format))),
+            Seq()
+          ))
+        } else {
+          List.empty
         }
-        case _ => registerInvalidTypeProblem(problems, element, schema)
+        case _ => List(invalidTypeProblem(element, schema))
       }
       case SFilePath(_) => element match {
-        case JsonStringLiteral(_) =>
-        case _ => registerInvalidTypeProblem(problems, element, schema)
+        case JsonStringLiteral(_) => List.empty
+        case _ => List(invalidTypeProblem(element, schema))
       }
       case SStringChoice(choices) => element match {
         case x@JsonStringLiteral(value) if !choices.contains(value) => {
-          problems.registerProblem(
+          List(ProblemDescriptor(
             element,
             ComposerBundle.message("inspection.schema.notAllowedPropertyValue", value, choices.map("'"+_+"'").mkString(" or ")),
-            new ShowValidValuesQuickFix(x)
-          )
+            Seq(new ShowValidValuesQuickFix(x))
+          ))
         }
-        case JsonStringLiteral(_) =>
-        case _ => registerInvalidTypeProblem(problems, element, schema)
+        case JsonStringLiteral(_) => List.empty
+        case _ => List(invalidTypeProblem(element, schema))
       }
       case SBoolean => element match {
-        case JsonBooleanLiteral(_) =>
-        case _ => {
-          registerInvalidTypeProblem(problems, element, schema, removeQuotesQuickFixWhenMatches(element, booleanPattern):_*)
-        }
+        case JsonBooleanLiteral(_) => List.empty
+        case _ => List(invalidTypeProblem(element, schema, removeQuotesQuickFixWhenMatches(element, booleanPattern):_*))
       }
       case SArray(item) => element match {
-        case JsonArray(values) => for(value <- values) {
-          collectProblems(value, item, problems)
-        }
-        case _ => registerInvalidTypeProblem(problems, element, schema)
+        case JsonArray(values) => for {
+          value <- values
+          problem <- collectProblems(value, item)
+        } yield problem
+        case _ => List(invalidTypeProblem(element, schema))
       }
       case SOr(items) => {
-        val localProblems = new ProblemsHolder(problems.getManager, problems.getFile, problems.isOnTheFly)
-        items.foreach {collectProblems(element, _, localProblems)}
+        val problems = items.map(collectProblems(element, _)).filter(_.size > 0).flatten
+        val innerProblems = problems.filterNot(_.element == element)
 
-        if(localProblems.getResultCount >= items.length) {
-          registerInvalidTypeProblem(problems, element, schema)
-        }
+        if(innerProblems.size > 0) innerProblems
+        else if(problems.size >= items.length) List(invalidTypeProblem(element, schema))
+        else List.empty
       }
       case SNumber => element match {
-        case PsiExtractors.JsonNumberLiteral(_) =>
-        case _ => {
-          registerInvalidTypeProblem(problems, element, schema, removeQuotesQuickFixWhenMatches(element, numberPattern):_*)
-        }
+        case PsiExtractors.JsonNumberLiteral(_) => List.empty
+        case _ => List(invalidTypeProblem(element, schema, removeQuotesQuickFixWhenMatches(element, numberPattern):_*))
       }
-      case _ =>
+      case _ => List.empty
     }
   }
 
@@ -126,7 +136,7 @@ class SchemaInspection extends AbstractInspection {
       .flatten
   }
 
-  private def removeJsonPropertyQuickFix(property: JsonProperty): RemoveJsonElementQuickFix = {
+  private def removeJsonPropertyQuickFix(property: JsonProperty): LocalQuickFix = {
     new RemoveJsonElementQuickFix(property, ComposerBundle.message("inspection.quickfix.removeEntry"))
   }
 
@@ -138,11 +148,11 @@ class SchemaInspection extends AbstractInspection {
     }
   }
 
-  private def registerInvalidTypeProblem(problems: ProblemsHolder, element: PsiElement, schema: Schema, quickFixes: LocalQuickFix*) {
-    problems.registerProblem(
+  private def invalidTypeProblem(element: PsiElement, schema: Schema, quickFixes: LocalQuickFix*) = {
+    ProblemDescriptor(
       element,
-      ComposerBundle.message("inspection.schema.type", prependPrefix(readableType(schema)), readableType(element)),
-      quickFixes: _*
+      Some(ComposerBundle.message("inspection.schema.type", prependPrefix(readableType(schema)), readableType(element))),
+      quickFixes
     )
   }
 

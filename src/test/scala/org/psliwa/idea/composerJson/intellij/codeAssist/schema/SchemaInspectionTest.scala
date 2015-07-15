@@ -336,4 +336,19 @@ class SchemaInspectionTest extends InspectionTest {
       """.stripMargin
     )
   }
+
+  def testInspectionObjectWithPatternProperties() = {
+    checkInspection(
+      s"""
+         |{
+         |  $RequiredProperties
+         |  "repositories": {
+         |    "name": {
+         |      "type": <error>123</error>
+         |    }
+         |  }
+         |}
+       """.stripMargin
+    )
+  }
 }

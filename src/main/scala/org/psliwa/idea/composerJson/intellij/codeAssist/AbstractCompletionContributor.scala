@@ -5,12 +5,13 @@ import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.json.JsonLanguage
 import com.intellij.json.psi.{JsonArray, JsonFile, JsonObject, JsonProperty}
 import com.intellij.patterns.PlatformPatterns._
-import com.intellij.patterns.PsiElementPattern
+import com.intellij.patterns.{StringPattern, PsiElementPattern}
 import com.intellij.psi.PsiElement
 import com.intellij.util.ProcessingContext
 import org.psliwa.idea.composerJson._
 import org.psliwa.idea.composerJson.intellij.Patterns._
 import org.psliwa.idea.composerJson.json._
+import com.intellij.patterns.StandardPatterns.string
 
 import scala.annotation.tailrec
 import scala.collection.Seq
@@ -31,12 +32,17 @@ abstract class AbstractCompletionContributor extends com.intellij.codeInsight.co
 
   private def completionProvidersForSchema(s: Schema, parent: Capture): List[(Capture, CompletionProvider[CompletionParameters])] = s match {
     case SObject(properties, _) => {
-      propertyCompletionProvider(parent, properties) ++
-        properties.flatMap(t => completionProvidersForSchema(t._2.schema, psiElement().and(propertyCapture(parent)).withName(t._1)))
+      propertyCompletionProvider(parent, properties.named) ++
+        completionProvidersForProperties(properties.named, parent, string().equalTo(_: String)) ++
+        completionProvidersForProperties(properties.patterned, parent, stringMatches)
     }
     case SOr(l) => l.flatMap(completionProvidersForSchema(_, parent))
     case SArray(i) => completionProvidersForSchema(i, psiElement(classOf[JsonArray]).withParent(parent))
     case _ => getCompletionProvidersForSchema(s, parent)
+  }
+
+  private def completionProvidersForProperties[Name](properties: Map[Name,Property], parent: Capture, namePattern: Name => StringPattern) = {
+    properties.flatMap(t => completionProvidersForSchema(t._2.schema, psiElement().and(propertyCapture(parent)).withName(namePattern(t._1))))
   }
 
   protected def propertyCompletionProvider(parent: Capture, properties: Map[String, Property]): List[(Capture, CompletionProvider[CompletionParameters])] = List()

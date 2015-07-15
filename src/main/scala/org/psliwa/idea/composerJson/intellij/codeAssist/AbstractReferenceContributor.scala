@@ -23,7 +23,7 @@ abstract class AbstractReferenceContributor extends PsiReferenceContributor {
   private def schemaToPatterns(s: Schema): List[ReferenceMatcher] = {
     def loop(s: Schema, parent: Capture): List[ReferenceMatcher] = s match {
       case SObject(properties, _) => {
-        properties.toList.flatMap{ case(name, property) => {
+        properties.named.toList.flatMap{ case(name, property) => {
           loop(
             property.schema,
             psiElement(classOf[JsonProperty]).withName(name).withParent(psiElement(classOf[JsonObject]).withParent(parent))

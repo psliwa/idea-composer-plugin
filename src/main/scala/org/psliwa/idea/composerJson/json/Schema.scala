@@ -1,14 +1,19 @@
 package org.psliwa.idea.composerJson.json
 
 import scala.language.{higherKinds, implicitConversions}
+import scala.util.matching.Regex
 import scala.util.parsing.json.{JSON, JSONArray, JSONObject, JSONType}
 import org.psliwa.idea.composerJson.util.OptionOps._
 
 sealed trait Schema
 
-case class SObject(properties: Map[String, Property], additionalProperties: Boolean = true) extends Schema {
-  lazy val requiredProperties = properties.filter(_._2.required)
+case class SObject(properties: Properties, additionalProperties: Boolean = true) extends Schema {
+  lazy val requiredProperties = properties.named.filter(_._2.required)
+
+  def this(properties: Map[String,Property]) = this(new Properties(properties, Map()), true)
+  def this(properties: Map[String,Property], additionalProperties: Boolean) = this(new Properties(properties, Map()), additionalProperties)
 }
+
 case class SArray(child: Schema) extends Schema
 case class SStringChoice(choices: List[String]) extends Schema
 case class SOr(alternatives: List[Schema]) extends Schema
@@ -20,6 +25,30 @@ object SBoolean extends Schema
 object SNumber extends Schema
 object SPackages extends Schema
 object SAny extends Schema
+
+final class Properties(val named: Map[String,Property], val patterned: Map[Regex,Property]) {
+
+  private lazy val patternedNamed = patterned.map(property => property._1.toString() -> property._2)
+
+  def get(name: String): Option[Property] = {
+    named.get(name)
+      .orElse(patterned.keys.find(_.findFirstIn(name).isDefined).flatMap(patterned.get))
+  }
+  def +(name: String, property: Property) = new Properties(named + (name -> property), patterned)
+  def +(name: Regex, property: Property) = new Properties(named, patterned + (name -> property))
+
+  override def equals(other: Any): Boolean = other match {
+    case that: Properties =>
+      named == that.named &&
+        patternedNamed == that.patternedNamed
+    case _ => false
+  }
+
+  override def hashCode(): Int = {
+    val state = Seq(named, patternedNamed)
+    state.map(_.hashCode()).foldLeft(0)((a, b) => 31 * a + b)
+  }
+}
 
 case class Property(schema: Schema, required: Boolean, description: String)
 
@@ -145,23 +174,46 @@ object Schema {
 
   private def jsonObjectToObjectSchema: Converter[JSONObject] = (t, defs) => {
     if(t.obj.get("type").exists(_ == "object")) {
-      val maybeJsonObject = t.obj.getOrElse("properties", JSONObject(Map()))
+      val propertiesObject = t.obj.getOrElse("properties", JSONObject(Map()))
+      val patternPropertiesObject = t.obj.getOrElse("patternProperties", JSONObject(Map()))
 
       for {
-        jsonObject <- tryJsonObject(maybeJsonObject)
-        properties <- traverseMap(jsonObject.obj){
-          case o@JSONObject(_) => for{
-            required <- booleanProperty("required")(o.obj).orElse(Some(false))
-            description <- stringProperty("description")(o.obj).orElse(Some(""))
-            schema <- jsonObjectToSchema(o, defs).map(Property(_, required, description))
-          } yield schema
-          case _ => None
-        }
+        properties <- jsonObjectToProperties(propertiesObject, defs)
+        patternProperties <- jsonObjectToPatternProperties(patternPropertiesObject, defs)
         additionalProperties <- booleanProperty("additionalProperties")(t.obj).orElse(Some(true))
-      } yield SObject(properties, additionalProperties)
+      } yield SObject(new Properties(properties, patternProperties), additionalProperties)
     } else {
       None
     }
+  }
+
+  private def jsonObjectToProperties(maybeJsonObject: Any, defs: Map[String,Schema]): Option[Map[String,Property]] = {
+    for {
+      jsonObject <- tryJsonObject(maybeJsonObject)
+      properties <- traverseMap(jsonObject.obj){
+        case o@JSONObject(_) => for{
+          required <- booleanProperty("required")(o.obj).orElse(Some(false))
+          description <- stringProperty("description")(o.obj).orElse(Some(""))
+          schema <- jsonObjectToSchema(o, defs).map(Property(_, required, description))
+        } yield schema
+        case _ => None
+      }
+    } yield properties
+  }
+
+  private def jsonObjectToPatternProperties(maybeJsonObject: Any, defs: Map[String,Schema]): Option[Map[Regex,Property]] = {
+    //TODO: refactor
+    for {
+      jsonObject <- tryJsonObject(maybeJsonObject)
+      properties <- traverseMap(jsonObject.obj.map(prop => prop._1.r -> prop._2)){
+        case o@JSONObject(_) => for{
+          required <- booleanProperty("required")(o.obj).orElse(Some(false))
+          description <- stringProperty("description")(o.obj).orElse(Some(""))
+          schema <- jsonObjectToSchema(o, defs).map(Property(_, required, description))
+        } yield schema
+        case _ => None
+      }
+    } yield properties
   }
 
   private def booleanProperty(k: String)(map: Map[String,Any]): Option[Boolean] = map.get(k).flatMap(toBoolean)
