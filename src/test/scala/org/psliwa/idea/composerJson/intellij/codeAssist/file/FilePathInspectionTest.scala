@@ -2,6 +2,7 @@ package org.psliwa.idea.composerJson.intellij.codeAssist.file
 
 import org.junit.ComparisonFailure
 import org.psliwa.idea.composerJson.intellij.codeAssist.InspectionTest
+import org.psliwa.idea.composerJson.ComposerJson
 
 class FilePathInspectionTest extends InspectionTest {
 
@@ -86,6 +87,26 @@ class FilePathInspectionTest extends InspectionTest {
         |  }
         |}
       """.stripMargin
+    )
+  }
+
+  //issue #10
+  def testGivenComposerProjectInNestedDirectory_givenExistingRelativeFilePath_warningShouldNotBeReported(): Unit = {
+
+    writeAction(() => findOrCreateDir("main"))
+    writeAction(() => findOrCreateDir("tests").createChildData(this, "src"))
+
+    checkInspection(
+      """
+        |{
+        |  "autoload": {
+        |    "psr-0": {
+        |      "": "../tests/src"
+        |    }
+        |  }
+        |}
+      """.stripMargin,
+      s"main/$ComposerJson"
     )
   }
 

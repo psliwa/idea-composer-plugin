@@ -9,10 +9,20 @@ import org.psliwa.idea.composerJson._
 abstract class InspectionTest extends LightPlatformCodeInsightFixtureTestCase {
   override def isWriteActionRequired: Boolean = false
 
-  def checkInspection(s: String): Unit = {
-    myFixture.configureByText(ComposerJson, s.replace("\r", ""))
-    myFixture.checkHighlighting()
+  def checkInspection(s: String, filePath: String = ComposerJson): Unit = {
+    filePath.split("/").toList match {
+      case dir :: file :: Nil =>
+        val composerJson = myFixture.configureByText(file, s.replace("\r", ""))
+        writeAction(() => composerJson.getVirtualFile.move(this, findOrCreateDir(dir)))
+        myFixture.testHighlighting(filePath)
+      case file :: Nil =>
+        myFixture.configureByText(file, s.replace("\r", ""))
+        myFixture.checkHighlighting()
+      case _ => fail(s"only file name or file name with one parent dir are supported as filePath, $filePath given")
+    }
   }
+
+  protected def findOrCreateDir(dir: String) = myFixture.getTempDirFixture.findOrCreateDir(dir)
 
   def checkQuickFix(quickFix: String, expectedQuickFixCount: Int = 1)(actual: String, expected: String): Unit = {
     checkQuickFix(quickFix, Range(Some(expectedQuickFixCount), Some(expectedQuickFixCount)))(actual, expected)
