@@ -17,6 +17,11 @@ object Files {
     def loop(rootDir: PsiDirectory, paths: List[String]): Option[PsiFileSystemItem] = {
       paths match {
         case Nil => Some(rootDir)
+        case ".."::t => Option(rootDir.getParent) match {
+          case Some(parent) => loop(parent, t)
+          case None => None
+        }
+        case "."::t => loop(rootDir, t)
         case h::t => {
           val subPath = Option(rootDir.findSubdirectory(h))
             .orElse(Option(rootDir.findFile(h)))

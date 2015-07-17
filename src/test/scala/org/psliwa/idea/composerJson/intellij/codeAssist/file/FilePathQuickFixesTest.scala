@@ -174,6 +174,20 @@ class FilePathQuickFixesTest extends InspectionTest {
     assertTrue(findFile(dir).isDefined)
   }
 
+  def testRunCreateFileQuickFix_filePathIsRelative_fileShouldBeCreated() = {
+    val dir = "./some/../some/unexisting.file"
+
+    runQuickFix(CreateFileQuickFix(dir))(
+      s"""
+         |{
+         |  "bin": [ "$dir" ]
+         |}
+      """.stripMargin
+    )
+
+    assertTrue(findFile(dir).isDefined)
+  }
+
   private def findDir = {
     import org.psliwa.idea.composerJson.util.Files
 

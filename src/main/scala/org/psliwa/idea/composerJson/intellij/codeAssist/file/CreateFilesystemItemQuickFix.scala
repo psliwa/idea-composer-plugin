@@ -57,6 +57,11 @@ private object CreateFilesystemItemQuickFix {
       def createFilePath(dir: PsiDirectory, paths: List[String]): Either[String,PsiFileSystemItem] = {
         paths match {
           case h::Nil => createLeafItem(dir, h)
+          case ".."::t => Option(dir.getParent) match {
+            case Some(parent) => createFilePath(parent, t)
+            case None => Left(ComposerBundle.message("inspection.quickfix.filepathCannotBeCreated", getPath))
+          }
+          case "."::t => createFilePath(dir, t)
           case h::t => {
             val subDir = Option(dir.findSubdirectory(h))
               .map(Right(_))

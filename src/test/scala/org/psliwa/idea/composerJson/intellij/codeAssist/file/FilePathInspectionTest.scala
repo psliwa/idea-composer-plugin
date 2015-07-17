@@ -90,6 +90,36 @@ class FilePathInspectionTest extends InspectionTest {
     )
   }
 
+  def testGivenFilePathsElement_givenExistingRelativeFilePath_warningShouldNotBeReported() = {
+    writeAction(() => myFixture.getTempDirFixture.findOrCreateDir("some").createChildDirectory(this, "existing"))
+
+    checkInspection(
+      """
+        |{
+        |  "autoload": {
+        |    "psr-0": {
+        |      "": "./some/../some/existing/./../../some/existing"
+        |    }
+        |  }
+        |}
+      """.stripMargin
+    )
+  }
+
+  def testGivenFilePathsElement_givenRelativeUnexistingPath_warningShouldBeReported() = {
+    checkInspection(
+      """
+        |{
+        |  "autoload": {
+        |    "psr-0": {
+        |      "": <warning>"../../../../../../../../../../../../../../../../../../../../.."</warning>
+        |    }
+        |  }
+        |}
+      """.stripMargin
+    )
+  }
+
   //issue #10
   def testGivenComposerProjectInNestedDirectory_givenExistingRelativeFilePath_warningShouldNotBeReported(): Unit = {
 
