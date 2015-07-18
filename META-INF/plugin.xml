@@ -1,7 +1,7 @@
 <idea-plugin version="2">
   <id>org.psliwa.idea.composer</id>
   <name>PHP composer.json support</name>
-  <version>1.0.6</version>
+  <version>1.0.7</version>
   <vendor email="me@psliwa.org" url="http://github.org/psliwa/idea-composer-plugin">psliwa</vendor>
 
     <description><![CDATA[
@@ -11,6 +11,15 @@ This plugin adds auto completion and inspections support for composer.json file 
     ]]></description>
 
   <change-notes><![CDATA[
+<h2>1.0.7</h2>
+<ul>
+  <li>[#10] Fix inspection and quick fixes for relative file paths</li>
+  <li>Support for completion inline repositories that are defined in "repositories" property as "package" repo type</li>
+  <li>Add support for new properties in composer.json file + update descriptions etc.</li>
+  <li>Support for named repositories completion and inspections</li>
+  <li>Schema inspection messages fixes</li>
+</ul>
+
 <h2>1.0.6</h2>
 <ul>
   <li>[#7] Fix NullPointerException in files other than composer.json</li>

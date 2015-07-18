@@ -13,7 +13,7 @@ This plugin provides:
 
 * completion for:
     * composer.json schema
-    * package names and version (in require, require-dev etc) from packagist repository and custom repositories defined in composer.json file (only "composer" repository type is supported right now)
+    * package names and version (in require, require-dev etc) from packagist repository and custom repositories defined in composer.json file (only "composer" and "package" repositories type are supported right now)
     * filepath completion (in bin, autoload etc)
     * class and static method names in "scripts" properties
     * namespaces eg. in "autoload.psr-0" property
@@ -47,9 +47,8 @@ This plugin provides:
 
 ## Whats next?
 
-* improve support for custom repositories - support for inline repositories
-* improve inspections (detect misconfiguration, detect not existing namespaces in "autoload.psr-0")
-* and more ;)
+* If you have feature ideas, please to create an issue! I have created a lot of features that used to be useful
+for me during my daily job, so I waiting for yours ideas too ;)
 
 [1]: https://plugins.jetbrains.com/files/7631/screenshot_14847.png
 [2]: https://plugins.jetbrains.com/plugin/7631
