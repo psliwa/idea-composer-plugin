@@ -292,7 +292,11 @@ class SchemaInspectionTest extends InspectionTest {
   def testReportMissingProperties() = {
     checkInspection(
       """
-        |<error descr="The 'name' property is required.">{}</error>
+        |{
+        |  "authors": [
+        |    <error descr="The 'name' property is required.">{}</error>
+        |  ]
+        |}
       """.stripMargin
     )
   }

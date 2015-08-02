@@ -1,6 +1,6 @@
 package org.psliwa.idea.composerJson.intellij.codeAssist.problem
 
-import com.intellij.json.psi.JsonObject
+import com.intellij.json.psi.{JsonProperty, JsonObject}
 import com.intellij.psi.PsiElement
 import org.psliwa.idea.composerJson.intellij.PsiExtractors
 
@@ -9,7 +9,7 @@ private[codeAssist] sealed trait Condition {
 
   def check(jsonObject: JsonObject, propertyName: String): Boolean = {
     val result = for {
-      property <- Option(jsonObject.findProperty(propertyName))
+      property <- findProperty(jsonObject, propertyName)
       value <- getValue(property.getValue)
     } yield this match {
         case ConditionIs(expected) => value == expected
@@ -19,6 +19,11 @@ private[codeAssist] sealed trait Condition {
       }
 
     result.getOrElse(false)
+  }
+
+  private def findProperty(jsonObject: JsonObject, propertyName: String): Option[JsonProperty] = {
+    import scala.collection.JavaConversions._
+    jsonObject.getPropertyList.find(_.getName == propertyName)
   }
 }
 private[codeAssist] case class ConditionIs(value: Any) extends Condition

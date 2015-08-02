@@ -192,13 +192,21 @@ class SchemaQuickFixesTest extends InspectionTest {
   def testCreateProperty_propertyShouldBeCreated() = {
     checkQuickFix(CreatePropertyQuickFix("name"))(
       s"""
-        |{<caret>
-        |}
+         |{
+         |  "authors": [
+         |    {<caret>
+         |    }
+         |  ]
+         |}
       """.stripMargin,
       s"""
-        |{
-        |  "name": "<caret>"
-        |}
+         |{
+         |  "authors": [
+         |    {
+         |      "name": "<caret>"
+         |    }
+         |  ]
+         |}
       """.stripMargin
     )
   }
@@ -206,15 +214,23 @@ class SchemaQuickFixesTest extends InspectionTest {
   def testCreateProperty_thereAreSomePropertiesAlready_caretIsBeforeExistingProperty_propertyShouldBeCreatedBeforeExistingOne() = {
     checkQuickFix(CreatePropertyQuickFix("name"))(
       s"""
-        |{<caret>
-        |  "require": {}
-        |}
+         |{
+         |  "authors": [
+         |    {<caret>
+         |      "role": ""
+         |    }
+         |  ]
+         |}
       """.stripMargin,
       s"""
-        |{
-        |  "name": "<caret>",
-        |  "require": {}
-        |}
+         |{
+         |  "authors": [
+         |    {
+         |      "name": "<caret>",
+         |      "role": ""
+         |    }
+         |  ]
+         |}
       """.stripMargin
     )
   }
@@ -222,15 +238,23 @@ class SchemaQuickFixesTest extends InspectionTest {
   def testCreateProperty_thereAreSomePropertiesAlready_caretIsAfterExistingProperty_propertyShouldBeCreatedAfterExistingOne() = {
     checkQuickFix(CreatePropertyQuickFix("name"))(
       s"""
-        |{
-        |  "require": {}<caret>
-        |}
+         |{
+         |  "authors": [
+         |    {
+         |      "role": ""<caret>
+         |    }
+         |  ]
+         |}
       """.stripMargin,
       s"""
-        |{
-        |  "require": {},
-        |  "name": "<caret>"
-        |}
+         |{
+         |  "authors": [
+         |    {
+         |      "role": "",
+         |      "name": "<caret>"
+         |    }
+         |  ]
+         |}
       """.stripMargin
     )
   }
@@ -238,17 +262,25 @@ class SchemaQuickFixesTest extends InspectionTest {
   def testCreateProperty_thereAreSomePropertiesAlready_caretIsBetweenExistingProperties_propertyShouldBeCreatedBetweenExistingOne() = {
     checkQuickFix(CreatePropertyQuickFix("name"))(
       s"""
-        |{
-        |  "require": {},<caret>
-        |  "require-dev": {}
-        |}
+         |{
+         |  "authors": [
+         |    {
+         |      "email": "",<caret>
+         |      "role": ""
+         |    }
+         |  ]
+         |}
       """.stripMargin,
       s"""
-        |{
-        |  "require": {},
-        |  "name": "<caret>",
-        |  "require-dev": {}
-        |}
+         |{
+         |  "authors": [
+         |    {
+         |      "email": "",
+         |      "name": "<caret>",
+         |      "role": ""
+         |    }
+         |  ]
+         |}
       """.stripMargin
     )
   }
@@ -257,15 +289,23 @@ class SchemaQuickFixesTest extends InspectionTest {
     checkQuickFix(CreatePropertyQuickFix("name"))(
       s"""
         |{
-        |  "require<caret>": {},
-        |  "require-dev": {}
+        |  "authors": [
+        |    {
+        |      "email<caret>": "",
+        |      "role": ""
+        |    }
+        |  ]
         |}
       """.stripMargin,
       s"""
         |{
-        |  "require": {},
-        |  "name": "<caret>",
-        |  "require-dev": {}
+        |  "authors": [
+        |    {
+        |      "email": "",
+        |      "name": "<caret>",
+        |      "role": ""
+        |    }
+        |  ]
         |}
       """.stripMargin
     )
@@ -274,12 +314,20 @@ class SchemaQuickFixesTest extends InspectionTest {
   def testCreateProperty_noneNewLineGiven_newLinesShouldBeFixed() = {
     checkQuickFix(CreatePropertyQuickFix("name"))(
       s"""
-        |{<caret>}
+         |{
+         |  "authors": [
+         |    {<caret>}
+         |  ]
+         |}
       """.stripMargin,
       s"""
-        |{
-        |  "name": "<caret>"
-        |}
+         |{
+         |  "authors": [
+         |    {
+         |      "name": "<caret>"
+         |    }
+         |  ]
+         |}
       """.stripMargin
     )
   }

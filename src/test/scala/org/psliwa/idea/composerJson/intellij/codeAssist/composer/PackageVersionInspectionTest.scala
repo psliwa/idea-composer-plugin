@@ -37,6 +37,17 @@ class PackageVersionInspectionTest extends InspectionTest {
       """.stripMargin)
   }
 
+  def testGivenSemVerBoundedVersion_thatIsOk() = {
+    checkInspection(
+      """
+        |{
+        |  "require": {
+        |    "vendor/pkg": "~1.4"
+        |  }
+        |}
+      """.stripMargin)
+  }
+
   def testGivenUnboundVersion_givenPackageIsExcluded_thatIsOk() = {
     val pkg = "vendor/pkg"
 

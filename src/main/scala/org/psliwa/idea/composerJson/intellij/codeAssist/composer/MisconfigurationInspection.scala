@@ -1,11 +1,11 @@
 package org.psliwa.idea.composerJson.intellij.codeAssist.composer
 
-import com.intellij.codeInspection.ProblemsHolder
+import com.intellij.codeInspection.{ProblemHighlightType, ProblemsHolder}
 import com.intellij.json.psi.JsonObject
 import com.intellij.psi.PsiElement
 import org.psliwa.idea.composerJson.ComposerBundle
 import org.psliwa.idea.composerJson.intellij.PsiElements
-import org.psliwa.idea.composerJson.intellij.codeAssist.{AbstractInspection, SetPropertyValueQuickFix}
+import org.psliwa.idea.composerJson.intellij.codeAssist.{CreatePropertyQuickFix, AbstractInspection, SetPropertyValueQuickFix}
 import org.psliwa.idea.composerJson.intellij.codeAssist.problem.Checker._
 import org.psliwa.idea.composerJson.intellij.codeAssist.problem.ImplicitConversions._
 import org.psliwa.idea.composerJson.intellij.codeAssist.problem._
@@ -23,6 +23,15 @@ class MisconfigurationInspection extends AbstractInspection {
         new SetPropertyValueQuickFix(jsonObject, "prefer-stable", SBoolean, "true"),
         new SetPropertyValueQuickFix(jsonObject, "minimum-stability", SString(), "stable")
       )
+    ),
+    ProblemChecker(
+      ("type" isNot "project") && not("name"),
+      List("type"),
+      ComposerBundle.message("inspection.misconfig.nameRequiredForLibrary"),
+      (jsonObject) => List(
+        new CreatePropertyQuickFix(jsonObject, "name", new SString())
+      ),
+      ProblemHighlightType.GENERIC_ERROR
     )
   )
 
@@ -38,12 +47,19 @@ class MisconfigurationInspection extends AbstractInspection {
           .map(name => Option(jsonObject.findProperty(name)))
           .filter(_ != None)
           .flatMap(value => Option(value.get.getValue))
-          .map(value => ProblemDescriptor(value, Some(checker.problem), checker.createQuickFixes(jsonObject)))
+          .map(value => ProblemDescriptor(
+            element = value,
+            message = Some(checker.problem),
+            quickFixes = checker.createQuickFixes(jsonObject),
+            highlightType = checker.highlightType
+          ))
       } else {
         List()
       }
     })
 
-    problemDescriptions.foreach(problem => problems.registerProblem(problem.element.getContext, problem.message.getOrElse(""), problem.quickFixes:_*))
+    problemDescriptions.foreach(problem =>
+      problems.registerProblem(problem.element.getContext, problem.message.getOrElse(""), problem.highlightType, problem.quickFixes:_*)
+    )
   }
 }

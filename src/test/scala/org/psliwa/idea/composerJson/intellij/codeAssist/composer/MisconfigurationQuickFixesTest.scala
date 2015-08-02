@@ -7,6 +7,7 @@ class MisconfigurationQuickFixesTest extends InspectionTest {
 
   val FixPreferStable = ComposerBundle.message("inspection.quickfix.setPropertyValue", "prefer-stable", "true")
   val FixMinimumStability = ComposerBundle.message("inspection.quickfix.setPropertyValue", "minimum-stability", "stable")
+  val CreateNameProperty = ComposerBundle.message("inspection.quickfix.createProperty", "name")
 
   val atLeastOne = new Range(Some(1), None)
 
@@ -84,6 +85,22 @@ class MisconfigurationQuickFixesTest extends InspectionTest {
         |{
         |  "type": "project",
         |  "minimum-stability": "stable"
+        |}
+      """.stripMargin
+    )
+  }
+
+  def testCreateNamePropertyQuickFix() = {
+    checkQuickFix(CreateNameProperty)(
+      """
+        |{
+        |  "type": "library<caret>"
+        |}
+      """.stripMargin,
+      """
+        |{
+        |  "type": "library",
+        |  "name": "<caret>"
         |}
       """.stripMargin
     )
