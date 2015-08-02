@@ -90,6 +90,29 @@ class MisconfigurationQuickFixesTest extends InspectionTest {
     )
   }
 
+  def testSetMinimumStabilityQuickFix_setStableMinimumStabilityForRootProperty() = {
+    checkQuickFix(FixMinimumStability, atLeastOne)(
+      """
+        |{
+        |  "type": "project<caret>",
+        |  "someObject": {
+        |    "minimum-stability": "dev"
+        |  },
+        |  "minimum-stability": "dev"
+        |}
+      """.stripMargin,
+      """
+        |{
+        |  "type": "project",
+        |  "someObject": {
+        |    "minimum-stability": "dev"
+        |  },
+        |  "minimum-stability": "stable"
+        |}
+      """.stripMargin
+    )
+  }
+
   def testCreateNamePropertyQuickFix() = {
     checkQuickFix(CreateNameProperty)(
       """

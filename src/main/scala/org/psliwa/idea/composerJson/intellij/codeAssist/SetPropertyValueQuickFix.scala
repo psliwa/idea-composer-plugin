@@ -8,6 +8,7 @@ import com.intellij.openapi.util.TextRange
 import com.intellij.psi.{PsiElement, PsiFile}
 import org.psliwa.idea.composerJson.ComposerBundle
 import org.psliwa.idea.composerJson.json.Schema
+import org.psliwa.idea.composerJson.intellij.PsiElements.findProperty
 import QuickFix._
 
 private class SetPropertyValueQuickFix(
@@ -21,7 +22,7 @@ private class SetPropertyValueQuickFix(
   override def invoke(project: Project, file: PsiFile, startElement: PsiElement, endElement: PsiElement): Unit = {
     import org.psliwa.idea.composerJson.intellij.PsiExtractors.JsonProperty
 
-    Option(element.findProperty(propertyName)) match {
+    findProperty(element, propertyName) match {
       case Some(p@JsonProperty(_, _)) => setPropertyValue(p)
       case None => createProperty()
     }

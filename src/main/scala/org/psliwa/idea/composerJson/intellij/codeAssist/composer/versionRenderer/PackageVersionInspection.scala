@@ -17,7 +17,7 @@ class PackageVersionInspection extends AbstractInspection {
     val packageVersions = for {
       jsonObject <- ensureJsonObject(element).toList
       propertyName <- List("require", "require-dev")
-      property <- Option(jsonObject.findProperty(propertyName)).toList
+      property <- findProperty(jsonObject, propertyName).toList
       packagesObject <- Option(property.getValue).toList
       packagesObject <- ensureJsonObject(packagesObject).toList
       packageProperty <- packagesObject.getPropertyList

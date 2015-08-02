@@ -11,7 +11,7 @@ private object NotInstalledPackages {
   def getNotInstalledPackageProperties(element: PsiElement, installedPackages: Packages): Seq[JsonProperty] = for {
     jsonObject <- ensureJsonObject(element).toList
     (propertyName, devPred) <- List("require" -> pred(_ == false), "require-dev" -> pred(_ => true))
-    property <- Option(jsonObject.findProperty(propertyName)).toList
+    property <- findProperty(jsonObject, propertyName).toList
     packagesObject <- Option(property.getValue).toList
     packagesObject <- ensureJsonObject(packagesObject).toList
     packageProperty <- packagesObject.getPropertyList if isNotInstalled(packageProperty, devPred, installedPackages)

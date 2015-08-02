@@ -10,6 +10,7 @@ import org.psliwa.idea.composerJson.intellij.codeAssist.problem.Checker._
 import org.psliwa.idea.composerJson.intellij.codeAssist.problem.ImplicitConversions._
 import org.psliwa.idea.composerJson.intellij.codeAssist.problem._
 import org.psliwa.idea.composerJson.json.{SBoolean, SString, Schema}
+import org.psliwa.idea.composerJson.intellij.PsiElements.findProperty
 import PsiElements._
 
 class MisconfigurationInspection extends AbstractInspection {
@@ -44,9 +45,8 @@ class MisconfigurationInspection extends AbstractInspection {
     val problemDescriptions = problemCheckers.flatMap(checker => {
       if(checker.check(jsonObject)) {
         checker.properties
-          .map(name => Option(jsonObject.findProperty(name)))
-          .filter(_ != None)
-          .flatMap(value => Option(value.get.getValue))
+          .flatMap(findProperty(jsonObject, _))
+          .flatMap(value => Option(value.getValue))
           .map(value => ProblemDescriptor(
             element = value,
             message = Some(checker.problem),

@@ -62,4 +62,9 @@ private object PsiElements {
       .map(_.getText)
       .flatMap(booleans.get)
   }
+
+  def findProperty(jsonObject: JsonObject, propertyName: String): Option[JsonProperty] = {
+    import scala.collection.JavaConversions._
+    jsonObject.getPropertyList.find(_.getName == propertyName)
+  }
 }

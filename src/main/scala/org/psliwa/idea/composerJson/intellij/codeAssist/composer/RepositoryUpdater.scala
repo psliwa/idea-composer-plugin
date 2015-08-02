@@ -45,7 +45,7 @@ class RepositoryUpdater extends Annotator {
 
   private def getJsonPropertyValue(objectElement: JsonObject, propertyName: String): Option[JsonElement] = {
     for {
-      packageProperty <- Option(objectElement.findProperty(propertyName))
+      packageProperty <- findProperty(objectElement, propertyName)
       packageValue <- Option(packageProperty.getValue)
     } yield packageValue
   }
