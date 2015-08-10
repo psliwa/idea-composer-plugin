@@ -52,6 +52,7 @@ class MisconfigurationInspectionTest extends InspectionTest {
       s"""
         |{
         |  "name": "some/pkg",
+        |  "description": "desc",
         |  "type": "library",
         |  "minimum-stability": "dev",
         |  "prefer-stable": false
@@ -88,6 +89,18 @@ class MisconfigurationInspectionTest extends InspectionTest {
     checkInspection(
       """
         |{
+        |  "description": "desc",
+        |  <error>"type": "library"</error>
+        |}
+      """.stripMargin
+    )
+  }
+
+  def testDescriptionProperty_givenLibraryPackageType_descPropertyIsMissing_errorShouldBeReported() = {
+    checkInspection(
+      """
+        |{
+        |  "name": "some/pkg",
         |  <error>"type": "library"</error>
         |}
       """.stripMargin
@@ -99,6 +112,7 @@ class MisconfigurationInspectionTest extends InspectionTest {
       """
         |{
         |  "name": "some/pkg",
+        |  "description": "desc",
         |  "type": "library"
         |}
       """.stripMargin

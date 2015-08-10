@@ -25,15 +25,19 @@ class MisconfigurationInspection extends AbstractInspection {
         new SetPropertyValueQuickFix(jsonObject, "minimum-stability", SString(), "stable")
       )
     ),
-    ProblemChecker(
-      ("type" isNot "project") && not("name"),
-      List("type"),
-      ComposerBundle.message("inspection.misconfig.nameRequiredForLibrary"),
-      (jsonObject) => List(
-        new CreatePropertyQuickFix(jsonObject, "name", new SString())
-      ),
-      ProblemHighlightType.GENERIC_ERROR
-    )
+    requiredPropertyForLibrary("name"),
+    requiredPropertyForLibrary("description")
+  )
+
+  private def requiredPropertyForLibrary(property: String) = ProblemChecker(
+    ("type" isNot "project") && not(property),
+    List("type"),
+    ComposerBundle.message("inspection.misconfig.requiredForLibrary", property),
+    (jsonObject) => List(
+      new CreatePropertyQuickFix(jsonObject, property, new SString()),
+      new SetPropertyValueQuickFix(jsonObject, "type", new SString(), "project")
+    ),
+    ProblemHighlightType.GENERIC_ERROR
   )
 
   override protected def collectProblems(element: PsiElement, schema: Schema, problems: ProblemsHolder): Unit = {
