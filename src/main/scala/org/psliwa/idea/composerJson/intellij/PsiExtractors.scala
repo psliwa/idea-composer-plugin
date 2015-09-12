@@ -3,6 +3,7 @@ package org.psliwa.idea.composerJson.intellij
 import com.intellij.json.psi._
 import com.intellij.psi.PsiWhiteSpace
 import com.intellij.psi.impl.source.tree.LeafPsiElement
+import org.psliwa.idea.composerJson.util.ImplicitConversions._
 
 private object PsiExtractors {
   object JsonFile {
@@ -26,8 +27,7 @@ private object PsiExtractors {
   }
 
   object JsonStringLiteral {
-    import scala.collection.JavaConversions._
-    def unapply(x: JsonStringLiteral): Option[(String)] = Some(x.getTextFragments.foldRight("")((p, s) => p.getSecond+s))//headOption.map(_.second).orElse(Some(""))
+    def unapply(x: JsonStringLiteral): Option[(String)] = Some(x.getText.stripQuotes)
   }
 
   object JsonBooleanLiteral {

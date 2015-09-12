@@ -111,10 +111,10 @@ class SchemaInspection extends AbstractInspection {
         case _ => List(invalidTypeProblem(element, schema))
       }
       case SOr(items) => {
-        val problems = items.map(collectProblems(element, _)).filter(_.size > 0).flatten
+        val problems = items.map(collectProblems(element, _)).filter(_.nonEmpty).flatten
         val innerProblems = problems.filterNot(_.element == element)
 
-        if(innerProblems.size > 0) innerProblems
+        if(innerProblems.nonEmpty) innerProblems
         else if(problems.size >= items.length) List(invalidTypeProblem(element, schema))
         else List.empty
       }

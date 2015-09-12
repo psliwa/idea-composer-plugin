@@ -33,7 +33,7 @@ private object InstallPackagesAction extends IntentionAction {
       pkg <- getNotInstalledPackageProperties(topValue, installedPackages).map(property => composer.Package(property.getName, getPackageVersion(property)))
     } yield pkg
 
-    if(packages.size > 0) {
+    if(packages.nonEmpty) {
       Configuration.forProject(project) match {
         case Right(config) => new DefaultPackagesInstaller(project, config, file).install(packages)
         case _ =>
