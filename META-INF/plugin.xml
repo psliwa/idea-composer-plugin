@@ -1,7 +1,7 @@
 <idea-plugin version="2">
   <id>org.psliwa.idea.composer</id>
   <name>PHP composer.json support</name>
-  <version>1.0.7</version>
+  <version>1.0.8</version>
   <vendor email="me@psliwa.org" url="http://github.org/psliwa/idea-composer-plugin">psliwa</vendor>
 
     <description><![CDATA[
@@ -11,6 +11,13 @@ This plugin adds auto completion and inspections support for composer.json file 
     ]]></description>
 
   <change-notes><![CDATA[
+<h2>1.0.8</h2>
+<ul>
+  <li>[#16] Fix cache invalidation bug</li>
+  <li>[#14] "name" and "description" property are required only when package type is "project"</li>
+  <li>fix "set property value" quick fix</li>
+</ul>
+
 <h2>1.0.7</h2>
 <ul>
   <li>[#10] Fix inspection and quick fixes for relative file paths</li>
