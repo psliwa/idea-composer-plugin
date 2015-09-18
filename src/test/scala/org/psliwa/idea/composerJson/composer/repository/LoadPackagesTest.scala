@@ -9,14 +9,14 @@ class LoadPackagesTest {
   def loadJsonFromPackagist_shouldBeLoaded() = {
     val result = Packagist.loadPackagesFromPackagist()
 
-    assertFalse(result.isLeft)
-    assertTrue(result.right.toOption.map(_.contains("packageNames")).get)
+    assertFalse(result.isFailure)
+    assertTrue(result.toOption.map(_.contains("packageNames")).get)
   }
 
   @Test
   def loadJsonFromPackagist_givenInvalidIri_expectedError() = {
     val result = Packagist.loadUri("some/invalid/uri.json")
 
-    assertTrue(result.isLeft)
+    assertTrue(result.isFailure)
   }
 }

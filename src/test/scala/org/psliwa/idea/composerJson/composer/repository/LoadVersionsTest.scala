@@ -9,14 +9,14 @@ class LoadVersionsTest {
   def loadFromPackagist_givenValidPackage_expectSomeVersions() = {
     val result = Packagist.loadVersions("symfony/symfony")
 
-    assertTrue(result.isRight)
-    assertTrue(result.right.get.size > 0)
+    assertTrue(result.isSuccess)
+    assertTrue(result.get.nonEmpty)
   }
 
   @Test
   def loadFromPackagist_givenInvalidPackage_expectError() = {
     val result = Packagist.loadVersions("some-unexisting-vendor/some-unexisting-package-123")
 
-    assertTrue(result.isLeft)
+    assertTrue(result.isFailure)
   }
 }

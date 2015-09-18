@@ -19,9 +19,9 @@ class PackagesLoader extends ApplicationComponent {
   private lazy val loadPackageLookupElements = loadPackages.map(new BaseLookupElement(_, Some(Icons.Packagist)))
   private lazy val loadPackages = {
     if(isUnitTestMode) Nil
-    else Packagist.loadPackages().right.getOrElse(Nil)
+    else Packagist.loadPackages().getOrElse(Nil)
   }
-  private val versionsLoader: (String) => Seq[String] = memorize(30)(Packagist.loadVersions(_).right.getOrElse(List()))
+  private val versionsLoader: (String) => Seq[String] = memorize(30)(Packagist.loadVersions(_).getOrElse(List()))
   private lazy val packagistRepository = new CallbackRepository(loadPackageLookupElements, versionsLoader)
 
   private val defaultRepositoryProvider = new DefaultRepositoryProvider(packagistRepository, new BaseLookupElement(_))

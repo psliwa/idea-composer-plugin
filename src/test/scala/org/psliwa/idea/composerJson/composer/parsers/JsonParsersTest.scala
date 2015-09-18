@@ -20,10 +20,10 @@ class JsonParsersTest {
 
     val result = JsonParsers.parsePackageNames(s)
 
-    assertFalse(result.isLeft)
+    assertFalse(result.isFailure)
     assertEquals(
       List("ps/image-optimizer", "ps/fluent-traversable", "psliwa/php-pdf"),
-      result.right.get
+      result.get
     )
   }
 
@@ -32,7 +32,7 @@ class JsonParsersTest {
     val s = "invalid json"
 
     val result = JsonParsers.parsePackageNames(s)
-    assertTrue(result.isLeft)
+    assertTrue(result.isFailure)
   }
 
 
@@ -54,8 +54,8 @@ class JsonParsersTest {
 
     val result = JsonParsers.parseVersions(json)
 
-    assertTrue(result.isRight)
-    assertEquals(List("dev-master", "1.0.0", "1.0.1"), result.right.get)
+    assertTrue(result.isSuccess)
+    assertEquals(List("dev-master", "1.0.0", "1.0.1"), result.get)
   }
 
   @Test
@@ -71,7 +71,7 @@ class JsonParsersTest {
 
     val result = JsonParsers.parseVersions(json)
 
-    assertTrue(result.isLeft)
+    assertTrue(result.isFailure)
   }
 
   @Test
@@ -80,7 +80,7 @@ class JsonParsersTest {
 
     val result = JsonParsers.parseVersions(json)
 
-    assertTrue(result.isLeft)
+    assertTrue(result.isFailure)
   }
 
   @Test
@@ -105,8 +105,8 @@ class JsonParsersTest {
 
       val result = JsonParsers.parseLockPackages(json)
 
-      assertTrue(packagesKey, result.isRight)
-      assertEquals(packagesKey, Packages(Package("ps/image-optimizer", "1.0.0", dev), Package("ps/fluent-traversable", "0.3.0", dev)), result.right.get)
+      assertTrue(packagesKey, result.isSuccess)
+      assertEquals(packagesKey, Packages(Package("ps/image-optimizer", "1.0.0", dev), Package("ps/fluent-traversable", "0.3.0", dev)), result.get)
     })
   }
 
@@ -116,7 +116,7 @@ class JsonParsersTest {
 
     val result = JsonParsers.parseLockPackages(json)
 
-    assertTrue(result.isLeft)
+    assertTrue(result.isFailure)
   }
 
   @Test
@@ -138,12 +138,12 @@ class JsonParsersTest {
 
     val result = JsonParsers.parsePackages(json)
 
-    assertTrue(result.isRight)
+    assertTrue(result.isSuccess)
     assertEquals(RepositoryPackages(Map(
         "some/package" -> Seq("1.0.0", "2.0.0"),
         "some/package2" -> Seq("3.0.0")
       ), List()),
-      result.right.get
+      result.get
     )
   }
 
@@ -157,7 +157,7 @@ class JsonParsersTest {
 
     val result = JsonParsers.parsePackages(json)
 
-    assertTrue(result.isLeft)
+    assertTrue(result.isFailure)
   }
 
   @Test
@@ -174,8 +174,8 @@ class JsonParsersTest {
 
     val result = JsonParsers.parsePackages(json)
 
-    assertTrue(result.isRight)
-    assertEquals(RepositoryPackages(Map(), List("some-include.json")), result.right.get)
+    assertTrue(result.isSuccess)
+    assertEquals(RepositoryPackages(Map(), List("some-include.json")), result.get)
   }
 
   @Test
@@ -192,7 +192,7 @@ class JsonParsersTest {
 
     val result = JsonParsers.parsePackages(json)
 
-    assertTrue(result.isRight)
-    assertEquals(RepositoryPackages(Map(), List("some-include.json")), result.right.get)
+    assertTrue(result.isSuccess)
+    assertEquals(RepositoryPackages(Map(), List("some-include.json")), result.get)
   }
 }

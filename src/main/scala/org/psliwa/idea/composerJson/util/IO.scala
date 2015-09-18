@@ -1,18 +1,17 @@
 package org.psliwa.idea.composerJson.util
 
 import scala.io.Source
+import scala.util.Try
 
 object IO {
-  def loadUrl(uri: String): Either[String,String] = {
-    try {
+  def loadUrl(uri: String): Try[String] = {
+    Try {
       val in = Source.fromURL(uri)
       try {
-        Right(in.getLines().mkString)
+        in.getLines().mkString
       } finally {
         in.close()
       }
-    } catch {
-      case e: Throwable => Left(e.getStackTraceString)
     }
   }
 }

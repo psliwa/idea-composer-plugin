@@ -1,13 +1,16 @@
 package org.psliwa.idea.composerJson.composer.parsers
 
 import org.psliwa.idea.composerJson.composer._
-import scala.util.parsing.json.{JSONType, JSONArray, JSONObject, JSON}
+import scala.util.parsing.json.{JSONArray, JSONObject, JSON}
+import scala.util.{Failure, Try}
 
 object JsonParsers {
 
   type Error = String
 
-  def parsePackageNames(data: String): Either[Error,Seq[String]] = {
+  class ParseException() extends RuntimeException
+
+  def parsePackageNames(data: String): Try[Seq[String]] = {
     val packages = for {
       result <- JSON.parseRaw(data)
       o <- tryJsonObject(result)
@@ -15,7 +18,7 @@ object JsonParsers {
       packageNames <- tryJsonArray(packageNames)
     } yield packageNames.list.map(_.toString)
 
-    packages.map(Right(_)).getOrElse(Left("Json parse error"))
+    packages.map(Try(_)).getOrElse(Failure(new ParseException()))
   }
 
   private def tryJsonObject(a: Any): Option[JSONObject] = a match {
@@ -28,7 +31,7 @@ object JsonParsers {
     case _ => None
   }
 
-  def parseVersions(data: String): Either[Error,Seq[String]] = {
+  def parseVersions(data: String): Try[Seq[String]] = {
     val versions = for {
       result <- JSON.parseRaw(data)
       o <- tryJsonObject(result)
@@ -38,10 +41,10 @@ object JsonParsers {
       versions <- tryJsonObject(versions)
     } yield versions.obj.keys.toList
 
-    versions.map(Right(_)).getOrElse(Left("Json parse error"))
+    versions.map(Try(_)).getOrElse(Failure(new ParseException()))
   }
 
-  def parseLockPackages(data: String): Either[Error,Packages] = {
+  def parseLockPackages(data: String): Try[Packages] = {
     import org.psliwa.idea.composerJson.util.OptionOps._
 
     def parse(property: String, dev: Boolean) = for {
@@ -58,8 +61,8 @@ object JsonParsers {
     } yield prodPackages ++ devPackages
 
     packages match {
-      case Some(pkgs) if pkgs.nonEmpty => Right(Packages(pkgs: _*))
-      case _ => Left("Json parse error")
+      case Some(pkgs) if pkgs.nonEmpty => Try(Packages(pkgs: _*))
+      case _ => Failure(new ParseException)
     }
   }
 
@@ -71,7 +74,7 @@ object JsonParsers {
     } yield Package(name, version, dev)
   }
 
-  def parsePackages(data: String): Either[Error, RepositoryPackages] = {
+  def parsePackages(data: String): Try[RepositoryPackages] = {
     def getPackagesFrom(json: Any): Option[Map[String,Seq[String]]] = {
       val packages: Map[String,Seq[String]] = (for {
         obj <- tryJsonObject(json).toList
@@ -102,6 +105,6 @@ object JsonParsers {
       include <- includesElement.obj.keys.toList
     } yield include
 
-    packages.map(pkgs => Right(RepositoryPackages(pkgs, includes))).getOrElse(Left("parse error"))
+    packages.map(pkgs => Try(RepositoryPackages(pkgs, includes))).getOrElse(Failure(new ParseException))
   }
 }

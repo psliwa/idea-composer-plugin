@@ -4,6 +4,7 @@ import org.psliwa.idea.composerJson.composer.repository.DefaultRepositoryProvide
 import org.psliwa.idea.composerJson.composer.parsers.{JsonParsers, RepositoryPackages}
 import org.psliwa.idea.composerJson.util.IO
 import scala.collection.mutable
+import scala.util.Try
 
 class DefaultRepositoryProvider[Package](repositoryFactory: RepositoryFactory[Package], defaultRepository: Repository[Package]) extends RepositoryProvider[Package] {
 
@@ -70,8 +71,8 @@ object DefaultRepositoryProvider {
   }
 
   private[repository] def repositoryFromUrl(
-    loadUrl: String => Either[String, String],
-    parsePackages: String => Either[String, RepositoryPackages]
+    loadUrl: String => Try[String],
+    parsePackages: String => Try[RepositoryPackages]
   )(url: String): Repository[String] = {
 
     //TODO: par?
@@ -81,8 +82,8 @@ object DefaultRepositoryProvider {
 
     def loadPackages(url: String): Option[RepositoryPackages] = {
       for {
-        data <- loadUrl(url).right.toOption
-        packages <- parsePackages(data).right.toOption
+        data <- loadUrl(url).toOption
+        packages <- parsePackages(data).toOption
       } yield packages
     }
 

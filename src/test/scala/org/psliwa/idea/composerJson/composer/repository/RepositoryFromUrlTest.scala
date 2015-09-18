@@ -4,6 +4,8 @@ import org.junit.Assert._
 import org.junit.Test
 import org.psliwa.idea.composerJson.composer.parsers.RepositoryPackages
 
+import scala.util.Try
+
 class RepositoryFromUrlTest {
 
   @Test
@@ -101,11 +103,11 @@ class RepositoryFromUrlTest {
     assertTrue(repository.getPackages.contains("package"))
   }
 
-  private def loadUrl(contents: Map[String, String])(url: String): Either[String,String] = {
-    contents.get(url).toRight("")
+  private def loadUrl(contents: Map[String, String])(url: String): Try[String] = {
+    Try { contents.get(url).get }
   }
 
-  private def parsePackages(results: Map[String, RepositoryPackages])(data: String): Either[String,RepositoryPackages] = {
-    results.get(data).toRight("")
+  private def parsePackages(results: Map[String, RepositoryPackages])(data: String): Try[RepositoryPackages] = {
+    Try { results.get(data).get }
   }
 }
