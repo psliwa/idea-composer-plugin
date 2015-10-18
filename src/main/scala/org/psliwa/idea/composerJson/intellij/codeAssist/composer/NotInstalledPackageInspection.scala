@@ -23,7 +23,7 @@ class NotInstalledPackageInspection extends AbstractInspection {
   private def createProblem(property: JsonProperty) = {
     ProblemDescriptor(
       property,
-      ComposerBundle.message("inspection.notIninstalledPackage.packageIsNotInstalled", property.getName),
+      ComposerBundle.message("inspection.notInstalledPackage.packageIsNotInstalled", property.getName),
       Seq(new IntentionActionQuickFixAdapter(InstallPackagesAction, property.getContainingFile))
     )
   }
