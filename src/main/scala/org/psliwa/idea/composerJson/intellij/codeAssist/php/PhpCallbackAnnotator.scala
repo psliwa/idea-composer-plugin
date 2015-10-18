@@ -86,7 +86,7 @@ class PhpCallbackAnnotator extends Annotator {
             problems += createMethodProblem(element, elementRange, methodName, "inspection.php.methodIsAbstract")
           }
 
-          if(method.getParameters.length > 0) {
+          if(method.getParameters.nonEmpty) {
             val firstParameter = method.getParameters.head
             val otherParameters = method.getParameters.tail
 

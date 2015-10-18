@@ -3,7 +3,7 @@
 To be able setup environment for this plugin, you need:
 
 - Idea Intellij 14+ (community edition should be enough) with [scala plugin][1]
-- Follow the [instructions][2] to setup general plugin development sdk
+- Follow the [instructions][2] to setup general plugin development sdk (IntelliJ 141.+ SDK is required)
 - checkout plugin repository
 - create new project choosing composer-json-plugin directory, select "Intellij Platform Plugin" project type and choose
 "Scala" as additional library (select 2.10.2 version or eventually any 2.10.x).
