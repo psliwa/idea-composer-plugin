@@ -10,17 +10,17 @@ import com.intellij.openapi.util.Key
 import com.intellij.psi.PsiFile
 import org.psliwa.idea.composerJson
 import org.psliwa.idea.composerJson.ComposerBundle
-import org.psliwa.idea.composerJson.composer.Package
+import org.psliwa.idea.composerJson.composer.ComposerPackage
 import org.psliwa.idea.composerJson.intellij.Notifications
 import org.psliwa.idea.composerJson.ui.OutputDialog
 
 trait PackagesInstaller {
-  def install(packages: List[Package]): Unit
+  def install(packages: List[ComposerPackage]): Unit
 }
 
 class DefaultPackagesInstaller(project: Project, config: Configuration, file: PsiFile) extends PackagesInstaller {
 
-  override def install(packages: List[Package]) = {
+  override def install(packages: List[ComposerPackage]) = {
     val task = new Backgroundable(project, ComposerBundle.message("inspection.notInstalledPackage.installing"), true, PerformInBackgroundOption.DEAF) {
       override def run(indicator: ProgressIndicator): Unit = {
         val packageNames = packages.map(_.name).mkString(", ")

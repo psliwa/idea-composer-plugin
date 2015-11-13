@@ -2,8 +2,8 @@ package org.psliwa.idea.composerJson.intellij.codeAssist.composer.versionRendere
 
 import com.intellij.openapi.application.ApplicationManager
 import org.psliwa.idea.composerJson.fixtures.ComposerFixtures._
-import org.psliwa.idea.composerJson.composer.Packages
-import org.psliwa.idea.composerJson.composer.Package
+import org.psliwa.idea.composerJson.composer.ComposerPackages
+import org.psliwa.idea.composerJson.composer.ComposerPackage
 import org.junit.Assert._
 import org.psliwa.idea.composerJson.intellij.codeAssist.InspectionTest
 
@@ -25,7 +25,7 @@ class PackageVersionInspectionTest extends InspectionTest {
   }
 
   def testGivenInstalledPackage_itsVersionShouldBeCollected(): Unit = {
-    createComposerLock(myFixture, Packages(Package("some/pkg", "1.0.1")), ".")
+    createComposerLock(myFixture, ComposerPackages(ComposerPackage("some/pkg", "1.0.1")), ".")
 
     checkInspection(
       s"""

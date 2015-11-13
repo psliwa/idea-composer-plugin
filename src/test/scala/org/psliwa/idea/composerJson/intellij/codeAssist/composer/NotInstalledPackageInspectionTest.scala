@@ -35,7 +35,7 @@ class NotInstalledPackageInspectionTest extends InspectionTest {
   }
 
   def testGivenInstalledPackage_thatShouldNotBeReported() = {
-    createComposerLock(myFixture, composer.Packages(composer.Package("vendor/pkg", "1.0.2")))
+    createComposerLock(myFixture, composer.ComposerPackages(composer.ComposerPackage("vendor/pkg", "1.0.2")))
 
     checkInspection(
       """
@@ -48,7 +48,7 @@ class NotInstalledPackageInspectionTest extends InspectionTest {
   }
 
   def testGivenInstalledPackage_givenPackageNameInDifferentCase_thatShouldNotBeReported() = {
-    createComposerLock(myFixture, composer.Packages(composer.Package("veNdor/pkg", "1.0.2")))
+    createComposerLock(myFixture, composer.ComposerPackages(composer.ComposerPackage("veNdor/pkg", "1.0.2")))
 
     checkInspection(
       """
@@ -72,7 +72,7 @@ class NotInstalledPackageInspectionTest extends InspectionTest {
   }
 
   def testGivenInstalledProdPackage_thatPackageIsOnlyInRequireDev_thatShouldNotBeReported() = {
-    createComposerLock(myFixture, composer.Packages(composer.Package("vendor/pkg", "1.0.2")))
+    createComposerLock(myFixture, composer.ComposerPackages(composer.ComposerPackage("vendor/pkg", "1.0.2")))
 
     checkInspection(
       """
@@ -96,7 +96,7 @@ class NotInstalledPackageInspectionTest extends InspectionTest {
   }
 
   def testGivenInstalledDevPackage_thatPackageIsOnlyInRequireDev_thatShouldNotBeReported() = {
-    createComposerLock(myFixture, composer.Packages(composer.Package("vendor/pkg", "1.0.2", isDev = true)))
+    createComposerLock(myFixture, composer.ComposerPackages(composer.ComposerPackage("vendor/pkg", "1.0.2", isDev = true)))
 
     checkInspection(
       """
@@ -109,7 +109,7 @@ class NotInstalledPackageInspectionTest extends InspectionTest {
   }
 
   def testGivenInstalledDevPackage_thatPackageIsOnlyInRequire_thatShouldBeReported() = {
-    createComposerLock(myFixture, composer.Packages(composer.Package("vendor/pkg", "1.0.2", isDev = true)))
+    createComposerLock(myFixture, composer.ComposerPackages(composer.ComposerPackage("vendor/pkg", "1.0.2", isDev = true)))
 
     checkInspection(
       """

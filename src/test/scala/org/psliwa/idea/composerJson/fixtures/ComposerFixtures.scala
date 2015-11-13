@@ -18,7 +18,7 @@ object ComposerFixtures {
     writeAction(() => VfsUtil.saveText(file, text))
   }
 
-  private def makePackagesJson(pkgs: Iterable[Package]): String = {
+  private def makePackagesJson(pkgs: Iterable[ComposerPackage]): String = {
     pkgs.map( pkg =>
       s"""{
           |  "name": "${pkg.name}",
@@ -28,7 +28,7 @@ object ComposerFixtures {
     ).mkString(",\n")
   }
 
-  def createComposerLock(fixture: CodeInsightTestFixture, packages: Packages, dir: String = ".") = {
+  def createComposerLock(fixture: CodeInsightTestFixture, packages: ComposerPackages, dir: String = ".") = {
 
     val (devPackages, prodPackages) = packages.values.partition(_.isDev)
 

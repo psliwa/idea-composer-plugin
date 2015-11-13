@@ -325,10 +325,6 @@ class SchemaInspectionTest extends InspectionTest {
     )
   }
 
-  def testDoesNotReportAnyErrorsWhenFileIsEmpty() = {
-    checkInspection("")
-  }
-
   def testReportAlreadyDefinedProperty() = {
     checkInspection(
       s"""

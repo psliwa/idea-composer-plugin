@@ -22,13 +22,13 @@ class InstalledPackagesTest extends LightPlatformCodeInsightFixtureTestCase {
   private def installedPackages(file: VirtualFile = composerJsonFile) = InstalledPackages.forFile(file)
 
   def testEmptyComposerLockExist_installedPackagesShouldBeEmpty() = {
-    createComposerLock(Packages())
+    createComposerLock(ComposerPackages())
 
     assertTrue(installedPackages().isEmpty)
   }
 
   def testGivenComposerLockWithFewPackages_installedPackagesShouldBeTheSame() = {
-    val packages = Packages(Package("vendor/name", "1.0.0"), Package("vendor2/name2", "2.0.0"))
+    val packages = ComposerPackages(ComposerPackage("vendor/name", "1.0.0"), ComposerPackage("vendor2/name2", "2.0.0"))
     createComposerLock(packages)
 
     assertEquals(packages, installedPackages())
@@ -37,8 +37,8 @@ class InstalledPackagesTest extends LightPlatformCodeInsightFixtureTestCase {
   def testGivenTwoComposerLockInDifferentLocations_installedPackagesDependOnRequestedFile() = {
     val subComposerJson = createComposerJson("subdir")
 
-    val packages1 = Packages(Package("vendor/name", "1.0.0"), Package("vendor2/name2", "2.0.0"))
-    val packages2 = Packages(Package("vendor3/name3", "1.0.0"), Package("vendor24/name24", "2.0.0"))
+    val packages1 = ComposerPackages(ComposerPackage("vendor/name", "1.0.0"), ComposerPackage("vendor2/name2", "2.0.0"))
+    val packages2 = ComposerPackages(ComposerPackage("vendor3/name3", "1.0.0"), ComposerPackage("vendor24/name24", "2.0.0"))
 
     createComposerLock(packages1)
     createComposerLock(packages2, "subdir")
@@ -48,7 +48,7 @@ class InstalledPackagesTest extends LightPlatformCodeInsightFixtureTestCase {
   }
 
   def testGivenComposerLockWithFewPackages_deleteComposerLock_installedPackagesShouldBeEmpty() = {
-    val packages = Packages(Package("vendor/name", "1.0.0"))
+    val packages = ComposerPackages(ComposerPackage("vendor/name", "1.0.0"))
     val file = createComposerLock(packages)
 
     assertEquals(packages, installedPackages())
@@ -59,7 +59,7 @@ class InstalledPackagesTest extends LightPlatformCodeInsightFixtureTestCase {
   }
 
   def testGivenComposerLockWithFewPackages_moveIt_installedPackagesShouldBeEmpty() = {
-    val packages = Packages(Package("vendor/name", "1.0.0"))
+    val packages = ComposerPackages(ComposerPackage("vendor/name", "1.0.0"))
     val file = createComposerLock(packages)
 
     writeAction(() => file.move(this, myFixture.getTempDirFixture.findOrCreateDir("subdir")))
@@ -68,7 +68,7 @@ class InstalledPackagesTest extends LightPlatformCodeInsightFixtureTestCase {
   }
 
   def testGivenComposerLockWithFewPackages_moveIt_givenComposerJsonInMoveDest_installedPackagesShouldBeTheSame() = {
-    val packages = Packages(Package("vendor/name", "1.0.0"))
+    val packages = ComposerPackages(ComposerPackage("vendor/name", "1.0.0"))
     val file = createComposerLock(packages)
 
     writeAction(() => file.move(this, myFixture.getTempDirFixture.findOrCreateDir("subdir")))
@@ -77,6 +77,6 @@ class InstalledPackagesTest extends LightPlatformCodeInsightFixtureTestCase {
     assertEquals(packages, installedPackages(composerJson))
   }
 
-  private def createComposerLock(packages: Packages, dir: String = ".") = ComposerFixtures.createComposerLock(myFixture, packages, dir)
+  private def createComposerLock(packages: ComposerPackages, dir: String = ".") = ComposerFixtures.createComposerLock(myFixture, packages, dir)
   private def createComposerJson(dir: String = ".") = ComposerFixtures.createComposerJson(myFixture, dir)
 }

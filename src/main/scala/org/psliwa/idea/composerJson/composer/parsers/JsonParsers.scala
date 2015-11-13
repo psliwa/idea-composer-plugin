@@ -44,7 +44,7 @@ object JsonParsers {
     versions.map(Try(_)).getOrElse(Failure(new ParseException()))
   }
 
-  def parseLockPackages(data: String): Try[Packages] = {
+  def parseLockPackages(data: String): Try[ComposerPackages] = {
     import org.psliwa.idea.composerJson.util.OptionOps._
 
     def parse(property: String, dev: Boolean) = for {
@@ -61,17 +61,17 @@ object JsonParsers {
     } yield prodPackages ++ devPackages
 
     packages match {
-      case Some(pkgs) if pkgs.nonEmpty => Try(Packages(pkgs: _*))
+      case Some(pkgs) if pkgs.nonEmpty => Try(ComposerPackages(pkgs: _*))
       case _ => Failure(new ParseException)
     }
   }
 
-  private def createLockPackage(dev: Boolean)(maybeJsonObject: Any): Option[Package] = {
+  private def createLockPackage(dev: Boolean)(maybeJsonObject: Any): Option[ComposerPackage] = {
     for {
       jsonObject <- tryJsonObject(maybeJsonObject)
       name <- jsonObject.obj.get("name").map(_.toString)
       version <- jsonObject.obj.get("version").map(_.toString)
-    } yield Package(name, version, dev)
+    } yield ComposerPackage(name, version, dev)
   }
 
   def parsePackages(data: String): Try[RepositoryPackages] = {

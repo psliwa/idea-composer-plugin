@@ -2,7 +2,7 @@ package org.psliwa.idea.composerJson.composer.parsers
 
 import org.junit.Assert._
 import org.junit.Test
-import org.psliwa.idea.composerJson.composer.{Package, Packages}
+import org.psliwa.idea.composerJson.composer.{ComposerPackage, ComposerPackages}
 
 class JsonParsersTest {
   @Test
@@ -106,7 +106,7 @@ class JsonParsersTest {
       val result = JsonParsers.parseLockPackages(json)
 
       assertTrue(packagesKey, result.isSuccess)
-      assertEquals(packagesKey, Packages(Package("ps/image-optimizer", "1.0.0", dev), Package("ps/fluent-traversable", "0.3.0", dev)), result.get)
+      assertEquals(packagesKey, ComposerPackages(ComposerPackage("ps/image-optimizer", "1.0.0", dev), ComposerPackage("ps/fluent-traversable", "0.3.0", dev)), result.get)
     })
   }
 

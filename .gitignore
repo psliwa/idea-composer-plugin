@@ -5,3 +5,8 @@ target/*
 !target/.gitkeep
 composer-json-plugin.zip
 IDEAS.md
+project/project
+project/target
+idea/
+subprojects
+proguard.jar
