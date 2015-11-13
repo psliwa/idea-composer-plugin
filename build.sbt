@@ -10,6 +10,8 @@ addCommandAlias("pluginProguard", "proguard/package")
 
 onLoad in Global := ((s: State) => { "updateIdea" :: s}) compose (onLoad in Global).value
 
+ideaBuild in ThisBuild := Versions.idea
+
 lazy val release = TaskKey[Unit]("release")
 release in ThisBuild := {
   clean.value
@@ -40,9 +42,8 @@ lazy val root = (project in file("."))
       "CSS"
     ),
     ideaExternalPlugins ++= Seq(
-      IdeaPlugin.Zip("php", url(s"https://plugins.jetbrains.com/files/6610/22244/php-${Versions.phpPlugin}.zip"))
+      IdeaPlugin.Zip("php", url(s"https://plugins.jetbrains.com/files/6610/22244/php-143.382.38.zip"))
     ),
-    ideaBuild := Versions.idea,
 
     unmanagedJars in Test += file(System.getProperty("java.home")).getParentFile / "lib" / "tools.jar",
     fork in Test := true,
@@ -176,12 +177,12 @@ lazy val proguard: Project = (project in file("subprojects/proguard"))
   )
 
 //use Intellij Ultimate instead of Community Edition
-updateIdea <<= (ideaBaseDirectory, ideaExternalPlugins.in(root), ideaBuild.in(root), streams).map {
+updateIdea <<= (ideaBaseDirectory, ideaExternalPlugins.in(root), ideaBuild, streams).map {
   (baseDir, externalPlugins, build, streams) =>
     val log = streams.log
     if(!baseDir.isDirectory) {
       IO.createDirectory(baseDir)
-      val ideaUrl = url(s"https://download.jetbrains.com/idea/ideaIU-$build.zip")
+      val ideaUrl = url(s"https://www.jetbrains.com/intellij-repository/releases/com/jetbrains/intellij/idea/ideaIU/$build/ideaIU-$build.zip")
       val ideaZipFile = baseDir.getParentFile / s"ideaIU-$build.zip"
 
       log.info(s"Download ideaIU-$build from $ideaUrl")

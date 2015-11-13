@@ -19,7 +19,7 @@ If you want to run tests using Intellij, you should set following VM options in
     -Xms128m
     -Xmx4096m
     -XX:MaxPermSize=350m
-    -Didea.system.path=$MODULE_DIR$/../../idea/LATEST-EAP-SNAPSHOT/test-system
-    -Didea.config.path=$MODULE_DIR$/../../idea/LATEST-EAP-SNAPSHOT/test-config
+    -Didea.system.path=$MODULE_DIR$/../../idea/15.0/test-system
+    -Didea.config.path=$MODULE_DIR$/../../idea/15.0/test-config
     -Dplugin.path=$MODULE_DIR$/../../target/plugin
-    -Didea.home.path=$MODULE_DIR$/../../idea/LATEST-EAP-SNAPSHOT
+    -Didea.home.path=$MODULE_DIR$/../../idea/15.0
