@@ -74,7 +74,7 @@ private class CreatePropertyQuickFix(element: PsiElement, propertyName: String, 
   private def findTrailingComma(element: PsiElement): Option[LeafPsiElement] = findNextComma(element.getNode.getTreeNext)
   private def findNextComma(node: ASTNode): Option[LeafPsiElement] = {
     node match {
-      case PsiExtractors.PsiWhiteSpace() => findNextComma(node.getTreeNext)
+      case PsiExtractors.PsiWhiteSpace(()) => findNextComma(node.getTreeNext)
       case x@PsiExtractors.LeafPsiElement(",") => Some(x)
       case _ => None
     }
