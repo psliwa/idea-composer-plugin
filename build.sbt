@@ -11,6 +11,7 @@ addCommandAlias("pluginProguard", "proguard/package")
 onLoad in Global := ((s: State) => { "updateIdea" :: s}) compose (onLoad in Global).value
 
 ideaBuild in ThisBuild := Versions.idea
+scalaVersion in ThisBuild := Versions.scala
 
 lazy val release = TaskKey[Unit]("release")
 release in ThisBuild := {
