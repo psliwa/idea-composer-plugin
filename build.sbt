@@ -1,7 +1,6 @@
 import sbt.Keys.{`package` => pack}
 import sbt.project
 import scala.language.postfixOps
-import com.dancingrobot84.sbtidea.Tasks.{updateIdea => updateIdeaTask}
 
 addCommandAlias("pluginRun", "runner/run")
 addCommandAlias("pluginCompress", "compressor/package")
@@ -11,6 +10,7 @@ addCommandAlias("pluginProguard", "proguard/package")
 onLoad in Global := ((s: State) => { "updateIdea" :: s}) compose (onLoad in Global).value
 
 ideaBuild in ThisBuild := Versions.idea
+ideaEdition in ThisBuild := IdeaEdition.Ultimate
 scalaVersion in ThisBuild := Versions.scala
 
 lazy val release = TaskKey[Unit]("release")
@@ -176,22 +176,3 @@ lazy val proguard: Project = (project in file("subprojects/proguard"))
       artifactPath.value
     }
   )
-
-//use Intellij Ultimate instead of Community Edition
-updateIdea <<= (ideaBaseDirectory, ideaExternalPlugins.in(root), ideaBuild, streams).map {
-  (baseDir, externalPlugins, build, streams) =>
-    val log = streams.log
-    if(!baseDir.isDirectory) {
-      IO.createDirectory(baseDir)
-      val ideaUrl = url(s"https://www.jetbrains.com/intellij-repository/releases/com/jetbrains/intellij/idea/ideaIU/$build/ideaIU-$build.zip")
-      val ideaZipFile = baseDir.getParentFile / s"ideaIU-$build.zip"
-
-      log.info(s"Download ideaIU-$build from $ideaUrl")
-      IO.download(ideaUrl, ideaZipFile)
-
-      log.info(s"Unpacking ideaUI-$build.zip to $ideaZipFile")
-      IO.unzip(ideaZipFile, baseDir)
-    }
-
-    updateIdeaTask(baseDir, build, externalPlugins, streams)
-}
