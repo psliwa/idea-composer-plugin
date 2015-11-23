@@ -77,7 +77,7 @@ public class ChooserDialog<T> extends DialogWrapper {
     }
 
     public interface Presentation<T> {
-        public String getPresentation(T object);
+        String getPresentation(T object);
     }
 
     private static class ToStringPresentation<T> implements Presentation<T> {

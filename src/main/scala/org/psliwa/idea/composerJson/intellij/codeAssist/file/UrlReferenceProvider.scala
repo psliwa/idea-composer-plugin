@@ -6,7 +6,7 @@ import org.psliwa.idea.composerJson.json.{EmailFormat, UriFormat}
 
 private object UrlReferenceProvider extends PsiReferenceProvider {
   override def getReferencesByElement(element: PsiElement, context: ProcessingContext): Array[PsiReference] = {
-    val text = element.getText.substring(1, element.getText.size-1)
+    val text = element.getText.substring(1, element.getText.length-1)
 
     if(EmailFormat.isValid(text)) {
       Array(new UrlPsiReference(element, "mailto:"))

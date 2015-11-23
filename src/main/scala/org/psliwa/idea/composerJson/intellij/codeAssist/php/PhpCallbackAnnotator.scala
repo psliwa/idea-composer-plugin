@@ -52,7 +52,7 @@ class PhpCallbackAnnotator extends Annotator {
       problems += ProblemDescriptor(element, Some(message), Seq(), Some(elementRange))
     }
 
-    if(methodName.size == 0) {
+    if(methodName.isEmpty) {
       val message = ComposerBundle.message("inspection.php.methodIsEmpty")
       problems += ProblemDescriptor(element, Some(message), Seq(), Some(elementRange))
     } else {

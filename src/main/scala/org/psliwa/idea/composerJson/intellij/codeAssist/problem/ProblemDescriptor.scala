@@ -1,6 +1,6 @@
 package org.psliwa.idea.composerJson.intellij.codeAssist.problem
 
-import com.intellij.codeInspection.{ProblemHighlightType}
+import com.intellij.codeInspection.ProblemHighlightType
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
 

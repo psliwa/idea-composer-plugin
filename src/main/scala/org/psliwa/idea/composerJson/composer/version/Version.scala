@@ -3,6 +3,10 @@ package org.psliwa.idea.composerJson.composer.version
 import org.psliwa.idea.composerJson.util.CharOffsetFinder._
 import org.psliwa.idea.composerJson.util.OffsetFinder.ImplicitConversions._
 
+import scala.language.postfixOps
+import scalaz._
+import scalaz.Scalaz._
+
 object Version {
 
   type SemVer = String
@@ -17,24 +21,20 @@ object Version {
       .getOrElse(List())
   }
 
-  def isGreater(version1: String, version2: String): Boolean = {
-    def isSemVer(v: String): Boolean = !v.exists(_.isLetter)
-    val version1IsSemVer = isSemVer(version1)
-    val version2IsSemVer = isSemVer(version2)
+  def isGreater(version1: String, version2: String): Boolean = compare(version1, version2) != Ordering.LT
 
-    if(version1IsSemVer && !version2IsSemVer) true
-    else if(!version1IsSemVer && version2IsSemVer) false
-    else if(version1IsSemVer && version2IsSemVer) {
-      val dotsCount1 = version1.count(_ == '.')
-      val dotsCount2 = version2.count(_ == '.')
+  private def compare(version1: String, version2: String): Ordering = {
+    def isSemanticVersion(v: String): Boolean = !v.exists(_.isLetter)
+    def normalize(v: String) = v.replace("*", "999999")
+    def dots(v: String) = v.count(_ == '.')
 
-      if(dotsCount1 == dotsCount2) {
-        version1.replace("*", "999999").compareTo(version2.replace("*", "999999")) >= 0
-      } else {
-        dotsCount1 >= dotsCount2
-      }
+    val semanticVersionOrdering = isSemanticVersion(version1) ?|? isSemanticVersion(version2)
+
+    if(semanticVersionOrdering == Ordering.EQ && isSemanticVersion(version1)) {
+      dots(version1) ?|? dots(version2) |+| normalize(version1) ?|? normalize(version2)
+    } else {
+      semanticVersionOrdering |+| version1 ?|? version2
     }
-    else version1.compareTo(version2) >= 0
   }
 
   def equivalentsFor(version: Constraint): Seq[Constraint] = {

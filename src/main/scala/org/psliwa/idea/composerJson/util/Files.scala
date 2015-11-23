@@ -5,11 +5,9 @@ import com.intellij.psi.{PsiFile, PsiFileSystemItem, PsiDirectory}
 import scala.annotation.tailrec
 
 object Files {
-  def findDir(rootDir: PsiDirectory, path: String): Option[PsiDirectory] = {
-    findPath(rootDir, path) match {
-      case Some(x: PsiDirectory) => Some(x)
-      case _ => None
-    }
+  def findDir(rootDir: PsiDirectory, path: String): Option[PsiDirectory] = findPath(rootDir, path) match {
+    case Some(x: PsiDirectory) => Some(x)
+    case _ => None
   }
 
   def findPath(rootDir: PsiDirectory, path: String): Option[PsiFileSystemItem] = {

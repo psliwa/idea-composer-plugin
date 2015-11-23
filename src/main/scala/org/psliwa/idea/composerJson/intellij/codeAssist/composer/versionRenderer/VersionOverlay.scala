@@ -9,19 +9,7 @@ import scala.collection.mutable
 class VersionOverlay(editorFactory: EditorFactory) extends ApplicationComponent {
 
   private val packageVersionsMap = mutable.Map[String, List[PackageVersion]]()
-  private val caretListener = new CaretAdapter {
-    var listener = newVersionCaretListener
-
-    override def caretPositionChanged(e: CaretEvent) = {
-      listener.caretPositionChanged(e)
-    }
-
-    private def newVersionCaretListener = new VersionCaretListener(packageVersionsMap.toMap)
-
-    def refresh() = {
-      listener = newVersionCaretListener
-    }
-  }
+  private val caretListener = new CaretListener()
 
   override def initComponent(): Unit = {
     editorFactory.getEventMulticaster.addCaretListener(caretListener)
@@ -47,4 +35,17 @@ class VersionOverlay(editorFactory: EditorFactory) extends ApplicationComponent 
 
   override def getComponentName: String = "composer.editorOverlay"
 
+  private class CaretListener extends CaretAdapter {
+    var listener = newVersionCaretListener
+
+    override def caretPositionChanged(e: CaretEvent) = {
+      listener.caretPositionChanged(e)
+    }
+
+    private def newVersionCaretListener = new VersionCaretListener(packageVersionsMap.toMap)
+
+    def refresh() = {
+      listener = newVersionCaretListener
+    }
+  }
 }

@@ -100,7 +100,9 @@ class DefaultPackagesInstaller(project: Project, config: Configuration, file: Ps
             Right(message.toString())
           }
         } catch {
-          case e: ExecutionException => Left(e.toString+": "+e.getMessage+"\n\n"+e.getStackTraceString)
+          case e: ExecutionException =>
+            import scala.compat.Platform.EOL
+            Left(e.toString+": "+e.getMessage+"\n\n"+e.getStackTrace.mkString("", EOL, EOL))
         }
       }
     }

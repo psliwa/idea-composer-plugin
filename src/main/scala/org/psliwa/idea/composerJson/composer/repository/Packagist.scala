@@ -13,7 +13,5 @@ object Packagist {
   def loadVersions(pkg: String): Try[Seq[String]] = loadUri("packages/"+pkg+".json").flatMap(parseVersions)
 
   private[repository] def loadPackagesFromPackagist(): Try[String] = loadUri("packages/list.json")
-  private[repository] def loadUri(uri: String): Try[String] = {
-    IO.loadUrl(PackagistUrl+uri)
-  }
+  private[repository] def loadUri(uri: String): Try[String] = IO.loadUrl(PackagistUrl+uri)
 }

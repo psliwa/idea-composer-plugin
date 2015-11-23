@@ -6,8 +6,6 @@ import scala.util.{Failure, Try}
 
 object JsonParsers {
 
-  type Error = String
-
   class ParseException() extends RuntimeException
 
   def parsePackageNames(data: String): Try[Seq[String]] = {
@@ -45,14 +43,14 @@ object JsonParsers {
   }
 
   def parseLockPackages(data: String): Try[ComposerPackages] = {
-    import org.psliwa.idea.composerJson.util.OptionOps._
+    import scalaz.Scalaz._
 
     def parse(property: String, dev: Boolean) = for {
       result <- JSON.parseRaw(data)
       o <- tryJsonObject(result)
       packagesElement <- o.obj.get(property)
       packagesArray <- tryJsonArray(packagesElement)
-      packages <- traverse(packagesArray.list)(createLockPackage(dev))
+      packages <- packagesArray.list.traverse(createLockPackage(dev))
     } yield packages
 
     val packages = for {

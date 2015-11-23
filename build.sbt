@@ -35,6 +35,7 @@ lazy val root = (project in file("."))
       "org.scala-lang" % "scala-library" % Versions.scala,
       "org.scala-lang" % "scala-compiler" % Versions.scala,
       "org.scala-lang.modules" %% "scala-parser-combinators" % Versions.scalaParsers,
+      "org.scalaz" %% "scalaz-core" % Versions.scalaz,
       "com.novocode" % "junit-interface" % "0.11" % "test"
     ),
     ideaInternalPlugins ++= Seq(
@@ -89,7 +90,7 @@ lazy val runner = (project in file("subprojects/idea-runner"))
       "-Didea.is.internal=true",
       "-Didea.debug.mode=true",
       "-Dapple.laf.useScreenMenuBar=true",
-      s"-Dplugin.path=${getBaseDirPath(baseDirectory.value)}/target/plugin",
+      s"-Dplugin.path=${packagedPluginDir.value}",
       "-Didea.ProcessCanceledException=disabled"
     ),
     run in Compile <<= run in Compile dependsOn pack.in(packager)
@@ -97,7 +98,7 @@ lazy val runner = (project in file("subprojects/idea-runner"))
 
 lazy val packagedPluginDir = settingKey[File]("Path to packaged, but not yet compressed plugin")
 
-packagedPluginDir in ThisBuild := baseDirectory.in(ThisBuild).value / "target" / "plugin"
+packagedPluginDir in ThisBuild := baseDirectory.in(ThisBuild).value / "target" / name.in(root).value
 
 lazy val packager: Project = (project in file("subprojects/packager"))
   .settings(
@@ -150,8 +151,7 @@ lazy val proguard: Project = (project in file("subprojects/proguard"))
     pack := {
       val proguardUrl = "https://github.com/psliwa/proguard-fixd/raw/master/proguard.jar"
       val proguardDest: File = getBaseDir(baseDirectory.value) / "proguard.jar"
-      println(proguardDest)
-      println(proguardDest.exists())
+
       if(!proguardDest.exists()) {
         IO.download(new URL(proguardUrl), proguardDest)
       }
@@ -163,7 +163,7 @@ lazy val proguard: Project = (project in file("subprojects/proguard"))
       val libraryJars = (javaRt :: ideaFullJars.in(root).value.map(_.data).toList).map(_.getAbsolutePath).map(escape).mkString(";")
 
       val cmd = Seq(
-        "java", "-jar", escape(proguardDest.getAbsolutePath), "@"+escape(getBaseDirPath(baseDirectory.value)+"/proguard.pro"), "-injars", escape(artifactPath.in(packager, Compile).value.getAbsolutePath), "-outjars", escape(artifactPath.value.getAbsolutePath),
+        "java", "-jar", escape(proguardDest.getAbsolutePath), "@"+escape(getBaseDirPath(baseDirectory.value)+"/proguard.pro"), "-injars", escape(artifactPath.in(compressor, Compile).value.getAbsolutePath), "-outjars", escape(artifactPath.value.getAbsolutePath),
         "-libraryjars", libraryJars
       )
 

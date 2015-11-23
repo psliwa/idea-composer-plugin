@@ -14,7 +14,7 @@ private object PhpUtils {
   def escapeSlashes(s: String) = s.replace("\\", "\\\\")
 
   def getCallableInfo(s: String): (String, String) = {
-    s.replace("::", "").splitAt(positive(s.indexOf("::"), s.size))
+    s.replace("::", "").splitAt(positive(s.indexOf("::"), s.length))
   }
 
   private def positive(i: Int, default: => Int): Int = {

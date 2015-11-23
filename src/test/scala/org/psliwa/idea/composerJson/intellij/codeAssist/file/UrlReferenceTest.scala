@@ -75,6 +75,6 @@ class UrlReferenceTest extends LightPlatformCodeInsightFixtureTestCase {
     val references = element.getReferences
       .filter(_.isInstanceOf[UrlPsiReference])
 
-    assertEquals(expectedCount, references.size)
+    assertEquals(expectedCount, references.length)
   }
 }

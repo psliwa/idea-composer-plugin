@@ -1,11 +1,11 @@
 package org.psliwa.idea.composerJson.composer.version
 
 import org.psliwa.idea.composerJson.util.parsers.{Parsers, Parser}
-import org.psliwa.idea.composerJson.util.parsers.Combinators._
-import org.psliwa.idea.composerJson.util.parsers.ImplicitConversions._
+import org.psliwa.idea.composerJson.util.parsers.ParserMonad._
+import org.psliwa.idea.composerJson.util.parsers.Implicits._
 
 object Parser {
-  def parse(in: String): Option[Constraint] = run(parser)(in)
+  def parse(in: String): Option[Constraint] = parser.run(in)
 
   private val dev = string("dev-").flatMap(_ => regex("[a-z0-9]+".r)).map(DevConstraint)
   private val hash = regex("[a-f]{4,40}".r).map(HashConstraint)

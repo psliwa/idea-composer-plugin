@@ -35,9 +35,7 @@ public class EnabledItem {
         EnabledItem that = (EnabledItem) o;
 
         if (enabled != that.enabled) return false;
-        if (!name.equals(that.name)) return false;
-
-        return true;
+        return name.equals(that.name);
     }
 
     @Override

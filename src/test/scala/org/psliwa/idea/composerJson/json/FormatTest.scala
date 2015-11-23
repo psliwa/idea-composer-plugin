@@ -25,6 +25,6 @@ class FormatTest {
       "abc" -> false
     )
 
-    assertEquals(emails.map(_._2), emails.map{ case (email, _) => EmailFormat.isValid(email) }.toList)
+    assertEquals(emails.map(_._2), emails.map { case (email, _) => EmailFormat.isValid(email) })
   }
 }

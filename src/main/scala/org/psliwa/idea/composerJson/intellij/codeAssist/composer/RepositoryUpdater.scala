@@ -66,7 +66,7 @@ class RepositoryUpdater extends Annotator {
 
     val packagesMap = packages.foldLeft(Map[String,List[String]]())(update)
 
-    new InMemoryRepository(packagesMap.map(_._1).toSeq, packagesMap)
+    new InMemoryRepository(packagesMap.keys.toSeq, packagesMap)
   }
 
   private def getPackages(repositoriesElement: JsonArray): Seq[(String, String)] = {

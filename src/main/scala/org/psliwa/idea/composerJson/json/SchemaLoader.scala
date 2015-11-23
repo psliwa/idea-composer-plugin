@@ -1,6 +1,7 @@
 package org.psliwa.idea.composerJson.json
 
 import scala.io.Source
+import scala.util.Try
 
 object SchemaLoader {
   def load(path: String): Option[Schema] = {
@@ -11,14 +12,12 @@ object SchemaLoader {
   }
 
   private def consumeSource(s: Source): Option[String] = {
-    try {
+    Try {
       try {
-        Some(s.mkString)
+        s.mkString
       } finally {
         s.close()
       }
-    } catch {
-      case _: Throwable => None
-    }
+    }.toOption
   }
 }

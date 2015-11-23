@@ -27,7 +27,7 @@ class DefaultRepositoryProvider[Package](repositoryFactory: RepositoryFactory[Pa
     repositories.getOrElse(file, getRepositoryFromFactory(file))
   }
   override def updateRepository(file: String, info: RepositoryInfo) = {
-    val changed = !infos.get(file).exists(_ == info)
+    val changed = !infos.get(file).contains(info)
 
     infos(file) = info
     repositories -= file
@@ -75,8 +75,6 @@ object DefaultRepositoryProvider {
     parsePackages: String => Try[RepositoryPackages]
   )(url: String): Repository[String] = {
 
-    //TODO: par?
-
     val rootUrl = "http(s?)://[^/]+".r.findFirstIn(url).getOrElse(url)
     def buildUrl(uri: String): String = rootUrl+"/"+uri
 
@@ -88,8 +86,8 @@ object DefaultRepositoryProvider {
     }
 
     def loadPackagesFromUrls(urls: Seq[String]): Map[String,Seq[String]] = {
-      urls
-        .flatMap(url => loadPackages(url).toList)
+      urls.par
+        .flatMap(loadPackages(_).toList)
         .flatMap(pkgs => Seq(pkgs, new RepositoryPackages(loadPackagesFromUrls(pkgs.includes.map(buildUrl)), Nil)))
         .foldLeft(Map[String,Seq[String]]())((map, pkgs) => map ++ pkgs.packages)
     }

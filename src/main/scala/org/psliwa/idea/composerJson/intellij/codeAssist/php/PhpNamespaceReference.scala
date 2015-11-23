@@ -29,7 +29,7 @@ private class PhpNamespaceReference(element: JsonStringLiteral) extends PsiPolyV
     import org.psliwa.idea.composerJson.util.OffsetFinder.ImplicitConversions._
 
     val o = for {
-      lastSlashOffset <- findOffsetReverse('\\')(namespaceName.size-1)(namespaceName)
+      lastSlashOffset <- findOffsetReverse('\\')(namespaceName.length-1)(namespaceName)
     } yield (namespaceName.substring(0, lastSlashOffset), namespaceName.substring(lastSlashOffset+1))
 
     val (parentNamespace, currentNamespace) = o match {

@@ -151,7 +151,7 @@ private object CompletionContributor {
   @tailrec
   private def firstNamedProperty(element: PsiElement): Option[JsonProperty] = {
     element match {
-      case p@PsiExtractors.JsonProperty(name) => Some(p)
+      case p@PsiExtractors.JsonProperty(name, _) => Some(p)
       case _: JsonFile => None
       case e => firstNamedProperty(e.getParent)
     }

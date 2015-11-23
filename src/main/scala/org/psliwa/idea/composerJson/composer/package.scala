@@ -5,6 +5,6 @@ package object composer {
   type ComposerPackages = Map[String,ComposerPackage]
 
   object ComposerPackages {
-    def apply(packages: ComposerPackage*): ComposerPackages = Map[String,ComposerPackage](packages.map(pkg => pkg.name.toLowerCase -> pkg):_*)
+    def apply(packages: ComposerPackage*): ComposerPackages = packages.map(pkg => pkg.name.toLowerCase -> pkg).toMap
   }
 }

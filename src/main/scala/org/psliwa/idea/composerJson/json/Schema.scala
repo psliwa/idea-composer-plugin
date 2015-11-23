@@ -1,9 +1,9 @@
 package org.psliwa.idea.composerJson.json
 
-import scala.language.{higherKinds, implicitConversions}
+import scala.language.{postfixOps, higherKinds, implicitConversions}
 import scala.util.matching.Regex
 import scala.util.parsing.json.{JSON, JSONArray, JSONObject, JSONType}
-import org.psliwa.idea.composerJson.util.OptionOps._
+import scalaz.Scalaz._
 
 sealed trait Schema
 
@@ -126,7 +126,7 @@ object Schema {
     if(t.obj.contains("oneOf")) {
       for {
         arr <- t.obj.get("oneOf").flatMap(tryJsonArray)
-        alternatives <- traverse(arr.list)(tryJsonObject(_).flatMap(jsonObjectToSchema(_, defs)))
+        alternatives <- arr.list.traverse(tryJsonObject(_).flatMap(jsonObjectToSchema(_, defs)))
       } yield SOr(alternatives)
     } else {
       None
@@ -136,8 +136,8 @@ object Schema {
   private def jsonObjectToSimpleOr: Converter[JSONObject] = (t, defs) => {
     for {
       arr <- t.obj.get("type").flatMap(tryJsonArray)
-      stringValues <- traverse(arr.list)(tryString)
-      schemaValues <- traverse(stringValues)(s => jsonObjectToSchema(JSONObject(Map("type" -> s)), defs))
+      stringValues <- arr.list.traverse(tryString)
+      schemaValues <- stringValues.traverse[Option,Schema](s => jsonObjectToSchema(JSONObject(Map("type" -> s)), defs))
     } yield SOr(schemaValues)
   }
 
@@ -145,7 +145,7 @@ object Schema {
     if(t.obj.contains("enum")) {
       for {
         arr <- t.obj.get("enum").flatMap(tryJsonArray)
-        values <- traverse(arr.list)(tryString)
+        values <- arr.list.traverse(tryString)
       } yield SStringChoice(values)
     } else {
       None
@@ -173,7 +173,7 @@ object Schema {
   }
 
   private def jsonObjectToObjectSchema: Converter[JSONObject] = (t, defs) => {
-    if(t.obj.get("type").exists(_ == "object")) {
+    if(t.obj.get("type").contains("object")) {
       val propertiesObject = t.obj.getOrElse("properties", JSONObject(Map()))
       val patternPropertiesObject = t.obj.getOrElse("patternProperties", JSONObject(Map()))
 
@@ -190,29 +190,23 @@ object Schema {
   private def jsonObjectToProperties(maybeJsonObject: Any, defs: Map[String,Schema]): Option[Map[String,Property]] = {
     for {
       jsonObject <- tryJsonObject(maybeJsonObject)
-      properties <- traverseMap(jsonObject.obj){
-        case o@JSONObject(_) => for{
-          required <- booleanProperty("required")(o.obj).orElse(Some(false))
-          description <- stringProperty("description")(o.obj).orElse(Some(""))
-          schema <- jsonObjectToSchema(o, defs).map(Property(_, required, description))
-        } yield schema
-        case _ => None
-      }
+      properties <- jsonObject.obj.traverse(tryProperty(defs))
     } yield properties
   }
 
+  private def tryProperty[K](defs: Map[String,Schema])(jsonObject: Any): Option[Property] = jsonObject match {
+    case o@JSONObject(_) => for {
+      required <- booleanProperty("required")(o.obj).orElse(Some(false))
+      description <- stringProperty("description")(o.obj).orElse(Some(""))
+      property <- jsonObjectToSchema(o, defs).map(Property(_, required, description))
+    } yield property
+    case _ => None
+  }
+
   private def jsonObjectToPatternProperties(maybeJsonObject: Any, defs: Map[String,Schema]): Option[Map[Regex,Property]] = {
-    //TODO: refactor
     for {
       jsonObject <- tryJsonObject(maybeJsonObject)
-      properties <- traverseMap(jsonObject.obj.map(prop => prop._1.r -> prop._2)){
-        case o@JSONObject(_) => for{
-          required <- booleanProperty("required")(o.obj).orElse(Some(false))
-          description <- stringProperty("description")(o.obj).orElse(Some(""))
-          schema <- jsonObjectToSchema(o, defs).map(Property(_, required, description))
-        } yield schema
-        case _ => None
-      }
+      properties <- jsonObject.obj.map(prop => prop._1.r -> prop._2).traverse(tryProperty(defs))
     } yield properties
   }
 
@@ -228,7 +222,7 @@ object Schema {
   }
 
   private def jsonObjectToArraySchema: Converter[JSONObject] = (t, defs) => {
-    if(t.obj.get("type").exists(_ == "array")) {
+    if(t.obj.get("type").contains("array")) {
       val maybeItems = t.obj.get("items")
 
       val maybeItemsType = for {
@@ -244,7 +238,7 @@ object Schema {
   }
 
   private def jsonObjectToPackagesSchema: Converter[JSONObject] = (t, defs) => {
-    if(t.obj.get("type").exists(_ == "packages")) {
+    if(t.obj.get("type").contains("packages")) {
       Some(SPackages)
     } else {
       None
@@ -254,7 +248,7 @@ object Schema {
   private def jsonObjectToFilePathSchema: Converter[JSONObject] = (o, _) => jsonObjectToSchemaWithBooleanArg(SFilePath, "filePath", "existingFilePath")(o)
 
   private def jsonObjectToSchemaWithBooleanArg(f: Boolean => Schema, typeProp: String, booleanProp: String)(jsonObject: JSONObject): Option[Schema] = {
-    if(jsonObject.obj.get("type").exists(_ == typeProp)) {
+    if(jsonObject.obj.get("type").contains(typeProp)) {
       Some(f(booleanProperty(booleanProp)(jsonObject.obj).getOrElse(true)))
     } else {
       None
