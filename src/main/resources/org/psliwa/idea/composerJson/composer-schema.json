@@ -199,6 +199,10 @@
           ],
           "description": "The cache max size for the files cache, defaults to \"300MiB\"."
         },
+        "bin-compat": {
+          "enum": ["auto", "full"],
+          "description": "The compatibility of the binaries, defaults to \"auto\" (automatically guessed) and can be \"full\" (compatible with both Windows and Unix-based systems)."
+        },
         "discard-changes": {
           "oneOf": [
             { "type": "boolean" },
@@ -232,6 +236,14 @@
         "github-expose-hostname": {
           "type": "boolean",
           "description": "Defaults to true. If set to false, the OAuth tokens created to access the github API will have a date instead of the machine hostname."
+        },
+        "archive-format": {
+          "type": "string",
+          "description": "The default archiving format when not provided on cli, defaults to \"tar\"."
+        },
+        "archive-dir": {
+          "type": "filePath",
+          "description": "The default archive path when not provided on cli, defaults to \".\"."
         }
       }
     },
@@ -301,6 +313,13 @@
             "type": "filePath"
           },
           "description": "This is an array of files that are always required on every request."
+        },
+        "exclude-from-classmap": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "This is an array of patterns to exclude from autoload classmap generation. (e.g. \"exclude-from-classmap\": [\"/test/\", \"/tests/\", \"/Tests/\"]"
         }
       }
     },
@@ -369,14 +388,14 @@
       "description": "A set of additional repositories where packages can be found."
     },
     "minimum-stability": {
-      "enum": [ "dev", "alpha", "beta", "RC", "stable" ],
+      "enum": [ "dev", "alpha", "beta", "rc", "RC", "stable" ],
       "description": "The minimum stability the packages must have to be install-able. Possible values are: dev, alpha, beta, RC, stable."
     },
     "prefer-stable": {
       "type": [
         "boolean"
       ],
-      "description": "If set to true, stable packages will be prefered to dev packages when possible, even if the minimum-stability allows unstable packages."
+      "description": "If set to true, stable packages will be preferred to dev packages when possible, even if the minimum-stability allows unstable packages."
     },
     "bin": {
       "type": "array",
@@ -520,17 +539,17 @@
         },
         "issues": {
           "type": "string",
-          "description": "URL to the issue tracker.",
+          "description": "URL to the Issue Tracker.",
           "format": "uri"
         },
         "forum": {
           "type": "string",
-          "description": "URL to the forum.",
+          "description": "URL to the Forum.",
           "format": "uri"
         },
         "wiki": {
           "type": "string",
-          "description": "URL to the wiki.",
+          "description": "URL to the Wiki.",
           "format": "uri"
         },
         "irc": {
@@ -555,6 +574,10 @@
       "items": {
         "type": "string"
       }
+    },
+    "abandoned": {
+      "type": ["boolean", "string"],
+      "description": "Indicates whether this package has been abandoned, it can be boolean or a package name/URL pointing to a recommended alternative. Defaults to false."
     }
   },
   "definitions": {

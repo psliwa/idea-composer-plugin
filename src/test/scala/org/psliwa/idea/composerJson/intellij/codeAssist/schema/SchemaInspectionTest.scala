@@ -48,7 +48,7 @@ class SchemaInspectionTest extends InspectionTest {
 
   def testReportInvalidPropertyValueInEnum() = {
 
-    val allowed = List("dev", "alpha", "beta", "RC", "stable").map("'"+_+"'").mkString(" or ")
+    val allowed = List("dev", "alpha", "beta", "rc", "RC", "stable").map("'"+_+"'").mkString(" or ")
 
     checkInspection(
       s"""
