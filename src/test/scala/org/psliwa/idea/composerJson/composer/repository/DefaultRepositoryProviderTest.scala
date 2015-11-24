@@ -131,7 +131,7 @@ class DefaultRepositoryProviderTest {
   }
 
   @Test
-  def givenFineHasRepositoryInfo_updateRepositoryInfoWithDifferentObject_trueShouldBeReturned() = {
+  def givenFileHasRepositoryInfo_updateRepositoryInfoWithDifferentObject_trueShouldBeReturned() = {
     //given
 
     val file = "file"
@@ -147,13 +147,41 @@ class DefaultRepositoryProviderTest {
 
     assertTrue(changed)
   }
+
+  @Test
+  def givenFileHasRepositoryInfo_repositoryFactoryShouldBeCalledOnlyOnce() = {
+    //given
+
+    val file = "someFile"
+    val repositoryInfo = new RepositoryInfo(List("a"), false)
+    val repository = new InMemoryRepository[String](List())
+
+    repositoryFactory.setRepositories(repositoryInfo, repository)
+    provider.updateRepository(file, repositoryInfo)
+
+    //when
+
+    provider.repositoryFor(file)
+    provider.updateRepository(file, repositoryInfo)
+    provider.repositoryFor(file)
+
+    //then
+
+    assertEquals(1, repositoryFactory.callsFor(repositoryInfo))
+  }
 }
 
 object DefaultRepositoryProviderTest {
   class FakeRepositoryFactory extends DefaultRepositoryProvider.RepositoryFactory[String] {
     private var repositories = Map[RepositoryInfo, Repository[String]]()
+    private var calls = Map[RepositoryInfo,Int]()
 
-    override def repositoryFor(repositoryInfo: RepositoryInfo): Repository[String] = repositories.get(repositoryInfo).get
+    override def repositoryFor(repositoryInfo: RepositoryInfo): Repository[String] = {
+      calls += repositoryInfo -> (callsFor(repositoryInfo) + 1)
+      repositories.get(repositoryInfo).get
+    }
+
+    def callsFor(repositoryInfo: RepositoryInfo): Int = calls.getOrElse(repositoryInfo, 0)
 
     def setRepositories(repositoryInfo: RepositoryInfo, repository: Repository[String]) = {
       repositories += (repositoryInfo -> repository)

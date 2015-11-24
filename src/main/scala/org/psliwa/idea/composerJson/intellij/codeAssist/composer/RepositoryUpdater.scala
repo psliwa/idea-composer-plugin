@@ -24,7 +24,7 @@ class RepositoryUpdater extends Annotator {
 
       getRepositoryProvider(element.getProject)
         .map(
-          _.updateRepository(getFilePath(element), new RepositoryInfo(urls, packagistEnabled, Some(repository)))
+          _.updateRepository(getFilePath(element), RepositoryInfo(urls, packagistEnabled, Some(repository)))
         )
         .filter(_ == true)
         .flatMap(_ => notifications)

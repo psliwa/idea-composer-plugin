@@ -26,11 +26,14 @@ class DefaultRepositoryProvider[Package](repositoryFactory: RepositoryFactory[Pa
   override def repositoryFor(file: String): Repository[Package] = {
     repositories.getOrElse(file, getRepositoryFromFactory(file))
   }
+
   override def updateRepository(file: String, info: RepositoryInfo) = {
     val changed = !infos.get(file).contains(info)
 
-    infos(file) = info
-    repositories -= file
+    if(changed) {
+      infos(file) = info
+      repositories -= file
+    }
 
     changed
   }
