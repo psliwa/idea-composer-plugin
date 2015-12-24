@@ -599,7 +599,7 @@
           "oneOf": [
             { "type": "string" },
             {
-              "enum": [ "vcs", "pear", "git", "svn", "package", "perforce", "hg", "artifact", "composer" ]
+              "enum": [ "vcs", "pear", "git", "svn", "package", "perforce", "hg", "artifact", "composer", "path" ]
             }
           ]
         },

@@ -39,6 +39,43 @@ class RepositoryUpdaterTest extends InspectionTest {
     assertRepositories(List(url+"/packages.json"))
   }
 
+  def testGivenPathRepository_givenPathIsRelative_thereShouldBeOneUrlRepository() = {
+    val url = "some/relative/path"
+
+    List("", "/") foreach { suffix =>
+      checkInspection(
+        s"""{
+            |  "repositories": [
+            |    {
+            |      "type": "path",
+            |      "url": "$url$suffix"
+            |    }
+            |  ]
+            |}""".stripMargin
+      )
+
+      assertRepositories(List(myFixture.getFile.getVirtualFile.getParent.getUrl + s"/$url/composer.json"))
+    }
+  }
+
+  def testGivenPathRepository_givenPathIsAbsolute_thereShouldBeOneUrlRepository() = {
+    val url = "/some/relative/path"
+    List("", "/") foreach { suffix =>
+      checkInspection(
+        s"""{
+            |  "repositories": [
+            |    {
+            |      "type": "path",
+            |      "url": "$url$suffix"
+            |    }
+            |  ]
+            |}""".stripMargin
+      )
+
+      assertRepositories(List(s"file://$url/composer.json"))
+    }
+  }
+
   def testGivenExcludedPackagistRepo_thereShouldNotBeIncludedPackagistRepo() = {
     checkInspection(
       s"""{

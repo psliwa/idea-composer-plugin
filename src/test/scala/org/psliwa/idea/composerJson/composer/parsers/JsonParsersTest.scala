@@ -195,4 +195,35 @@ class JsonParsersTest {
     assertTrue(result.isSuccess)
     assertEquals(RepositoryPackages(Map(), List("some-include.json")), result.get)
   }
+
+  @Test
+  def parsePackageFromComposerJson_givenValidPackage_expectPackageAndVersion() = {
+    val json =
+      """
+        |{
+        |  "name": "some/pkg",
+        |  "version": "1.0.0"
+        |}
+      """.stripMargin
+
+    val result = JsonParsers.parsePackages(json)
+
+    assertTrue(result.isSuccess)
+    assertEquals(RepositoryPackages(Map("some/pkg" -> Seq("1.0.0")), List.empty), result.get)
+  }
+
+  @Test
+  def parsePackageFromComposerJson_givenValidPackage_versionIsMissing_expectPackage() = {
+    val json =
+      """
+        |{
+        |  "name": "some/pkg"
+        |}
+      """.stripMargin
+
+    val result = JsonParsers.parsePackages(json)
+
+    assertTrue(result.isSuccess)
+    assertEquals(RepositoryPackages(Map("some/pkg" -> Seq()), List.empty), result.get)
+  }
 }

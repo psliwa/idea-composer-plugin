@@ -35,13 +35,10 @@ class RepositoryUpdater extends Annotator {
   private def getFilePath(element: PsiElement) = getFile(element).getCanonicalPath
   private def getFile(element: PsiElement) = element.getContainingFile.getVirtualFile
 
-  private def getComposerRepositoryUrls(element: PsiElement): List[String] = {
-    val urls = for {
-      repositoriesElement <- repositoriesJsonArray(element)
-      url <- getRepositoryUrls(repositoriesElement)
-    } yield url
-    urls
-  }
+  private def getComposerRepositoryUrls(element: PsiElement): List[String] = for {
+    repositoriesElement <- repositoriesJsonArray(element)
+    url <- getRepositoryUrls(repositoriesElement)
+  } yield url
 
   private def getJsonPropertyValue(objectElement: JsonObject, propertyName: String): Option[JsonElement] = {
     for {
@@ -118,7 +115,18 @@ class RepositoryUpdater extends Annotator {
       getJsonPropertyValue(objectElement, "url", getStringValue).map(_ + "/packages.json")
     }
 
-    mapRepositoryElements(repositoriesElement, "composer", mapUrl)
+    def mapPath(objectElement: JsonObject): Option[String] = {
+      getJsonPropertyValue(objectElement, "url", getStringValue).map { path =>
+        path.headOption match {
+          case Some('/') =>
+            s"file://${path.stripSuffix("/")}/composer.json"
+          case _ =>
+            objectElement.getContainingFile.getContainingDirectory.getVirtualFile.getUrl + s"/${path.stripSuffix("/")}/composer.json"
+        }
+      }
+    }
+
+    mapRepositoryElements(repositoriesElement, "composer", mapUrl).toList ::: mapRepositoryElements(repositoriesElement, "path", mapPath).toList
   }
 }
 

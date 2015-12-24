@@ -1,12 +1,17 @@
 package org.psliwa.idea.composerJson.composer.parsers
 
 import org.psliwa.idea.composerJson.composer._
+import org.psliwa.idea.composerJson.util.TryMonoid
 import scala.util.parsing.json.{JSONArray, JSONObject, JSON}
-import scala.util.{Failure, Try}
+import scala.util.{Success, Failure, Try}
+import scalaz._
+import Scalaz._
 
 object JsonParsers {
 
   class ParseException() extends RuntimeException
+
+  private implicit val tryMonoid = new TryMonoid[RepositoryPackages](new ParseException)
 
   def parsePackageNames(data: String): Try[Seq[String]] = {
     val packages = for {
@@ -26,6 +31,11 @@ object JsonParsers {
 
   private def tryJsonArray(a: Any): Option[JSONArray] = a match {
     case a@JSONArray(_) => Some(a)
+    case _ => None
+  }
+
+  private def tryJsonString(a: Any): Option[String] = a match {
+    case a: String => Some(a)
     case _ => None
   }
 
@@ -72,7 +82,7 @@ object JsonParsers {
     } yield ComposerPackage(name, version, dev)
   }
 
-  def parsePackages(data: String): Try[RepositoryPackages] = {
+  private def parsePackagesFromPackagesJson(data: String): Try[RepositoryPackages] = {
     def getPackagesFrom(json: Any): Option[Map[String,Seq[String]]] = {
       val packages: Map[String,Seq[String]] = (for {
         obj <- tryJsonObject(json).toList
@@ -85,10 +95,7 @@ object JsonParsers {
       Option(packages)
     }
 
-    val maybeRoot = for {
-      result <- JSON.parseRaw(data)
-      o <- tryJsonObject(result)
-    } yield o
+    val maybeRoot = parse(data)
 
     val packages = for {
       root <- maybeRoot
@@ -103,6 +110,25 @@ object JsonParsers {
       include <- includesElement.obj.keys.toList
     } yield include
 
-    packages.map(pkgs => Try(RepositoryPackages(pkgs, includes))).getOrElse(Failure(new ParseException))
+    packages.map(pkgs => Try(RepositoryPackages(pkgs, includes))).getOrElse(tryMonoid.zero)
   }
+
+  private def parse(data: String): Option[JSONObject] = for {
+    result <- JSON.parseRaw(data)
+    o <- tryJsonObject(result)
+  } yield o
+
+  private def parsePackageFromComposerJson(data: String): Try[RepositoryPackages] = {
+    (for {
+      root <- parse(data)
+      name <- root.obj.get("name")
+      name <- tryJsonString(name)
+      versions <- (for {
+        version <- root.obj.get("version")
+        version <- tryJsonString(version)
+      } yield version).map(Seq(_)).orElse(Some(Seq.empty))
+    } yield RepositoryPackages(Map(name -> versions), Seq.empty)).map(Success(_)).getOrElse(tryMonoid.zero)
+  }
+
+  def parsePackages(data: String): Try[RepositoryPackages] = parsePackagesFromPackagesJson(data) |+| parsePackageFromComposerJson(data)
 }
