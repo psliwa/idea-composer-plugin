@@ -5,6 +5,7 @@ import com.intellij.json.psi._
 import com.intellij.lang.annotation.{AnnotationHolder, Annotator}
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.util.SystemInfo
 import com.intellij.patterns.PlatformPatterns._
 import com.intellij.psi.PsiElement
 import com.intellij.ui.EditorNotifications
@@ -123,6 +124,14 @@ class RepositoryUpdater extends Annotator {
           case _ =>
             objectElement.getContainingFile.getContainingDirectory.getVirtualFile.getUrl + s"/${path.stripSuffix("/")}/composer.json"
         }
+      }.map(fixFileUrl)
+    }
+
+    def fixFileUrl(url: String): String = {
+      if(SystemInfo.isWindows && "file://[^/]".r.findFirstMatchIn(url).isDefined) {
+        url.replaceFirst("file://", "file:///")
+      } else {
+        url
       }
     }
 

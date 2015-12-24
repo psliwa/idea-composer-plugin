@@ -6,14 +6,11 @@
 
 Adds code completion, inspections and more to composer.json file.
 
-PhpStorm 8.0.2+ and 139+ version Intellij are supported, because in that version json language support is natively in
-intellij sdk.
-
 This plugin provides:
 
 * completion for:
     * composer.json schema
-    * package names and version (in require, require-dev etc) from packagist repository and custom repositories defined in composer.json file (only "composer" and "package" repositories type are supported right now)
+    * package names and version (in require, require-dev etc) from packagist repository and custom repositories defined in composer.json file ("composer", "package" and "path" repository types are supported right now)
     * filepath completion (in bin, autoload etc)
     * class and static method names in "scripts" properties
     * namespaces eg. in "autoload.psr-0" property
