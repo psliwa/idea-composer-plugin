@@ -1,9 +1,9 @@
 package org.psliwa.idea.composerJson.intellij.codeAssist.composer
 
 import com.intellij.codeInsight.intention.IntentionAction
-import com.intellij.json.JsonLanguage
 import com.intellij.json.psi._
-import com.intellij.lang.annotation.{AnnotationHolder, Annotator}
+import com.intellij.lang.annotation.{AnnotationHolder, Annotator, HighlightSeverity}
+import com.intellij.openapi.application.Application
 import com.intellij.openapi.project.Project
 import com.intellij.patterns.PlatformPatterns._
 import com.intellij.patterns.StandardPatterns._
@@ -12,18 +12,18 @@ import com.intellij.psi.PsiElement
 import com.intellij.util.ProcessingContext
 import org.psliwa.idea.composerJson._
 import org.psliwa.idea.composerJson.composer.version._
-import org.psliwa.idea.composerJson.intellij.codeAssist.{QuickFixIntentionActionAdapter, SetPropertyValueQuickFix}
-import org.psliwa.idea.composerJson.intellij.{PsiElements, PsiExtractors}
-import org.psliwa.idea.composerJson.intellij.codeAssist.problem.ProblemDescriptor
 import org.psliwa.idea.composerJson.intellij.Patterns._
+import org.psliwa.idea.composerJson.intellij.PsiElements._
+import org.psliwa.idea.composerJson.intellij.codeAssist.problem.ProblemDescriptor
+import org.psliwa.idea.composerJson.intellij.codeAssist.{QuickFixIntentionActionAdapter, SetPropertyValueQuickFix}
 import org.psliwa.idea.composerJson.json.SString
 import org.psliwa.idea.composerJson.settings.ComposerJsonSettings
-import PsiElements._
 
-import scala.collection.GenTraversableOnce
-
-class PackageVersionAnnotator extends Annotator {
+class PackageVersionAnnotator(app: Application) extends Annotator {
   import org.psliwa.idea.composerJson.intellij.codeAssist.composer.PackageVersionAnnotator._
+
+  val suggestionHighlightSeverity = if(app.isUnitTestMode) HighlightSeverity.INFORMATION
+                                    else `HighlightSeverity.SUGGESTION`
 
   private type QuickFixGroup = (Option[String], Seq[IntentionAction])
 
@@ -40,8 +40,10 @@ class PackageVersionAnnotator extends Annotator {
 
       problemDescriptors.foreach(problem => {
         val annotation = problem.message match {
-          case Some(message) => annotations.createWarningAnnotation(problem.element.getContext, message)
-          case _ => annotations.createInfoAnnotation(problem.element, null)
+          case Some(message) =>
+            annotations.createWarningAnnotation(problem.element.getContext, message)
+          case _ =>
+            annotations.createAnnotation(suggestionHighlightSeverity, problem.element.getContext.getTextRange, null)
         }
 
         problem.quickFixes.foreach(fix => annotation.registerFix(fix))
@@ -180,4 +182,6 @@ private object PackageVersionAnnotator {
   import org.psliwa.idea.composerJson.util.Funcs._
   val parseVersion: (String) => Option[Constraint] = memorize(40)(Parser.parse)
   val pattern = packageElement.afterLeaf(":")
+  val `HighlightSeverity.SUGGESTION` =
+    new HighlightSeverity(HighlightSeverity.INFORMATION.myName, HighlightSeverity.WEAK_WARNING.myVal - 2)
 }
