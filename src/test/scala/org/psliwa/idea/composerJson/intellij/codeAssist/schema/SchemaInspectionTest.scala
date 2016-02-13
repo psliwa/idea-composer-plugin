@@ -9,6 +9,7 @@ class SchemaInspectionTest extends InspectionTest {
   private val RequiredProperties =
     """
       |"name": "vendor/pkg",
+      |"description": "desc",
     """.stripMargin
 
   val AlreadyDefinedPropertyError = ComposerBundle.message("inspection.schema.alreadyDefinedProperty", _: String)
@@ -291,8 +292,9 @@ class SchemaInspectionTest extends InspectionTest {
 
   def testReportMissingProperties() = {
     checkInspection(
-      """
+      s"""
         |{
+        |  $RequiredProperties
         |  "authors": [
         |    <error descr="The 'name' property is required.">{}</error>
         |  ]

@@ -8,6 +8,7 @@ class SchemaQuickFixesTest extends InspectionTest {
   private val RequiredProperties =
     """
       |"name": "vendor/pkg",
+      |"description": "desc",
     """.stripMargin
 
   override def setUp(): Unit = {
@@ -193,6 +194,7 @@ class SchemaQuickFixesTest extends InspectionTest {
     checkQuickFix(CreatePropertyQuickFix("name"))(
       s"""
          |{
+         |  $RequiredProperties
          |  "authors": [
          |    {<caret>
          |    }
@@ -201,6 +203,7 @@ class SchemaQuickFixesTest extends InspectionTest {
       """.stripMargin,
       s"""
          |{
+         |  $RequiredProperties
          |  "authors": [
          |    {
          |      "name": "<caret>"
@@ -215,6 +218,7 @@ class SchemaQuickFixesTest extends InspectionTest {
     checkQuickFix(CreatePropertyQuickFix("name"))(
       s"""
          |{
+         |  $RequiredProperties
          |  "authors": [
          |    {<caret>
          |      "role": ""
@@ -224,6 +228,7 @@ class SchemaQuickFixesTest extends InspectionTest {
       """.stripMargin,
       s"""
          |{
+         |  $RequiredProperties
          |  "authors": [
          |    {
          |      "name": "<caret>",
@@ -239,6 +244,7 @@ class SchemaQuickFixesTest extends InspectionTest {
     checkQuickFix(CreatePropertyQuickFix("name"))(
       s"""
          |{
+         |  $RequiredProperties
          |  "authors": [
          |    {
          |      "role": ""<caret>
@@ -248,6 +254,7 @@ class SchemaQuickFixesTest extends InspectionTest {
       """.stripMargin,
       s"""
          |{
+         |  $RequiredProperties
          |  "authors": [
          |    {
          |      "role": "",
@@ -263,6 +270,7 @@ class SchemaQuickFixesTest extends InspectionTest {
     checkQuickFix(CreatePropertyQuickFix("name"))(
       s"""
          |{
+         |  $RequiredProperties
          |  "authors": [
          |    {
          |      "email": "",<caret>
@@ -273,6 +281,7 @@ class SchemaQuickFixesTest extends InspectionTest {
       """.stripMargin,
       s"""
          |{
+         |  $RequiredProperties
          |  "authors": [
          |    {
          |      "email": "",
@@ -289,6 +298,7 @@ class SchemaQuickFixesTest extends InspectionTest {
     checkQuickFix(CreatePropertyQuickFix("name"))(
       s"""
         |{
+        |  $RequiredProperties
         |  "authors": [
         |    {
         |      "email<caret>": "",
@@ -299,6 +309,7 @@ class SchemaQuickFixesTest extends InspectionTest {
       """.stripMargin,
       s"""
         |{
+        |  $RequiredProperties
         |  "authors": [
         |    {
         |      "email": "",
@@ -315,6 +326,7 @@ class SchemaQuickFixesTest extends InspectionTest {
     checkQuickFix(CreatePropertyQuickFix("name"))(
       s"""
          |{
+         |  $RequiredProperties
          |  "authors": [
          |    {<caret>}
          |  ]
@@ -322,6 +334,7 @@ class SchemaQuickFixesTest extends InspectionTest {
       """.stripMargin,
       s"""
          |{
+         |  $RequiredProperties
          |  "authors": [
          |    {
          |      "name": "<caret>"
@@ -334,13 +347,15 @@ class SchemaQuickFixesTest extends InspectionTest {
 
   def testFixEnum_valueShouldBeSelected() = {
     checkQuickFix(ShowValidValuesQuickFix)(
-      """
+      s"""
         |{
+        |  $RequiredProperties
         |  "minimum-stability": "invalid<caret>"
         |}
       """.stripMargin,
-      """
+      s"""
         |{
+        |  $RequiredProperties
         |  "minimum-stability": "<selection>invalid</selection>"
         |}
       """.stripMargin
