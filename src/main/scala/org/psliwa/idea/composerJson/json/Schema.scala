@@ -1,6 +1,7 @@
 package org.psliwa.idea.composerJson.json
 
 import scala.language.{postfixOps, higherKinds, implicitConversions}
+import scala.util.Try
 import scala.util.matching.Regex
 import scala.util.parsing.json.{JSON, JSONArray, JSONObject, JSONType}
 import scalaz.Scalaz._
@@ -104,7 +105,8 @@ object Schema {
     for {
       o <- ensureType(o, "string")
       format <- o.obj.get("format").orElse(Some("any"))
-    } yield stringsForFormat.getOrElse(format.toString, SAnyString)
+      pattern = Try { o.obj.get("pattern").map(_.toString.r) }.toOption.flatten.map(new PatternFormat(_))
+    } yield pattern.map(SString).getOrElse(stringsForFormat.getOrElse(format.toString, SAnyString))
   }
 
   private def jsonObjectToNumberSchema: Converter[JSONObject] = (o, _) => jsonObjectTo(SNumber, "integer")(o)

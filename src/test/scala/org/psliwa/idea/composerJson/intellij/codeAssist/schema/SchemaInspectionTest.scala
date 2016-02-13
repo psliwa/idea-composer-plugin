@@ -31,6 +31,17 @@ class SchemaInspectionTest extends InspectionTest {
     )
   }
 
+  def testReportValueThatDoesNotMatchRequiredPattern() = {
+    checkInspection(
+      s"""
+         |{
+         |  "name": <error>"some"</error>,
+         |  "description": "desc"
+         |}
+       """.stripMargin
+    )
+  }
+
   def testReportNotAllowedPropertyInNestedLevel() = {
     checkInspection(
       s"""

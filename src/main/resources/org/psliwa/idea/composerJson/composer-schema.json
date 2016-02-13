@@ -5,7 +5,8 @@
     "name": {
       "type": "string",
       "description": "Package name, including 'vendor-name/' prefix.",
-      "required": true
+      "required": true,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]*/[A-Za-z0-9][A-Za-z0-9_.-]*$"
     },
     "type": {
       "description": "Package type, either 'library' for common packages, 'composer-plugin' for plugins, 'metapackage' for empty packages, or a custom type ([a-z0-9-]+) defined by whatever project this package applies to.",

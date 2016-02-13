@@ -178,6 +178,7 @@ class SchemaInspection extends AbstractInspection {
   def readableFormat(format: Format): String = format match {
     case EmailFormat => "email"
     case UriFormat => "uri"
+    case PatternFormat(pattern) => pattern.toString
     case _ => "unknown"
   }
 
