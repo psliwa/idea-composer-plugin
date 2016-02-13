@@ -3,6 +3,8 @@ package org.psliwa.idea.composerJson.intellij.codeAssist.composer
 import org.psliwa.idea.composerJson.intellij.codeAssist.InspectionTest
 
 class MisconfigurationInspectionTest extends InspectionTest {
+  val RequiredProperties = """"license":"proprietary","""
+
   override def setUp(): Unit = {
     super.setUp()
 
@@ -13,6 +15,7 @@ class MisconfigurationInspectionTest extends InspectionTest {
     checkInspection(
       s"""
         |{
+        |  $RequiredProperties
         |  "name": "some/pkg",
         |  <weak_warning>"type": "project"</weak_warning>,
         |  <weak_warning>"minimum-stability": "dev"</weak_warning>
@@ -25,6 +28,7 @@ class MisconfigurationInspectionTest extends InspectionTest {
     checkInspection(
       s"""
         |{
+        |  $RequiredProperties
         |  "name": "some/pkg",
         |  <weak_warning>"type": "project"</weak_warning>,
         |  <weak_warning>"minimum-stability": "dev"</weak_warning>,
@@ -38,6 +42,7 @@ class MisconfigurationInspectionTest extends InspectionTest {
     checkInspection(
       s"""
         |{
+        |  $RequiredProperties
         |  "name": "some/pkg",
         |  "type": "project",
         |  "minimum-stability": "dev",
@@ -51,6 +56,7 @@ class MisconfigurationInspectionTest extends InspectionTest {
     checkInspection(
       s"""
         |{
+        |  $RequiredProperties
         |  "name": "some/pkg",
         |  "description": "desc",
         |  "type": "library",
@@ -65,6 +71,7 @@ class MisconfigurationInspectionTest extends InspectionTest {
     checkInspection(
       s"""
         |{
+        |  $RequiredProperties
         |  "name": "some/pkg",
         |  "type": "project",
         |  "minimum-stability": "stable"
@@ -77,6 +84,7 @@ class MisconfigurationInspectionTest extends InspectionTest {
     checkInspection(
       s"""
         |{
+        |  $RequiredProperties
         |  "name": "some/pkg",
         |  "type": "project",
         |  "prefer-stable": false
@@ -85,60 +93,25 @@ class MisconfigurationInspectionTest extends InspectionTest {
     )
   }
 
-  def testNameProperty_givenLibraryPackageType_namePropertyIsMissing_errorShouldBeReported() = {
+  def testLicenseProperty_itIsMissing_warningShouldBeReported() = {
     checkInspection(
-      """
+      s"""
         |{
+        |  <weak_warning>"name": "aaa/bbb"</weak_warning>
+        |}
+      """.stripMargin
+    )
+  }
+
+
+  def testTypeProperty_typeIsComposerInstaller_warningShouldBeReported() = {
+    checkInspection(
+      s"""
+        |{
+        |  $RequiredProperties
+        |  "name": "some/name",
         |  "description": "desc",
-        |  <error>"type": "library"</error>
-        |}
-      """.stripMargin
-    )
-  }
-
-  def testDescriptionProperty_givenLibraryPackageType_descPropertyIsMissing_errorShouldBeReported() = {
-    checkInspection(
-      """
-        |{
-        |  "name": "some/pkg",
-        |  <error>"type": "library"</error>
-        |}
-      """.stripMargin
-    )
-  }
-
-  def testNameProperty_givenLibraryPackageType_givenNameProperty_errorShouldNotBeReported() = {
-    checkInspection(
-      """
-        |{
-        |  "name": "some/pkg",
-        |  "description": "desc",
-        |  "type": "library"
-        |}
-      """.stripMargin
-    )
-  }
-
-  def testNameProperty_givenProjectPackageType_namePropertyIsMissing_errorShouldNotBeReported() = {
-    checkInspection(
-      """
-        |{
-        |  "type": "project"
-        |}
-      """.stripMargin
-    )
-  }
-
-  def testNameProperty_givenLibraryPackageType_namePropertyIsMissing_givenAuthorsProperty_errorShouldBeReported() = {
-    checkInspection(
-      """
-        |{
-        |  <error>"type": "library"</error>,
-        |  "authors": [
-        |     {
-        |       "name": "psliwa"
-        |     }
-        |  ]
+        |  <weak_warning>"type": "composer-installer"</weak_warning>
         |}
       """.stripMargin
     )

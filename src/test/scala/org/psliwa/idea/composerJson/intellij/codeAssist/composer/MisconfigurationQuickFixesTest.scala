@@ -8,6 +8,8 @@ class MisconfigurationQuickFixesTest extends InspectionTest {
   val FixPreferStable = ComposerBundle.message("inspection.quickfix.setPropertyValue", "prefer-stable", "true")
   val FixMinimumStability = ComposerBundle.message("inspection.quickfix.setPropertyValue", "minimum-stability", "stable")
   val CreateNameProperty = ComposerBundle.message("inspection.quickfix.createProperty", "name")
+  val CreateLicenseProperty = ComposerBundle.message("inspection.quickfix.createProperty", "license")
+  val SetTypeToComposerPlugin = ComposerBundle.message("inspection.quickfix.setPropertyValue", "type", "composer-plugin")
 
   val atLeastOne = new Range(Some(1), None)
 
@@ -113,17 +115,32 @@ class MisconfigurationQuickFixesTest extends InspectionTest {
     )
   }
 
-  def testCreateNamePropertyQuickFix() = {
-    checkQuickFix(CreateNameProperty)(
+  def testFixComposerInstallerType_setTypeToComposerPlugin() = {
+    checkQuickFix(SetTypeToComposerPlugin)(
       """
         |{
-        |  "type": "library<caret>"
+        |  "type": "composer-installer<caret>"
         |}
       """.stripMargin,
       """
         |{
-        |  "type": "library",
-        |  "name": "<caret>"
+        |  "type": "composer-plugin"
+        |}
+      """.stripMargin
+    )
+  }
+
+  def testFixMissingLicense_createLicenseProperty() = {
+    checkQuickFix(CreateLicenseProperty)(
+      """
+        |{
+        |  "name": "a/a<caret>"
+        |}
+      """.stripMargin,
+      """
+        |{
+        |  "name": "a/a",
+        |  "license": "<caret>"
         |}
       """.stripMargin
     )

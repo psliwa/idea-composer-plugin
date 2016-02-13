@@ -9,8 +9,7 @@ import org.psliwa.idea.composerJson.intellij.codeAssist.{CreatePropertyQuickFix,
 import org.psliwa.idea.composerJson.intellij.codeAssist.problem.Checker._
 import org.psliwa.idea.composerJson.intellij.codeAssist.problem.ImplicitConversions._
 import org.psliwa.idea.composerJson.intellij.codeAssist.problem._
-import org.psliwa.idea.composerJson.json.{SBoolean, SString, Schema}
-import org.psliwa.idea.composerJson.intellij.PsiElements.findProperty
+import org.psliwa.idea.composerJson.json.{SStringChoice, SBoolean, SString, Schema}
 import PsiElements._
 
 class MisconfigurationInspection extends AbstractInspection {
@@ -25,19 +24,24 @@ class MisconfigurationInspection extends AbstractInspection {
         new SetPropertyValueQuickFix(jsonObject, "minimum-stability", SString(), "stable")
       )
     ),
-    requiredPropertyForLibrary("name"),
-    requiredPropertyForLibrary("description")
-  )
-
-  private def requiredPropertyForLibrary(property: String) = ProblemChecker(
-    ("type" isNot "project") && not(property),
-    List("type"),
-    ComposerBundle.message("inspection.misconfig.requiredForLibrary", property),
-    (jsonObject) => List(
-      new CreatePropertyQuickFix(jsonObject, property, new SString()),
-      new SetPropertyValueQuickFix(jsonObject, "type", new SString(), "project")
+    ProblemChecker(
+      not("license"),
+      List("name"),
+      ComposerBundle.message("inspection.misconfig.missingLicense"),
+      (jsonObject) => List(
+        new CreatePropertyQuickFix(jsonObject, "license", SString())
+      ),
+      ProblemHighlightType.WEAK_WARNING
     ),
-    ProblemHighlightType.GENERIC_ERROR
+    ProblemChecker(
+      "type" is "composer-installer",
+      List("type"),
+      ComposerBundle.message("inspection.misconfig.composerInstaller"),
+      (jsonObject) => List(
+        new SetPropertyValueQuickFix(jsonObject, "type", SStringChoice(List.empty), "composer-plugin")
+      ),
+      ProblemHighlightType.WEAK_WARNING
+    )
   )
 
   override protected def collectProblems(element: PsiElement, schema: Schema, problems: ProblemsHolder): Unit = {
