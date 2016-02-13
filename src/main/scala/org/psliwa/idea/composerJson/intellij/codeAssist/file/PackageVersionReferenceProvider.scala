@@ -16,7 +16,7 @@ private object PackageVersionReferenceProvider extends PsiReferenceProvider {
       propertyName <- ensureJsonStringLiteral(property.getNameElement)
       (vendor, name) <- `vendor/package`(propertyName.getValue.stripQuotes)
     } yield Array[PsiReference](new UrlPsiReference(propertyValue) {
-      override protected def url: String = packagistUrl(s"$vendor/$name")
+      override protected def url: String = documentationUrl(element, s"$vendor/$name")
     })
 
     maybeReferences.getOrElse(EmptyReferences)

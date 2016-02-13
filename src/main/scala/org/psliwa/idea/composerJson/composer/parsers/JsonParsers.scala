@@ -79,7 +79,8 @@ object JsonParsers {
       jsonObject <- tryJsonObject(maybeJsonObject)
       name <- jsonObject.obj.get("name").map(_.toString)
       version <- jsonObject.obj.get("version").map(_.toString)
-    } yield ComposerPackage(name, version, dev)
+      homepage = jsonObject.obj.get("homepage").map(_.toString)
+    } yield ComposerPackage(name, version, dev, homepage)
   }
 
   private def parsePackagesFromPackagesJson(data: String): Try[RepositoryPackages] = {

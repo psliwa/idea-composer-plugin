@@ -21,7 +21,7 @@ class PackageDocumentationProvider extends DocumentationProvider {
 
   override def getUrlFor(element: PsiElement, originalElement: PsiElement): util.List[String] = {
     if(packageNamePattern.accepts(originalElement)) {
-      util.Arrays.asList(packagistUrl(getStringValue(originalElement.getParent).getOrElse("")))
+      util.Arrays.asList(documentationUrl(originalElement, getStringValue(originalElement.getParent).getOrElse("")))
     } else {
       null
     }

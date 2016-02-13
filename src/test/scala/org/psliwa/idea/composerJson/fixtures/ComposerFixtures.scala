@@ -22,6 +22,7 @@ object ComposerFixtures {
     pkgs.map( pkg =>
       s"""{
           |  "name": "${pkg.name}",
+          |  ${pkg.homepage.map(homepage => s""""homepage":"$homepage",""").getOrElse("")}
           |  "version": "${pkg.version}"
           |}
         """.stripMargin
