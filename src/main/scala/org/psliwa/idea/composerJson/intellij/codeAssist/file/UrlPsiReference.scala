@@ -5,18 +5,18 @@ import com.intellij.navigation.ItemPresentation
 import com.intellij.psi.{NavigatablePsiElement, PsiElement, PsiReferenceBase}
 import org.psliwa.idea.composerJson.intellij.PsiElementWrapper
 
-private class UrlPsiReference(element: PsiElement, prefix: String = "") extends PsiReferenceBase[PsiElement](element) {
+private class UrlPsiReference(element: PsiElement) extends PsiReferenceBase[PsiElement](element) {
 
-  protected def getUrl: String = prefix+getValue
+  protected def url: String = getValue
 
   def resolve: PsiElement = {
     new PsiElementWrapper(element) with NavigatablePsiElement {
-      override def getParent: PsiElement = element
-      override def navigate(requestFocus: Boolean) = BrowserUtil.browse(getUrl)
+      override def getParent: PsiElement = element.getParent
+      override def navigate(requestFocus: Boolean) = BrowserUtil.browse(url)
       override def canNavigate: Boolean = true
       override def canNavigateToSource: Boolean = true
       override def getNavigationElement = this
-      override def getName: String = getValue
+      override def getName: String = url
       override def getPresentation: ItemPresentation = null
     }
   }

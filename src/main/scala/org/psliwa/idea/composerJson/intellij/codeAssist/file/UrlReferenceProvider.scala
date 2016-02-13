@@ -9,7 +9,9 @@ private object UrlReferenceProvider extends PsiReferenceProvider {
     val text = element.getText.substring(1, element.getText.length-1)
 
     if(EmailFormat.isValid(text)) {
-      Array(new UrlPsiReference(element, "mailto:"))
+      Array(new UrlPsiReference(element) {
+        override protected def url: String = "mailto:" + super.url
+      })
     } else if(UriFormat.isValid(text)) {
       Array(new UrlPsiReference(element))
     } else {

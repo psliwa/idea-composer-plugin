@@ -6,6 +6,7 @@ import com.intellij.lang.documentation.DocumentationProvider
 import com.intellij.psi.{PsiManager, PsiElement}
 import com.intellij.patterns.PlatformPatterns._
 import org.psliwa.idea.composerJson.intellij.PsiElements._
+import org.psliwa.idea.composerJson.composer.ComposerPackage._
 
 class PackageDocumentationProvider extends DocumentationProvider {
   import PackageDocumentationProvider._
@@ -20,7 +21,7 @@ class PackageDocumentationProvider extends DocumentationProvider {
 
   override def getUrlFor(element: PsiElement, originalElement: PsiElement): util.List[String] = {
     if(packageNamePattern.accepts(originalElement)) {
-      util.Arrays.asList("https://packagist.org/packages/"+getStringValue(originalElement.getParent).getOrElse(""))
+      util.Arrays.asList(packagistUrl(getStringValue(originalElement.getParent).getOrElse("")))
     } else {
       null
     }

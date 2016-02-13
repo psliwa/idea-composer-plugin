@@ -67,6 +67,18 @@ class UrlReferenceTest extends LightPlatformCodeInsightFixtureTestCase {
     )
   }
 
+  def testGivenPackageVersionProperty_valueShouldBeUrlReference() = {
+    checkUrlReference(
+      """
+        |{
+        |  "require": {
+        |    "some/pkg": "1.<caret>0.0"
+        |  }
+        |}
+      """.stripMargin
+    )
+  }
+
   private def checkUrlReference(s: String, expectedCount: Int = 1) = {
     myFixture.configureByText(ComposerJson, s)
 

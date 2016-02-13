@@ -1,5 +1,6 @@
 package org.psliwa.idea.composerJson.intellij.codeAssist
 
+import com.intellij.codeInsight.lookup.Lookup
 import com.intellij.testFramework.UsefulTestCase
 import com.intellij.testFramework.fixtures.LightPlatformCodeInsightFixtureTestCase
 import org.junit.Assert._
@@ -38,7 +39,12 @@ abstract class CompletionTest extends LightPlatformCodeInsightFixtureTestCase {
 
   protected def completion(contents: String, expected: String) = {
     myFixture.configureByText(ComposerJson, contents)
-    myFixture.completeBasic()
+    val elements = myFixture.completeBasic()
+
+    if(elements != null && elements.length == 1) {
+      //finish completion if there is only one item
+      myFixture.finishLookup(Lookup.NORMAL_SELECT_CHAR)
+    }
 
     myFixture.checkResult(expected.replace("\r", ""))
   }

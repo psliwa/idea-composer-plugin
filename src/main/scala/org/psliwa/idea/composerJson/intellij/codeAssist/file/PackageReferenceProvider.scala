@@ -7,6 +7,7 @@ import com.intellij.psi.{ElementManipulators, PsiElement, PsiReference, PsiRefer
 import com.intellij.util.ProcessingContext
 import org.psliwa.idea.composerJson.intellij.PsiElements
 import PsiElements._
+import org.psliwa.idea.composerJson.composer.ComposerPackage._
 
 private object PackageReferenceProvider extends PsiReferenceProvider {
   private val EmptyReferences: Array[PsiReference] = Array()
@@ -27,19 +28,12 @@ private object PackageReferenceProvider extends PsiReferenceProvider {
 
     val set = new FileReferenceSet("vendor/"+text, nameElement, range.getStartOffset, this, true)
 
-    packageName(text)
+    `vendor/package`(text)
       .map{ case(vendor, pkg) => {
         Array[PsiReference](
           new FileReference(set, new TextRange(1, vendor.length + 1), 0, "vendor/"+vendor),
           new FileReference(set, new TextRange(1, vendor.length+pkg.length+2), 0, "vendor/"+vendor+"/"+pkg)
         )
       }}
-  }
-
-  private def packageName(s: String): Option[(String, String)] = {
-    s.split("/") match {
-      case Array(vendor, pkg) => Some((vendor, pkg))
-      case _ => None
-    }
   }
 }
