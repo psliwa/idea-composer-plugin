@@ -10,6 +10,7 @@ class MisconfigurationQuickFixesTest extends InspectionTest {
   val CreateNameProperty = ComposerBundle.message("inspection.quickfix.createProperty", "name")
   val CreateLicenseProperty = ComposerBundle.message("inspection.quickfix.createProperty", "license")
   val SetTypeToComposerPlugin = ComposerBundle.message("inspection.quickfix.setPropertyValue", "type", "composer-plugin")
+  val SetNameTo = ComposerBundle.message("inspection.quickfix.setPropertyValue", "name", _: String)
 
   val atLeastOne = new Range(Some(1), None)
 
@@ -141,6 +142,51 @@ class MisconfigurationQuickFixesTest extends InspectionTest {
         |{
         |  "name": "a/a",
         |  "license": "<caret>"
+        |}
+      """.stripMargin
+    )
+  }
+
+  def testFixCamelCaseName() = {
+    checkQuickFix(SetNameTo("some-vendor/some-package"))(
+      """
+        |{
+        |  "name": "someVendor/somePackage<caret>"
+        |}
+      """.stripMargin,
+      """
+        |{
+        |  "name": "some-vendor/some-package"
+        |}
+      """.stripMargin
+    )
+  }
+
+  def testNameStartUpperCase_makeFirstLetterLowerCase() = {
+    checkQuickFix(SetNameTo("some-vendor/some-package"))(
+      """
+        |{
+        |  "name": "SomeVendor/somePackage<caret>"
+        |}
+      """.stripMargin,
+      """
+        |{
+        |  "name": "some-vendor/some-package"
+        |}
+      """.stripMargin
+    )
+  }
+
+  def testNamePackageStartUpperCase_makeFirstLetterLowerCase() = {
+    checkQuickFix(SetNameTo("some-vendor/some-package"))(
+      """
+        |{
+        |  "name": "someVendor/SomePackage<caret>"
+        |}
+      """.stripMargin,
+      """
+        |{
+        |  "name": "some-vendor/some-package"
         |}
       """.stripMargin
     )

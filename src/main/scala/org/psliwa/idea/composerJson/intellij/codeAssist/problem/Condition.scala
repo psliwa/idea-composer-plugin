@@ -5,6 +5,8 @@ import com.intellij.psi.PsiElement
 import org.psliwa.idea.composerJson.intellij.PsiExtractors
 import org.psliwa.idea.composerJson.intellij.PsiElements.findProperty
 
+import scala.util.matching.Regex
+
 private[codeAssist] sealed trait Condition {
   import Condition._
 
@@ -16,6 +18,7 @@ private[codeAssist] sealed trait Condition {
         case ConditionIs(expected) => value == expected
         case ConditionIsNot(expected) => value != expected
         case ConditionNot(condition) => !condition.check(jsonObject, propertyName)
+        case ConditionMatch(pattern) => pattern.findFirstIn(value.toString).isDefined
         case ConditionExists => true
       }
 
@@ -23,6 +26,7 @@ private[codeAssist] sealed trait Condition {
   }
 }
 private[codeAssist] case class ConditionIs(value: Any) extends Condition
+private[codeAssist] case class ConditionMatch(regex: Regex) extends Condition
 private[codeAssist] object ConditionExists extends Condition
 private[codeAssist] case class ConditionIsNot(value: Any) extends Condition
 private[codeAssist] case class ConditionNot(condition: Condition) extends Condition

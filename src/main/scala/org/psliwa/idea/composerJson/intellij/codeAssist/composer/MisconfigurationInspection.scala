@@ -4,6 +4,7 @@ import com.intellij.codeInspection.{ProblemHighlightType, ProblemsHolder}
 import com.intellij.json.psi.JsonObject
 import com.intellij.psi.PsiElement
 import org.psliwa.idea.composerJson.ComposerBundle
+import org.psliwa.idea.composerJson.composer.ComposerPackage
 import org.psliwa.idea.composerJson.intellij.PsiElements
 import org.psliwa.idea.composerJson.intellij.codeAssist.{CreatePropertyQuickFix, AbstractInspection, SetPropertyValueQuickFix}
 import org.psliwa.idea.composerJson.intellij.codeAssist.problem.Checker._
@@ -40,6 +41,19 @@ class MisconfigurationInspection extends AbstractInspection {
       (jsonObject) => List(
         new SetPropertyValueQuickFix(jsonObject, "type", SStringChoice(List.empty), "composer-plugin")
       ),
+      ProblemHighlightType.WEAK_WARNING
+    ),
+    ProblemChecker(
+      "name" && ("name" matches "[A-Z]".r),
+      List("name"),
+      ComposerBundle.message("inspection.misconfig.camelCaseName"),
+      (jsonObject) => {
+        (for {
+          nameProperty <- Some(jsonObject.findProperty("name"))
+          nameValue <- Some(nameProperty.getValue)
+          name <- getStringValue(nameValue)
+        } yield new SetPropertyValueQuickFix(jsonObject, "name", SString(), ComposerPackage.fixName(name))).toList
+      },
       ProblemHighlightType.WEAK_WARNING
     )
   )

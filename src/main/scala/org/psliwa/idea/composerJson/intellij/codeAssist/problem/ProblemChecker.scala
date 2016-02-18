@@ -4,6 +4,7 @@ import com.intellij.codeInspection.{ProblemHighlightType, LocalQuickFixOnPsiElem
 import com.intellij.json.psi.JsonObject
 
 import scala.language.implicitConversions
+import scala.util.matching.Regex
 
 private[codeAssist] case class ProblemChecker(
   checker: Checker,
@@ -25,6 +26,7 @@ private[codeAssist] trait Checker {
 private[codeAssist] case class PropertyChecker(property: String, condition: Condition = ConditionExists) extends Checker {
   def is(value: Any) = copy(condition = ConditionIs(value))
   def isNot(value: Any) = copy(condition = ConditionIsNot(value))
+  def matches(regex: Regex) = copy(condition = ConditionMatch(regex))
 
   override def check(jsonObject: JsonObject): Boolean = condition.check(jsonObject, property)
 }

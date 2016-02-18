@@ -116,4 +116,15 @@ class MisconfigurationInspectionTest extends InspectionTest {
       """.stripMargin
     )
   }
+
+  def testNameIsCamelCase_warningShouldBeReported() = {
+    checkInspection(
+      s"""
+         |{
+         |  $RequiredProperties
+         |  <weak_warning>"name": "someVendor/somePackage"</weak_warning>
+         |}
+       """.stripMargin
+    )
+  }
 }
