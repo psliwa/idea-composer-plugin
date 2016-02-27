@@ -6,12 +6,14 @@ import com.intellij.psi.PsiElement
 import org.psliwa.idea.composerJson.ComposerBundle
 import org.psliwa.idea.composerJson.composer.ComposerPackage
 import org.psliwa.idea.composerJson.intellij.PsiElements
+import org.psliwa.idea.composerJson.intellij.codeAssist.problem.checker.{ImplicitConversions, Checker}
 import org.psliwa.idea.composerJson.intellij.codeAssist.{RemoveJsonElementQuickFix, CreatePropertyQuickFix, AbstractInspection, SetPropertyValueQuickFix}
-import org.psliwa.idea.composerJson.intellij.codeAssist.problem.Checker._
-import org.psliwa.idea.composerJson.intellij.codeAssist.problem.ImplicitConversions._
+import Checker._
+import ImplicitConversions._
 import org.psliwa.idea.composerJson.intellij.codeAssist.problem._
 import org.psliwa.idea.composerJson.json.{SStringChoice, SBoolean, SString, Schema}
 import PsiElements._
+import PropertyPath._
 
 class MisconfigurationInspection extends AbstractInspection {
 
@@ -55,9 +57,9 @@ class MisconfigurationInspection extends AbstractInspection {
     ProblemChecker(
       ("require" duplicatesSibling "require-dev") || ("require-dev" duplicatesSibling "require"),
       ComposerBundle.message("inspection.misconfig.requireDuplication"),
-      (jsonObject, propertyName) => {
-        Option(jsonObject.findProperty(propertyName))
-          .map(new RemoveJsonElementQuickFix(_, ComposerBundle.message("inspection.quickfix.removeDependency", propertyName))).toList
+      (jsonObject, propertyPath) => {
+        findPropertyInPath(jsonObject, propertyPath)
+          .map(new RemoveJsonElementQuickFix(_, ComposerBundle.message("inspection.quickfix.removeDependency", propertyPath.lastProperty))).toList
       }
     )
   )
@@ -71,13 +73,13 @@ class MisconfigurationInspection extends AbstractInspection {
     val problemDescriptions = problemCheckers.flatMap(checker => {
       checker.elements(jsonObject).map(element => (element, checker.check(element))).filter(_._2.value).flatMap { case(element, checkResult) =>
         for {
-          (obj, propertyName) <- checkResult.properties
-          property <- findProperty(obj, propertyName)
+          propertyPath <- checkResult.properties
+          property <- findPropertyInPath(jsonObject, propertyPath)
           value <- Option(property.getValue)
         } yield ProblemDescriptor(
           element = value,
           message = Some(checker.problem),
-          quickFixes = checker.createQuickFixes(obj, propertyName),
+          quickFixes = checker.createQuickFixes(jsonObject, propertyPath),
           highlightType = checker.highlightType
         )
       }

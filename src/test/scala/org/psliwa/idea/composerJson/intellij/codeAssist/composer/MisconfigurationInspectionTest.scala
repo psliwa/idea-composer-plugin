@@ -143,4 +143,24 @@ class MisconfigurationInspectionTest extends InspectionTest {
        """.stripMargin
     )
   }
+
+  def testEmptyNamespaceForPsr0_warningShouldBeReported() = {
+    checkInspection(
+      s"""
+         |{
+         |  $RequiredProperties
+         |  "autoload": {
+         |    "psr-0": {
+         |      <weak_warning>"": "abc"</weak_warning>,
+         |      "Def": "def"
+         |    },
+         |    "psr-4": {
+         |      <weak_warning>"": "abc"</weak_warning>,
+         |      "Def": "def"
+         |    }
+         |  }
+         |}
+       """.stripMargin
+    )
+  }
 }
