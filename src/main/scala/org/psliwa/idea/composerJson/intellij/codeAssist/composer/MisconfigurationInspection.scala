@@ -61,6 +61,11 @@ class MisconfigurationInspection extends AbstractInspection {
         findPropertyInPath(jsonObject, propertyPath)
           .map(new RemoveJsonElementQuickFix(_, ComposerBundle.message("inspection.quickfix.removeDependency", propertyPath.lastProperty))).toList
       }
+    ),
+    ProblemChecker(
+      ("autoload" / "psr-0" / "") || ("autoload" / "psr-4" / ""),
+      ComposerBundle.message("inspection.misconfig.emptyPsrNamespace"),
+      (jsonObject, _) => List.empty
     )
   )
 

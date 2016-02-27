@@ -5,7 +5,7 @@
   "description": "The \"Symfony Standard Edition\" distribution",
   "autoload": {
     "psr-0": {
-      "": "src/",
+      <weak_warning>"": "src/"</weak_warning>,
       "SymfonyStandard": "app/"
     }
   },
