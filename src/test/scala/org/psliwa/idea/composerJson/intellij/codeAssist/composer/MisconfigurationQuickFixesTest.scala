@@ -193,6 +193,20 @@ class MisconfigurationQuickFixesTest extends InspectionTest {
     )
   }
 
+  def testNamePackageWithDashAndUpperCase_makeThisLetterLowerCase() = {
+    checkQuickFix(SetNameTo("some-vendor/some-package"))(
+      """
+        |{
+        |  "name": "some-Vendor/SomePackage<caret>"
+        |}
+      """.stripMargin,
+      """
+        |{
+        |  "name": "some-vendor/some-package"
+        |}
+      """.stripMargin
+    )
+  }
 
   def testDependencyInRequiredAndRequiredDev_removeDependency() = {
     checkQuickFix(RemoveDependency("some/pkg"), atLeastOne)(
