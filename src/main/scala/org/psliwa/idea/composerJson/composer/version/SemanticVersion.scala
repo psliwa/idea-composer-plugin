@@ -62,7 +62,7 @@ case class SemanticVersion(major: Int, private val other: Option[(Int,Option[(In
   }
 
   def dropZeros: SemanticVersion = {
-    new SemanticVersion(reversedParts.dropWhile(_ == 0).reverse.toArray)
+    new SemanticVersion((major :: parts.tail.reverse.dropWhile(_ == 0).reverse).toArray)
   }
 
   override def toString: String = {

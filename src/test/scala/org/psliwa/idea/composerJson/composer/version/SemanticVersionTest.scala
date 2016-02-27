@@ -1,94 +1,117 @@
 package org.psliwa.idea.composerJson.composer.version
 
-import org.junit.Test
-import org.junit.Assert._
+import org.scalacheck.{Gen, Properties}
+import org.scalacheck.Prop.forAll
 
-class SemanticVersionTest {
-  @Test
-  def semanticVersionAcceptsZeros(): Unit = {
-    SemanticVersion(0, Some(0, Some(1)))
+import scala.util.Try
+
+class SemanticVersionTest extends Properties("SemanticVersion") {
+
+  type Patch = Option[(Int)]
+  type Minor = Option[(Int,Patch)]
+
+  //generators
+  val positiveZero = Gen.choose[Int](0, 20)
+  val positive = positiveZero.map(_ + 1)
+  val negative = Gen.choose[Int](-20, -1)
+  val major = positiveZero
+  def patchOptional(g: Gen[Int]): Gen[Patch] = Gen.option[(Int)](g)
+  def minorOptional(g: Gen[Int], patchGen: Gen[Patch] = patchOptional(positiveZero)): Gen[Minor] = Gen.option(minor(g, patchGen))
+  def minorSome(g: Gen[Int]): Gen[Minor] = minor(g).map(Some(_))
+  def minor(g: Gen[Int], patchGen: Gen[Patch] = patchOptional(positiveZero)) = for {
+    m <- g
+    p <- patchGen
+  } yield (m, p)
+
+  //properties
+
+  property("accepts zeros at beginning") = forAll(major, minorOptional(positiveZero)) { (major: Int, minor: Minor) =>
+    SemanticVersion(major, minor)
+    true
   }
 
-  @Test(expected = classOf[IllegalArgumentException])
-  def semanticVersionsDoesNotAcceptNegativeInts(): Unit = {
-    SemanticVersion(-1, Some(1, None))
+  property("does not accept negative numbers") = forAll(negative, minorOptional(positiveZero)) { (major: Int, minor: Minor) =>
+    Try { SemanticVersion(major, minor) }.isFailure
+  } && forAll(major, minorSome(negative)) { (major: Int, minor: Minor) =>
+    Try { SemanticVersion(major, minor) }.isFailure
   }
 
-  @Test
-  def incrementLastPart(): Unit = {
-    List(
-      (new SemanticVersion(1, 2, 3), new SemanticVersion(1, 2, 4)),
-      (new SemanticVersion(1, 2), new SemanticVersion(1, 3)),
-      (new SemanticVersion(1), new SemanticVersion(2))
-    ).foreach{
-      case (actual, expected) => assertEquals(expected, actual.incrementLast)
-    }
+  property("incrementLast") = forAll(major, minorOptional(positiveZero)) { (major: Int, minor: Minor) =>
+    val original = SemanticVersion(major, minor)
+    val incremented = original.incrementLast
+
+    parts(incremented) == (parts(original).dropRight(1) ++ List(parts(original).last + 1))
   }
 
-  @Test
-  def dropLastPart(): Unit = {
-    List(
-      (new SemanticVersion(1, 2, 3), new SemanticVersion(1, 2)),
-      (new SemanticVersion(1, 2), new SemanticVersion(1)),
-      (new SemanticVersion(1), null)
-    ).foreach{
-      case (actual, expected) => assertEquals(Option(expected), actual.dropLast)
-    }
+  property("dropLast") = forAll(major, minorOptional(positiveZero)) { (major: Int, minor: Minor) =>
+    val original = SemanticVersion(major, minor)
+    val updated = original.dropLast
+
+    updated.map(parts).getOrElse(List.empty) == parts(original).dropRight(1)
   }
 
-  @Test
-  def appendPart(): Unit = {
-    List(
-      (new SemanticVersion(1, 2, 3), null),
-      (new SemanticVersion(1, 2), new SemanticVersion(1, 2, 0)),
-      (new SemanticVersion(1), new SemanticVersion(1, 0))
-    ).foreach{
-      case (actual, expected) => assertEquals(Option(expected), actual.append(0))
-    }
+  property("append") = forAll(major, minorOptional(positiveZero, Gen.const[Patch](None)), positiveZero) { (major: Int, minor: Minor, part: Int) =>
+    val original = SemanticVersion(major, minor)
+    val updated = original.append(part)
+
+    updated.map(parts).contains(parts(original) ++ List(part))
+  } && forAll(major, minor(positiveZero, positiveZero.map(Some(_))).map(Some(_)), positiveZero) { (major: Int, minor: Minor, part: Int) =>
+    val original = SemanticVersion(major, minor)
+    val updated = original.append(part)
+
+    updated.isEmpty
   }
 
-  @Test
-  def fillZero(): Unit = {
-    List(
-      (new SemanticVersion(1, 2, 3), new SemanticVersion(1, 2, 3)),
-      (new SemanticVersion(1, 2), new SemanticVersion(1, 2, 0)),
-      (new SemanticVersion(1), new SemanticVersion(1, 0, 0))
-    ).foreach{
-      case (actual, expected) => assertEquals(expected, actual.fillZero)
-    }
+  property("fillZero") = forAll(major, minorOptional(positiveZero)) { (major: Int, minor: Minor) =>
+    val original = SemanticVersion(major, minor)
+    val updated = original.fillZero
+
+    checkFillZero(original, updated, 3)
   }
 
-  @Test
-  def ensuringParts(): Unit = {
-    List(
-      (new SemanticVersion(1, 2, 3), new SemanticVersion(1, 2, 3)),
-      (new SemanticVersion(1, 2), new SemanticVersion(1, 2)),
-      (new SemanticVersion(1), new SemanticVersion(1, 0))
-    ).foreach{
-      case (actual, expected) => assertEquals(expected, actual.ensureParts(2))
-    }
+  private def checkFillZero(original: SemanticVersion, updated: SemanticVersion, size: Int) = {
+    val sizeIs3 = parts(updated).size == size
+    val diffIs0 = parts(original).diff(parts(updated)).forall(_ == 0)
+    val addedOnly0 = parts(updated).drop(parts(original).size).forall(_ == 0)
+
+    sizeIs3 && diffIs0 && addedOnly0
   }
 
-  @Test
-  def ensuringExactlyParts(): Unit = {
-    List(
-      (new SemanticVersion(1, 2, 3), new SemanticVersion(1, 2)),
-      (new SemanticVersion(1, 2), new SemanticVersion(1, 2)),
-      (new SemanticVersion(1), new SemanticVersion(1, 0))
-    ).foreach{
-      case (actual, expected) => assertEquals(expected, actual.ensureExactlyParts(2))
-    }
+  property("ensureParts") = forAll(major, minorOptional(positiveZero), Gen.choose(1, 3)) { (major: Int, minor: Minor, minSize: Int) =>
+    val original = SemanticVersion(major, minor)
+    val updated = original.ensureParts(minSize)
+
+    val size = math.max(minSize, parts(original).size)
+    checkFillZero(original, updated, size)
   }
 
-  @Test
-  def droppingZeros(): Unit = {
-    List(
-      (new SemanticVersion(1, 2, 3), new SemanticVersion(1, 2, 3)),
-      (new SemanticVersion(1, 2, 0), new SemanticVersion(1, 2)),
-      (new SemanticVersion(1, 0, 0), new SemanticVersion(1)),
-      (new SemanticVersion(1, 0, 1), new SemanticVersion(1, 0, 1))
-    ).foreach{
-      case (actual, expected) => assertEquals(expected, actual.dropZeros)
-    }
+  property("ensureExactlyParts") = forAll(major, minorOptional(positiveZero), Gen.choose(1, 3)) { (major: Int, minor: Minor, size: Int) =>
+    val original = SemanticVersion(major, minor)
+    val updated = original.ensureExactlyParts(size)
+
+    if(size >= parts(original).size) checkFillZero(original, updated, size)
+    else parts(original).dropRight(parts(original).size - size) == parts(updated)
   }
+
+  property("dropZeros") = forAll(positive, minorOptional(positiveZero)) { (major: Int, minor: Minor) =>
+    val version = SemanticVersion(major, minor).dropZeros
+
+    parts(version).reverse.dropWhile(_ == 0).reverse == parts(version)
+  } && forAll(positiveZero) { (major: Int) =>
+    val original = SemanticVersion(major, None)
+    val updated = original.dropZeros
+
+    original == updated
+  }
+
+  property("partsNumber") = forAll(positiveZero, minorOptional(positiveZero)) { (major: Int, minor: Minor) =>
+    val version = SemanticVersion(major, minor)
+
+    version.partsNumber == parts(version).size
+  }
+
+  //util functions
+
+  def parts(version: SemanticVersion): List[Int] = version.major :: version.minor.toList ++ version.patch
+
 }
