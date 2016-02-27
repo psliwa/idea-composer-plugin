@@ -2,7 +2,7 @@ package org.psliwa.idea.composerJson.intellij.codeAssist.problem
 
 import com.intellij.codeInspection.{LocalQuickFixOnPsiElement, ProblemHighlightType}
 import com.intellij.json.psi.JsonObject
-import org.psliwa.idea.composerJson.intellij.codeAssist.problem.checker.{CheckResult, Checker}
+import org.psliwa.idea.composerJson.intellij.codeAssist.problem.checker.Checker
 
 import scala.language.implicitConversions
 

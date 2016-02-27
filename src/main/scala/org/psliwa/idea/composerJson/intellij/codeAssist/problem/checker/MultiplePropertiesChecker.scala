@@ -3,7 +3,7 @@ package org.psliwa.idea.composerJson.intellij.codeAssist.problem.checker
 import com.intellij.json.psi.JsonObject
 import org.psliwa.idea.composerJson.intellij.PsiElements._
 import org.psliwa.idea.composerJson.intellij.codeAssist.problem.PropertyPath._
-import org.psliwa.idea.composerJson.intellij.codeAssist.problem.{Condition, PropertyPath}
+import org.psliwa.idea.composerJson.intellij.codeAssist.problem.{CheckResult, Condition, PropertyPath}
 
 import scala.collection.JavaConversions._
 

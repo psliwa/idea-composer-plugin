@@ -5,7 +5,6 @@ import com.intellij.psi.PsiElement
 import org.psliwa.idea.composerJson.intellij.PsiExtractors
 import PropertyPath._
 import org.psliwa.idea.composerJson.intellij.PsiElements._
-import org.psliwa.idea.composerJson.intellij.codeAssist.problem.checker.CheckResult
 
 import scala.util.matching.Regex
 
@@ -32,6 +31,7 @@ private[codeAssist] sealed trait Condition {
     result.filter(_.value).foldLeft(CheckResult(value = false, Set.empty))(_ || _)
   }
 }
+
 private[codeAssist] case class ConditionIs(value: Any) extends Condition
 private[codeAssist] case class ConditionMatch(regex: Regex) extends Condition
 private[codeAssist] object ConditionExists extends Condition

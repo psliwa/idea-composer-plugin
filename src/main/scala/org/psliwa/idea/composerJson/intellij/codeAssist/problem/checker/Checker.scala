@@ -1,7 +1,7 @@
 package org.psliwa.idea.composerJson.intellij.codeAssist.problem.checker
 
 import com.intellij.json.psi.JsonObject
-import org.psliwa.idea.composerJson.intellij.codeAssist.problem.PropertyPath
+import org.psliwa.idea.composerJson.intellij.codeAssist.problem.{CheckResult, PropertyPath}
 
 import scala.language.implicitConversions
 
@@ -10,14 +10,6 @@ private[codeAssist] trait Checker {
 
   def &&(checker: Checker): Checker = AndChecker(this, checker)
   def ||(checker: Checker): Checker = OrChecker(this, checker)
-}
-
-private[codeAssist] case class CheckResult(value: Boolean, properties: Set[PropertyPath]) {
-  lazy val not = CheckResult(!value, properties)
-
-  def &&(result: CheckResult) = CheckResult(value && result.value, properties ++ result.properties)
-
-  def ||(result: CheckResult) = CheckResult(value || result.value, properties ++ result.properties)
 }
 
 private[codeAssist] object Checker {
