@@ -19,6 +19,10 @@ private[codeAssist] sealed trait Condition {
         case ConditionIsNot(expected) => value != expected
         case ConditionNot(condition) => !condition.check(jsonObject, propertyName)
         case ConditionMatch(pattern) => pattern.findFirstIn(value.toString).isDefined
+        case ConditionDuplicateIn(getObjectToCheck) => (for {
+          objectToCheck <- getObjectToCheck(jsonObject)
+          duplicatedProperty <- Option(objectToCheck.findProperty(propertyName))
+        } yield true).getOrElse(false)
         case ConditionExists => true
       }
 
@@ -30,6 +34,7 @@ private[codeAssist] case class ConditionMatch(regex: Regex) extends Condition
 private[codeAssist] object ConditionExists extends Condition
 private[codeAssist] case class ConditionIsNot(value: Any) extends Condition
 private[codeAssist] case class ConditionNot(condition: Condition) extends Condition
+private[codeAssist] case class ConditionDuplicateIn(getObjectToCheck: JsonObject => Option[JsonObject]) extends Condition
 
 private[codeAssist] object Condition {
   import PsiExtractors._

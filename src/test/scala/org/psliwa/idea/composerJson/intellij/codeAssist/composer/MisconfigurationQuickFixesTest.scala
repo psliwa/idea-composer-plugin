@@ -11,6 +11,7 @@ class MisconfigurationQuickFixesTest extends InspectionTest {
   val CreateLicenseProperty = ComposerBundle.message("inspection.quickfix.createProperty", "license")
   val SetTypeToComposerPlugin = ComposerBundle.message("inspection.quickfix.setPropertyValue", "type", "composer-plugin")
   val SetNameTo = ComposerBundle.message("inspection.quickfix.setPropertyValue", "name", _: String)
+  val RemoveDependency = ComposerBundle.message("inspection.quickfix.removeDependency", _: String)
 
   val atLeastOne = new Range(Some(1), None)
 
@@ -187,6 +188,31 @@ class MisconfigurationQuickFixesTest extends InspectionTest {
       """
         |{
         |  "name": "some-vendor/some-package"
+        |}
+      """.stripMargin
+    )
+  }
+
+
+  def testDependencyInRequiredAndRequiredDev_removeDependency() = {
+    checkQuickFix(RemoveDependency("some/pkg"), atLeastOne)(
+      """
+        |{
+        |  "require": {
+        |    "some/pkg<caret>": "1.0.0"
+        |  },
+        |  "require-dev": {
+        |    "some/pkg": "1.0.0"
+        |  }
+        |}
+      """.stripMargin,
+      """
+        |{
+        |  "require": {
+        |  },
+        |  "require-dev": {
+        |    "some/pkg": "1.0.0"
+        |  }
         |}
       """.stripMargin
     )

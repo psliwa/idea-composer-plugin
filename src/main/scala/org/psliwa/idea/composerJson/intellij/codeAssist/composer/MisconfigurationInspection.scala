@@ -6,7 +6,7 @@ import com.intellij.psi.PsiElement
 import org.psliwa.idea.composerJson.ComposerBundle
 import org.psliwa.idea.composerJson.composer.ComposerPackage
 import org.psliwa.idea.composerJson.intellij.PsiElements
-import org.psliwa.idea.composerJson.intellij.codeAssist.{CreatePropertyQuickFix, AbstractInspection, SetPropertyValueQuickFix}
+import org.psliwa.idea.composerJson.intellij.codeAssist.{RemoveJsonElementQuickFix, CreatePropertyQuickFix, AbstractInspection, SetPropertyValueQuickFix}
 import org.psliwa.idea.composerJson.intellij.codeAssist.problem.Checker._
 import org.psliwa.idea.composerJson.intellij.codeAssist.problem.ImplicitConversions._
 import org.psliwa.idea.composerJson.intellij.codeAssist.problem._
@@ -18,36 +18,32 @@ class MisconfigurationInspection extends AbstractInspection {
   private val problemCheckers = List(
     ProblemChecker(
       ("type" is "project") && ("minimum-stability" isNot "stable") && (("prefer-stable" is false) || not("prefer-stable")),
-      List("type", "minimum-stability", "prefer-stable"),
       ComposerBundle.message("inspection.misconfig.notStableProject"),
-      (jsonObject) => List(
+      (jsonObject, _) => List(
         new SetPropertyValueQuickFix(jsonObject, "prefer-stable", SBoolean, "true"),
         new SetPropertyValueQuickFix(jsonObject, "minimum-stability", SString(), "stable")
       )
     ),
     ProblemChecker(
-      not("license"),
-      List("name"),
+      not("license") && "name",
       ComposerBundle.message("inspection.misconfig.missingLicense"),
-      (jsonObject) => List(
+      (jsonObject, _) => List(
         new CreatePropertyQuickFix(jsonObject, "license", SString())
       ),
       ProblemHighlightType.WEAK_WARNING
     ),
     ProblemChecker(
       "type" is "composer-installer",
-      List("type"),
       ComposerBundle.message("inspection.misconfig.composerInstaller"),
-      (jsonObject) => List(
+      (jsonObject, _) => List(
         new SetPropertyValueQuickFix(jsonObject, "type", SStringChoice(List.empty), "composer-plugin")
       ),
       ProblemHighlightType.WEAK_WARNING
     ),
     ProblemChecker(
       "name" && ("name" matches "[A-Z]".r),
-      List("name"),
       ComposerBundle.message("inspection.misconfig.camelCaseName"),
-      (jsonObject) => {
+      (jsonObject, _) => {
         (for {
           nameProperty <- Some(jsonObject.findProperty("name"))
           nameValue <- Some(nameProperty.getValue)
@@ -55,6 +51,14 @@ class MisconfigurationInspection extends AbstractInspection {
         } yield new SetPropertyValueQuickFix(jsonObject, "name", SString(), ComposerPackage.fixName(name))).toList
       },
       ProblemHighlightType.WEAK_WARNING
+    ),
+    ProblemChecker(
+      ("require" duplicatesSibling "require-dev") || ("require-dev" duplicatesSibling "require"),
+      ComposerBundle.message("inspection.misconfig.requireDuplication"),
+      (jsonObject, propertyName) => {
+        Option(jsonObject.findProperty(propertyName))
+          .map(new RemoveJsonElementQuickFix(_, ComposerBundle.message("inspection.quickfix.removeDependency", propertyName))).toList
+      }
     )
   )
 
@@ -65,18 +69,17 @@ class MisconfigurationInspection extends AbstractInspection {
 
   private def collectProblems(jsonObject: JsonObject, problems: ProblemsHolder): Unit = {
     val problemDescriptions = problemCheckers.flatMap(checker => {
-      if(checker.check(jsonObject)) {
-        checker.properties
-          .flatMap(findProperty(jsonObject, _))
-          .flatMap(value => Option(value.getValue))
-          .map(value => ProblemDescriptor(
-            element = value,
-            message = Some(checker.problem),
-            quickFixes = checker.createQuickFixes(jsonObject),
-            highlightType = checker.highlightType
-          ))
-      } else {
-        List()
+      checker.elements(jsonObject).map(element => (element, checker.check(element))).filter(_._2.value).flatMap { case(element, checkResult) =>
+        for {
+          (obj, propertyName) <- checkResult.properties
+          property <- findProperty(obj, propertyName)
+          value <- Option(property.getValue)
+        } yield ProblemDescriptor(
+          element = value,
+          message = Some(checker.problem),
+          quickFixes = checker.createQuickFixes(obj, propertyName),
+          highlightType = checker.highlightType
+        )
       }
     })
 

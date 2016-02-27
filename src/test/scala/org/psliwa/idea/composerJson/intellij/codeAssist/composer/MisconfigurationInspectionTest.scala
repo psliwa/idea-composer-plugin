@@ -127,4 +127,20 @@ class MisconfigurationInspectionTest extends InspectionTest {
        """.stripMargin
     )
   }
+
+  def testDependencyDefinedInRequireAndRequireDev_warningShouldBeReported() = {
+    checkInspection(
+      s"""
+         |{
+         |  $RequiredProperties
+         |  "require": {
+         |    <weak_warning>"some/pkg": "1.0.0"</weak_warning>
+         |  },
+         |  "require-dev": {
+         |    <weak_warning>"some/pkg": "1.0.1"</weak_warning>
+         |  }
+         |}
+       """.stripMargin
+    )
+  }
 }
