@@ -58,14 +58,18 @@ class MisconfigurationInspection extends AbstractInspection {
       ("require" duplicatesSibling "require-dev") || ("require-dev" duplicatesSibling "require"),
       ComposerBundle.message("inspection.misconfig.requireDuplication"),
       (jsonObject, propertyPath) => {
-        findPropertyInPath(jsonObject, propertyPath)
-          .map(new RemoveJsonElementQuickFix(_, ComposerBundle.message("inspection.quickfix.removeDependency", propertyPath.lastProperty))).toList
+        findPropertiesInPath(jsonObject, propertyPath)
+          .map(new RemoveJsonElementQuickFix(_, ComposerBundle.message("inspection.quickfix.removeDependency", propertyPath.lastProperty)))
       }
     ),
     ProblemChecker(
       ("autoload" / "psr-0" / "") || ("autoload" / "psr-4" / ""),
       ComposerBundle.message("inspection.misconfig.emptyPsrNamespace"),
       (jsonObject, _) => List.empty
+    ),
+    ProblemChecker(
+      "require" / "*" matches "#".r,
+      ComposerBundle.message("inspection.misconfig.commitRefAsVersion")
     )
   )
 
@@ -79,7 +83,7 @@ class MisconfigurationInspection extends AbstractInspection {
       checker.elements(jsonObject).map(element => (element, checker.check(element))).filter(_._2.value).flatMap { case(element, checkResult) =>
         for {
           propertyPath <- checkResult.properties
-          property <- findPropertyInPath(jsonObject, propertyPath)
+          property <- findPropertiesInPath(jsonObject, propertyPath)
           value <- Option(property.getValue)
         } yield ProblemDescriptor(
           element = value,

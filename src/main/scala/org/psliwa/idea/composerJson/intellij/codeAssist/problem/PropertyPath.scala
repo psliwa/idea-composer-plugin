@@ -2,9 +2,13 @@ package org.psliwa.idea.composerJson.intellij.codeAssist.problem
 
 import com.intellij.json.psi.{JsonObject, JsonProperty}
 import org.psliwa.idea.composerJson.intellij.PsiElements._
+import scala.collection.JavaConverters._
 
 import scala.annotation.tailrec
 
+/***
+  * "*" char can be used as wildcard
+  */
 private[codeAssist] case class PropertyPath(headProperty: String, tailProperties: List[String]) {
   def /(property: String) = copy(tailProperties = tailProperties ++ List(property))
 
@@ -12,17 +16,24 @@ private[codeAssist] case class PropertyPath(headProperty: String, tailProperties
 }
 
 private[codeAssist] object PropertyPath {
-  def findPropertyInPath(jsonObject: JsonObject, propertyPath: PropertyPath): Option[JsonProperty] = {
+  def findPropertiesInPath(jsonObject: JsonObject, propertyPath: PropertyPath): List[JsonProperty] = {
     @tailrec
-    def loop(jsonObject: Option[JsonObject], propertyPath: PropertyPath, foundProperty: Option[JsonProperty]): Option[JsonProperty] = {
-      (jsonObject.flatMap(o => Option(o.findProperty(propertyPath.headProperty))), propertyPath) match {
-        case (Some(property), PropertyPath(_, Nil)) => Some(property)
-        case (Some(property), PropertyPath(_, head :: tail)) => loop(ensureJsonObject(property.getValue), PropertyPath(head, tail), Some(property))
-        case _ => None
+    def loop(jsonObjects: List[JsonObject], propertyPath: PropertyPath, foundProperties: List[JsonProperty]): List[JsonProperty] = {
+      (jsonObjects.flatMap(findProperties(_, propertyPath.headProperty)), propertyPath) match {
+        case (properties, PropertyPath(_, Nil)) => properties
+        case (properties, PropertyPath(_, head :: tail)) =>
+          val newJsonObjects: List[JsonObject] = properties.flatMap(property => Option(property.getValue)).flatMap(ensureJsonObject)
+          loop(newJsonObjects, PropertyPath(head, tail), properties)
+        case _ => foundProperties
       }
     }
 
-    loop(Some(jsonObject), propertyPath, None)
+    def findProperties(jsonObject: JsonObject, propertyName: String): List[JsonProperty] = propertyName match {
+      case "*" => jsonObject.getPropertyList.asScala.toList
+      case name => Option(jsonObject.findProperty(name)).toList
+    }
+
+    loop(List(jsonObject), propertyPath, List.empty)
   }
 
   def siblingPropertyPath(propertyPath: PropertyPath, siblingPropertyName: String): PropertyPath = propertyPath match {

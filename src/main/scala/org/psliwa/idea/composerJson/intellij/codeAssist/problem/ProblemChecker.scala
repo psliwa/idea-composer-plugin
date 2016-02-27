@@ -9,7 +9,7 @@ import scala.language.implicitConversions
 private[codeAssist] case class ProblemChecker(
   checker: Checker,
   problem: String,
-  createQuickFixes: (JsonObject, PropertyPath) => List[LocalQuickFixOnPsiElement],
+  createQuickFixes: (JsonObject, PropertyPath) => List[LocalQuickFixOnPsiElement] = (_, _) => List.empty,
   highlightType: ProblemHighlightType = ProblemHighlightType.GENERIC_ERROR_OR_WARNING,
   elements: JsonObject => List[JsonObject] = List(_: JsonObject)
 ) extends Checker {

@@ -5,30 +5,31 @@ import com.intellij.psi.PsiElement
 import org.psliwa.idea.composerJson.intellij.PsiExtractors
 import PropertyPath._
 import org.psliwa.idea.composerJson.intellij.PsiElements._
+import org.psliwa.idea.composerJson.intellij.codeAssist.problem.checker.CheckResult
 
 import scala.util.matching.Regex
 
 private[codeAssist] sealed trait Condition {
   import Condition._
 
-  def check(jsonObject: JsonObject, propertyPath: PropertyPath): Boolean = {
+  def check(jsonObject: JsonObject, propertyPath: PropertyPath): CheckResult = {
     val result = for {
-      property <- findPropertyInPath(jsonObject, propertyPath)
+      property <- findPropertiesInPath(jsonObject, propertyPath)
       value <- getValue(property.getValue)
-    } yield this match {
-        case ConditionIs(expected) => value == expected
-        case ConditionIsNot(expected) => value != expected
-        case ConditionNot(condition) => !condition.check(jsonObject, propertyPath)
-        case ConditionMatch(pattern) => pattern.findFirstIn(value.toString).isDefined
-        case ConditionDuplicateIn(dependencyPropertyPath) => (for {
-          dependencyProperty <- findPropertyInPath(jsonObject, dependencyPropertyPath)
-          dependencyObject <- Option(dependencyProperty.getValue).flatMap(ensureJsonObject)
-          duplicatedProperty <- findPropertyInPath(dependencyObject, PropertyPath(propertyPath.lastProperty, List.empty))
-        } yield true).getOrElse(false)
-        case ConditionExists => true
-      }
+    } yield CheckResult(this match {
+      case ConditionIs(expected) => value == expected
+      case ConditionIsNot(expected) => value != expected
+      case ConditionNot(condition) => condition.check(jsonObject, propertyPath).not.value
+      case ConditionMatch(pattern) => pattern.findFirstIn(value.toString).isDefined
+      case ConditionDuplicateIn(dependencyPropertyPath) => (for {
+        dependencyProperty <- findPropertiesInPath(jsonObject, dependencyPropertyPath)
+        dependencyObject <- Option(dependencyProperty.getValue).flatMap(ensureJsonObject).toList
+        duplicatedProperty <- findPropertiesInPath(dependencyObject, PropertyPath(propertyPath.lastProperty, List.empty))
+      } yield true).headOption.getOrElse(false)
+      case ConditionExists => true
+    }, Set(siblingPropertyPath(propertyPath, property.getName)))
 
-    result.getOrElse(false)
+    result.filter(_.value).foldLeft(CheckResult(value = false, Set.empty))(_ || _)
   }
 }
 private[codeAssist] case class ConditionIs(value: Any) extends Condition

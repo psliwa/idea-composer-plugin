@@ -163,4 +163,18 @@ class MisconfigurationInspectionTest extends InspectionTest {
        """.stripMargin
     )
   }
+
+  def testCommitRefAsPackageVersion_warningShouldBeReported() = {
+    checkInspection(
+      s"""
+         |{
+         |  $RequiredProperties
+         |  "require": {
+         |    <weak_warning>"some/pkg1": "dev-master#adcdf"</weak_warning>,
+         |    "some/pkg2": "1.0.0"
+         |  }
+         |}
+       """.stripMargin
+    )
+  }
 }
