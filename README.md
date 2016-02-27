@@ -49,4 +49,4 @@ for me during my daily job, so I waiting for yours ideas too ;)
 
 [1]: https://plugins.jetbrains.com/files/7631/screenshot_14847.png
 [2]: https://plugins.jetbrains.com/plugin/7631
-[3]: https://github.com/composer/composer/commit/430c6f39721c74ad96a68c8103c2899947c1cd7e
+[3]: https://github.com/composer/composer/commit/06be9b8
