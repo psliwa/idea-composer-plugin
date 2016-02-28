@@ -1,7 +1,7 @@
 package org.psliwa.idea.composerJson.composer.version
 
-import org.scalacheck.{Gen, Properties}
-import org.scalacheck.Prop.forAll
+import org.scalacheck.{Prop, Gen, Properties}
+import org.scalacheck.Prop.{forAll, BooleanOperators}
 
 import scala.util.Try
 
@@ -26,8 +26,7 @@ class SemanticVersionTest extends Properties("SemanticVersion") {
   //properties
 
   property("accepts zeros at beginning") = forAll(major, minorOptional(positiveZero)) { (major: Int, minor: Minor) =>
-    SemanticVersion(major, minor)
-    true
+    Try { SemanticVersion(major, minor) }.isSuccess
   }
 
   property("does not accept negative numbers") = forAll(negative, minorOptional(positiveZero)) { (major: Int, minor: Minor) =>
@@ -70,11 +69,13 @@ class SemanticVersionTest extends Properties("SemanticVersion") {
   }
 
   private def checkFillZero(original: SemanticVersion, updated: SemanticVersion, size: Int) = {
-    val sizeIs3 = parts(updated).size == size
+    val sizeIsOk = parts(updated).size == size
     val diffIs0 = parts(original).diff(parts(updated)).forall(_ == 0)
     val addedOnly0 = parts(updated).drop(parts(original).size).forall(_ == 0)
 
-    sizeIs3 && diffIs0 && addedOnly0
+    sizeIsOk    :| "size == #3" &&
+    diffIs0     :| "difference is only 0" &&
+    addedOnly0  :| "only zeros were added"
   }
 
   property("ensureParts") = forAll(major, minorOptional(positiveZero), Gen.choose(1, 3)) { (major: Int, minor: Minor, minSize: Int) =>
@@ -90,7 +91,7 @@ class SemanticVersionTest extends Properties("SemanticVersion") {
     val updated = original.ensureExactlyParts(size)
 
     if(size >= parts(original).size) checkFillZero(original, updated, size)
-    else parts(original).dropRight(parts(original).size - size) == parts(updated)
+    else Prop { parts(original).dropRight(parts(original).size - size) == parts(updated) }
   }
 
   property("dropZeros") = forAll(positive, minorOptional(positiveZero)) { (major: Int, minor: Minor) =>
