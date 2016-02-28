@@ -7,23 +7,7 @@ import scala.util.Try
 
 class SemanticVersionTest extends Properties("SemanticVersion") {
 
-  type Patch = Option[(Int)]
-  type Minor = Option[(Int,Patch)]
-
-  //generators
-  val positiveZero = Gen.choose[Int](0, 20)
-  val positive = positiveZero.map(_ + 1)
-  val negative = Gen.choose[Int](-20, -1)
-  val major = positiveZero
-  def patchOptional(g: Gen[Int]): Gen[Patch] = Gen.option[(Int)](g)
-  def minorOptional(g: Gen[Int], patchGen: Gen[Patch] = patchOptional(positiveZero)): Gen[Minor] = Gen.option(minor(g, patchGen))
-  def minorSome(g: Gen[Int]): Gen[Minor] = minor(g).map(Some(_))
-  def minor(g: Gen[Int], patchGen: Gen[Patch] = patchOptional(positiveZero)) = for {
-    m <- g
-    p <- patchGen
-  } yield (m, p)
-
-  //properties
+  import VersionGenerators.SemanticVersion._
 
   property("accepts zeros at beginning") = forAll(major, minorOptional(positiveZero)) { (major: Int, minor: Minor) =>
     Try { SemanticVersion(major, minor) }.isSuccess

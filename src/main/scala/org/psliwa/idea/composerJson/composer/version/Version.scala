@@ -98,7 +98,7 @@ object Version {
       .isDefined
   }
 
-  private def trySemantic(s: String): Option[SemVer] = "^v?(\\d)(\\.\\d)+$".r.findFirstIn(s)
+  private def trySemantic(s: String): Option[SemVer] = "^v?(\\d+)(\\.\\d+)+$".r.findFirstIn(s)
 
   private def semanticWildcards(prefix: String)(version: SemVer): List[String] = {
 
