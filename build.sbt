@@ -37,7 +37,8 @@ lazy val root = (project in file("."))
       "org.scala-lang.modules" %% "scala-parser-combinators" % Versions.scalaParsers,
       "org.scalaz" %% "scalaz-core" % Versions.scalaz,
       "com.novocode" % "junit-interface" % "0.11" % "test",
-      "org.scalacheck" %% "scalacheck" % "1.13.0" % "test"
+      "org.scalacheck" %% "scalacheck" % "1.12.5" % "test",
+      "org.scalatest" %% "scalatest" % "2.2.6" % "test"
     ),
     ideaInternalPlugins ++= Seq(
       "java-i18n",

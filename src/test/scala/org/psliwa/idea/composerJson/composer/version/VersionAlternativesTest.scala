@@ -1,10 +1,12 @@
 package org.psliwa.idea.composerJson.composer.version
 
-import org.scalacheck.{Gen, Properties}
-import org.scalacheck.Prop.{forAll, BooleanOperators}
 import org.psliwa.idea.composerJson.composer.version.{VersionGenerators => gen}
+import org.scalacheck.Gen
+import org.scalacheck.Prop.BooleanOperators
+import org.scalatest.PropSpec
+import org.scalatest.prop.PropertyChecks
 
-class VersionAlternativesTest extends Properties("VersionAlternatives") {
+class VersionAlternativesTest extends PropSpec with PropertyChecks {
 
   //generators
 
@@ -21,36 +23,44 @@ class VersionAlternativesTest extends Properties("VersionAlternatives") {
 
   //properties
 
-  property("for pure semantic version") = forAll(semanticVersionGen(prefix = "")) { (version: GeneratedVersion) =>
-    val alternatives = Version.alternativesForPrefix("")(version.get)
+  property("alternatives for pure semantic version") {
+    forAll(semanticVersionGen(prefix = "")) { (version: GeneratedVersion) =>
+      val alternatives = Version.alternativesForPrefix("")(version.get)
 
-    checkSemanticVersionAlternatives(version.get, alternatives)
+      checkSemanticVersionAlternatives(version.get, alternatives)
+    }
   }
 
-  property("for pure semantic version and prefix") = forAll(prefixGen, semanticVersionGen(prefix = "")) { (prefix: Prefix, version: GeneratedVersion) =>
-    val alternatives = Version.alternativesForPrefix(prefix.get)(version.get)
-    val alternativesForPrefixedVersion = Version.alternativesForPrefix(prefix.get)(s"v${version.get}")
+  property("alternatives for pure semantic version and prefix") {
+    forAll(prefixGen, semanticVersionGen(prefix = "")) { (prefix: Prefix, version: GeneratedVersion) =>
+      val alternatives = Version.alternativesForPrefix(prefix.get)(version.get)
+      val alternativesForPrefixedVersion = Version.alternativesForPrefix(prefix.get)(s"v${version.get}")
 
-    alternatives.contains(version.get)                :| "alternatives contain original version" &&
-    (!alternatives.exists(_.contains('*')))           :| "alternatives don't contain wildcarded versions" &&
-    (alternativesForPrefixedVersion == alternatives)  :| "alternatives for 'v' prefixed versions are the same"
+      alternatives.contains(version.get)                :| "alternatives contain original version" &&
+        (!alternatives.exists(_.contains('*')))           :| "alternatives don't contain wildcarded versions" &&
+        (alternativesForPrefixedVersion == alternatives)  :| "alternatives for 'v' prefixed versions are the same"
+    }
   }
 
-  property("for prefixed semantic version") = forAll(semanticVersionGen(prefix = "v")) { (version: GeneratedVersion) =>
-    val alternatives = Version.alternativesForPrefix("")(version.get)
+  property("alternatives for prefixed semantic version") {
+    forAll(semanticVersionGen(prefix = "v")) { (version: GeneratedVersion) =>
+      val alternatives = Version.alternativesForPrefix("")(version.get)
 
-    val pureSemanticVersion = version.get.drop(1)
-    val alternativesWithoutOriginal = alternatives.filterNot(_ == version.get)
+      val pureSemanticVersion = version.get.drop(1)
+      val alternativesWithoutOriginal = alternatives.filterNot(_ == version.get)
 
-    checkSemanticVersionAlternatives(pureSemanticVersion, alternativesWithoutOriginal) &&
-    alternatives.contains(version.get) :| "alternatives contain prefixed semantic version"
+      checkSemanticVersionAlternatives(pureSemanticVersion, alternativesWithoutOriginal) &&
+        alternatives.contains(version.get) :| "alternatives contain prefixed semantic version"
+    }
   }
 
-  property("for non semantic version") = forAll(nonSemanticVersionGen) { (version: GeneratedVersion) =>
-    val alternatives = Version.alternativesForPrefix("")(version.get)
+  property("alternatives for non semantic version") {
+    forAll(nonSemanticVersionGen) { (version: GeneratedVersion) =>
+      val alternatives = Version.alternativesForPrefix("")(version.get)
 
-    alternatives.contains(version.get)  :| "alternatives contain original version" &&
-    (alternatives.size == 1)            :| "alternatives contain only one alternative"
+      alternatives.contains(version.get)    :| "alternatives contain original version" &&
+        (alternatives.size == 1)            :| "alternatives contain only one alternative"
+    }
   }
 
   def checkSemanticVersionAlternatives(version: String, alternatives: List[String]) = {
