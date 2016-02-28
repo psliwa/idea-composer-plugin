@@ -67,8 +67,7 @@ lazy val root = (project in file("."))
         s"-Didea.home.path=${ideaBaseDirectory.value.getAbsolutePath}"
       )
     },
-    envVars in Test += "NO_FS_ROOTS_ACCESS_CHECK" -> "yes",
-    testOptions in Test += Tests.Argument(TestFrameworks.ScalaCheck, "-minSuccessfulTests", "300")
+    envVars in Test += "NO_FS_ROOTS_ACCESS_CHECK" -> "yes"
   )
 
 def getBaseDir(baseDir: File) = baseDir.getParentFile.getParentFile

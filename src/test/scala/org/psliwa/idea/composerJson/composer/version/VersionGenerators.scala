@@ -26,6 +26,7 @@ object VersionGenerators {
     version <- wrappedVersion(size)
   } yield version
   def operator = Gen.oneOf(ConstraintOperator.!=, ConstraintOperator.<, ConstraintOperator.<=, ConstraintOperator.>, ConstraintOperator.>=, ConstraintOperator.^, ConstraintOperator.~)
+  def nsrOperator = Gen.oneOf(ConstraintOperator.^, ConstraintOperator.~)
   def padding = Gen.oneOf("", " ")
   def operatorVersion = for {
     version <- primitiveVersion
