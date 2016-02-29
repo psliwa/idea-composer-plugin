@@ -121,11 +121,15 @@ class MisconfigurationQuickFixesTest extends InspectionTest {
     checkQuickFix(SetTypeToComposerPlugin)(
       """
         |{
+        |  "name": "some/name",
+        |  "description": "some desc",
         |  "type": "composer-installer<caret>"
         |}
       """.stripMargin,
       """
         |{
+        |  "name": "some/name",
+        |  "description": "some desc",
         |  "type": "composer-plugin"
         |}
       """.stripMargin
@@ -227,6 +231,22 @@ class MisconfigurationQuickFixesTest extends InspectionTest {
         |  "require-dev": {
         |    "some/pkg": "1.0.0"
         |  }
+        |}
+      """.stripMargin
+    )
+  }
+
+  def testCreateNamePropertyQuickFix() = {
+    checkQuickFix(CreateNameProperty)(
+      """
+        |{
+        |  "type": "library<caret>"
+        |}
+      """.stripMargin,
+      """
+        |{
+        |  "type": "library",
+        |  "name": "<caret>"
         |}
       """.stripMargin
     )

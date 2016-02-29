@@ -70,7 +70,9 @@ class MisconfigurationInspection extends AbstractInspection {
     ProblemChecker(
       "require" / "*" matches "#".r,
       ComposerBundle.message("inspection.misconfig.commitRefAsVersion")
-    )
+    ),
+    requiredPropertyForLibrary("name"),
+    requiredPropertyForLibrary("description")
   )
 
   override protected def collectProblems(element: PsiElement, schema: Schema, problems: ProblemsHolder): Unit = {
@@ -98,4 +100,14 @@ class MisconfigurationInspection extends AbstractInspection {
       problems.registerProblem(problem.element.getContext, problem.message.getOrElse(""), problem.highlightType, problem.quickFixes:_*)
     )
   }
+
+  private def requiredPropertyForLibrary(property: String) = ProblemChecker(
+    ("type" isNot "project") && not(property),
+    ComposerBundle.message("inspection.misconfig.requiredForLibrary", property),
+    (jsonObject, _) => List(
+      new CreatePropertyQuickFix(jsonObject, property, new SString()),
+      new SetPropertyValueQuickFix(jsonObject, "type", new SString(), "project")
+    ),
+    ProblemHighlightType.GENERIC_ERROR
+  )
 }

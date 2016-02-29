@@ -177,4 +177,68 @@ class MisconfigurationInspectionTest extends InspectionTest {
        """.stripMargin
     )
   }
+
+  def testNameProperty_givenLibraryPackageType_namePropertyIsMissing_errorShouldBeReported() = {
+    checkInspection(
+      s"""
+        |{
+        |  $RequiredProperties
+        |  "description": "desc",
+        |  <error>"type": "library"</error>
+        |}
+      """.stripMargin
+    )
+  }
+
+  def testDescriptionProperty_givenLibraryPackageType_descPropertyIsMissing_errorShouldBeReported() = {
+    checkInspection(
+      s"""
+        |{
+        |  $RequiredProperties
+        |  "name": "some/pkg",
+        |  <error>"type": "library"</error>
+        |}
+      """.stripMargin
+    )
+  }
+
+  def testNameProperty_givenLibraryPackageType_givenNameProperty_errorShouldNotBeReported() = {
+    checkInspection(
+      s"""
+        |{
+        |  $RequiredProperties
+        |  "name": "some/pkg",
+        |  "description": "desc",
+        |  "type": "library"
+        |}
+      """.stripMargin
+    )
+  }
+
+  def testNameProperty_givenProjectPackageType_namePropertyIsMissing_errorShouldNotBeReported() = {
+    checkInspection(
+      s"""
+        |{
+        |  $RequiredProperties
+        |  "type": "project"
+        |}
+      """.stripMargin
+    )
+  }
+
+  def testNameProperty_givenLibraryPackageType_namePropertyIsMissing_givenAuthorsProperty_errorShouldBeReported() = {
+    checkInspection(
+      s"""
+        |{
+        |  $RequiredProperties
+        |  <error>"type": "library"</error>,
+        |  "authors": [
+        |     {
+        |       "name": "psliwa"
+        |     }
+        |  ]
+        |}
+      """.stripMargin
+    )
+  }
 }

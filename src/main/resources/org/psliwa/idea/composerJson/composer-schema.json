@@ -5,7 +5,6 @@
     "name": {
       "type": "string",
       "description": "Package name, including 'vendor-name/' prefix.",
-      "required": true,
       "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]*/[A-Za-z0-9][A-Za-z0-9_.-]*$"
     },
     "type": {
@@ -21,8 +20,7 @@
     },
     "description": {
       "type": "string",
-      "description": "Short package description.",
-      "required": true
+      "description": "Short package description."
     },
     "keywords": {
       "type": "array",
