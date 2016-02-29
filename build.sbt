@@ -50,7 +50,7 @@ lazy val root = (project in file("."))
     ),
 
     unmanagedJars in Test += file(System.getProperty("java.home")).getParentFile / "lib" / "tools.jar",
-    fork in Test := true,
+    fork in Test := false,
     parallelExecution := false,
     javaOptions in Test := {
       def ivyHomeDir: File =

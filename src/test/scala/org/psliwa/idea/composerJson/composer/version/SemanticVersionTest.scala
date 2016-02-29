@@ -11,6 +11,9 @@ class SemanticVersionTest extends PropSpec with Checkers {
 
   import VersionGenerators.SemanticVersion._
 
+  def minorOptionalPositive = minorOptional(g = positive, patchGen = patchOptional(positive))
+  def minorOptionalZero = minorOptional(g = Gen.const(0), patchGen = patchOptional(Gen.const(0)))
+
   property("constructor accepts zeros at beginning") {
     check(forAll(major, minorOptional(positiveZero)) { (major: Int, minor: Minor) =>
       Try { SemanticVersion(major, minor) }.isSuccess
@@ -35,6 +38,21 @@ class SemanticVersionTest extends PropSpec with Checkers {
       val incremented = original.incrementLast
 
       parts(incremented) == (parts(original).dropRight(1) ++ List(parts(original).last + 1))
+    })
+  }
+
+  property("decrement last part") {
+    check(forAll(positive, minorOptionalPositive) { (major: Int, minor: Minor) =>
+      val original = SemanticVersion(major, minor)
+      val decremented = original.decrementLast
+
+      decremented.isDefined &&
+        decremented.get.incrementLast == original
+    } && forAll(minorOptionalZero) { (minor: Minor) =>
+      val original = SemanticVersion(0, minor)
+      val decremented = original.decrementLast
+
+      decremented.isEmpty
     })
   }
 
@@ -165,5 +183,6 @@ class SemanticVersionTest extends PropSpec with Checkers {
   //util functions
 
   def parts(version: SemanticVersion): List[Int] = version.major :: version.minor.toList ++ version.patch
+  def last(a: SemanticVersion) = parts(a).last
 
 }

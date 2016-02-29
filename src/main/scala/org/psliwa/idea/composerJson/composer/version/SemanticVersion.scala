@@ -34,6 +34,17 @@ case class SemanticVersion(major: Int, private val other: Option[(Int,Option[(In
     new SemanticVersion(((reversedParts.head+1) :: reversedParts.tail).reverse.toArray)
   }
 
+  def incrementMajor: SemanticVersion = {
+    new SemanticVersion(major + 1, minor.flatMap(i => Some((i,patch))))
+  }
+
+  def decrementLast: Option[SemanticVersion] = {
+    val parts = ((reversedParts.head - 1) :: reversedParts.tail).reverse.toArray
+
+    if(parts.last < 0) None
+    else Some(new SemanticVersion(parts))
+  }
+
   def dropLast: Option[SemanticVersion] = {
     if(reversedParts.size == 1) None
     else Some(new SemanticVersion(reversedParts.tail.reverse.toArray))
