@@ -1,49 +1,24 @@
 package org.psliwa.idea.composerJson.composer.repository
 
-import org.junit.Assert._
-import org.junit.Test
+import org.scalacheck.Prop
+import org.scalacheck.Prop.{AnyOperators, forAll, forAllNoShrink}
+import org.scalatest.PropSpec
+import org.scalatest.prop.Checkers
 
-class ComposedRepositoryTest {
 
-  @Test
-  def givenFewRepositories_composedRepositoryShouldMergePackagesFromAllRepos(): Unit = {
-    //given
+class ComposedRepositoryTest extends PropSpec with Checkers {
+  import RepositoryGenerators._
 
-    val repository = new ComposedRepository(
-      List(
-        new InMemoryRepository(List("package1", "package2")),
-        new InMemoryRepository(List("package3", "package4"))
-      )
-    )
-
-    //when
-
-    val packages = repository.getPackages
-
-    //then
-
-    assertEquals(List("package1", "package2", "package3", "package4"), packages)
+  property("contains packages from all repositories") {
+    check(forAll(repositoryWithPkgsGen) { case(repository: Repository[String], packages: Seq[String]) =>
+      repository.getPackages ?= packages
+    })
   }
 
-  @Test
-  def givenFewRepositories_composedRepositoryShouldMergeVersionsFromAllRepos(): Unit = {
-
-    //given
-
-    val repository = new ComposedRepository(
-      List(
-        new InMemoryRepository(List("package1", "package2"), Map("package1" -> List("1.0.0"), "package2" -> List("2.0.0"))),
-        new InMemoryRepository(List("package1", "package2"), Map("package1" -> List("1.0.1"), "package2" -> List("2.0.1")))
-      )
-    )
-
-    //when
-
-    val versions = repository.getPackageVersions("package1")
-
-    //then
-
-    assertEquals(List("1.0.0", "1.0.1"), versions)
+  property("contains versions from all repositories") {
+    check(forAllNoShrink(repositoryWithVersionsGen) { case(repository: Repository[String], pkgsVersions: Map[String, Seq[String]]) =>
+      Prop.all(pkgsVersions.map { case(pkg, versions) => (repository.getPackageVersions(pkg).toList ?= versions.toList) :| s"$versions" }.toSeq: _*)
+    })
   }
 
 }
