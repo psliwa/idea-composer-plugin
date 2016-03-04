@@ -1,12 +1,11 @@
 package org.psliwa.idea.composerJson.composer.version
 
+import org.psliwa.idea.composerJson.BasePropSpec
 import org.psliwa.idea.composerJson.composer.version.{VersionGenerators => gen}
 import org.scalacheck.Gen
-import org.scalacheck.Prop.{forAll, BooleanOperators}
-import org.scalatest.PropSpec
-import org.scalatest.prop.Checkers
+import org.scalacheck.Prop.{BooleanOperators, forAll}
 
-class VersionAlternativesTest extends PropSpec with Checkers {
+class VersionAlternativesTest extends BasePropSpec {
 
   //generators
 
@@ -24,26 +23,26 @@ class VersionAlternativesTest extends PropSpec with Checkers {
   //properties
 
   property("alternatives for pure semantic version") {
-    check(forAll(semanticVersionGen(prefix = "")) { (version: GeneratedVersion) =>
+    forAll(semanticVersionGen(prefix = "")) { (version: GeneratedVersion) =>
       val alternatives = Version.alternativesForPrefix("")(version.get)
 
       checkSemanticVersionAlternatives(version.get, alternatives)
-    })
+    }
   }
 
   property("alternatives for pure semantic version and prefix") {
-    check(forAll(prefixGen, semanticVersionGen(prefix = "")) { (prefix: Prefix, version: GeneratedVersion) =>
+    forAll(prefixGen, semanticVersionGen(prefix = "")) { (prefix: Prefix, version: GeneratedVersion) =>
       val alternatives = Version.alternativesForPrefix(prefix.get)(version.get)
       val alternativesForPrefixedVersion = Version.alternativesForPrefix(prefix.get)(s"v${version.get}")
 
       alternatives.contains(version.get)                  :| "alternatives contain original version" &&
         (!alternatives.exists(_.contains('*')))           :| "alternatives don't contain wildcarded versions" &&
         (alternativesForPrefixedVersion == alternatives)  :| "alternatives for 'v' prefixed versions are the same"
-    })
+    }
   }
 
   property("alternatives for prefixed semantic version") {
-    check(forAll(semanticVersionGen(prefix = "v")) { (version: GeneratedVersion) =>
+    forAll(semanticVersionGen(prefix = "v")) { (version: GeneratedVersion) =>
       val alternatives = Version.alternativesForPrefix("")(version.get)
 
       val pureSemanticVersion = version.get.drop(1)
@@ -51,16 +50,16 @@ class VersionAlternativesTest extends PropSpec with Checkers {
 
       checkSemanticVersionAlternatives(pureSemanticVersion, alternativesWithoutOriginal) &&
         alternatives.contains(version.get) :| "alternatives contain prefixed semantic version"
-    })
+    }
   }
 
   property("alternatives for non semantic version") {
-    check(forAll(nonSemanticVersionGen) { (version: GeneratedVersion) =>
+    forAll(nonSemanticVersionGen) { (version: GeneratedVersion) =>
       val alternatives = Version.alternativesForPrefix("")(version.get)
 
       alternatives.contains(version.get)    :| "alternatives contain original version" &&
         (alternatives.size == 1)            :| "alternatives contain only one alternative"
-    })
+    }
   }
 
   def checkSemanticVersionAlternatives(version: String, alternatives: List[String]) = {

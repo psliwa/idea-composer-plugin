@@ -1,25 +1,24 @@
 package org.psliwa.idea.composerJson.composer.version
 
+import org.psliwa.idea.composerJson.BasePropSpec
 import org.psliwa.idea.composerJson.composer.version.{VersionGenerators => gen}
 import org.scalacheck.Prop
-import org.scalacheck.Prop.{forAll, BooleanOperators}
-import org.scalatest.PropSpec
-import org.scalatest.prop.Checkers
+import org.scalacheck.Prop.{BooleanOperators, forAll}
 
 import scala.language.implicitConversions
 
-class VersionNsrEquivalentsTest extends PropSpec with Checkers {
+class VersionNsrEquivalentsTest extends BasePropSpec {
 
   def semanticVersionGen = gen.semanticVersion(size = 3)
 
   property("pure semantic versions should not have equivalents") {
-    check(forAll(semanticVersionGen) { (version: Constraint) =>
+    forAll(semanticVersionGen) { (version: Constraint) =>
       equivalentsFor(version).isEmpty
-    })
+    }
   }
 
   property("next Significant Releases should have range equivalents") {
-    check(forAll(gen.semanticVersion, gen.nsrOperator) { (semanticVersion: SemanticConstraint, operator: ConstraintOperator) =>
+    forAll(gen.semanticVersion, gen.nsrOperator) { (semanticVersion: SemanticConstraint, operator: ConstraintOperator) =>
       val equivalents = equivalentsFor(OperatorConstraint(operator, semanticVersion))
       val version = semanticVersion.version
 
@@ -28,7 +27,7 @@ class VersionNsrEquivalentsTest extends PropSpec with Checkers {
           contains(equivalent, operator, version)
         case _ => Prop { false }
       }
-    })
+    }
   }
 
   private def contains(rangeVersion: Constraint, nsrOperator: ConstraintOperator, version: SemanticVersion): Prop = {
