@@ -12,7 +12,7 @@ class DefaultRepositoryProvider[Package](repositoryFactory: RepositoryFactory[Pa
   def this(packagistRepository: Repository[Package], mapPackage: String => Package) = {
     this(
       new DefaultRepositoryFactory(
-        DefaultRepositoryProvider.repositoryFromUrl(IO.loadUrl, JsonParsers.parsePackages),
+        DefaultRepositoryProvider.repositoryFromUrl,
         packagistRepository,
         mapPackage
       ),
@@ -73,12 +73,18 @@ object DefaultRepositoryProvider {
     }
   }
 
-  private[repository] def repositoryFromUrl(
+  private def repositoryFromUrl(url: String): Repository[String] = {
+    packagistRepositoryFromUrl(url) orElse satisRepositoryFromUrl(IO.loadUrl, JsonParsers.parsePackages)(url) getOrElse EmptyRepository
+  }
+
+  private def rootUrlOf(url: String) = "http(s?)://[^/]+".r.findFirstIn(url).getOrElse(url)
+
+  private[repository] def satisRepositoryFromUrl(
     loadUrl: String => Try[String],
     parsePackages: String => Try[RepositoryPackages]
-  )(url: String): Repository[String] = {
+  )(url: String): Option[Repository[String]] = {
 
-    val rootUrl = "http(s?)://[^/]+".r.findFirstIn(url).getOrElse(url)
+    val rootUrl = rootUrlOf(url)
     def buildUrl(uri: String): String = rootUrl+"/"+uri
 
     def loadPackages(url: String): Option[RepositoryPackages] = {
@@ -95,10 +101,15 @@ object DefaultRepositoryProvider {
         .foldLeft(Map[String,Seq[String]]())((map, pkgs) => map ++ pkgs.packages)
     }
 
-    val maybeRepository = loadPackages(url)
+    loadPackages(url)
       .map(pkgs => pkgs.packages ++ loadPackagesFromUrls(pkgs.includes.map(buildUrl)))
       .map(pkgs => new InMemoryRepository(pkgs.keys.toList, pkgs))
+  }
 
-    maybeRepository.getOrElse(EmptyRepository)
+  private def packagistRepositoryFromUrl(url: String): Option[Repository[String]] = {
+    import org.psliwa.idea.composerJson.util.Funcs._
+    val packages: Try[Seq[String]] = Packagist.loadPackages(url)
+    packages.toOption
+      .map(packages => new CallbackRepository[String](packages, memorize(30)(Packagist.loadVersions(url)(_).getOrElse(List.empty))))
   }
 }

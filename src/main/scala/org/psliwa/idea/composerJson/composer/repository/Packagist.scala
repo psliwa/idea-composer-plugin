@@ -7,11 +7,14 @@ import scala.util.Try
 
 object Packagist {
 
-  private val PackagistUrl = "https://packagist.org/"
+  val defaultUrl: String = "https://packagist.org/"
 
-  def loadPackages(): Try[Seq[String]] = loadPackagesFromPackagist().flatMap(parsePackageNames)
-  def loadVersions(pkg: String): Try[Seq[String]] = loadUri("packages/"+pkg+".json").flatMap(parseVersions)
+  def loadPackages(url: String): Try[Seq[String]] = loadPackagesFromPackagist(url).flatMap(parsePackageNames)
+  def loadVersions(url: String)(pkg: String): Try[Seq[String]] = loadUri(url)("packages/"+pkg+".json").flatMap(parseVersions)
 
-  private[repository] def loadPackagesFromPackagist(): Try[String] = loadUri("packages/list.json")
-  private[repository] def loadUri(uri: String): Try[String] = IO.loadUrl(PackagistUrl+uri)
+  private[repository] def loadPackagesFromPackagist(url: String): Try[String] = loadUri(url)("packages/list.json")
+  private[repository] def loadUri(url: String)(uri: String): Try[String] = {
+    val fixedUrl = if(!url.lastOption.contains('/')) url + "/" else url
+    IO.loadUrl(fixedUrl+uri)
+  }
 }

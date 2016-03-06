@@ -22,7 +22,7 @@ class RepositoryFromUrlTest {
 
     //when
 
-    val repository = DefaultRepositoryProvider.repositoryFromUrl(load, parse)(url)
+    val repository = DefaultRepositoryProvider.satisRepositoryFromUrl(load, parse)(url).getOrElse(EmptyRepository)
 
     //then
 
@@ -39,7 +39,7 @@ class RepositoryFromUrlTest {
 
     //when
 
-    val repository = DefaultRepositoryProvider.repositoryFromUrl(load, parse)("some-url")
+    val repository = DefaultRepositoryProvider.satisRepositoryFromUrl(load, parse)("some-url").getOrElse(EmptyRepository)
 
     //then
 
@@ -65,7 +65,7 @@ class RepositoryFromUrlTest {
 
     //when
 
-    val repository = DefaultRepositoryProvider.repositoryFromUrl(load, parse)(url)
+    val repository = DefaultRepositoryProvider.satisRepositoryFromUrl(load, parse)(url).getOrElse(EmptyRepository)
 
     //then
 
@@ -96,7 +96,7 @@ class RepositoryFromUrlTest {
 
     //when
 
-    val repository = DefaultRepositoryProvider.repositoryFromUrl(load, parse)(url)
+    val repository = DefaultRepositoryProvider.satisRepositoryFromUrl(load, parse)(url).getOrElse(EmptyRepository)
 
     //then
 
