@@ -16,7 +16,7 @@ This plugin provides:
     * namespaces eg. in "autoload.psr-0" property
 
 * inspections for:
-    * composer.json schema + quick fixes (remove entry / property, create property etc.). Schema inspections and completions are synced to [06be9b8 commit of composer/composer][3] repository.
+    * composer.json schema + quick fixes (remove entry / property, create property etc.). Schema inspections and completions are synced to [dacb97d commit of composer/composer][3] repository.
     * filepath existence (in bin, autoload etc) + quick fixes (remove entry, create file / directory)
     * misconfiguration + quick fixes
     * version constraints misconfiguration + quick fixes
@@ -44,7 +44,7 @@ This plugin provides:
 
 ## Whats next?
 
-* If you have feature ideas, please to create an issue! I have created a lot of features that used to be useful
+* If you have feature ideas, please create an issue! I have created a lot of features that used to be useful
 for me during my daily job, so I waiting for yours ideas too ;)
 
 [1]: https://plugins.jetbrains.com/files/7631/screenshot_14847.png
