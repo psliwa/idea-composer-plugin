@@ -257,6 +257,10 @@
           "type": "boolean",
           "description": "Always optimize when dumping the autoloader."
         },
+        "sort-packages": {
+          "type": "boolean",
+          "description": "The \"require\" command keeps packages sorted by name in composer.json when adding a new package."
+        },
         "prepend-autoloader": {
           "type": "boolean",
           "description": "If false, the composer autoloader will not be prepended to existing autoloaders, defaults to true."
@@ -611,6 +615,11 @@
           "type": "string",
           "description": "URL to the documentation.",
           "format": "uri"
+        },
+        "rss": {
+            "type": "string",
+            "description": "URL to the RSS feed.",
+            "format": "uri"
         }
       }
     },
