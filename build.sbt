@@ -1,6 +1,10 @@
+import java.io.File
+
 import sbt.Keys.{`package` => pack}
 import sbt.project
+
 import scala.language.postfixOps
+import scala.tools.nsc.io
 
 addCommandAlias("pluginRun", "runner/run")
 addCommandAlias("pluginCompress", "compressor/package")
@@ -158,11 +162,11 @@ lazy val proguard: Project = (project in file("subprojects/proguard"))
         IO.download(new URL(proguardUrl), proguardDest)
       }
 
-      def escape(s: String) = "\""+s+"\""
+      def escape(s: String) = if(File.pathSeparatorChar == '\\') "\""+s+"\"" else s
 
       val javaRt = file(System.getProperty("java.home")) / "lib" / "rt.jar"
 
-      val libraryJars = (javaRt :: ideaFullJars.in(root).value.map(_.data).toList).map(_.getAbsolutePath).map(escape).mkString(";")
+      val libraryJars = (javaRt :: ideaFullJars.in(root).value.map(_.data).toList).map(_.getAbsolutePath).map(escape).mkString(sys.props.getOrElse("path.separator", ":"))
 
       val cmd = Seq(
         "java", "-jar", escape(proguardDest.getAbsolutePath), "@"+escape(getBaseDirPath(baseDirectory.value)+"/proguard.pro"), "-injars", escape(artifactPath.in(compressor, Compile).value.getAbsolutePath), "-outjars", escape(artifactPath.value.getAbsolutePath),

@@ -1,7 +1,7 @@
 <idea-plugin version="2">
   <id>org.psliwa.idea.composer</id>
   <name>PHP composer.json support</name>
-  <version>1.0.13</version>
+  <version>1.0.14</version>
   <vendor email="me@psliwa.org" url="http://github.org/psliwa/idea-composer-plugin">psliwa</vendor>
 
     <description><![CDATA[
@@ -11,6 +11,11 @@ This plugin adds auto completion and inspections support for composer.json file 
     ]]></description>
 
   <change-notes><![CDATA[
+<h2>1.0.14</h2>
+<ul>
+  <li>[#30] add support for support.rss and config.sort-packages properties</li>
+  <li>update composer-schema.json</li>
+</ul>
 <h2>1.0.13</h2>
 <ul>
   <li>[#24] support for packagist custom repositories</li>
