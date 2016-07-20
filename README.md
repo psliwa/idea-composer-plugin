@@ -2,6 +2,8 @@
 [![Version](http://phpstorm.espend.de/badge/7631/version)](https://plugins.jetbrains.com/plugin/7631)
 [![Downloads](http://phpstorm.espend.de/badge/7631/downloads)](https://plugins.jetbrains.com/plugin/7631)
 [![Downloads last month](http://phpstorm.espend.de/badge/7631/last-month)](https://plugins.jetbrains.com/plugin/7631)
+[![Donate using Paypal](https://img.shields.io/badge/donate-paypal-yellow.svg)](https://www.paypal.me/psliwa)
+[![Donate using Bitcoin](https://img.shields.io/badge/donate-bitcoin-yellow.svg)](https://blockchain.info/address/1Q6f6ZAqYFVzSaBf9AZJ6Ba948jjmQJU4A)
 
 
 Adds code completion, inspections and more to composer.json file.
