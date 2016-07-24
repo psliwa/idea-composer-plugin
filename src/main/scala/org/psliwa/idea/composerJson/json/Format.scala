@@ -16,7 +16,7 @@ object PatternFormat {
   def unapply(format: PatternFormat): Option[Regex] = Some(format.pattern)
 }
 
-object EmailFormat extends PatternFormat("^(?i)[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,4}$".r)
+object EmailFormat extends PatternFormat("^(?i)[\\p{L}0-9._%+-]+@[\\p{L}0-9.-]+\\.[\\p{L}0-9]{2,}$".r)
 
 object UriFormat extends Format {
   override def isValid(s: String): Boolean = {

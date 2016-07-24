@@ -301,6 +301,33 @@ class SchemaInspectionTest extends InspectionTest {
     )
   }
 
+  def testNotReportCorrectEmailValue() = {
+    checkInspection(
+      s"""
+         |{
+         |  $RequiredProperties
+         |  "support": {
+         |    "email": "me@psliwa.org"
+         |  }
+         |}
+      """.stripMargin
+    )
+  }
+
+  def testNotReportCorrectEmailWithNonAsciiCharsValue() = {
+    checkInspection(
+      s"""
+         |{
+         |  $RequiredProperties
+         |  "support": {
+         |    "email": "mój@ąśćć.みんな"
+         |  }
+         |}
+      """.stripMargin
+    )
+  }
+
+
   def testReportMissingProperties() = {
     checkInspection(
       s"""
