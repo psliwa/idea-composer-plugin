@@ -44,7 +44,7 @@ This plugin provides:
 
 ![Screen][1]
 
-## Whats next?
+## What's next?
 
 * If you have feature ideas, please create an issue! I have created a lot of features that used to be useful
 for me during my daily job, so I waiting for yours ideas too ;)
