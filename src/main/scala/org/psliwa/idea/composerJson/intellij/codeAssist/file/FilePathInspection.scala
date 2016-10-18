@@ -14,58 +14,62 @@ class FilePathInspection extends AbstractInspection {
   override protected def collectProblems(element: PsiElement, schema: Schema, problems: ProblemsHolder): Unit = {
     import scala.collection.JavaConversions._
 
-    val rootDir = element.getContainingFile.getContainingDirectory
+    val maybeRootDir = Option(element.getContainingFile).flatMap(file => Option(file.getContainingDirectory))
 
-    schema match {
-      case SObject(schemaProperties, _) => element match {
-        case JsonObject(properties) => {
-          properties.foreach(property => {
-            schemaProperties.get(property.getName).foreach(schemaProperty => {
-              Option(property.getValue).foreach(collectProblems(_, schemaProperty.schema, problems))
-            })
-          })
-        }
-        case _ =>
-      }
-      case SArray(itemType) => element match {
-        case JsonArray(values) => for(value <- values) {
-          collectProblems(value, itemType, problems)
-        }
-        case _ =>
-      }
-      case SFilePath(true) => element match {
-        case jsl@JsonStringLiteral(value) => {
-          if(!pathExists(rootDir, value)) {
-            problems.registerProblem(
-              element,
-              ComposerBundle.message("inspection.filePath.fileMissing", value),
-              CreateFilesystemItemQuickFix.file(jsl), CreateFilesystemItemQuickFix.directory(jsl), removeValueQuickFix(element)
-            )
+    maybeRootDir match {
+      case Some(rootDir) =>
+        schema match {
+          case SObject(schemaProperties, _) => element match {
+            case JsonObject(properties) => {
+              properties.foreach(property => {
+                schemaProperties.get(property.getName).foreach(schemaProperty => {
+                  Option(property.getValue).foreach(collectProblems(_, schemaProperty.schema, problems))
+                })
+              })
+            }
+            case _ =>
           }
-        }
-        case _ =>
-      }
-      case SFilePaths(true) => element match {
-        case JsonObject(properties) => for(property <- properties) {
-          Option(property.getValue).foreach(collectProblems(_, schema, problems))
-        }
-        case jsl@JsonStringLiteral(value) => {
-          if(!pathExists(rootDir, value)) {
-            problems.registerProblem(
-              element,
-              ComposerBundle.message("inspection.filePath.fileMissing", value),
-              CreateFilesystemItemQuickFix.file(jsl),
-              CreateFilesystemItemQuickFix.directory(jsl),
-              removePropertyQuickFix(getPropertyIfPossible(element))
-            )
+          case SArray(itemType) => element match {
+            case JsonArray(values) => for(value <- values) {
+              collectProblems(value, itemType, problems)
+            }
+            case _ =>
           }
+          case SFilePath(true) => element match {
+            case jsl@JsonStringLiteral(value) => {
+              if(!pathExists(rootDir, value)) {
+                problems.registerProblem(
+                  element,
+                  ComposerBundle.message("inspection.filePath.fileMissing", value),
+                  CreateFilesystemItemQuickFix.file(jsl), CreateFilesystemItemQuickFix.directory(jsl), removeValueQuickFix(element)
+                )
+              }
+            }
+            case _ =>
+          }
+          case SFilePaths(true) => element match {
+            case JsonObject(properties) => for(property <- properties) {
+              Option(property.getValue).foreach(collectProblems(_, schema, problems))
+            }
+            case jsl@JsonStringLiteral(value) => {
+              if(!pathExists(rootDir, value)) {
+                problems.registerProblem(
+                  element,
+                  ComposerBundle.message("inspection.filePath.fileMissing", value),
+                  CreateFilesystemItemQuickFix.file(jsl),
+                  CreateFilesystemItemQuickFix.directory(jsl),
+                  removePropertyQuickFix(getPropertyIfPossible(element))
+                )
+              }
+            }
+            case JsonArray(values) => for(value <- values) {
+              collectProblems(value, schema, problems)
+            }
+            case _ =>
+          }
+          case _ =>
         }
-        case JsonArray(values) => for(value <- values) {
-          collectProblems(value, schema, problems)
-        }
-        case _ =>
-      }
-      case _ =>
+      case None =>
     }
   }
 
