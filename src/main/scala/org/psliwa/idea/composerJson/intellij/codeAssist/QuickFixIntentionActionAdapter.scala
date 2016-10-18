@@ -12,7 +12,7 @@ private class QuickFixIntentionActionAdapter(quickFix: LocalQuickFixOnPsiElement
   override def invoke(project: Project, editor: Editor, file: PsiFile): Unit = quickFix.applyFix()
   override def startInWriteAction(): Boolean = true
   override def isAvailable(project: Project, editor: Editor, file: PsiFile): Boolean = {
-    quickFix.isAvailable(
+    quickFix.getStartElement != null && quickFix.isAvailable(
       project,
       file,
       quickFix.getStartElement,
