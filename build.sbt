@@ -4,7 +4,6 @@ import sbt.Keys.{`package` => pack}
 import sbt.project
 
 import scala.language.postfixOps
-import scala.tools.nsc.io
 
 addCommandAlias("pluginRun", "runner/run")
 addCommandAlias("pluginCompress", "compressor/package")

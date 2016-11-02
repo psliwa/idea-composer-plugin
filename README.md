@@ -1,4 +1,5 @@
 # PHP composer.json support
+[![Build Status](https://travis-ci.org/psliwa/idea-composer-plugin.svg?branch=master)](https://travis-ci.org/psliwa/idea-composer-plugin)
 [![Version](http://phpstorm.espend.de/badge/7631/version)](https://plugins.jetbrains.com/plugin/7631)
 [![Downloads](http://phpstorm.espend.de/badge/7631/downloads)](https://plugins.jetbrains.com/plugin/7631)
 [![Downloads last month](http://phpstorm.espend.de/badge/7631/last-month)](https://plugins.jetbrains.com/plugin/7631)
