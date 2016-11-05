@@ -8,7 +8,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.psi.{PsiDirectory, PsiElement, PsiFile, PsiFileSystemItem}
 import com.intellij.util.IncorrectOperationException
 import org.psliwa.idea.composerJson.ComposerBundle
-import scala.collection.JavaConversions._
+import scala.collection.JavaConverters._
 
 import scala.annotation.tailrec
 
@@ -96,6 +96,6 @@ private object CreateFilesystemItemQuickFix {
 
     override def getFamilyName: String = ComposerBundle.message("inspection.group")
 
-    protected def getPath = element.getTextFragments.map(_.second).mkString("")
+    protected def getPath = element.getTextFragments.asScala.map(_.second).mkString("")
   }
 }

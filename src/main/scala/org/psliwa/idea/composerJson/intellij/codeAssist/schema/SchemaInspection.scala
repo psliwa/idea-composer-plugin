@@ -23,7 +23,7 @@ class SchemaInspection extends AbstractInspection {
   }
 
   private def collectProblems(element: PsiElement, schema: Schema): Seq[ProblemDescriptor[LocalQuickFix]] = {
-    import scala.collection.JavaConversions._
+    import scala.collection.JavaConverters._
     import PsiExtractors._
 
     def collectNotAllowedPropertyProblems(property: JsonProperty, schemaProperties: Properties, additionalProperties: Boolean): Seq[ProblemDescriptor[LocalQuickFix]] = {
@@ -42,11 +42,11 @@ class SchemaInspection extends AbstractInspection {
       case so@SObject(schemaProperties, additionalProperties) => element match {
         case JsonObject(properties) => {
           val notAllowedPropertyProblems = for {
-            property <- properties
+            property <- properties.asScala
             problem <- collectNotAllowedPropertyProblems(property, schemaProperties, additionalProperties)
           } yield problem
 
-          val alreadyDefinedPropertiesProblems = getAlreadyDefinedProperties(properties.toList)
+          val alreadyDefinedPropertiesProblems = getAlreadyDefinedProperties(properties.asScala.toList)
             .map(property => ProblemDescriptor(
               property,
               ComposerBundle.message("inspection.schema.alreadyDefinedProperty", property.getName),
@@ -54,7 +54,7 @@ class SchemaInspection extends AbstractInspection {
             )
           ).toList
 
-          lazy val propertyNames = properties.map(_.getName).toSet
+          lazy val propertyNames = properties.asScala.map(_.getName).toSet
 
           val requiredPropertiesProblems = for((name, property) <- so.requiredProperties if !propertyNames.contains(name)) yield {
             ProblemDescriptor(
@@ -64,7 +64,7 @@ class SchemaInspection extends AbstractInspection {
             )
           }
 
-          notAllowedPropertyProblems.toList ::: alreadyDefinedPropertiesProblems.toList ::: requiredPropertiesProblems.toList
+          notAllowedPropertyProblems.toList ::: alreadyDefinedPropertiesProblems ::: requiredPropertiesProblems.toList
         }
         case _ => List(invalidTypeProblem(element, schema))
       }
@@ -105,7 +105,7 @@ class SchemaInspection extends AbstractInspection {
       }
       case SArray(item) => element match {
         case JsonArray(values) => for {
-          value <- values
+          value <- values.asScala
           problem <- collectProblems(value, item)
         } yield problem
         case _ => List(invalidTypeProblem(element, schema))

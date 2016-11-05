@@ -86,11 +86,11 @@ object AbstractCompletionContributor {
   private object PropertyCompletionProvider {
     def apply(es: LookupElements, getInsertHandler: InsertHandlerFinder) = {
       new ParametersDependantCompletionProvider(context => {
-        import scala.collection.JavaConversions._
+        import scala.collection.JavaConverters._
 
         val existingProperties: Set[String] = for {
           obj <- firstJsonObject(context.getPosition).toSet[JsonObject]
-          property <- obj.getPropertyList
+          property <- obj.getPropertyList.asScala
         } yield property.getName
 
         es(context)

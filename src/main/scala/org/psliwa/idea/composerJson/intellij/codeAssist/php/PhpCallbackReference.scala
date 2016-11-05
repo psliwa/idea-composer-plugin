@@ -11,7 +11,7 @@ import com.jetbrains.php.PhpIndex
 import com.jetbrains.php.completion.{PhpLookupElement, PhpClassLookupElement}
 import com.jetbrains.php.lang.psi.elements.Method
 import org.psliwa.idea.composerJson.intellij.codeAssist.AutoPopupInsertHandler
-import scala.collection.JavaConversions._
+import scala.collection.JavaConverters._
 import PhpCallbackReference._
 import PhpUtils._
 
@@ -23,7 +23,7 @@ private class PhpCallbackReference(element: JsonStringLiteral) extends PsiPolyVa
   override def multiResolve(incompleteCode: Boolean): Array[ResolveResult] = {
     val phpIndex = PhpIndex.getInstance(element.getProject)
 
-    val classes = phpIndex.getClassesByFQN(className).toSeq
+    val classes = phpIndex.getClassesByFQN(className).asScala
     val classResult = classes
       .map(new PsiElementResolveResult(_))
 
@@ -43,14 +43,14 @@ private class PhpCallbackReference(element: JsonStringLiteral) extends PsiPolyVa
 
     val results = if (methodExists) {
       val methodMatcher = new CamelHumpMatcher(methodName)
-      phpIndex.getClassesByFQN(className).toStream
-        .flatMap(cls => cls.getMethods)
+      phpIndex.getClassesByFQN(className).asScala.toStream
+        .flatMap(cls => cls.getMethods.asScala)
         .filter(method => method.getAccess.isPublic && method.isStatic && !method.isAbstract)
         .filter(method => methodMatcher.prefixMatches(method.getName))
         .map(method => new PhpMethodLookupElement(method))
     } else {
       val classMatcher = new CamelHumpMatcher(className)
-      phpIndex.getAllClassNames(classMatcher).toStream
+      phpIndex.getAllClassNames(classMatcher).asScala.toStream
         .flatMap(className => Option(phpIndex.getClassByName(className)).toList)
         .filter(cls => !cls.isAbstract && !cls.isInterface && !cls.isInterface)
         .filter(_.hasStaticMembers)

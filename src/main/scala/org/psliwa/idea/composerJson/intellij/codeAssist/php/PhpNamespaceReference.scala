@@ -11,7 +11,7 @@ import com.jetbrains.php.{PhpIcons, PhpIndex}
 import org.psliwa.idea.composerJson.intellij.codeAssist.php.PhpNamespaceReference._
 import org.psliwa.idea.composerJson.intellij.codeAssist.php.PhpUtils._
 
-import scala.collection.JavaConversions._
+import scala.collection.JavaConverters._
 
 private class PhpNamespaceReference(element: JsonStringLiteral) extends PsiPolyVariantReferenceBase[JsonStringLiteral](element) {
   private val namespaceName = getFixedReferenceName(element.getText)
@@ -19,7 +19,7 @@ private class PhpNamespaceReference(element: JsonStringLiteral) extends PsiPolyV
   override def multiResolve(incompleteCode: Boolean): Array[ResolveResult] = {
     val phpIndex = PhpIndex.getInstance(element.getProject)
 
-    phpIndex.getNamespacesByName("\\"+namespaceName)
+    phpIndex.getNamespacesByName("\\"+namespaceName).asScala
       .map(new PsiElementResolveResult(_))
       .toArray
   }
@@ -41,7 +41,7 @@ private class PhpNamespaceReference(element: JsonStringLiteral) extends PsiPolyV
 
     val methodMatcher = new CamelHumpMatcher(currentNamespace)
 
-    phpIndex.getChildNamespacesByParentName(ensureLandingSlash(parentNamespace+"\\"))
+    phpIndex.getChildNamespacesByParentName(ensureLandingSlash(parentNamespace+"\\")).asScala
       .filter(methodMatcher.prefixMatches)
       .map(namespace => new PhpNamespaceLookupElement(element.getProject, (parentNamespace+"\\"+namespace).stripPrefix("\\")))
       .toArray

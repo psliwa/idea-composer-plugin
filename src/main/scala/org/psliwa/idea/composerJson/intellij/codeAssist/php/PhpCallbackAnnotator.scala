@@ -13,7 +13,7 @@ import com.jetbrains.php.PhpIndex
 import com.jetbrains.php.lang.psi.elements.{Method, PhpClass}
 import org.psliwa.idea.composerJson._
 import org.psliwa.idea.composerJson.intellij.PsiElements._
-import PhpUtils._
+import org.psliwa.idea.composerJson.intellij.codeAssist.php.PhpUtils._
 import org.psliwa.idea.composerJson.intellij.codeAssist.problem.ProblemDescriptor
 
 import scala.collection.mutable.ListBuffer
@@ -63,7 +63,7 @@ class PhpCallbackAnnotator extends Annotator {
   }
 
   private def getMethodProblems(element: PsiElement, methodName: String, classes: util.Collection[PhpClass], elementRange: TextRange) = {
-    import scala.collection.JavaConversions._
+    import scala.collection.JavaConverters._
 
     val problems = ListBuffer[ProblemDescriptor[IntentionAction]]()
     
@@ -71,7 +71,7 @@ class PhpCallbackAnnotator extends Annotator {
       Option(cls.findMethodByName(methodName))
     }
 
-    for(cls <- classes) {
+    for(cls <- classes.asScala) {
       findMethod(cls, methodName) match {
         case Some(method) => {
           if(!method.getAccess.isPublic) {

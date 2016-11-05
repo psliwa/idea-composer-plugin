@@ -31,8 +31,8 @@ lazy val root = (project in file("."))
     name := "composer-json-plugin",
     autoScalaLibrary := false,
     scalaVersion := Versions.scala,
-    javacOptions in Global ++= Seq("-source", "1.6", "-target", "1.6"),
-    scalacOptions in Global += "-target:jvm-1.6",
+    javacOptions in Global ++= Seq("-source", "1.8", "-target", "1.8"),
+    scalacOptions in Global += "-target:jvm-1.8",
 
     libraryDependencies ++= Seq(
       "org.scala-lang" % "scala-library" % Versions.scala,
@@ -40,8 +40,8 @@ lazy val root = (project in file("."))
       "org.scala-lang.modules" %% "scala-parser-combinators" % Versions.scalaParsers,
       "org.scalaz" %% "scalaz-core" % Versions.scalaz,
       "com.novocode" % "junit-interface" % "0.11" % "test",
-      "org.scalacheck" %% "scalacheck" % "1.12.5" % "test",
-      "org.scalatest" %% "scalatest" % "2.2.6" % "test"
+      "org.scalacheck" %% "scalacheck" % "1.13.4" % "test",
+      "org.scalatest" %% "scalatest" % "3.0.0" % "test"
     ),
     ideaInternalPlugins ++= Seq(
       "java-i18n",
@@ -49,7 +49,7 @@ lazy val root = (project in file("."))
       "CSS"
     ),
     ideaExternalPlugins ++= Seq(
-      IdeaPlugin.Zip("php", url(s"https://plugins.jetbrains.com/files/6610/22244/php-143.382.38.zip"))
+      IdeaPlugin.Zip("php", url(s"https://plugins.jetbrains.com/files/6610/24752/php-145.258.2.zip"))
     ),
 
     unmanagedJars in Test += file(System.getProperty("java.home")).getParentFile / "lib" / "tools.jar",

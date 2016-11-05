@@ -171,7 +171,7 @@ This plugin adds auto completion and inspections support for composer.json file 
 </ul>
   ]]></change-notes>
 
-    <idea-version since-build="143.0"/>
+    <idea-version since-build="145.0"/>
 
     <depends>com.intellij.modules.platform</depends>
     <depends>com.jetbrains.php</depends>

@@ -12,7 +12,7 @@ import org.psliwa.idea.composerJson.util.Files._
 
 class FilePathInspection extends AbstractInspection {
   override protected def collectProblems(element: PsiElement, schema: Schema, problems: ProblemsHolder): Unit = {
-    import scala.collection.JavaConversions._
+    import scala.collection.JavaConverters._
 
     val maybeRootDir = Option(element.getContainingFile).flatMap(file => Option(file.getContainingDirectory))
 
@@ -21,7 +21,7 @@ class FilePathInspection extends AbstractInspection {
         schema match {
           case SObject(schemaProperties, _) => element match {
             case JsonObject(properties) => {
-              properties.foreach(property => {
+              properties.asScala.foreach(property => {
                 schemaProperties.get(property.getName).foreach(schemaProperty => {
                   Option(property.getValue).foreach(collectProblems(_, schemaProperty.schema, problems))
                 })
@@ -30,7 +30,7 @@ class FilePathInspection extends AbstractInspection {
             case _ =>
           }
           case SArray(itemType) => element match {
-            case JsonArray(values) => for(value <- values) {
+            case JsonArray(values) => for(value <- values.asScala) {
               collectProblems(value, itemType, problems)
             }
             case _ =>
@@ -48,7 +48,7 @@ class FilePathInspection extends AbstractInspection {
             case _ =>
           }
           case SFilePaths(true) => element match {
-            case JsonObject(properties) => for(property <- properties) {
+            case JsonObject(properties) => for(property <- properties.asScala) {
               Option(property.getValue).foreach(collectProblems(_, schema, problems))
             }
             case jsl@JsonStringLiteral(value) => {
@@ -62,7 +62,7 @@ class FilePathInspection extends AbstractInspection {
                 )
               }
             }
-            case JsonArray(values) => for(value <- values) {
+            case JsonArray(values) => for(value <- values.asScala) {
               collectProblems(value, schema, problems)
             }
             case _ =>

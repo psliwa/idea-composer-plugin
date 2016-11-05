@@ -55,12 +55,12 @@ class ComposerJsonSettings extends PersistentStateComponent[Element] {
   }
 
   private def loadUnboundedVersionsInspectionState(state: Element): Unit = {
-    import scala.collection.JavaConversions._
+    import scala.collection.JavaConverters._
 
     val patterns: Seq[PatternItem] = for {
-      unboundedVersionsSettings <- state.getChildren("unboundedVersionInspectionSettings")
-      excludedPackages <- unboundedVersionsSettings.getChildren("excludedPackages")
-      pattern <- excludedPackages.getChildren("pattern")
+      unboundedVersionsSettings <- state.getChildren("unboundedVersionInspectionSettings").asScala
+      excludedPackages <- unboundedVersionsSettings.getChildren("excludedPackages").asScala
+      pattern <- excludedPackages.getChildren("pattern").asScala
       patternAttr <- Option(pattern.getAttribute("pattern")).toList
       patternValue <- Option(patternAttr.getValue).toList
     } yield new PatternItem(patternValue)
@@ -69,11 +69,11 @@ class ComposerJsonSettings extends PersistentStateComponent[Element] {
   }
 
   private def loadCustomRepositoriesState(state: Element): Unit = {
-    import scala.collection.JavaConversions._
+    import scala.collection.JavaConverters._
 
     val config: Seq[(String,Boolean)] = for {
-      customRepositoriesSettings <- state.getChildren("customRepositories")
-      file <- customRepositoriesSettings.getChildren("file")
+      customRepositoriesSettings <- state.getChildren("customRepositories").asScala
+      file <- customRepositoriesSettings.getChildren("file").asScala
       pathAttr <- Option(file.getAttribute("path")).toList
       path <- Option(pathAttr.getValue).toList
       enabledAttr <- Option(file.getAttribute("enabled")).toList

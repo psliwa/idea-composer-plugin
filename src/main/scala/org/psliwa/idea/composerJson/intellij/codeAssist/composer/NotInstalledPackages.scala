@@ -5,7 +5,7 @@ import com.intellij.psi.PsiElement
 import org.psliwa.idea.composerJson.composer._
 import org.psliwa.idea.composerJson.intellij.PsiElements
 import PsiElements._
-import scala.collection.JavaConversions._
+import scala.collection.JavaConverters._
 
 private object NotInstalledPackages {
   def getNotInstalledPackageProperties(element: PsiElement, installedPackages: ComposerPackages): Seq[JsonProperty] = for {
@@ -14,7 +14,7 @@ private object NotInstalledPackages {
     property <- findProperty(jsonObject, propertyName).toList
     packagesObject <- Option(property.getValue).toList
     packagesObject <- ensureJsonObject(packagesObject).toList
-    packageProperty <- packagesObject.getPropertyList if isNotInstalled(packageProperty, devPred, installedPackages)
+    packageProperty <- packagesObject.getPropertyList.asScala if isNotInstalled(packageProperty, devPred, installedPackages)
   } yield packageProperty
 
   private def pred(f: Boolean => Boolean) = f
@@ -26,12 +26,12 @@ private object NotInstalledPackages {
   }
 
   def getPackageVersion(property: JsonProperty): String = {
-    import scala.collection.JavaConversions._
+    import scala.collection.JavaConverters._
 
     val maybeVersion = for {
       value <- Option(property.getValue)
       stringLiteral <- ensureJsonStringLiteral(value)
-    } yield stringLiteral.getTextFragments.foldLeft("")(_ + _.second)
+    } yield stringLiteral.getTextFragments.asScala.foldLeft("")(_ + _.second)
 
     maybeVersion.getOrElse("")
   }
