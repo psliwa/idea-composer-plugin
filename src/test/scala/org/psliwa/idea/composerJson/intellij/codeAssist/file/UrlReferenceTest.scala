@@ -1,11 +1,11 @@
 package org.psliwa.idea.composerJson.intellij.codeAssist.file
 
-import com.intellij.testFramework.fixtures.LightPlatformCodeInsightFixtureTestCase
 import org.junit.Assert._
 import org.psliwa.idea.composerJson.ComposerJson
+import org.psliwa.idea.composerJson.intellij.codeAssist.CompletionTest
 
 
-class UrlReferenceTest extends LightPlatformCodeInsightFixtureTestCase {
+class UrlReferenceTest extends CompletionTest {
 
   def testGivenUrlProperty_givenUrlValue_valueShouldBeUrlReference() = {
     checkUrlReference(

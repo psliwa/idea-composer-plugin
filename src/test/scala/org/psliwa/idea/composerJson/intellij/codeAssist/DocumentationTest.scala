@@ -6,6 +6,9 @@ import org.psliwa.idea.composerJson._
 import org.junit.Assert._
 
 abstract class DocumentationTest extends LightPlatformCodeInsightFixtureTestCase {
+
+  override def isWriteActionRequired: Boolean = true
+
   protected def checkDocumentation(s: String, externalUrls: List[String], maybeExpectedDoc: Option[String] = None, filename: String = ComposerJson): Unit = {
     def externalUrlsAssertion(urls: List[String]): Unit =  externalUrls.foreach(url => assertTrue(urls.exists(_.contains(url))))
     def docAssertion(doc: String): Unit = maybeExpectedDoc.foreach(assertEquals(_, doc))

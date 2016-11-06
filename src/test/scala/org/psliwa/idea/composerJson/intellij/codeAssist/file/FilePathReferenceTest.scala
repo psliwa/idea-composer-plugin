@@ -1,11 +1,11 @@
 package org.psliwa.idea.composerJson.intellij.codeAssist.file
 
 import com.intellij.psi.{PsiElement, PsiFileSystemItem}
-import com.intellij.testFramework.fixtures.LightPlatformCodeInsightFixtureTestCase
 import org.junit.Assert._
 import org.psliwa.idea.composerJson._
+import org.psliwa.idea.composerJson.intellij.codeAssist.CompletionTest
 
-class FilePathReferenceTest extends LightPlatformCodeInsightFixtureTestCase {
+class FilePathReferenceTest extends CompletionTest {
 
   def testGivenFileInArrayOfFilePaths_referenceShouldBeCreated() = {
     val file = "file.txt"

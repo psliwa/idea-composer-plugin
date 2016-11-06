@@ -10,9 +10,11 @@ addCommandAlias("pluginCompress", "compressor/package")
 addCommandAlias("pluginPack", "packager/package")
 addCommandAlias("pluginProguard", "proguard/package")
 
+val phpPluginUrl = sys.env.getOrElse("PHP_PLUGIN_URL", "https://plugins.jetbrains.com/files/6610/25793/php-145.970.40.zip")
+
 onLoad in Global := ((s: State) => { "updateIdea" :: s}) compose (onLoad in Global).value
 
-ideaBuild in ThisBuild := Versions.idea
+ideaBuild in ThisBuild := sys.env.getOrElse("IDEA_VERSION", Versions.idea)
 ideaEdition in ThisBuild := IdeaEdition.Ultimate
 scalaVersion in ThisBuild := Versions.scala
 
@@ -49,7 +51,7 @@ lazy val root = (project in file("."))
       "CSS"
     ),
     ideaExternalPlugins ++= Seq(
-      IdeaPlugin.Zip("php", url(s"https://plugins.jetbrains.com/files/6610/25793/php-145.970.40.zip"))
+      IdeaPlugin.Zip("php", url(phpPluginUrl))
     ),
 
     unmanagedJars in Test += file(System.getProperty("java.home")).getParentFile / "lib" / "tools.jar",

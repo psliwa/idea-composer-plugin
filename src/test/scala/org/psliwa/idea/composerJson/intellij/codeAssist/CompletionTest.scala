@@ -8,6 +8,8 @@ import org.psliwa.idea.composerJson.ComposerJson
 
 abstract class CompletionTest extends LightPlatformCodeInsightFixtureTestCase {
 
+  override def isWriteActionRequired: Boolean = true
+
   protected def suggestions(
     contents: String,
     expectedSuggestions: Array[String],
