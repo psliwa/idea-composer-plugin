@@ -49,7 +49,7 @@ lazy val root = (project in file("."))
       "CSS"
     ),
     ideaExternalPlugins ++= Seq(
-      IdeaPlugin.Zip("php", url(s"https://plugins.jetbrains.com/files/6610/24752/php-145.258.2.zip"))
+      IdeaPlugin.Zip("php", url(s"https://plugins.jetbrains.com/files/6610/25793/php-145.970.40.zip"))
     ),
 
     unmanagedJars in Test += file(System.getProperty("java.home")).getParentFile / "lib" / "tools.jar",
