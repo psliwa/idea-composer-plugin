@@ -6,21 +6,21 @@ class PackagesCompletionTest extends AbstractPackagesTest {
   def testPackageNameCompletion_versionQuotesShouldBeFixed() = {
     val contributor = getCompletionContributor
 
-    val pkg = "ps/image-optimizer"
+    val pkg = "symfony/symfony"
     contributor.setPackagesLoader(() => List(new BaseLookupElement(pkg)))
 
     completion(
       """
         |{
         | "require": {
-        |   "ps/image-opti<caret>"
+        |   "symsym<caret>"
         | }
         |}
       """.stripMargin,
       """
         |{
         | "require": {
-        |   "ps/image-optimizer": "<caret>"
+        |   "symfony/symfony": "<caret>"
         | }
         |}
       """.stripMargin

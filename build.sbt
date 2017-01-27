@@ -10,12 +10,13 @@ addCommandAlias("pluginCompress", "compressor/package")
 addCommandAlias("pluginPack", "packager/package")
 addCommandAlias("pluginProguard", "proguard/package")
 
-val phpPluginUrl = sys.env.getOrElse("PHP_PLUGIN_URL", "https://plugins.jetbrains.com/files/6610/25793/php-145.970.40.zip")
+val phpPluginUrl = settingKey[String]("Php plugin url")
 
 onLoad in Global := ((s: State) => { "updateIdea" :: s}) compose (onLoad in Global).value
 
-ideaBuild in ThisBuild := sys.env.getOrElse("IDEA_VERSION", Versions.idea)
+ideaBuild in ThisBuild := sys.props.getOrElse("IDEA_VERSION", Versions.idea)
 ideaEdition in ThisBuild := IdeaEdition.Ultimate
+phpPluginUrl in ThisBuild := sys.props.getOrElse("PHP_PLUGIN_URL", "https://plugins.jetbrains.com/files/6610/31161/php-163.10504.2.zip")
 scalaVersion in ThisBuild := Versions.scala
 
 lazy val release = TaskKey[Unit]("release")
@@ -43,7 +44,7 @@ lazy val root = (project in file("."))
       "org.scalaz" %% "scalaz-core" % Versions.scalaz,
       "com.novocode" % "junit-interface" % "0.11" % "test",
       "org.scalacheck" %% "scalacheck" % "1.13.4" % "test",
-      "org.scalatest" %% "scalatest" % "3.0.0" % "test"
+      "org.scalatest" %% "scalatest" % "3.0.1" % "test"
     ),
     ideaInternalPlugins ++= Seq(
       "java-i18n",
@@ -51,7 +52,7 @@ lazy val root = (project in file("."))
       "CSS"
     ),
     ideaExternalPlugins ++= Seq(
-      IdeaPlugin.Zip("php", url(phpPluginUrl))
+      IdeaPlugin.Zip("php", url(phpPluginUrl.value))
     ),
 
     unmanagedJars in Test += file(System.getProperty("java.home")).getParentFile / "lib" / "tools.jar",

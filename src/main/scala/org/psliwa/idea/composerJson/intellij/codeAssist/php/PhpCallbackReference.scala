@@ -72,11 +72,6 @@ private class PhpCallbackReference(element: JsonStringLiteral) extends PsiPolyVa
 
     false
   }
-
-  private def hookMethod(method: Method): Boolean = {
-    method.isStatic && method.getAccess.isPublic && !method.isAbstract &&
-      (method.getParameters.nonEmpty && ComposerEventTypes.exists(method.getParameters()(0).getType.getTypes.contains(_)))
-  }
 }
 
 private object PhpCallbackReference {

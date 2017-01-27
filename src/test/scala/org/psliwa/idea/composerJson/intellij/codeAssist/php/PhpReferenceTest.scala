@@ -158,7 +158,7 @@ class PhpReferenceTest extends CompletionTest {
       """
         |{
         |  "scripts": {
-        |    "pre-install-cmd": "SH<caret>"
+        |    "pre-install-cmd": "S<caret>"
         |  }
         |}
       """.stripMargin,
