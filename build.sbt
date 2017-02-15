@@ -157,11 +157,17 @@ lazy val proguard: Project = (project in file("subprojects/proguard"))
   .settings(
     artifactPath := getBaseDir(baseDirectory.value) / "target" / "composer-json-plugin-proguard.zip",
     pack := {
-      val proguardUrl = "https://github.com/psliwa/proguard-fixd/raw/master/proguard.jar"
+      val proguardUrl = "http://heanet.dl.sourceforge.net/project/proguard/proguard/5.3/proguard5.3.2.zip"
+      val proguardZipUrl = getBaseDir(baseDirectory.value) / "proguard.zip"
       val proguardDest: File = getBaseDir(baseDirectory.value) / "proguard.jar"
 
+      if(!proguardZipUrl.exists()) {
+        IO.download(new URL(proguardUrl), proguardZipUrl)
+      }
+
       if(!proguardDest.exists()) {
-        IO.download(new URL(proguardUrl), proguardDest)
+        IO.unzip(proguardZipUrl, getBaseDir(baseDirectory.value) / "proguard")
+        IO.move(getBaseDir(baseDirectory.value) / "proguard" / "proguard5.3.2" / "lib" / "proguard.jar", proguardDest)
       }
 
       def escape(s: String) = if(File.pathSeparatorChar == '\\') "\""+s+"\"" else s
