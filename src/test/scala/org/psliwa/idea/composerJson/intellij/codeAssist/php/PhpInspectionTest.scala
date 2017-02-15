@@ -20,6 +20,7 @@ class PhpInspectionTest extends InspectionTest {
         |    public static function clearCache1(\Composer\Script\Event $event) {}
         |    public abstract static function abstractHook(\Composer\Script\Event $event);
         |    public static function clearCache2(\Composer\Script\Event $event) {}
+        |    public static function clearCache3(\Composer\Installer\PackageEvent $event) {}
         |    private static function clearCachePrivate(\Composer\Script\Event $event) {}
         |    public function clearCacheNonStatic(\Composer\Script\Event $event) {}
         |    public static function invalidArgTypeHook(\stdClass $object) {}
@@ -46,6 +47,17 @@ class PhpInspectionTest extends InspectionTest {
         |{
         |  "scripts": {
         |    "post-create-project-cmd": "ComposerJson\\Example1\\ScriptHandler::clearCache1"
+        |  }
+        |}
+      """.stripMargin)
+  }
+
+  def testCallbackValidity_givenCallbackAcceptsInstallerPackageEvent_isShouldNotBeReported(): Unit = {
+    checkInspection(
+      """
+        |{
+        |  "scripts": {
+        |    "post-create-project-cmd": "ComposerJson\\Example1\\ScriptHandler::clearCache3"
         |  }
         |}
       """.stripMargin)

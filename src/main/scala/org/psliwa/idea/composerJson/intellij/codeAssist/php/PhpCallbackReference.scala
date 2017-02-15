@@ -80,6 +80,8 @@ private object PhpCallbackReference {
     "\\Composer\\EventDispatcher\\Event",
     "\\Composer\\Script\\Event",
     "\\Composer\\Script\\PackageEvent",
+    "\\Composer\\Installer\\PackageEvent",
+    "\\Composer\\Installer\\InstallerEvent ",
     "\\Composer\\Script\\CommandEvent",
     "\\Composer\\Plugin\\CommandEvent",
     "\\Composer\\Plugin\\PreFileDownloadEvent"

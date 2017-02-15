@@ -8,8 +8,6 @@ import org.psliwa.idea.composerJson.intellij.codeAssist.CompletionTest
 
 class PhpReferenceTest extends CompletionTest {
 
-  private val ComposerScriptEvent = "\\Composer\\Script\\Event"
-
   override def setUp(): Unit = {
     super.setUp()
 
@@ -26,6 +24,7 @@ class PhpReferenceTest extends CompletionTest {
         |  class ScriptHandler {
         |    public static function clearCache1(\Composer\Script\Event $event) {}
         |    public static function clearCache2(\Composer\Script\Event $event) {}
+        |    public static function clearCache3(\Composer\Installer\PackageEvent $event) {}
         |    private static function clearCachePrivate(\Composer\Script\Event $event) {}
         |    public function clearCacheNonStatic(\Composer\Script\Event $event) {}
         |    public static function invalidHook(\stdClass $object) {}
@@ -177,7 +176,7 @@ class PhpReferenceTest extends CompletionTest {
         |  }
         |}
       """.stripMargin,
-      Array(s"$className::clearCache1", s"$className::clearCache2"),
+      Array(s"$className::clearCache1", s"$className::clearCache2", s"$className::clearCache3"),
       Array(s"$className::clearCachePrivate", s"$className::clearCacheNonStatic")
     )
   }
