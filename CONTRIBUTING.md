@@ -12,14 +12,3 @@ manually and restart testing Intellij
 * `sbt pluginProguard` - shrink plugin zip using proguard - result should be ~5 times smaller than raw zip
 * `sbt release` - compile plugin from scratch, prepare package, create zip and shrink it
 
-If you want to run tests using Intellij, you should set following VM options in 
-"Run > Edit Configurations > Edit Defaults > JUnit > VM Options":
-
-    -ea
-    -Xms128m
-    -Xmx4096m
-    -XX:MaxPermSize=350m
-    -Didea.system.path=$MODULE_DIR$/../../idea/15.0/test-system
-    -Didea.config.path=$MODULE_DIR$/../../idea/15.0/test-config
-    -Dplugin.path=$MODULE_DIR$/../../target/plugin
-    -Didea.home.path=$MODULE_DIR$/../../idea/15.0

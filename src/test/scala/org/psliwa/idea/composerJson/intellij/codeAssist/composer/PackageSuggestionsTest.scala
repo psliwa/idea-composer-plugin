@@ -21,6 +21,23 @@ class PackageSuggestionsTest extends AbstractPackagesTest {
     )
   }
 
+  def testPackageSuggestions_givenVendorAndSlash_suggestMatchingPackages() = {
+    val packages = List("some/package1", "some/package2", "another/package3")
+    setCompletionPackageLoader(() => packages.map(new BaseLookupElement(_)))
+
+    suggestions(
+      """
+        |{
+        | "require": {
+        |   "some/<caret>"
+        | }
+        |}
+      """.stripMargin,
+      Array("some/package1", "some/package2"),
+      Array("another/package3")
+    )
+  }
+
   def testVersionSuggestions() = {
 
     val pkg = "ps/image-optimizer"

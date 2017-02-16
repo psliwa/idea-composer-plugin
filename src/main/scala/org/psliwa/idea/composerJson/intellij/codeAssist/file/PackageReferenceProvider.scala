@@ -7,6 +7,7 @@ import com.intellij.psi.{ElementManipulators, PsiElement, PsiReference, PsiRefer
 import com.intellij.util.ProcessingContext
 import org.psliwa.idea.composerJson.intellij.PsiElements
 import PsiElements._
+import org.psliwa.idea.composerJson
 import org.psliwa.idea.composerJson.composer.ComposerPackage._
 
 private object PackageReferenceProvider extends PsiReferenceProvider {
@@ -26,14 +27,16 @@ private object PackageReferenceProvider extends PsiReferenceProvider {
     val range = ElementManipulators.getValueTextRange(nameElement)
     val text = range.substring(nameElement.getText)
 
-    val set = new FileReferenceSet("vendor/"+text, nameElement, range.getStartOffset, this, true)
-
     `vendor/package`(text)
-      .map{ case(vendor, pkg) => {
-        Array[PsiReference](
-          new FileReference(set, new TextRange(1, vendor.length + 1), 0, "vendor/"+vendor),
-          new FileReference(set, new TextRange(1, vendor.length+pkg.length+2), 0, "vendor/"+vendor+"/"+pkg)
-        )
-      }}
+      .map{
+        case(vendor, pkg) if !pkg.contains(composerJson.EmptyPsiElementNamePlaceholder) => {
+          val set = new FileReferenceSet("vendor/"+text, nameElement, range.getStartOffset, this, true)
+          Array[PsiReference](
+            new FileReference(set, new TextRange(1, vendor.length + 1), 0, "vendor/"+vendor),
+            new FileReference(set, new TextRange(1, vendor.length+pkg.length+2), 0, "vendor/"+vendor+"/"+pkg)
+          )
+        }
+        case _ => Array()
+      }
   }
 }
