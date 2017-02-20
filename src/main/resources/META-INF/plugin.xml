@@ -1,7 +1,7 @@
 <idea-plugin version="2">
   <id>org.psliwa.idea.composer</id>
   <name>PHP composer.json support</name>
-  <version>1.0.17</version>
+  <version>1.0.18</version>
   <vendor email="me@psliwa.org" url="http://github.org/psliwa/idea-composer-plugin">psliwa</vendor>
 
     <description><![CDATA[
@@ -14,6 +14,10 @@ This plugin adds auto completion and inspections support for composer.json file 
     ]]></description>
 
   <change-notes><![CDATA[
+<h2>1.0.18</h2>
+<ul>
+  <li>[#38] Fix packages names completion after reaching "/" char</li>
+</ul>
 <h2>1.0.17</h2>
 <ul>
   <li>[#37] Fix inspections for scripts</li>
