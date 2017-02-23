@@ -94,6 +94,18 @@ class DefaultRepositoryProviderTest {
   }
 
   @Test
+  def givenFileHasPackagistRepoTurnedOff_packagistRepoIsSpecifiedAsCustormRepo_isShouldHaveDefaultRepository() = {
+    //given
+
+    val file = "file"
+    provider.updateRepository(file, new RepositoryInfo(List("https://packagist.org/"), false))
+
+    //when & then
+
+    assertTrue(provider.hasDefaultRepository(file))
+  }
+
+  @Test
   def givenFileHasFewUrlsInRepositoryInfo_itShouldNotToHaveDefaultRepository() = {
     //given
 

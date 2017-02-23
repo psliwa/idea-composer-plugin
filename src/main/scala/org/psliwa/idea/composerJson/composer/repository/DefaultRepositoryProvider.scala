@@ -50,7 +50,7 @@ class DefaultRepositoryProvider[Package](repositoryFactory: RepositoryFactory[Pa
   }
 
   override def hasDefaultRepository(file: String): Boolean = {
-    infos.get(file).map(info => info.packagist && info.urls.isEmpty).getOrElse(true)
+    infos.get(file).forall(info => info.packagist && info.urls.isEmpty || info.urls.nonEmpty && info.urls.forall(_.startsWith(Packagist.defaultUrl)))
   }
 }
 
