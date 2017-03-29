@@ -52,33 +52,7 @@
       "description": "License name. Or an array of license names."
     },
     "authors": {
-      "type": "array",
-      "description": "List of authors that contributed to the package. This is typically the main maintainers, not the full list.",
-      "items": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "name": {
-            "type": "string",
-            "description": "Full name of the author.",
-            "required": true
-          },
-          "email": {
-            "type": "string",
-            "description": "Email address of the author.",
-            "format": "email"
-          },
-          "homepage": {
-            "type": "string",
-            "description": "Homepage URL for the author.",
-            "format": "uri"
-          },
-          "role": {
-            "type": "string",
-            "description": "Author's role in the project."
-          }
-        }
-      }
+      "$ref": "#/definitions/authors"
     },
     "require": {
       "type": "packages",
@@ -184,7 +158,17 @@
         "http-basic": {
           "type": "object",
           "description": "A hash of domain name => {\"username\": \"...\", \"password\": \"...\"}.",
-          "additionalProperties": true
+          "additionalProperties": true,
+          "properties": {
+            "username": {
+                "type": "string",
+                "description": "The username used for HTTP Basic authentication"
+            },
+            "password": {
+                "type": "string",
+                "description": "The password used for HTTP Basic authentication"
+            }
+          }
         },
         "store-auths": {
           "oneOf": [
@@ -274,6 +258,10 @@
           "type": "boolean",
           "description": "If true, the composer autoloader will not scan the filesystem for classes that are not found in the class map, defaults to false."
         },
+        "apcu-autoloader": {
+            "type": "boolean",
+            "description": "If true, the Composer autoloader will check for APCu and use it to cache found/not-found classes when the extension is enabled, defaults to false."
+        },
         "github-domains": {
           "type": "array",
           "description": "A list of domains to use in github mode. This is used for GitHub Enterprise setups, defaults to [\"github.com\"].",
@@ -342,41 +330,7 @@
       "additionalProperties": true
     },
     "autoload": {
-      "type": "object",
-      "description": "Description of how the package can be autoloaded.",
-      "properties": {
-        "psr-0": {
-          "type": "filePaths",
-          "description": "This is a hash of namespaces (keys) and the directories they can be found in (values, can be arrays of paths) by the autoloader.",
-          "additionalProperties": true
-        },
-        "psr-4": {
-          "type": "filePaths",
-          "description": "This is a hash of namespaces (keys) and the PSR-4 directories they can map to (values, can be arrays of paths) by the autoloader.",
-          "additionalProperties": true
-        },
-        "classmap": {
-          "type": "array",
-          "items": {
-            "type": "filePath"
-          },
-          "description": "This is an array of directories that contain classes to be included in the class-map generation process."
-        },
-        "files": {
-          "type": "array",
-          "items": {
-            "type": "filePath"
-          },
-          "description": "This is an array of files that are always required on every request."
-        },
-        "exclude-from-classmap": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "description": "This is an array of patterns to exclude from autoload classmap generation. (e.g. \"exclude-from-classmap\": [\"/test/\", \"/tests/\", \"/Tests/\"]"
-        }
-      }
+      "$ref": "#/definitions/autoload"
     },
     "autoload-dev": {
       "type": "object",
@@ -653,66 +607,6 @@
       "type": "object",
       "additionalProperties": true
     },
-    "repository": {
-      "type": "object",
-      "additionalProperties": true,
-      "properties": {
-        "packagist": {
-          "type": "boolean",
-          "description": "Packagist repository could be disabled by passing \"false\" value"
-        },
-        "type": {
-          "description": "Repository type, could be composer, vcs, package etc",
-          "oneOf": [
-            { "type": "string" },
-            {
-              "enum": [ "vcs", "pear", "git", "svn", "package", "perforce", "hg", "artifact", "composer", "path" ]
-            }
-          ]
-        },
-        "url": {
-          "description": "Url to vcs, pear, artifact or composer repository",
-          "oneOf": [
-            {
-              "type": "string",
-              "format": "uri"
-            },
-            {
-              "type": "filePath"
-            }
-          ]
-        },
-        "trunk-path": {
-          "description": "Only for svn repository",
-          "type": "string"
-        },
-        "branches-path": {
-          "description": "Only for svn repository",
-          "type": "string"
-        },
-        "tags-path": {
-          "description": "Only for svn repository",
-          "type": "string"
-        },
-        "svn-cache-credentials": {
-          "type": "boolean"
-        },
-        "vendor-alias": {
-          "description": "Vendor alias for PEAR channel - only for \"pear\" repository",
-          "type": "string"
-        },
-        "package": {
-          "description": "Package definition - only for \"package\" repository",
-          "type": "object",
-          "additionalProperties": true
-        },
-        "packages": {
-          "description": "Packages definition - only for \"composer\" repository",
-          "type": "object",
-          "additionalProperties": true
-        }
-      }
-    },
     "incenteev-parameters": {
       "type": "object",
       "properties": {
@@ -723,6 +617,322 @@
         "env-map": { "type": "object", "additionalProperties": true },
         "rename-map": { "type": "object", "additionalProperties": true }
       }
+    },
+    "autoload": {
+      "type": "object",
+      "description": "Description of how the package can be autoloaded.",
+      "properties": {
+        "psr-0": {
+          "type": "filePaths",
+          "description": "This is a hash of namespaces (keys) and the directories they can be found in (values, can be arrays of paths) by the autoloader.",
+          "additionalProperties": true
+        },
+        "psr-4": {
+          "type": "filePaths",
+          "description": "This is a hash of namespaces (keys) and the PSR-4 directories they can map to (values, can be arrays of paths) by the autoloader.",
+          "additionalProperties": true
+        },
+        "classmap": {
+          "type": "array",
+          "items": {
+            "type": "filePath"
+          },
+          "description": "This is an array of directories that contain classes to be included in the class-map generation process."
+        },
+        "files": {
+          "type": "array",
+          "items": {
+            "type": "filePath"
+          },
+          "description": "This is an array of files that are always required on every request."
+        },
+        "exclude-from-classmap": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "This is an array of patterns to exclude from autoload classmap generation. (e.g. \"exclude-from-classmap\": [\"/test/\", \"/tests/\", \"/Tests/\"]"
+        }
+      }
+    },
+    "authors": {
+      "type": "array",
+      "description": "List of authors that contributed to the package. This is typically the main maintainers, not the full list.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Full name of the author.",
+            "required": true
+          },
+          "email": {
+            "type": "string",
+            "description": "Email address of the author.",
+            "format": "email"
+          },
+          "homepage": {
+            "type": "string",
+            "description": "Homepage URL for the author.",
+            "format": "uri"
+          },
+          "role": {
+            "type": "string",
+            "description": "Author's role in the project."
+          }
+        }
+      }
+    },
+    "repository": {
+      "oneOf": [
+        { "$ref": "#/definitions/composer-repository" },
+        { "$ref": "#/definitions/vcs-repository" },
+        { "$ref": "#/definitions/path-repository" },
+        { "$ref": "#/definitions/artifact-repository" },
+        { "$ref": "#/definitions/pear-repository" },
+        { "$ref": "#/definitions/package-repository" }
+      ]
+    },
+    "composer-repository": {
+      "type": "object",
+      "properties": {
+        "type": { "enum": ["composer"] },
+        "url": {
+          "oneOf": [
+            {
+              "type": "string",
+              "format": "uri"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "filePath"
+            }
+          ]
+        },
+        "options": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "allow_ssl_downgrade": { "type": "boolean" },
+        "force-lazy-providers": { "type": "boolean" }
+      }
+    },
+    "vcs-repository": {
+      "type": "object",
+      "properties": {
+        "type": { "enum": ["vcs", "github", "git", "gitlab", "git-bitbucket", "hg", "hg-bitbucket", "fossil", "perforce", "svn"] },
+        "url": { "type": "string" },
+        "no-api": { "type": "boolean" },
+        "secure-http": { "type": "boolean" },
+        "svn-cache-credentials": { "type": "boolean" },
+        "trunk-path": { "oneOf": [ { "type": "string" }, { "type": "boolean" } ] },
+        "branches-path": { "oneOf": [ { "type": "string" }, { "type": "boolean" } ] },
+        "tags-path": { "oneOf": [ { "type": "string" }, { "type": "boolean" } ] },
+        "package-path": { "type": "string" },
+        "depot": { "type": "string" },
+        "branch": { "type": "string" },
+        "unique_perforce_client_name": { "type": "string" },
+        "p4user": { "type": "string" },
+        "p4password": { "type": "string" }
+      }
+    },
+    "path-repository": {
+      "type": "object",
+      "properties": {
+        "type": { "enum": ["path"] },
+        "url": { "type": "string" },
+        "options": {
+          "type": "object",
+          "properties": {
+            "symlink": { "type": "boolean" }
+          },
+          "additionalProperties": true
+        }
+      }
+    },
+    "artifact-repository": {
+      "type": "object",
+      "properties": {
+        "type": { "enum": ["artifact"] },
+        "url": { "type": "string" }
+      }
+    },
+    "pear-repository": {
+      "type": "object",
+      "properties": {
+        "type": { "enum": ["pear"] },
+        "url": { "type": "string" },
+        "vendor-alias": { "type": "string" }
+      }
+    },
+    "package-repository": {
+      "type": "object",
+      "properties": {
+        "type": { "enum": ["package"] },
+        "package": {
+          "oneOf": [
+            { "$ref": "#/definitions/inline-package" },
+            {
+              "type": "array",
+              "items": {
+                "type": { "$ref": "#/definitions/inline-package" }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "inline-package": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Package name, including 'vendor-name/' prefix."
+        },
+        "type": {
+          "type": "string"
+        },
+        "target-dir": {
+          "description": "DEPRECATED: Forces the package to be installed into the given subdirectory path. This is used for autoloading PSR-0 packages that do not contain their full path. Use forward slashes for cross-platform compatibility.",
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "keywords": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "homepage": {
+          "type": "string",
+          "format": "uri"
+        },
+        "version": {
+          "type": "string"
+        },
+        "time": {
+          "type": "string"
+        },
+        "license": {
+          "type": [
+            "string",
+            "array"
+          ]
+        },
+        "authors": {
+          "$ref": "#/definitions/authors"
+        },
+        "require": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "replace": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "conflict": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "provide": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "require-dev": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "suggest": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "extra": {
+          "type": ["object", "array"],
+          "additionalProperties": true
+        },
+        "autoload": {
+          "$ref": "#/definitions/autoload"
+        },
+        "archive": {
+          "type": ["object"],
+          "properties": {
+            "exclude": {
+              "type": "array"
+            }
+          }
+        },
+        "bin": {
+          "type": ["array"],
+          "description": "A set of files that should be treated as binaries and symlinked into bin-dir (from config).",
+          "items": {
+            "type": "string"
+          }
+        },
+        "include-path": {
+          "type": ["array"],
+          "description": "DEPRECATED: A list of directories which should get added to PHP's include path. This is only present to support legacy projects, and all new code should preferably use autoloading.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "source": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string"
+            },
+            "url": {
+              "type": "string"
+            },
+            "reference": {
+              "type": "string"
+            },
+            "mirrors": {
+              "type": "array"
+            }
+          }
+        },
+        "dist": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "required": true
+            },
+            "url": {
+              "type": "string",
+              "required": true
+            },
+            "reference": {
+              "type": "string"
+            },
+            "shasum": {
+              "type": "string"
+            },
+            "mirrors": {
+              "type": "array"
+            }
+          }
+        }
+      },
+      "additionalProperties": true
     }
   }
 }

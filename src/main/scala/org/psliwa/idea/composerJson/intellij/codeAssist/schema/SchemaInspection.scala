@@ -111,12 +111,19 @@ class SchemaInspection extends AbstractInspection {
         case _ => List(invalidTypeProblem(element, schema))
       }
       case SOr(items) => {
-        val problems = items.map(collectProblems(element, _)).filter(_.nonEmpty).flatten
-        val innerProblems = problems.filterNot(_.element == element)
+        // TODO: find the better matching item and report problems for it
+        val problemsForItems = items.map(collectProblems(element, _))
+        problemsForItems.find(_.isEmpty) match {
+          case Some(_) =>
+            List.empty
+          case None =>
+            val problems = problemsForItems.filter(_.nonEmpty).flatten
+            val innerProblems = problems.filterNot(_.element == element)
 
-        if(innerProblems.nonEmpty) innerProblems
-        else if(problems.size >= items.length) List(invalidTypeProblem(element, schema))
-        else List.empty
+            if(innerProblems.nonEmpty) innerProblems
+            else if(problems.size >= items.length) List(invalidTypeProblem(element, schema))
+            else List.empty
+        }
       }
       case SNumber => element match {
         case PsiExtractors.JsonNumberLiteral(_) => List.empty

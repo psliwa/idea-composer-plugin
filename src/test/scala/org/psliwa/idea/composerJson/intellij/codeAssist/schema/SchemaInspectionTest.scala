@@ -391,4 +391,34 @@ class SchemaInspectionTest extends InspectionTest {
        """.stripMargin
     )
   }
+
+  def testValidEnumValueForMultipleOrs() = {
+    checkInspection(
+      s"""
+         |{
+         |  $RequiredProperties
+         |  "repositories": {
+         |    "name": {
+         |      "type": "composer"
+         |    }
+         |  }
+         |}
+       """.stripMargin
+    )
+  }
+
+  def testInvalidEnumValueForMultipleAlternatives() = {
+    checkInspection(
+      s"""
+         |{
+         |  $RequiredProperties
+         |  "repositories": {
+         |    "name": {
+         |      "type": <error>"invalid"</error>
+         |    }
+         |  }
+         |}
+       """.stripMargin
+    )
+  }
 }

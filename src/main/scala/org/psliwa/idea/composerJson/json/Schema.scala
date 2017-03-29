@@ -70,10 +70,33 @@ object Schema {
     } yield schema
   }
 
-  private def tryDefinitions(jsonObject: JSONObject) = for {
-    rawDefinitions <- jsonObject.obj.get("definitions")
-    definitions <- ensureJsonObject(rawDefinitions).map(parseDefinitions).orElse(Option(Map[String,Schema]()))
+  private def tryDefinitions(jsonObject: JSONObject): Option[Map[String,Schema]] = for {
+    rawDefinitions <- jsonObject.obj.get("definitions").flatMap(ensureJsonObject)
+    resolvedDefinitions = resolveDefinitions(rawDefinitions.obj)
+    definitions = parseDefinitions(JSONObject(resolvedDefinitions))
   } yield definitions
+
+  private def resolveDefinitions(definitions: Map[String, Any]): Map[String, Any] = {
+    definitions.map { case(name, obj) => name -> resolveDefinition(obj, definitions)}
+  }
+
+  // performance is not perfect, because one definition may be resolved many times. If needed: FIXME
+  private def resolveDefinition(definition: Any, definitions: Map[String, Any]): Any = {
+    def definitionByReference(ref: Any): Option[Any] = for {
+      refName <- ensureString(ref)
+      name <- resolveRefName(refName)
+      definition <- definitions.get(name).map(resolveDefinition(_, definitions))
+    } yield definition
+
+    def loop(json: Any): Any = json match {
+      case obj: JSONObject if obj.obj.contains("$ref") => obj.obj.get("$ref").flatMap(definitionByReference).getOrElse(obj)
+      case obj: JSONObject => JSONObject(obj.obj.map { case(name, value) => name -> loop(value) })
+      case array: JSONArray => JSONArray(array.list.map(loop))
+      case other => other
+    }
+
+    loop(definition)
+  }
 
   private implicit def converterOps[A<:JSONType](c: Converter[A]): ConverterOps[A] = ConverterOps(c)
   private type Converter[A<:JSONType] = (A, Map[String,Schema]) => Option[Schema]
@@ -158,12 +181,12 @@ object Schema {
     for {
       ref <- t.obj.get("$ref")
       ref <- ensureString(ref)
-      name <- refName(ref)
+      name <- resolveRefName(ref)
       schema <- defs.get(name)
     } yield schema
   }
 
-  private def refName(ref: String): Option[String] = {
+  private def resolveRefName(ref: String): Option[String] = {
     val prefix = "#/definitions/"
     if(ref.startsWith(prefix)) Option(ref.substring(prefix.length))
     else None
