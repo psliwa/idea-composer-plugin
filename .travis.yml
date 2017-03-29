@@ -9,7 +9,7 @@ env:
   - "IDEA_VERSION=2016.1.3;PHP_PLUGIN_URL=https://plugins.jetbrains.com/files/6610/25793/php-145.970.40.zip"
   - "IDEA_VERSION=2016.2.5;PHP_PLUGIN_URL=https://plugins.jetbrains.com/files/6610/27859/php-162.1628.23.zip"
   - "IDEA_VERSION=2016.3.3;PHP_PLUGIN_URL=https://plugins.jetbrains.com/files/6610/31161/php-163.10504.2.zip"
-  - "IDEA_VERSION=171-SNAPSHOT;PHP_PLUGIN_URL=https://plugins.jetbrains.com/files/6610/31870/php-171.2455.9.zip"
+  - "IDEA_VERSION=2017.1;PHP_PLUGIN_URL=https://plugins.jetbrains.com/files/6610/33685/php-171.3780.104.zip"
 
 install:
    - sbt -DIDEA_VERSION=$IDEA_VERSION -DPHP_PLUGIN_URL=$PHP_PLUGIN_URL test
@@ -18,6 +18,4 @@ script:
    - sbt -DIDEA_VERSION=$IDEA_VERSION -DPHP_PLUGIN_URL=$PHP_PLUGIN_URL "; pluginPack ; pluginCompress ; pluginProguard"
 
 matrix:
-  allow_failures:
-    # allow failure for EAP
-    - env: "IDEA_VERSION=171-SNAPSHOT;PHP_PLUGIN_URL=https://plugins.jetbrains.com/files/6610/31870/php-171.2455.9.zip"
+  allow_failures: []
