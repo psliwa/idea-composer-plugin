@@ -4,9 +4,11 @@ import org.psliwa.idea.composerJson.intellij.codeAssist.CompletionTest
 
 class FilePathTest extends CompletionTest {
   def testSuggestions_givenEmptyPrefix_suggestPathOnTopLevel() = {
-    myFixture.getTempDirFixture.findOrCreateDir("dir1").createChildDirectory(this, "dir1.1").createChildData(this, "file1.txt")
-    myFixture.getTempDirFixture.findOrCreateDir("dir2").createChildDirectory(this, "dir2.1").createChildData(this, "file2.txt")
-    myFixture.getTempDirFixture.createFile("file3.txt")
+    writeAction(() => {
+      myFixture.getTempDirFixture.findOrCreateDir("dir1").createChildDirectory(this, "dir1.1").createChildData(this, "file1.txt")
+      myFixture.getTempDirFixture.findOrCreateDir("dir2").createChildDirectory(this, "dir2.1").createChildData(this, "file2.txt")
+      myFixture.getTempDirFixture.createFile("file3.txt")
+    })
 
     suggestions(
       """
@@ -20,9 +22,11 @@ class FilePathTest extends CompletionTest {
   }
 
   def testSuggestions_givenDirectoryPrefix_suggestPathsFromGivenDirectory() = {
-    myFixture.getTempDirFixture.findOrCreateDir("dir1").createChildDirectory(this, "dir1.1")
-    myFixture.getTempDirFixture.findOrCreateDir("dir1").createChildData(this, "file1.txt")
-    myFixture.getTempDirFixture.findOrCreateDir("dir2").createChildDirectory(this, "dir2.1")
+    writeAction(() => {
+      myFixture.getTempDirFixture.findOrCreateDir("dir1").createChildDirectory(this, "dir1.1")
+      myFixture.getTempDirFixture.findOrCreateDir("dir1").createChildData(this, "file1.txt")
+      myFixture.getTempDirFixture.findOrCreateDir("dir2").createChildDirectory(this, "dir2.1")
+    })
 
     suggestions(
       """
@@ -36,7 +40,9 @@ class FilePathTest extends CompletionTest {
   }
 
   def testSuggestions_givenDirectoryPrefix_givenFileInDirectory_suggestFileFromGivenDirectory() = {
-    myFixture.getTempDirFixture.findOrCreateDir("dir1").createChildDirectory(this, "dir1.1").createChildData(this, "file.txt")
+    writeAction(() => {
+      myFixture.getTempDirFixture.findOrCreateDir("dir1").createChildDirectory(this, "dir1.1").createChildData(this, "file.txt")
+    })
 
     suggestions(
       """
@@ -49,7 +55,9 @@ class FilePathTest extends CompletionTest {
   }
 
   def testSuggestionsInAutoloadProperty() = {
-    myFixture.getTempDirFixture.findOrCreateDir("dir1")
+    writeAction(() => {
+      myFixture.getTempDirFixture.findOrCreateDir("dir1")
+    })
 
     suggestions(
       """
@@ -66,7 +74,9 @@ class FilePathTest extends CompletionTest {
   }
 
   def testSuggestionsInAutoloadProperty_givenArrayOfFilePaths_completionShouldWorkAsWell() = {
-    myFixture.getTempDirFixture.findOrCreateDir("dir1")
+    writeAction(() => {
+      myFixture.getTempDirFixture.findOrCreateDir("dir1")
+    })
 
     suggestions(
       """
@@ -83,7 +93,9 @@ class FilePathTest extends CompletionTest {
   }
 
   def testSuggestionsInAutoload_filePathsShouldNotBeSuggestedAsAutoloadProperties() = {
-    myFixture.getTempDirFixture.findOrCreateDir("dir1")
+    writeAction(() => {
+      myFixture.getTempDirFixture.findOrCreateDir("dir1")
+    })
 
     suggestions(
       """

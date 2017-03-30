@@ -64,11 +64,12 @@ class FilePathReferenceTest extends CompletionTest {
   }
 
   def testGivenRequireProperty_referenceToVendorDirShouldBeCreated() = {
-
-    myFixture.getTempDirFixture
-      .findOrCreateDir("vendor")
-      .createChildDirectory(this, "some-vendor")
-      .createChildDirectory(this, "some-pkg")
+    writeAction(() => {
+      myFixture.getTempDirFixture
+        .findOrCreateDir("vendor")
+        .createChildDirectory(this, "some-vendor")
+        .createChildDirectory(this, "some-pkg")
+    })
 
     val references =  getResolvedFileReferences(_.contains("vendor"),
       """
