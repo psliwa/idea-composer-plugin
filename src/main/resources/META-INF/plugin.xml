@@ -1,7 +1,7 @@
 <idea-plugin version="2">
   <id>org.psliwa.idea.composer</id>
   <name>PHP composer.json support</name>
-  <version>1.0.18</version>
+  <version>1.0.19</version>
   <vendor email="me@psliwa.org" url="http://github.org/psliwa/idea-composer-plugin">psliwa</vendor>
 
     <description><![CDATA[
@@ -14,6 +14,12 @@ This plugin adds auto completion and inspections support for composer.json file 
     ]]></description>
 
   <change-notes><![CDATA[
+<h2>1.0.19</h2>
+<ul>
+  <li>[#36] do not offer custom repositories for official repository</li>
+  <li>[#39] fix possible NullPointerException - problem with concurrent access to cache</li>
+  <li>Update composer-schema.json file version</li>
+</ul>
 <h2>1.0.18</h2>
 <ul>
   <li>[#38] Fix packages names completion after reaching "/" char</li>
