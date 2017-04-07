@@ -2,7 +2,7 @@
   <id>org.psliwa.idea.composer</id>
   <name>PHP composer.json support</name>
   <version>1.0.19</version>
-  <vendor email="me@psliwa.org" url="http://github.org/psliwa/idea-composer-plugin">psliwa</vendor>
+  <vendor email="me@psliwa.org" url="https://github.com/psliwa/idea-composer-plugin">psliwa</vendor>
 
     <description><![CDATA[
 <h1>PHP composer.json support</h1>
