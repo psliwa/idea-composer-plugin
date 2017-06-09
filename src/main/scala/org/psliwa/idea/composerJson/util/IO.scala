@@ -1,12 +1,22 @@
 package org.psliwa.idea.composerJson.util
 
+import java.net.{HttpURLConnection, URL}
+
 import scala.io.Source
 import scala.util.Try
 
 object IO {
   def loadUrl(uri: String): Try[String] = {
     Try {
-      val in = Source.fromURL(uri)
+      val connection = new URL(uri).openConnection() match {
+        case c: HttpURLConnection =>
+          c.setConnectTimeout(5000)
+          c.setReadTimeout(15000) // packages list might be very heavy, take it enough time to complete
+          c
+        case c => c
+      }
+
+      val in = Source.fromInputStream(connection.getInputStream)
       try {
         in.getLines().mkString
       } finally {
