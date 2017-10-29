@@ -6,17 +6,17 @@ jdk:
   - openjdk8
 
 env:
-  - "IDEA_VERSION=2019.2;PHP_PLUGIN_URL=https://plugins.jetbrains.com/files/6610/66024/php-192.5728.108.zip"
-  - "IDEA_VERSION=2019.2.3;PHP_PLUGIN_URL=https://plugins.jetbrains.com/files/6610/68963/php-192.6817.12.zip"
-  - "IDEA_VERSION=2019.2.4;PHP_PLUGIN_URL=https://plugins.jetbrains.com/files/6610/71439/php-192.7142.41.zip"
-  - "IDEA_VERSION=193.4932-EAP-CANDIDATE-SNAPSHOT;PHP_PLUGIN_URL=https://plugins.jetbrains.com/files/6610/71513/php.zip"
+  - "IDEA_VERSION=2019.2;PHP_PLUGIN_VERSION=192.5728.108"
+  - "IDEA_VERSION=2019.2.3;PHP_PLUGIN_VERSION=192.6817.12"
+  - "IDEA_VERSION=2019.2.4;PHP_PLUGIN_VERSION=192.7142.41"
+  - "IDEA_VERSION=193.5233.12;PHP_PLUGIN_VERSION=193.5233.21" # EAP
 
 install:
-   - sbt -DIDEA_VERSION=$IDEA_VERSION -DPHP_PLUGIN_URL=$PHP_PLUGIN_URL "; test ; benchmarks/jmh:run"
+   - sbt -DIDEA_VERSION=$IDEA_VERSION -DPHP_PLUGIN_VERSION=$PHP_PLUGIN_VERSION "; test ; benchmarks/jmh:run"
 
 script:
-   - sbt -DIDEA_VERSION=$IDEA_VERSION -DPHP_PLUGIN_URL=$PHP_PLUGIN_URL "; pluginPack ; pluginCompress ; pluginProguard"
+   - sbt -DIDEA_VERSION=$IDEA_VERSION -DPHP_PLUGIN_VERSION=$PHP_PLUGIN_VERSION "; release"
 
 matrix:
   allow_failures:
-    - env: "IDEA_VERSION=193.4932-EAP-CANDIDATE-SNAPSHOT;PHP_PLUGIN_URL=https://plugins.jetbrains.com/files/6610/71513/php.zip"
+    - env: "IDEA_VERSION=193.5233.12;PHP_PLUGIN_VERSION=193.5233.21"

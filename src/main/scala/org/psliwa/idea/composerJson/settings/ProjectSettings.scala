@@ -138,7 +138,7 @@ object ProjectSettings {
   def apply(project: Project): ProjectSettings = getInstance(project)
 
   class UnboundedVersionInspectionSettings private[ProjectSettings]() extends TabularSettings[PatternItem] {
-    private val excludedPatterns: mutable.MutableList[PatternItem] = mutable.MutableList()
+    private val excludedPatterns: mutable.ListBuffer[PatternItem] = mutable.ListBuffer()
 
     def isExcluded(s: String): Boolean = excludedPatterns.exists(_.matches(s))
 
@@ -175,7 +175,7 @@ object ProjectSettings {
 
     override def getValues(): java.util.List[EnabledItem] = {
       customRepositories
-        .map{ case(file, enabled) => new EnabledItem(file, enabled) }
+        .map { case(file, enabled) => new EnabledItem(file, enabled) }
         .toList
         .asJava
     }

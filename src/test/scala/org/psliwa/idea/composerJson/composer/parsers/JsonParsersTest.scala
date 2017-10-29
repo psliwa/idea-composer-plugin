@@ -1,17 +1,14 @@
 package org.psliwa.idea.composerJson.composer.parsers
 
-import java.io.File
-
-import com.intellij.openapi.application.PathManager
 import org.junit.Assert._
 import org.junit.Test
-import org.psliwa.idea.composerJson.composer.model.{Packages, PackageDescriptor}
+import org.psliwa.idea.composerJson.composer.model.{PackageDescriptor, Packages}
 
 import scala.io.Source
 
 class JsonParsersTest {
   @Test
-  def parsePackageNames_givenValidJson_expectSomeList() = {
+  def parsePackageNames_givenValidJson_expectSomeList(): Unit = {
     val s =
       """
         |{
@@ -33,7 +30,7 @@ class JsonParsersTest {
   }
 
   @Test
-  def parsePackageNames_givenInvalidJson_expectedError() = {
+  def parsePackageNames_givenInvalidJson_expectedError(): Unit = {
     val s = "invalid json"
 
     val result = JsonParsers.parsePackageNames(s)
@@ -42,7 +39,7 @@ class JsonParsersTest {
 
 
   @Test
-  def parseVersions_givenValidJson_expectList() = {
+  def parseVersions_givenValidJson_expectList(): Unit = {
     val json =
       """
         |{
@@ -64,7 +61,7 @@ class JsonParsersTest {
   }
 
   @Test
-  def parseVersions_versionsAreMissing_expectError() = {
+  def parseVersions_versionsAreMissing_expectError(): Unit = {
     val json =
       """
         |{
@@ -80,7 +77,7 @@ class JsonParsersTest {
   }
 
   @Test
-  def parseVersions_givenInvalidJson_expectError() = {
+  def parseVersions_givenInvalidJson_expectError(): Unit = {
     val json = "invalid json"
 
     val result = JsonParsers.parseVersions(json)
@@ -89,7 +86,7 @@ class JsonParsersTest {
   }
 
   @Test
-  def parseLockPackages_givenValidJson_expectList() = {
+  def parseLockPackages_givenValidJson_expectList(): Unit = {
     List(true, false).foreach(dev => {
       val packagesKey = "packages"+(if(dev) "-dev" else "")
       val json =
@@ -116,7 +113,7 @@ class JsonParsersTest {
   }
 
   @Test
-  def parseLockPackages_givenInvalidJson_expectError() = {
+  def parseLockPackages_givenInvalidJson_expectError(): Unit = {
     val json = "invalid json"
 
     val result = JsonParsers.parseLockPackages(json)
@@ -133,9 +130,8 @@ class JsonParsersTest {
     assertTrue(result.nonEmpty)
   }
 
-  private def readFileFromClasspath(filepath: String) = {
-    val file = new File(s"${PathManager.getHomePath}/../../src/test/resources/org/psliwa/idea/composerJson/$filepath")
-    val source = Source.fromFile(file)
+  private def readFileFromClasspath(filepath: String): String = {
+    val source = Source.fromURL(this.getClass.getResource(s"/org/psliwa/idea/composerJson/$filepath"), "UTF-8")
     val fileContent: String = source.mkString
     source.close()
 
@@ -143,7 +139,7 @@ class JsonParsersTest {
   }
 
   @Test
-  def parsePackages_givenValidJson_expectPackagesWithVersions() = {
+  def parsePackages_givenValidJson_expectPackagesWithVersions(): Unit = {
     val json =
       """
         |{
@@ -171,7 +167,7 @@ class JsonParsersTest {
   }
 
   @Test
-  def parsePackages_givenInvalidJson_expectError() = {
+  def parsePackages_givenInvalidJson_expectError(): Unit = {
     val json =
       """
         |{
@@ -184,7 +180,7 @@ class JsonParsersTest {
   }
 
   @Test
-  def parsePackages_givenIncludesInJson_expectIncludesInResult() = {
+  def parsePackages_givenIncludesInJson_expectIncludesInResult(): Unit = {
     val json =
       """
         |{
@@ -202,7 +198,7 @@ class JsonParsersTest {
   }
 
   @Test
-  def parsePackages_givenPackagesAsArray_givenIncludes_expectIncludesInResult() = {
+  def parsePackages_givenPackagesAsArray_givenIncludes_expectIncludesInResult(): Unit = {
     val json =
       """
         |{
@@ -220,7 +216,7 @@ class JsonParsersTest {
   }
 
   @Test
-  def parsePackageFromComposerJson_givenValidPackage_expectPackageAndVersion() = {
+  def parsePackageFromComposerJson_givenValidPackage_expectPackageAndVersion(): Unit = {
     val json =
       """
         |{
@@ -236,7 +232,7 @@ class JsonParsersTest {
   }
 
   @Test
-  def parsePackageFromComposerJson_givenValidPackage_versionIsMissing_expectPackage() = {
+  def parsePackageFromComposerJson_givenValidPackage_versionIsMissing_expectPackage(): Unit = {
     val json =
       """
         |{

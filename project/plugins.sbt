@@ -1,4 +1,5 @@
-resolvers += Resolver.url("dancingrobot84-bintray", url("http://dl.bintray.com/dancingrobot84/sbt-plugins/"))(Resolver.ivyStylePatterns)
+resolvers += Resolver.url("jetbrains-sbt", url("https://dl.bintray.com/jetbrains/sbt-plugins"))(Resolver.ivyStylePatterns)
 
-addSbtPlugin("com.dancingrobot84" % "sbt-idea-plugin" % "0.4.2")
+addSbtPlugin("org.jetbrains" % "sbt-idea-plugin" % "3.3.3")
+addSbtPlugin("org.jetbrains" % "sbt-ide-settings" % "1.0.0")
 addSbtPlugin("pl.project13.scala" % "sbt-jmh" % "0.3.7")

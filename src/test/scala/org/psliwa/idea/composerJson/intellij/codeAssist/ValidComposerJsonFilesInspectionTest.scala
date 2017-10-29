@@ -2,7 +2,6 @@ package org.psliwa.idea.composerJson.intellij.codeAssist
 
 import java.io.File
 
-import com.intellij.openapi.application.PathManager
 import org.psliwa.idea.composerJson.intellij.codeAssist.composer.MisconfigurationInspection
 import org.psliwa.idea.composerJson.intellij.codeAssist.file.FilePathInspection
 import org.psliwa.idea.composerJson.intellij.codeAssist.schema.SchemaInspection
@@ -37,7 +36,7 @@ class ValidComposerJsonFilesInspectionTest extends InspectionTest {
   }
 
   override def getTestDataPath: String = {
-    new File(s"${PathManager.getHomePath}/../../src/test/resources/org/psliwa/idea/composerJson/inspection/").getAbsolutePath
+    new File(s"${sys.env("PWD")}/src/test/resources/org/psliwa/idea/composerJson/inspection/").getAbsolutePath
   }
 
   private def checkComposerJson(pkg: String): Unit = {
