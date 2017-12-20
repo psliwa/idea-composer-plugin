@@ -538,6 +538,13 @@
         }
       }
     },
+    "scripts-descriptions": {
+      "type": "object",
+      "description": "Descriptions for custom commands, shown in console help.",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
     "support": {
       "type": "object",
       "properties": {
