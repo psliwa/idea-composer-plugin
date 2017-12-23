@@ -38,4 +38,9 @@ class NotificationsHandler(project: Project) extends ProjectComponent {
       Notifications.balloonInfo(title, text, Some(project))
     }
   }
+
+  override def initComponent(): Unit = {}
+  override def disposeComponent(): Unit = {}
+  override def getComponentName: String = "NotificationsHandler"
+  override def projectClosed(): Unit = {}
 }
