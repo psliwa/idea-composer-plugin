@@ -8,7 +8,7 @@ import com.intellij.openapi.vfs.VirtualFile
 import org.psliwa.idea.composerJson._
 import org.psliwa.idea.composerJson.composer.repository._
 import org.psliwa.idea.composerJson.intellij.codeAssist.BaseLookupElement
-import org.psliwa.idea.composerJson.settings.ComposerJsonSettings
+import org.psliwa.idea.composerJson.settings.ProjectSettings
 import org.psliwa.idea.composerJson.util.Funcs._
 
 import scala.collection.{mutable, Seq}
@@ -51,7 +51,7 @@ class PackagesLoader extends ApplicationComponent {
   }
 
   private def createRepositoryProvider(project: Project): RepositoryProvider[_ <: BaseLookupElement] = {
-    val settings = ComposerJsonSettings.getInstance(project)
+    val settings = ProjectSettings.getInstance(project)
     if(isUnitTestMode) new TestingRepositoryProvider
     else {
       new RepositoryProviderWrapper(

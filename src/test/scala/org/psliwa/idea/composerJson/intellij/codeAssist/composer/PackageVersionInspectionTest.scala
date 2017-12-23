@@ -2,7 +2,7 @@ package org.psliwa.idea.composerJson.intellij.codeAssist.composer
 
 import org.psliwa.idea.composerJson.ComposerBundle
 import org.psliwa.idea.composerJson.intellij.codeAssist.InspectionTest
-import org.psliwa.idea.composerJson.settings.{ComposerJsonSettings, PatternItem}
+import org.psliwa.idea.composerJson.settings.{ProjectSettings, PatternItem}
 
 class PackageVersionInspectionTest extends InspectionTest {
 
@@ -12,7 +12,7 @@ class PackageVersionInspectionTest extends InspectionTest {
   override def setUp(): Unit = {
     super.setUp()
 
-    ComposerJsonSettings(myFixture.getProject).getUnboundedVersionInspectionSettings.clear()
+    ProjectSettings(myFixture.getProject).getUnboundedVersionInspectionSettings.clear()
   }
 
   def testGivenUnboundVersion_thatShouldBeReported() = {
@@ -51,7 +51,7 @@ class PackageVersionInspectionTest extends InspectionTest {
   def testGivenUnboundVersion_givenPackageIsExcluded_thatIsOk() = {
     val pkg = "vendor/pkg"
 
-    ComposerJsonSettings(myFixture.getProject).getUnboundedVersionInspectionSettings.addExcludedPattern(new PatternItem(pkg))
+    ProjectSettings(myFixture.getProject).getUnboundedVersionInspectionSettings.addExcludedPattern(new PatternItem(pkg))
 
     checkInspection(
       s"""

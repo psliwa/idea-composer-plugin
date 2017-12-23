@@ -6,13 +6,13 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiFile
 import org.psliwa.idea.composerJson.ComposerBundle
-import org.psliwa.idea.composerJson.settings.{ComposerJsonSettings, PatternItem}
+import org.psliwa.idea.composerJson.settings.{ProjectSettings, PatternItem}
 
 private class ExcludePatternAction(pattern: String) extends IntentionAction {
   override def getText: String = ComposerBundle.message("inspection.quickfix.excludePackagePattern", pattern)
 
   private def settings(project: Project) = {
-    ComposerJsonSettings(project)
+    ProjectSettings(project)
   }
 
   override def getFamilyName: String = ComposerBundle.message("inspection.group")

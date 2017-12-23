@@ -83,12 +83,7 @@ public class ComposerJsonConfigurable implements Configurable {
         });
 
         configurations.add(new TabularConfiguration<EnabledItem>(
-                new LazyRef<JPanel>() {
-                    @Override
-                    public JPanel get() {
-                        return customReposPanel;
-                    }
-                },
+                () -> customReposPanel,
                 customReposModel,
                 getComposerJsonSettings().getCustomRepositoriesSettings()
         ) {
@@ -119,8 +114,8 @@ public class ComposerJsonConfigurable implements Configurable {
         return null;
     }
 
-    private ComposerJsonSettings getComposerJsonSettings() {
-        return ComposerJsonSettings.getInstance(project);
+    private ProjectSettings getComposerJsonSettings() {
+        return ProjectSettings.getInstance(project);
     }
 
     @Nullable

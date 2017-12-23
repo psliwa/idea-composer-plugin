@@ -3,7 +3,7 @@ package org.psliwa.idea.composerJson.intellij.codeAssist.composer
 import org.junit.Assert._
 import org.psliwa.idea.composerJson.ComposerBundle
 import org.psliwa.idea.composerJson.intellij.codeAssist.InspectionTest
-import org.psliwa.idea.composerJson.settings.ComposerJsonSettings
+import org.psliwa.idea.composerJson.settings.ProjectSettings
 
 class PackageVersionQuickFixesTest extends InspectionTest {
   val ExcludePatternQuickFix = ComposerBundle.message("inspection.quickfix.excludePackagePattern", _: String)
@@ -13,7 +13,7 @@ class PackageVersionQuickFixesTest extends InspectionTest {
   override def setUp(): Unit = {
     super.setUp()
 
-    ComposerJsonSettings(myFixture.getProject).getUnboundedVersionInspectionSettings.clear()
+    ProjectSettings(myFixture.getProject).getUnboundedVersionInspectionSettings.clear()
   }
 
   def testExcludePatternQuickFix_givenExactPattern() = {
@@ -239,7 +239,7 @@ class PackageVersionQuickFixesTest extends InspectionTest {
   private def assertPatternExcluded(pkg: String) {
     import scala.collection.JavaConverters._
     assertTrue(
-      ComposerJsonSettings(myFixture.getProject).getUnboundedVersionInspectionSettings.getValues().asScala.exists(_.getPattern == pkg)
+      ProjectSettings(myFixture.getProject).getUnboundedVersionInspectionSettings.getValues().asScala.exists(_.getPattern == pkg)
     )
   }
 

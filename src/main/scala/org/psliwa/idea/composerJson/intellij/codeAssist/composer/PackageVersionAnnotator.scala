@@ -17,7 +17,7 @@ import org.psliwa.idea.composerJson.intellij.PsiElements._
 import org.psliwa.idea.composerJson.intellij.codeAssist.problem.ProblemDescriptor
 import org.psliwa.idea.composerJson.intellij.codeAssist.{QuickFixIntentionActionAdapter, SetPropertyValueQuickFix}
 import org.psliwa.idea.composerJson.json.SString
-import org.psliwa.idea.composerJson.settings.ComposerJsonSettings
+import org.psliwa.idea.composerJson.settings.ProjectSettings
 
 class PackageVersionAnnotator(app: Application) extends Annotator {
   import org.psliwa.idea.composerJson.intellij.codeAssist.composer.PackageVersionAnnotator._
@@ -172,7 +172,7 @@ class PackageVersionAnnotator(app: Application) extends Annotator {
   private def excluded(project: Project): StringPattern = {
     string().`with`(new PatternCondition[String]("matches") {
       override def accepts(t: String, context: ProcessingContext): Boolean = {
-        ComposerJsonSettings(project).getUnboundedVersionInspectionSettings.isExcluded(t)
+        ProjectSettings(project).getUnboundedVersionInspectionSettings.isExcluded(t)
       }
     })
   }

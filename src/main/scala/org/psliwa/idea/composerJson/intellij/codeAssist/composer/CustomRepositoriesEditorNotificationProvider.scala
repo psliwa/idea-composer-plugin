@@ -9,7 +9,7 @@ import com.intellij.ui.{EditorNotificationPanel, EditorNotifications}
 import org.psliwa.idea.composerJson._
 import org.psliwa.idea.composerJson.composer.repository.RepositoryProvider
 import org.psliwa.idea.composerJson.intellij.codeAssist.BaseLookupElement
-import org.psliwa.idea.composerJson.settings.ComposerJsonSettings
+import org.psliwa.idea.composerJson.settings.ProjectSettings
 
 class CustomRepositoriesEditorNotificationProvider(
   notifications: EditorNotifications,
@@ -44,7 +44,7 @@ class CustomRepositoriesEditorNotificationProvider(
   }
 
   private def getSettings() = {
-    ComposerJsonSettings.getInstance(project).getCustomRepositoriesSettings
+    ProjectSettings.getInstance(project).getCustomRepositoriesSettings
   }
 
   private def isCustomRepositoriesSupportUnspecified(file: VirtualFile): Boolean = {

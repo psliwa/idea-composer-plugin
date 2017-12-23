@@ -13,9 +13,9 @@ import org.jdom.Element
     new Storage(id = "dir", file = StoragePathMacros.PROJECT_CONFIG_DIR + "/composerJson.xml", scheme = StorageScheme.DIRECTORY_BASED)
   )
 )
-class ComposerJsonSettings extends PersistentStateComponent[Element] {
-  private val unboundedVersionInspectionSettings: ComposerJsonSettings.UnboundedVersionInspectionSettings = new ComposerJsonSettings.UnboundedVersionInspectionSettings
-  private val customRepositoriesSettings = new ComposerJsonSettings.CustomRepositoriesSettings()
+class ProjectSettings extends PersistentStateComponent[Element] {
+  private val unboundedVersionInspectionSettings: ProjectSettings.UnboundedVersionInspectionSettings = new ProjectSettings.UnboundedVersionInspectionSettings
+  private val customRepositoriesSettings = new ProjectSettings.CustomRepositoriesSettings()
 
   def getState: Element = {
     val element = new Element("ComposerJsonSettings")
@@ -39,7 +39,7 @@ class ComposerJsonSettings extends PersistentStateComponent[Element] {
       .foreach(excludedPackages.addContent)
   }
 
-  private def writeCustomRepositoriesState(element: Element) = {
+  private def writeCustomRepositoriesState(element: Element): Unit = {
     val customRepositoriesElement = new Element("customRepositories")
     element.addContent(customRepositoriesElement)
 
@@ -84,20 +84,20 @@ class ComposerJsonSettings extends PersistentStateComponent[Element] {
     config.foreach{ case(file, enabled) => customRepositoriesSettings.setConfigurationForFile(file, enabled)}
   }
 
-  def getUnboundedVersionInspectionSettings: ComposerJsonSettings.UnboundedVersionInspectionSettings = {
+  def getUnboundedVersionInspectionSettings: ProjectSettings.UnboundedVersionInspectionSettings = {
     unboundedVersionInspectionSettings
   }
 
-  def getCustomRepositoriesSettings = customRepositoriesSettings
+  def getCustomRepositoriesSettings: ProjectSettings.CustomRepositoriesSettings = customRepositoriesSettings
 }
 
-object ComposerJsonSettings {
+object ProjectSettings {
   import scala.collection.JavaConverters._
 
-  def getInstance(project: Project): ComposerJsonSettings = ServiceManager.getService(project, classOf[ComposerJsonSettings])
-  def apply(project: Project): ComposerJsonSettings = getInstance(project)
+  def getInstance(project: Project): ProjectSettings = ServiceManager.getService(project, classOf[ProjectSettings])
+  def apply(project: Project): ProjectSettings = getInstance(project)
 
-  class UnboundedVersionInspectionSettings private[ComposerJsonSettings]() extends TabularSettings[PatternItem] {
+  class UnboundedVersionInspectionSettings private[ProjectSettings]() extends TabularSettings[PatternItem] {
     private val excludedPatterns: mutable.Set[PatternItem] = mutable.Set()
 
     def isExcluded(s: String): Boolean = excludedPatterns.exists(_.matches(s))
@@ -120,13 +120,13 @@ object ComposerJsonSettings {
     def clear(): Unit = excludedPatterns.clear()
   }
 
-  class CustomRepositoriesSettings private[ComposerJsonSettings]() extends TabularSettings[EnabledItem] {
+  class CustomRepositoriesSettings private[ProjectSettings]() extends TabularSettings[EnabledItem] {
     private val customRepositories: mutable.Map[String, Boolean] = mutable.Map()
 
-    def isUnspecified(file: String) = !customRepositories.contains(file)
-    def isEnabled(file: String) = customRepositories.getOrElse(file, false)
+    def isUnspecified(file: String): Boolean = !customRepositories.contains(file)
+    def isEnabled(file: String): Boolean = customRepositories.getOrElse(file, false)
 
-    override def setValues(config: java.util.List[EnabledItem]) = {
+    override def setValues(config: java.util.List[EnabledItem]): Unit = {
       customRepositories.clear()
       for(item <- config.asScala) {
         customRepositories(item.getName) = item.isEnabled
