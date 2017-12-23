@@ -6,12 +6,11 @@ jdk:
   - oraclejdk8
 
 env:
-  - "IDEA_VERSION=2016.1.3;PHP_PLUGIN_URL=https://plugins.jetbrains.com/files/6610/25793/php-145.970.40.zip"
-  - "IDEA_VERSION=2016.2.5;PHP_PLUGIN_URL=https://plugins.jetbrains.com/files/6610/27859/php-162.1628.23.zip"
-  - "IDEA_VERSION=2016.3.3;PHP_PLUGIN_URL=https://plugins.jetbrains.com/files/6610/31161/php-163.10504.2.zip"
-  - "IDEA_VERSION=2017.1;PHP_PLUGIN_URL=https://plugins.jetbrains.com/files/6610/33685/php-171.3780.104.zip"
-  - "IDEA_VERSION=2017.1.5;PHP_PLUGIN_URL=https://download.plugins.jetbrains.com/6610/34625/php-171.4424.11.zip"
+# TODO: there is a bug in testkit introduced in 2017.3, will be fixed in 2017.3.2
+#  - "IDEA_VERSION=2017.3.1;PHP_PLUGIN_URL=https://download.plugins.jetbrains.com/6610/41228/php-173.3942.13.zip"
   - "IDEA_VERSION=2017.2.5;PHP_PLUGIN_URL=https://download.plugins.jetbrains.com/6610/38422/php-172.4155.25.zip"
+  - "IDEA_VERSION=2017.1.5;PHP_PLUGIN_URL=https://download.plugins.jetbrains.com/6610/34625/php-171.4424.11.zip"
+  - "IDEA_VERSION=2017.1;PHP_PLUGIN_URL=https://plugins.jetbrains.com/files/6610/33685/php-171.3780.104.zip"
 
 install:
    - sbt -DIDEA_VERSION=$IDEA_VERSION -DPHP_PLUGIN_URL=$PHP_PLUGIN_URL test
