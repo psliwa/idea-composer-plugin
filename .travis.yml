@@ -6,8 +6,7 @@ jdk:
   - oraclejdk8
 
 env:
-# TODO: there is a bug in testkit introduced in 2017.3, will be fixed in 2017.3.2
-#  - "IDEA_VERSION=2017.3.1;PHP_PLUGIN_URL=https://download.plugins.jetbrains.com/6610/41228/php-173.3942.13.zip"
+  - "IDEA_VERSION=2017.3.2;PHP_PLUGIN_URL=https://d1n3kg4j1bkixe.cloudfront.net/files/6610/41723/php-173.4127.29.zip"
   - "IDEA_VERSION=2017.2.5;PHP_PLUGIN_URL=https://download.plugins.jetbrains.com/6610/38422/php-172.4155.25.zip"
   - "IDEA_VERSION=2017.1.5;PHP_PLUGIN_URL=https://download.plugins.jetbrains.com/6610/34625/php-171.4424.11.zip"
   - "IDEA_VERSION=2017.1;PHP_PLUGIN_URL=https://plugins.jetbrains.com/files/6610/33685/php-171.3780.104.zip"

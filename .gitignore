@@ -9,4 +9,4 @@ IDEAS.md
 /idea/
 /subprojects
 proguard/
-proguard.*
+proguard.jar

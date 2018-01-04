@@ -168,7 +168,11 @@ lazy val proguard: Project = (project in file("subprojects/proguard"))
 
       val javaRt = file(System.getProperty("java.home")) / "lib" / "rt.jar"
 
-      val libraryJars = (javaRt :: ideaFullJars.in(root).value.map(_.data).toList).map(_.getAbsolutePath).map(escape).mkString(sys.props.getOrElse("path.separator", ":"))
+      val libraryJars = (javaRt :: ideaFullJars.in(root).value.map(_.data).toList)
+        .map(_.getAbsolutePath)
+        .filterNot(_.contains("jshell")) // it is java 9.0 jar, this proguard version doesn't support it.
+        .map(escape)
+        .mkString(sys.props.getOrElse("path.separator", ":"))
 
       val cmd = Seq(
         "java", "-jar", escape(proguardDest.getAbsolutePath), "@"+escape(getBaseDirPath(baseDirectory.value)+"/proguard.pro"), "-injars", escape(artifactPath.in(compressor, Compile).value.getAbsolutePath), "-outjars", escape(artifactPath.value.getAbsolutePath),
