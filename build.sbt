@@ -16,7 +16,7 @@ onLoad in Global := ((s: State) => { "updateIdea" :: s}) compose (onLoad in Glob
 
 ideaBuild in ThisBuild := sys.props.getOrElse("IDEA_VERSION", Versions.idea)
 ideaEdition in ThisBuild := IdeaEdition.Ultimate
-phpPluginUrl in ThisBuild := sys.props.getOrElse("PHP_PLUGIN_URL", "https://download.plugins.jetbrains.com/6610/38422/php-172.4155.25.zip")
+phpPluginUrl in ThisBuild := sys.props.getOrElse("PHP_PLUGIN_URL", "https://plugins.jetbrains.com/files/6610/38422/php-172.4155.25.zip")
 scalaVersion in ThisBuild := Versions.scala
 
 lazy val release = TaskKey[Unit]("release")

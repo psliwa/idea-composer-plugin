@@ -22,7 +22,10 @@
             <constraints>
               <tabbedpane title-resource-bundle="org/psliwa/idea/composerJson/messages/ComposerBundle" title-key="settings.unboundedPackageVersion"/>
             </constraints>
-            <properties/>
+            <properties>
+              <minimumSize width="200" height="49"/>
+              <preferredSize width="200" height="49"/>
+            </properties>
             <border type="none"/>
             <children>
               <component id="7fef5" class="javax.swing.JLabel">
@@ -48,7 +51,10 @@
             <constraints>
               <tabbedpane title-resource-bundle="org/psliwa/idea/composerJson/messages/ComposerBundle" title-key="settings.customRepositories"/>
             </constraints>
-            <properties/>
+            <properties>
+              <minimumSize width="200" height="49"/>
+              <preferredSize width="200" height="49"/>
+            </properties>
             <border type="none"/>
             <children>
               <component id="59632" class="javax.swing.JLabel">
@@ -64,6 +70,43 @@
                   <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
                 </constraints>
                 <properties/>
+                <border type="none"/>
+                <children/>
+              </grid>
+            </children>
+          </grid>
+          <grid id="5ed39" layout-manager="GridLayoutManager" row-count="2" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+            <margin top="0" left="0" bottom="0" right="0"/>
+            <constraints>
+              <tabbedpane title-resource-bundle="org/psliwa/idea/composerJson/messages/ComposerBundle" title-key="settings.composerUpdateOptions"/>
+            </constraints>
+            <properties>
+              <minimumSize width="200" height="49"/>
+              <preferredSize width="200" height="49"/>
+            </properties>
+            <border type="none"/>
+            <children>
+              <component id="cf8cf" class="javax.swing.JLabel">
+                <constraints>
+                  <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties>
+                  <focusable value="true"/>
+                  <opaque value="false"/>
+                  <text resource-bundle="org/psliwa/idea/composerJson/messages/ComposerBundle" key="settings.composerUpdateOptions.label"/>
+                </properties>
+                <clientProperties>
+                  <html.disable class="java.lang.Boolean" value="false"/>
+                </clientProperties>
+              </component>
+              <grid id="92127" binding="composerUpdateOptionsPanel" layout-manager="BorderLayout" hgap="0" vgap="0">
+                <constraints>
+                  <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties/>
+                <clientProperties>
+                  <html.disable class="java.lang.Boolean" value="false"/>
+                </clientProperties>
                 <border type="none"/>
                 <children/>
               </grid>

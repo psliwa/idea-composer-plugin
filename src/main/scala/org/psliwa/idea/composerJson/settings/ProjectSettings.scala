@@ -1,10 +1,14 @@
 package org.psliwa.idea.composerJson.settings
 
+import java.util
+
 import com.intellij.openapi.components._
 import com.intellij.openapi.project.Project
 import org.jetbrains.annotations.NotNull
+
 import scala.collection.mutable
 import org.jdom.Element
+import org.psliwa.idea.composerJson.settings
 
 @State(
   name = "ComposerJsonPluginSettings",
@@ -16,11 +20,13 @@ import org.jdom.Element
 class ProjectSettings extends PersistentStateComponent[Element] {
   private val unboundedVersionInspectionSettings: ProjectSettings.UnboundedVersionInspectionSettings = new ProjectSettings.UnboundedVersionInspectionSettings
   private val customRepositoriesSettings = new ProjectSettings.CustomRepositoriesSettings()
+  private val composerUpdateOptions = new settings.ProjectSettings.ComposerUpdateOptions()
 
   def getState: Element = {
     val element = new Element("ComposerJsonSettings")
     writeUnboundedVersionsInspectionState(element)
     writeCustomRepositoriesState(element)
+    writeComposerUpdateOptionsState(element)
 
     element
   }
@@ -49,9 +55,21 @@ class ProjectSettings extends PersistentStateComponent[Element] {
       .foreach(customRepositoriesElement.addContent)
   }
 
+  private def writeComposerUpdateOptionsState(element: Element): Unit = {
+    import scala.collection.JavaConverters._
+
+    val composerUpdateOptionsElement = new Element("composerUpdateOptions")
+    element.addContent(composerUpdateOptionsElement)
+
+    composerUpdateOptions.getValues().asScala
+      .map(textItem => new Element("option").setAttribute("name", textItem.getText))
+      .foreach(composerUpdateOptionsElement.addContent)
+  }
+
   def loadState(state: Element) {
     loadUnboundedVersionsInspectionState(state)
     loadCustomRepositoriesState(state)
+    loadComposerUpdateOptionsState(state)
   }
 
   private def loadUnboundedVersionsInspectionState(state: Element): Unit = {
@@ -84,11 +102,28 @@ class ProjectSettings extends PersistentStateComponent[Element] {
     config.foreach{ case(file, enabled) => customRepositoriesSettings.setConfigurationForFile(file, enabled)}
   }
 
+  private def loadComposerUpdateOptionsState(state: Element): Unit = {
+    import scala.collection.JavaConverters._
+
+    val options: Seq[String] = for {
+      composerUpdateOptions <- state.getChildren("composerUpdateOptions").asScala
+      option <- composerUpdateOptions.getChildren("option").asScala
+      optionValueAttr <- Option(option.getAttribute("name")).toList
+      optionValue <- Option(optionValueAttr.getValue).toList
+    } yield optionValue
+
+    options.foreach(composerUpdateOptions.addOption)
+  }
+
   def getUnboundedVersionInspectionSettings: ProjectSettings.UnboundedVersionInspectionSettings = {
     unboundedVersionInspectionSettings
   }
 
   def getCustomRepositoriesSettings: ProjectSettings.CustomRepositoriesSettings = customRepositoriesSettings
+
+  def getComposerUpdateOptionsSettings: ProjectSettings.ComposerUpdateOptions = {
+    composerUpdateOptions
+  }
 }
 
 object ProjectSettings {
@@ -150,5 +185,26 @@ object ProjectSettings {
     private[settings] def getConfigurationForScala = customRepositories
 
     def clear(): Unit = customRepositories.clear()
+  }
+
+  class ComposerUpdateOptions private[ProjectSettings]() extends TabularSettings[TextItem] {
+    private val items: mutable.Set[TextItem] = mutable.Set()
+
+    override def getValues(): util.List[TextItem] = {
+      items.map(_.clone).toList.asJava
+    }
+
+    def values: List[String] = items.toList.map(_.getText)
+
+    override def setValues(values: util.List[TextItem]): Unit = {
+      items.clear()
+      values.asScala.map(_.clone).foreach(items.add)
+    }
+
+    def addOption(option: String): Unit = {
+      items.add(new TextItem(option))
+    }
+
+    def clear(): Unit = items.clear()
   }
 }

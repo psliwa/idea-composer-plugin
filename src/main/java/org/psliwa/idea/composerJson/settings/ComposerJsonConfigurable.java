@@ -1,7 +1,6 @@
 package org.psliwa.idea.composerJson.settings;
 
 import com.intellij.openapi.options.Configurable;
-import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.BooleanTableCellEditor;
 import com.intellij.ui.BooleanTableCellRenderer;
@@ -21,10 +20,8 @@ import javax.swing.*;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.LinkedList;
+import java.util.*;
 import java.util.List;
-import java.util.ResourceBundle;
 
 public class ComposerJsonConfigurable implements Configurable {
 
@@ -33,31 +30,32 @@ public class ComposerJsonConfigurable implements Configurable {
     private JComponent component;
     private JPanel unboundedVersionPanel;
     private JPanel customReposPanel;
+    private JPanel composerUpdateOptionsPanel;
 
-    private List<TabularConfiguration<?>> configurations = new LinkedList<TabularConfiguration<?>>();
+    private List<TabularConfiguration<?>> configurations = new LinkedList<>();
 
     public ComposerJsonConfigurable(@NotNull Project project) {
         this.project = project;
 
-        ListTableModel<PatternItem> unboundVersionsModel = new ListTableModel<PatternItem>(
+        ListTableModel<PatternItem> unboundVersionsModel = new ListTableModel<>(
                 new PatternColumn[]{new PatternColumn()},
-                new ArrayList<PatternItem>()
+                new ArrayList<>()
         );
 
-        ListTableModel<EnabledItem> customReposModel = new ListTableModel<EnabledItem>(
+        ListTableModel<EnabledItem> customReposModel = new ListTableModel<>(
                 new ColumnInfo[]{new EnabledNameColumn(), new EnableColumn()},
-                new ArrayList<EnabledItem>()
+                new ArrayList<>()
+        );
+
+        ListTableModel<TextItem> composerUpdateOptionsModel = new ListTableModel<>(
+                new ColumnInfo[]{new OptionColumn()},
+                new ArrayList<>()
         );
 
         configurations.add(new TabularConfiguration<PatternItem>(
-                new LazyRef<JPanel>() {
-                    @Override
-                    public JPanel get() {
-                        return unboundedVersionPanel;
-                    }
-                },
+                () -> unboundedVersionPanel,
                 unboundVersionsModel,
-                getComposerJsonSettings().getUnboundedVersionInspectionSettings()
+                getProjectSettings().getUnboundedVersionInspectionSettings()
         ) {
             @Override
             JComponent createComponent() {
@@ -85,7 +83,7 @@ public class ComposerJsonConfigurable implements Configurable {
         configurations.add(new TabularConfiguration<EnabledItem>(
                 () -> customReposPanel,
                 customReposModel,
-                getComposerJsonSettings().getCustomRepositoriesSettings()
+                getProjectSettings().getCustomRepositoriesSettings()
         ) {
             @Override
             JComponent createComponent() {
@@ -99,8 +97,35 @@ public class ComposerJsonConfigurable implements Configurable {
                 return tableDecorator.createPanel();
             }
         });
-    }
 
+        configurations.add(new TabularConfiguration<TextItem>(
+                () -> composerUpdateOptionsPanel,
+                composerUpdateOptionsModel,
+                getProjectSettings().getComposerUpdateOptionsSettings()
+        ) {
+            @Override
+            JComponent createComponent() {
+                TableView<TextItem> tableView = createTableView();
+
+                ToolbarDecorator tableDecorator = ToolbarDecorator.createDecorator(tableView, new ElementProducer<TextItem>() {
+                    @Override
+                    public TextItem createElement() {
+                        return new TextItem("--");
+                    }
+
+                    @Override
+                    public boolean canCreateElement() {
+                        return true;
+                    }
+                });
+
+                tableDecorator.disableUpAction();
+                tableDecorator.disableDownAction();
+
+                return tableDecorator.createPanel();
+            }
+        });
+    }
 
     @Nls
     @Override
@@ -114,7 +139,7 @@ public class ComposerJsonConfigurable implements Configurable {
         return null;
     }
 
-    private ProjectSettings getComposerJsonSettings() {
+    private ProjectSettings getProjectSettings() {
         return ProjectSettings.getInstance(project);
     }
 
@@ -139,7 +164,7 @@ public class ComposerJsonConfigurable implements Configurable {
     }
 
     @Override
-    public void apply() throws ConfigurationException {
+    public void apply() {
         for (TabularConfiguration<?> config : configurations) {
             config.apply();
         }
@@ -196,6 +221,15 @@ public class ComposerJsonConfigurable implements Configurable {
         customReposPanel = new JPanel();
         customReposPanel.setLayout(new BorderLayout(0, 0));
         panel2.add(customReposPanel, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        final JPanel panel3 = new JPanel();
+        panel3.setLayout(new GridLayoutManager(2, 1, new Insets(0, 0, 0, 0), -1, -1));
+        tabbedPane1.addTab(ResourceBundle.getBundle("org/psliwa/idea/composerJson/messages/ComposerBundle").getString("settings.composerUpdateOptions"), panel3);
+        final JLabel label3 = new JLabel();
+        this.$$$loadLabelText$$$(label3, ResourceBundle.getBundle("org/psliwa/idea/composerJson/messages/ComposerBundle").getString("settings.composerUpdateOptions.label"));
+        panel3.add(label3, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        composerUpdateOptionsPanel = new JPanel();
+        composerUpdateOptionsPanel.setLayout(new BorderLayout(0, 0));
+        panel3.add(composerUpdateOptionsPanel, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
     }
 
     /**
@@ -309,6 +343,29 @@ public class ComposerJsonConfigurable implements Configurable {
         }
     }
 
+    private static class OptionColumn extends ColumnInfo<TextItem, String> {
+
+        public OptionColumn() {
+            super("Option");
+        }
+
+        @Nullable
+        @Override
+        public String valueOf(TextItem textItem) {
+            return textItem.getText();
+        }
+
+        @Override
+        public boolean isCellEditable(TextItem textItem) {
+            return true;
+        }
+
+        @Override
+        public void setValue(TextItem textItem, String value) {
+            textItem.setText(value);
+        }
+    }
+
     private abstract static class TabularConfiguration<Model> {
         private final LazyRef<JPanel> component;
         private final ListTableModel<Model> model;
@@ -346,7 +403,7 @@ public class ComposerJsonConfigurable implements Configurable {
         }
 
         boolean isModified() {
-            return !model.getItems().equals(settings.getValues());
+            return !new HashSet<>(model.getItems()).equals(new HashSet<>(settings.getValues()));
         }
 
         void attachComponent() {

@@ -35,8 +35,9 @@ private object InstallPackagesAction extends IntentionAction {
 
     if(packages.nonEmpty) {
       Configuration.forProject(project) match {
-        case Right(config) => new DefaultPackagesInstaller(project, config, file).install(packages)
-        case _ =>
+        case Right(config) =>
+          new DefaultPackagesInstaller(project, config, file).install(packages)
+        case _ => // TODO: report exception
       }
     }
   }

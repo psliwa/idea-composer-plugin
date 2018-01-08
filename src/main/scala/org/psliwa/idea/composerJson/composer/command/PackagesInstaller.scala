@@ -3,8 +3,8 @@ package org.psliwa.idea.composerJson.composer.command
 import com.intellij.execution.ExecutionException
 import com.intellij.execution.process.{OSProcessManager, ProcessAdapter, ProcessEvent, ScriptRunnerUtil}
 import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.progress.Task.{Backgroundable, Modal}
-import com.intellij.openapi.progress.{PerformInBackgroundOption, Task, ProgressIndicator, ProgressManager}
+import com.intellij.openapi.progress.Task.Backgroundable
+import com.intellij.openapi.progress.{PerformInBackgroundOption, ProgressIndicator, ProgressManager}
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Key
 import com.intellij.psi.PsiFile
@@ -20,7 +20,7 @@ trait PackagesInstaller {
 
 class DefaultPackagesInstaller(project: Project, config: Configuration, file: PsiFile) extends PackagesInstaller {
 
-  override def install(packages: List[ComposerPackage]) = {
+  override def install(packages: List[ComposerPackage]): Unit = {
     val task = new Backgroundable(project, ComposerBundle.message("inspection.notInstalledPackage.installing"), true, PerformInBackgroundOption.DEAF) {
       override def run(indicator: ProgressIndicator): Unit = {
         val packageNames = packages.map(_.name).mkString(", ")
@@ -32,15 +32,13 @@ class DefaultPackagesInstaller(project: Project, config: Configuration, file: Ps
               packages.map(pkg => pkg.name+" ("+pkg.version+")").mkString(", ")
             )
 
-            ApplicationManager.getApplication.invokeLater(new Runnable{
-              override def run(): Unit = {
-                new OutputDialog(installationFailed, message).setVisible(true)
-              }
+            ApplicationManager.getApplication.invokeLater(() => {
+              new OutputDialog(installationFailed, message).setVisible(true)
             })
 
             Notifications.error(installationFailed, message, Some(project))
           }
-          case Right(message) => {
+          case Right(_) => {
             //refresh parent directory and composer.lock file in order to inter alia reanalyze composer.json
             val parentDir = file.getVirtualFile.getParent
             parentDir.refresh(true, false)
@@ -60,14 +58,14 @@ class DefaultPackagesInstaller(project: Project, config: Configuration, file: Ps
         indicator.setIndeterminate(true)
 
         val packagesParams = packages.map(pkg => pkg.name)
-        val commandParams = (config.composerPath :: "update" :: packagesParams).toArray
-        indicator.setText("composer update "+packagesParams.mkString(" "))
+        val commandParams = (config.commandOptions ++ List("update") ++ config.composerOptions ++ packagesParams).toArray
+        indicator.setText("composer update "+(config.composerOptions ++ packagesParams).mkString(" "))
 
         val message = new StringBuilder()
 
         try {
           val handler = ScriptRunnerUtil.execute(
-            config.phpPath,
+            config.executable,
             file.getVirtualFile.getParent.getPath,
             null,
             commandParams
