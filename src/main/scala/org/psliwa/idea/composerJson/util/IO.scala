@@ -12,6 +12,7 @@ object IO {
         case c: HttpURLConnection =>
           c.setConnectTimeout(5000)
           c.setReadTimeout(15000) // packages list might be very heavy, take it enough time to complete
+          c.setRequestProperty("User-Agent", "idea-composer-plugin")
           c
         case c => c
       }
