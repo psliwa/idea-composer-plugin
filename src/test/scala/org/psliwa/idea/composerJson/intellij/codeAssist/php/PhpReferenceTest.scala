@@ -113,7 +113,7 @@ class PhpReferenceTest extends CompletionTest {
         |{
         |  "autoload": {
         |    "psr-0": {
-        |      "ComposerJson\\Example1<caret>": ""
+        |      "ComposerJson\\Example1\\<caret>": ""
         |    }
         |  }
         |}
@@ -128,7 +128,7 @@ class PhpReferenceTest extends CompletionTest {
         |{
         |  "autoload": {
         |    "psr-0": {
-        |      "ComposerJson\\Example1<caret>"
+        |      "ComposerJson\\Example1\\<caret>"
         |    }
         |  }
         |}
@@ -143,7 +143,7 @@ class PhpReferenceTest extends CompletionTest {
         |{
         |  "autoload": {
         |    "psr-0": {
-        |      "": "ComposerJson\\Example1<caret>"
+        |      "": "ComposerJson\\Example1\\<caret>"
         |    }
         |  }
         |}
@@ -192,8 +192,8 @@ class PhpReferenceTest extends CompletionTest {
         |  }
         |}
       """.stripMargin,
-      Array("ComposerJson"),
-      Array("ComposerJson\\Example1", "Example1")
+      Array("ComposerJson\\\\"),
+      Array("ComposerJson\\\\Example1\\\\", "Example1\\\\")
     )
   }
 
@@ -208,8 +208,8 @@ class PhpReferenceTest extends CompletionTest {
         |  }
         |}
       """.stripMargin,
-      Array("ComposerJson"),
-      Array("ComposerJson\\Example1", "Example1")
+      Array("ComposerJson\\\\"),
+      Array("ComposerJson\\\\Example1\\\\", "Example1\\\\")
     )
   }
 
@@ -224,8 +224,8 @@ class PhpReferenceTest extends CompletionTest {
         |  }
         |}
       """.stripMargin,
-      Array("ComposerJson\\\\Example1"),
-      Array("Example1", "ComposerJson", "ComposerJson2\\\\Example3")
+      Array("ComposerJson\\\\Example1\\\\"),
+      Array("Example1\\\\", "ComposerJson\\\\", "ComposerJson2\\\\Example3\\\\")
     )
   }
 
@@ -282,7 +282,7 @@ class PhpReferenceTest extends CompletionTest {
         |{
         |  "autoload": {
         |    "psr-0": {
-        |      "ComposerJson\\Example1<caret>": ""
+        |      "ComposerJson\\Example1\\<caret>": ""
         |    }
         |  }
         |}

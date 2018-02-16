@@ -19,7 +19,7 @@ private class PhpNamespaceReference(element: JsonStringLiteral) extends PsiPolyV
   override def multiResolve(incompleteCode: Boolean): Array[ResolveResult] = {
     val phpIndex = PhpIndex.getInstance(element.getProject)
 
-    phpIndex.getNamespacesByName("\\"+namespaceName).asScala
+    phpIndex.getNamespacesByName("\\"+namespaceName.stripSuffix("\\")).asScala
       .map(new PsiElementResolveResult(_))
       .toArray
   }
@@ -43,7 +43,7 @@ private class PhpNamespaceReference(element: JsonStringLiteral) extends PsiPolyV
 
     phpIndex.getChildNamespacesByParentName(ensureLandingSlash(parentNamespace+"\\")).asScala
       .filter(methodMatcher.prefixMatches)
-      .map(namespace => new PhpNamespaceLookupElement(element.getProject, (parentNamespace+"\\"+namespace).stripPrefix("\\")))
+      .map(namespace => new PhpNamespaceLookupElement(element.getProject, (parentNamespace+"\\"+namespace+"\\").stripPrefix("\\")))
       .toArray
   }
 }
