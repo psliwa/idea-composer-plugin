@@ -1,7 +1,7 @@
 <idea-plugin version="2">
   <id>org.psliwa.idea.composer</id>
   <name>PHP composer.json support</name>
-  <version>1.0.24</version>
+  <version>1.0.25</version>
   <vendor email="me@psliwa.org" url="https://github.com/psliwa/idea-composer-plugin">psliwa</vendor>
 
     <description><![CDATA[
@@ -14,6 +14,15 @@ This plugin adds auto completion and inspections support for composer.json file 
     ]]></description>
 
   <change-notes><![CDATA[
+<h2>1.0.25</h2>
+<ul>
+  <li>[#51] Fix NullPointerException during browsing local history</li>
+  <li>[#56] Append backslashes automatically for namespace completion</li>
+  <li>[#50] Change SchemaInspection short name in order to avoid conflicts with the other plugins</li>
+  <li>[#54] Configurable composer options for package installation</li>
+  <li>[#58] Add custom user-agent for http requests</li>
+</ul>
+
 <h2>1.0.24</h2>
 <ul>
   <li>There is no any new feature or bug fix - only charity action summary.</li>
