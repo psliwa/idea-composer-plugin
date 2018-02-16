@@ -117,12 +117,13 @@ class RepositoryUpdater extends Annotator {
     }
 
     def mapPath(objectElement: JsonObject): Option[String] = {
-      getJsonPropertyValue(objectElement, "url", getStringValue).map { path =>
+      getJsonPropertyValue(objectElement, "url", getStringValue).flatMap { path =>
         path.headOption match {
           case Some('/') =>
-            s"file://${path.stripSuffix("/")}/composer.json"
+            Some(s"file://${path.stripSuffix("/")}/composer.json")
           case _ =>
-            objectElement.getContainingFile.getContainingDirectory.getVirtualFile.getUrl + s"/${path.stripSuffix("/")}/composer.json"
+            Option(objectElement.getContainingFile.getContainingDirectory)
+              .map(_.getVirtualFile.getUrl + s"/${path.stripSuffix("/")}/composer.json")
         }
       }.map(fixFileUrl)
     }
