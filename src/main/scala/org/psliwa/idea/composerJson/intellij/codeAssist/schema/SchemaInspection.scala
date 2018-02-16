@@ -136,8 +136,6 @@ class SchemaInspection extends AbstractInspection {
 
   override def getShortName: String = "ComposerJsonSchema"
 
-  override def getDefaultLevel: HighlightDisplayLevel = HighlightDisplayLevel.ERROR
-
   private def getAlreadyDefinedProperties(properties: List[JsonProperty]): Iterable[JsonProperty] = {
     properties
       .view

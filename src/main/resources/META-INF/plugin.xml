@@ -228,6 +228,8 @@ This plugin adds auto completion and inspections support for composer.json file 
                 language="JSON"
                 implementationClass="org.psliwa.idea.composerJson.intellij.codeAssist.schema.SchemaInspection"
                 displayName="JSON schema"
+                shortName="ComposerJsonSchema"
+                level="ERROR"
                 enabledByDefault="true"
                 groupKey="inspection.group"
                 />
