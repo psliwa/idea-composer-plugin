@@ -5,7 +5,7 @@ import java.time.{LocalDate, Month}
 import com.intellij.openapi.components.{PersistentStateComponent, ServiceManager, State, Storage}
 import org.jdom.Element
 
-@State(name = "ComposerJsonPluginAppSettings", storages = Array(new Storage(id = "other", file = "$APP_CONFIG$/composerJson.xml")))
+@State(name = "ComposerJsonPluginAppSettings", storages = Array(new Storage("$APP_CONFIG$/composerJson.xml")))
 class AppSettings extends PersistentStateComponent[Element] {
   private var charityNotificationShown: Boolean = false
   private var charitySummaryNotificationShown: Boolean = false

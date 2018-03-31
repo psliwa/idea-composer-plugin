@@ -6,6 +6,7 @@ jdk:
   - oraclejdk8
 
 env:
+  - "IDEA_VERSION=2018.1;PHP_PLUGIN_URL=https://plugins.jetbrains.com/files/6610/44552/php-181.4203.565.zip"
   - "IDEA_VERSION=2017.3.2;PHP_PLUGIN_URL=https://plugins.jetbrains.com/files/6610/41723/php-173.4127.29.zip"
   - "IDEA_VERSION=2017.2.5;PHP_PLUGIN_URL=https://plugins.jetbrains.com/files/6610/38422/php-172.4155.25.zip"
   - "IDEA_VERSION=2017.1.5;PHP_PLUGIN_URL=https://plugins.jetbrains.com/files/6610/34625/php-171.4424.11.zip"

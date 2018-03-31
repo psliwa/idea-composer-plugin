@@ -205,6 +205,8 @@ public class ComposerJsonConfigurable implements Configurable {
         component.add(tabbedPane1, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, new Dimension(200, 200), null, 0, false));
         final JPanel panel1 = new JPanel();
         panel1.setLayout(new GridLayoutManager(2, 1, new Insets(0, 0, 0, 0), -1, -1));
+        panel1.setMinimumSize(new Dimension(200, 49));
+        panel1.setPreferredSize(new Dimension(200, 49));
         tabbedPane1.addTab(ResourceBundle.getBundle("org/psliwa/idea/composerJson/messages/ComposerBundle").getString("settings.unboundedPackageVersion"), panel1);
         final JLabel label1 = new JLabel();
         this.$$$loadLabelText$$$(label1, ResourceBundle.getBundle("org/psliwa/idea/composerJson/messages/ComposerBundle").getString("settings.unboundedPackageVersion.label"));
@@ -214,6 +216,8 @@ public class ComposerJsonConfigurable implements Configurable {
         panel1.add(unboundedVersionPanel, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         final JPanel panel2 = new JPanel();
         panel2.setLayout(new GridLayoutManager(2, 1, new Insets(0, 0, 0, 0), -1, -1));
+        panel2.setMinimumSize(new Dimension(200, 49));
+        panel2.setPreferredSize(new Dimension(200, 49));
         tabbedPane1.addTab(ResourceBundle.getBundle("org/psliwa/idea/composerJson/messages/ComposerBundle").getString("settings.customRepositories"), panel2);
         final JLabel label2 = new JLabel();
         this.$$$loadLabelText$$$(label2, ResourceBundle.getBundle("org/psliwa/idea/composerJson/messages/ComposerBundle").getString("settings.customRepositories.label"));
@@ -223,12 +227,18 @@ public class ComposerJsonConfigurable implements Configurable {
         panel2.add(customReposPanel, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         final JPanel panel3 = new JPanel();
         panel3.setLayout(new GridLayoutManager(2, 1, new Insets(0, 0, 0, 0), -1, -1));
+        panel3.setMinimumSize(new Dimension(200, 49));
+        panel3.setPreferredSize(new Dimension(200, 49));
         tabbedPane1.addTab(ResourceBundle.getBundle("org/psliwa/idea/composerJson/messages/ComposerBundle").getString("settings.composerUpdateOptions"), panel3);
         final JLabel label3 = new JLabel();
+        label3.setFocusable(true);
+        label3.setOpaque(false);
         this.$$$loadLabelText$$$(label3, ResourceBundle.getBundle("org/psliwa/idea/composerJson/messages/ComposerBundle").getString("settings.composerUpdateOptions.label"));
+        label3.putClientProperty("html.disable", Boolean.FALSE);
         panel3.add(label3, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         composerUpdateOptionsPanel = new JPanel();
         composerUpdateOptionsPanel.setLayout(new BorderLayout(0, 0));
+        composerUpdateOptionsPanel.putClientProperty("html.disable", Boolean.FALSE);
         panel3.add(composerUpdateOptionsPanel, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
     }
 
