@@ -13,8 +13,7 @@ import org.psliwa.idea.composerJson.settings
 @State(
   name = "ComposerJsonPluginSettings",
   storages = Array(
-    new Storage(StoragePathMacros.PROJECT_FILE),
-    new Storage(StoragePathMacros.PROJECT_CONFIG_DIR + "/composerJson.xml")
+    new Storage("/composerJson.xml")
   )
 )
 class ProjectSettings extends PersistentStateComponent[Element] {

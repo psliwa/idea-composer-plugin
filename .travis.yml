@@ -6,11 +6,10 @@ jdk:
   - oraclejdk8
 
 env:
-  - "IDEA_VERSION=2018.1;PHP_PLUGIN_URL=https://plugins.jetbrains.com/files/6610/44552/php-181.4203.565.zip"
-  - "IDEA_VERSION=2017.3.2;PHP_PLUGIN_URL=https://plugins.jetbrains.com/files/6610/41723/php-173.4127.29.zip"
-  - "IDEA_VERSION=2017.2.5;PHP_PLUGIN_URL=https://plugins.jetbrains.com/files/6610/38422/php-172.4155.25.zip"
-  - "IDEA_VERSION=2017.1.5;PHP_PLUGIN_URL=https://plugins.jetbrains.com/files/6610/34625/php-171.4424.11.zip"
-  - "IDEA_VERSION=2017.1;PHP_PLUGIN_URL=https://plugins.jetbrains.com/files/6610/33685/php-171.3780.104.zip"
+  - "IDEA_VERSION=191.5109.14;PHP_PLUGIN_URL=https://plugins.jetbrains.com/files/6610/57867/php-191.5109.15.zip" # 2019.1 EAP
+  - "IDEA_VERSION=2018.3.4;PHP_PLUGIN_URL=https://plugins.jetbrains.com/files/6610/53883/php-183.5153.36.zip"
+  - "IDEA_VERSION=2018.2.7;PHP_PLUGIN_URL=https://plugins.jetbrains.com/files/6610/50942/php-182.4892.16.zip"
+  - "IDEA_VERSION=2018.1.5;PHP_PLUGIN_URL=https://plugins.jetbrains.com/files/6610/46673/php-181.5281.19.zip"
 
 install:
    - sbt -DIDEA_VERSION=$IDEA_VERSION -DPHP_PLUGIN_URL=$PHP_PLUGIN_URL test
@@ -19,4 +18,5 @@ script:
    - sbt -DIDEA_VERSION=$IDEA_VERSION -DPHP_PLUGIN_URL=$PHP_PLUGIN_URL "; pluginPack ; pluginCompress ; pluginProguard"
 
 matrix:
-  allow_failures: []
+  allow_failures:
+    - env: "IDEA_VERSION=191.5109.14;PHP_PLUGIN_URL=https://plugins.jetbrains.com/files/6610/57867/php-191.5109.15.zip"

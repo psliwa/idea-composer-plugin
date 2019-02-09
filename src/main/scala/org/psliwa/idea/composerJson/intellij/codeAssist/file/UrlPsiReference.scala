@@ -9,7 +9,7 @@ private class UrlPsiReference(element: PsiElement) extends PsiReferenceBase[PsiE
 
   protected def url: String = getValue
 
-  def resolve: PsiElement = {
+  override def resolve: PsiElement = {
     new PsiElementWrapper(element) with NavigatablePsiElement {
       override def getParent: PsiElement = element.getParent
       override def navigate(requestFocus: Boolean) = BrowserUtil.browse(url)
@@ -20,7 +20,7 @@ private class UrlPsiReference(element: PsiElement) extends PsiReferenceBase[PsiE
       override def getPresentation: ItemPresentation = null
     }
   }
-  def getVariants: Array[AnyRef] = UrlPsiReference.EmptyArray
+  override def getVariants: Array[AnyRef] = UrlPsiReference.EmptyArray
   override def isSoft: Boolean = true
 }
 

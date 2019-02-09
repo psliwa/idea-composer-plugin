@@ -16,7 +16,7 @@ onLoad in Global := ((s: State) => { "updateIdea" :: s}) compose (onLoad in Glob
 
 ideaBuild in ThisBuild := sys.props.getOrElse("IDEA_VERSION", Versions.idea)
 ideaEdition in ThisBuild := IdeaEdition.Ultimate
-phpPluginUrl in ThisBuild := sys.props.getOrElse("PHP_PLUGIN_URL", "https://plugins.jetbrains.com/files/6610/38422/php-172.4155.25.zip")
+phpPluginUrl in ThisBuild := sys.props.getOrElse("PHP_PLUGIN_URL", "https://plugins.jetbrains.com/files/6610/46673/php-181.5281.19.zip")
 scalaVersion in ThisBuild := Versions.scala
 
 lazy val release = TaskKey[Unit]("release")
@@ -157,7 +157,7 @@ lazy val proguard: Project = (project in file("subprojects/proguard"))
   .settings(
     artifactPath := getBaseDir(baseDirectory.value) / "target" / "composer-json-plugin-proguard.zip",
     pack := {
-      val proguardUrl = "https://github.com/psliwa/proguard-fixd/raw/master/proguard5.3.2.jar"
+      val proguardUrl = "https://github.com/psliwa/proguard-fixd/raw/master/proguard6.0.3.jar"
       val proguardDest: File = getBaseDir(baseDirectory.value) / "proguard.jar"
 
       if(!proguardDest.exists()) {

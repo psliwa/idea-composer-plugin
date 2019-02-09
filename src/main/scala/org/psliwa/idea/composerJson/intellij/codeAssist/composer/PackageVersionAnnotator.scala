@@ -3,7 +3,7 @@ package org.psliwa.idea.composerJson.intellij.codeAssist.composer
 import com.intellij.codeInsight.intention.IntentionAction
 import com.intellij.json.psi._
 import com.intellij.lang.annotation.{AnnotationHolder, Annotator, HighlightSeverity}
-import com.intellij.openapi.application.Application
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.Project
 import com.intellij.patterns.PlatformPatterns._
 import com.intellij.patterns.StandardPatterns._
@@ -19,10 +19,10 @@ import org.psliwa.idea.composerJson.intellij.codeAssist.{QuickFixIntentionAction
 import org.psliwa.idea.composerJson.json.SString
 import org.psliwa.idea.composerJson.settings.ProjectSettings
 
-class PackageVersionAnnotator(app: Application) extends Annotator {
+class PackageVersionAnnotator extends Annotator {
   import org.psliwa.idea.composerJson.intellij.codeAssist.composer.PackageVersionAnnotator._
 
-  val suggestionHighlightSeverity = if(app.isUnitTestMode) HighlightSeverity.INFORMATION
+  val suggestionHighlightSeverity = if(ApplicationManager.getApplication.isUnitTestMode) HighlightSeverity.INFORMATION
                                     else `HighlightSeverity.SUGGESTION`
 
   private type QuickFixGroup = (Option[String], Seq[IntentionAction])
