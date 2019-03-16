@@ -6,10 +6,8 @@ jdk:
   - oraclejdk8
 
 env:
-  - "IDEA_VERSION=191.5109.14;PHP_PLUGIN_URL=https://plugins.jetbrains.com/files/6610/57867/php-191.5109.15.zip" # 2019.1 EAP
+  - "IDEA_VERSION=191.6183.20;PHP_PLUGIN_URL=https://plugins.jetbrains.com/files/6610/59381/php-191.6183.13.zip" # 2019.1 EAP
   - "IDEA_VERSION=2018.3.4;PHP_PLUGIN_URL=https://plugins.jetbrains.com/files/6610/53883/php-183.5153.36.zip"
-  - "IDEA_VERSION=2018.2.7;PHP_PLUGIN_URL=https://plugins.jetbrains.com/files/6610/50942/php-182.4892.16.zip"
-  - "IDEA_VERSION=2018.1.5;PHP_PLUGIN_URL=https://plugins.jetbrains.com/files/6610/46673/php-181.5281.19.zip"
 
 install:
    - sbt -DIDEA_VERSION=$IDEA_VERSION -DPHP_PLUGIN_URL=$PHP_PLUGIN_URL test
@@ -19,4 +17,4 @@ script:
 
 matrix:
   allow_failures:
-    - env: "IDEA_VERSION=191.5109.14;PHP_PLUGIN_URL=https://plugins.jetbrains.com/files/6610/57867/php-191.5109.15.zip"
+    - env: "IDEA_VERSION=191.6183.20;PHP_PLUGIN_URL=https://plugins.jetbrains.com/files/6610/59381/php-191.6183.13.zip"
