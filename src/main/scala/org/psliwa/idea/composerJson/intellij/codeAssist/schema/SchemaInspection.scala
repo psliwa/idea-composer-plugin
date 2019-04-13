@@ -1,6 +1,5 @@
 package org.psliwa.idea.composerJson.intellij.codeAssist.schema
 
-import com.intellij.codeHighlighting.HighlightDisplayLevel
 import com.intellij.codeInspection.{LocalQuickFix, ProblemsHolder}
 import com.intellij.json.psi.{JsonNumberLiteral, JsonProperty, _}
 import com.intellij.psi.PsiElement
@@ -19,8 +18,8 @@ class SchemaInspection extends AbstractInspection {
   val booleanPattern = "^\"(true|false)\"$".r
 
   override protected def collectProblems(element: PsiElement, schema: Schema, problems: ProblemsHolder): Unit = {
-    collectProblems(element, schema)
-      .foreach(problem => problems.registerProblem(problem.element, problem.message.getOrElse(""), problem.quickFixes:_*))
+    val collectedProblems = collectProblems(element, schema).toSet
+    collectedProblems.foreach(problem => problems.registerProblem(problem.element, problem.message.getOrElse(""), problem.quickFixes:_*))
   }
 
   private def collectProblems(element: PsiElement, schema: Schema): Seq[ProblemDescriptor[LocalQuickFix]] = {
