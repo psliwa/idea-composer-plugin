@@ -55,7 +55,7 @@ class JsonParsersTest {
     val result = JsonParsers.parseVersions(json)
 
     assertTrue(result.isSuccess)
-    assertEquals(List("dev-master", "1.0.0", "1.0.1"), result.get)
+    assertEquals(Set("dev-master", "1.0.0", "1.0.1"), result.get.toSet)
   }
 
   @Test
