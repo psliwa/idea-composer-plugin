@@ -8,7 +8,7 @@ jdk:
 env:
   - "IDEA_VERSION=2019.1;PHP_PLUGIN_URL=https://plugins.jetbrains.com/files/6610/60039/php-191.6183.95.zip"
   - "IDEA_VERSION=2019.1.1;PHP_PLUGIN_URL=https://plugins.jetbrains.com/files/6610/61026/php-191.6707.66.zip"
-  - "IDEA_VERSION=191.7141-EAP-CANDIDATE-SNAPSHOT;PHP_PLUGIN_URL=https://plugins.jetbrains.com/files/6610/61733/php-191.7141.35.zip"
+  - "IDEA_VERSION=2019.1.2;PHP_PLUGIN_URL=https://plugins.jetbrains.com/files/6610/62069/php-191.7141.52.zip"
 install:
    - sbt -DIDEA_VERSION=$IDEA_VERSION -DPHP_PLUGIN_URL=$PHP_PLUGIN_URL test
 
@@ -16,5 +16,4 @@ script:
    - sbt -DIDEA_VERSION=$IDEA_VERSION -DPHP_PLUGIN_URL=$PHP_PLUGIN_URL "; pluginPack ; pluginCompress ; pluginProguard"
 
 matrix:
-  allow_failures:
-    - env: "IDEA_VERSION=191.7141-EAP-CANDIDATE-SNAPSHOT;PHP_PLUGIN_URL=https://plugins.jetbrains.com/files/6610/61733/php-191.7141.35.zip"
+  allow_failures: []
