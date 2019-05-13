@@ -1,7 +1,7 @@
 <idea-plugin version="2">
   <id>org.psliwa.idea.composer</id>
   <name>PHP composer.json support</name>
-  <version>1.0.27-spray-json</version>
+  <version>1.0.28</version>
   <vendor email="me@psliwa.org" url="https://github.com/psliwa/idea-composer-plugin">psliwa</vendor>
 
     <description><![CDATA[
@@ -14,6 +14,12 @@ This plugin adds auto completion and inspections support for composer.json file 
     ]]></description>
 
   <change-notes><![CDATA[
+<h2>1.0.28</h2>
+<ul>
+  <li>[#79] Switch from scala-parser-combinators to spray-json</li>
+  <li>Add plugin icon</li>
+</ul>
+
 <h2>1.0.27</h2>
 <ul>
   <li>[#78] Fix exception in PackageReferenceProvider</li>
