@@ -3,7 +3,7 @@ sudo: false
 language: scala
 
 jdk:
-  - oraclejdk8
+  - openjdk8
 
 env:
   - "IDEA_VERSION=2019.1;PHP_PLUGIN_URL=https://plugins.jetbrains.com/files/6610/60039/php-191.6183.95.zip"
