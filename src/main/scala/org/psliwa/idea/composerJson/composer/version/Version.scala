@@ -7,6 +7,8 @@ import scala.language.postfixOps
 import scalaz._
 import scalaz.Scalaz._
 
+import scala.util.Try
+
 object Version {
 
   type SemVer = String
@@ -23,16 +25,21 @@ object Version {
 
   def isGreater(version1: String, version2: String): Boolean = compare(version1, version2) != Ordering.LT
 
+  private val maxIntAsString = Int.MaxValue.toString
+
   private def compare(version1: String, version2: String): Ordering = {
     def isSemanticVersion(v: String): Boolean = !v.exists(_.isLetter)
-    def normalize(v: String) = v.replace("*", "999999")
+    def numeric(s: String) = Try { s.toInt }.toOption.getOrElse(0)
+    def normalize(v: String) = v.replace("*", maxIntAsString).split("\\.").map(numeric).toList
     def dots(v: String) = v.count(_ == '.')
 
-    val semanticVersionOrdering = isSemanticVersion(version1) ?|? isSemanticVersion(version2)
+    val isSemanticVersion1 = isSemanticVersion(version1)
+    val isSemanticVersion2 = isSemanticVersion(version2)
 
-    if(semanticVersionOrdering == Ordering.EQ && isSemanticVersion(version1)) {
+    if(isSemanticVersion1 && isSemanticVersion2) {
       dots(version1) ?|? dots(version2) |+| normalize(version1) ?|? normalize(version2)
     } else {
+      val semanticVersionOrdering = isSemanticVersion1 ?|? isSemanticVersion2
       semanticVersionOrdering |+| version1 ?|? version2
     }
   }
