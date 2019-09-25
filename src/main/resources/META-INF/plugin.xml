@@ -1,4 +1,4 @@
-<idea-plugin version="2">
+<idea-plugin>
   <id>org.psliwa.idea.composer</id>
   <name>PHP composer.json support</name>
   <version>1.0.29</version>
@@ -238,7 +238,7 @@ This plugin adds auto completion and inspections support for composer.json file 
 </ul>
   ]]></change-notes>
 
-    <idea-version since-build="191.0"/>
+    <idea-version since-build="192.0"/>
 
     <depends>com.intellij.modules.platform</depends>
     <depends>com.jetbrains.php</depends>

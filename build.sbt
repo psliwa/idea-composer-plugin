@@ -14,9 +14,9 @@ val phpPluginUrl = settingKey[String]("Php plugin url")
 
 onLoad in Global := ((s: State) => { "updateIdea" :: s}) compose (onLoad in Global).value
 
-ideaBuild in ThisBuild := sys.props.getOrElse("IDEA_VERSION", Versions.idea)
+ideaBuild in ThisBuild := sys.props.getOrElse("IDEA_VERSION", "2019.2.3")
+phpPluginUrl in ThisBuild := sys.props.getOrElse("PHP_PLUGIN_URL", "https://plugins.jetbrains.com/files/6610/68963/php-192.6817.12.zip")
 ideaEdition in ThisBuild := IdeaEdition.Ultimate
-phpPluginUrl in ThisBuild := sys.props.getOrElse("PHP_PLUGIN_URL", "https://plugins.jetbrains.com/files/6610/60039/php-191.6183.95.zip")
 scalaVersion in ThisBuild := Versions.scala
 
 lazy val release = TaskKey[Unit]("release")
@@ -50,7 +50,8 @@ lazy val root = (project in file("."))
     ideaInternalPlugins ++= Seq(
       "java-i18n",
       "properties",
-      "CSS"
+      "CSS",
+      "java"
     ),
     ideaExternalPlugins ++= Seq(
       IdeaPlugin.Zip("php", url(phpPluginUrl.value))

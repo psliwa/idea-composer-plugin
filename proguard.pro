@@ -5,6 +5,7 @@
 -dontwarn org.jetbrains.**
 -dontwarn com.intellij.memory.**
 -dontwarn javax.xml.bind.ModuleUtil
+-dontwarn module-info
 
 -keep class org.psliwa.idea.composerJson.**
 -keepclassmembers class org.psliwa.idea.composerJson.** {

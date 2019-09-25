@@ -1,11 +1,11 @@
 package org.psliwa.idea.composerJson.intellij.codeAssist
 
 import com.intellij.lang.documentation.DocumentationProvider
-import com.intellij.testFramework.fixtures.LightPlatformCodeInsightFixtureTestCase
-import org.psliwa.idea.composerJson._
+import com.intellij.testFramework.fixtures.BasePlatformTestCase
 import org.junit.Assert._
+import org.psliwa.idea.composerJson._
 
-abstract class DocumentationTest extends LightPlatformCodeInsightFixtureTestCase {
+abstract class DocumentationTest extends BasePlatformTestCase {
 
   override def isWriteActionRequired: Boolean = true
 

@@ -2,11 +2,11 @@ package org.psliwa.idea.composerJson.intellij.codeAssist
 
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.util.Computable
-import com.intellij.testFramework.fixtures.LightPlatformCodeInsightFixtureTestCase
+import com.intellij.testFramework.fixtures.BasePlatformTestCase
 import org.junit.Assert._
 import org.psliwa.idea.composerJson._
 
-abstract class InspectionTest extends LightPlatformCodeInsightFixtureTestCase {
+abstract class InspectionTest extends BasePlatformTestCase {
   override def isWriteActionRequired: Boolean = false
 
   def checkInspection(s: String, filePath: String = ComposerJson): Unit = {

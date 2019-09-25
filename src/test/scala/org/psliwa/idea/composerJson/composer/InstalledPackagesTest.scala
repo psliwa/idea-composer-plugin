@@ -1,12 +1,12 @@
 package org.psliwa.idea.composerJson.composer
 
 import com.intellij.openapi.vfs.VirtualFile
-import com.intellij.testFramework.fixtures.LightPlatformCodeInsightFixtureTestCase
+import com.intellij.testFramework.fixtures.BasePlatformTestCase
 import org.junit.Assert._
 import org.psliwa.idea.composerJson.fixtures.ComposerFixtures
 import org.psliwa.idea.composerJson.fixtures.ComposerFixtures._
 
-class InstalledPackagesTest extends LightPlatformCodeInsightFixtureTestCase {
+class InstalledPackagesTest extends BasePlatformTestCase {
 
   var composerJsonFile: VirtualFile = _
 

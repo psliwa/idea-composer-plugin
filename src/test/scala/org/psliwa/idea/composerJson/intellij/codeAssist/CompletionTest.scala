@@ -4,11 +4,11 @@ import com.intellij.codeInsight.lookup.Lookup
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.util.Computable
 import com.intellij.testFramework.UsefulTestCase
-import com.intellij.testFramework.fixtures.LightPlatformCodeInsightFixtureTestCase
+import com.intellij.testFramework.fixtures.BasePlatformTestCase
 import org.junit.Assert._
 import org.psliwa.idea.composerJson.ComposerJson
 
-abstract class CompletionTest extends LightPlatformCodeInsightFixtureTestCase {
+abstract class CompletionTest extends BasePlatformTestCase {
 
   override def isWriteActionRequired: Boolean = false
 
