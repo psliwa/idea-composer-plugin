@@ -39,14 +39,16 @@ class PackageVersionAnnotator extends Annotator {
       } yield ProblemDescriptor(element, message, quickFixes)
 
       problemDescriptors.foreach(problem => {
-        val annotation = problem.message match {
+        val maybeAnnotation = problem.message match {
           case Some(message) =>
-            annotations.createWarningAnnotation(problem.element.getContext, message)
-          case _ =>
-            annotations.createAnnotation(suggestionHighlightSeverity, problem.element.getContext.getTextRange, null)
+            Some(annotations.createWarningAnnotation(problem.element.getContext, message))
+          case None if annotations.isBatchMode =>
+            None // skip annotation when there are only quick fixes without message in batch mode
+          case None =>
+            Some(annotations.createAnnotation(suggestionHighlightSeverity, problem.element.getContext.getTextRange, null))
         }
 
-        problem.quickFixes.foreach(fix => annotation.registerFix(fix))
+        maybeAnnotation.foreach(annotation => problem.quickFixes.foreach(fix => annotation.registerFix(fix)))
       })
     }
   }
@@ -87,11 +89,11 @@ class PackageVersionAnnotator extends Annotator {
     createQuickFixes(element, create)
   }
 
-  private def createQuickFixes(element: PsiElement, f: (JsonObject) => Seq[IntentionAction]): Seq[IntentionAction] = {
+  private def createQuickFixes(element: PsiElement, createFix: JsonObject => Seq[IntentionAction]): Seq[IntentionAction] = {
     for {
       property <- ensureJsonProperty(element.getParent).toList
       jsonObject <- ensureJsonObject(property.getParent).toList
-      fix <- f(jsonObject)
+      fix <- createFix(jsonObject)
     } yield fix
   }
 
@@ -150,7 +152,6 @@ class PackageVersionAnnotator extends Annotator {
       .flatMap(Version.equivalentsFor)
       .map(equivalentVersion => createQuickFixes(element, jsonObject => List(changeEquivalentPackageVersionQuickFix(pkg, equivalentVersion, jsonObject))))
       .map(quickFix => (None, quickFix))
-      .toSeq
   }
 
   private def changePackageVersionQuickFix(pkg: String, fixedVersion: Constraint, jsonObject: JsonObject): IntentionAction = {
