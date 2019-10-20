@@ -6,10 +6,9 @@ import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiFile
 import org.psliwa.idea.composerJson.composer.InstalledPackages
-import org.psliwa.idea.composerJson.composer.command.{Configuration, DefaultPackagesInstaller}
-import org.psliwa.idea.composerJson.intellij.PsiElements
+import org.psliwa.idea.composerJson.composer.command.DefaultPackagesInstaller
+import org.psliwa.idea.composerJson.intellij.PsiElements._
 import org.psliwa.idea.composerJson.intellij.codeAssist.composer.NotInstalledPackages._
-import PsiElements._
 import org.psliwa.idea.composerJson.{ComposerBundle, composer}
 
 private object InstallPackagesAction extends IntentionAction {
@@ -34,11 +33,7 @@ private object InstallPackagesAction extends IntentionAction {
     } yield pkg
 
     if(packages.nonEmpty) {
-      Configuration.forProject(project) match {
-        case Right(config) =>
-          new DefaultPackagesInstaller(project, config, file).install(packages)
-        case _ => // TODO: report exception
-      }
+      new DefaultPackagesInstaller(project, file).install(packages)
     }
   }
 

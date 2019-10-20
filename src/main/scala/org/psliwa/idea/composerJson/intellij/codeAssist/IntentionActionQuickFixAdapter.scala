@@ -19,4 +19,6 @@ private class IntentionActionQuickFixAdapter(action: IntentionAction, file: PsiF
   private def editorFor(project: Project): Option[Editor] = {
     Option(FileEditorManager.getInstance(project).getSelectedTextEditor)
   }
+
+  override def startInWriteAction(): Boolean = action.startInWriteAction()
 }
