@@ -63,19 +63,15 @@ class PackageVersionAnnotator extends Annotator {
   }
 
   private def detectUnboundedVersionProblem(version: Option[Constraint], pkg: String, element: PsiElement): Seq[QuickFixGroup] = {
-    if(packagesAllowedWithUnboundedVersion.contains(pkg)) {
-      List.empty
-    } else {
-      version
-        .filter(!_.isBounded)
-        .map(versionConstraint => (
-          Some(ComposerBundle.message("inspection.version.unboundVersion")),
-          versionQuickFixes(getUnboundVersionFixers)(pkg, versionConstraint, element) ++ List(new ExcludePatternAction(pkg)) ++
-            packageVendorPattern(pkg).map(new ExcludePatternAction(_)).toList
-          )
+    version
+      .filter(!_.isBounded)
+      .map(versionConstraint => (
+        Some(ComposerBundle.message("inspection.version.unboundVersion")),
+        versionQuickFixes(getUnboundVersionFixers)(pkg, versionConstraint, element) ++ List(new ExcludePatternAction(pkg)) ++
+          packageVendorPattern(pkg).map(new ExcludePatternAction(_)).toList
         )
-        .toList
-    }
+      )
+      .toList
   }
 
   private def versionQuickFixes(fixers: Seq[Constraint => Option[Constraint]])(
@@ -189,5 +185,4 @@ private object PackageVersionAnnotator {
   val pattern = packageElement.afterLeaf(":")
   val `HighlightSeverity.SUGGESTION` =
     new HighlightSeverity(HighlightSeverity.INFORMATION.myName, HighlightSeverity.WEAK_WARNING.myVal - 2)
-  val packagesAllowedWithUnboundedVersion = Set("roave/security-advisories")
 }

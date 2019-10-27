@@ -82,7 +82,13 @@ class ProjectSettings extends PersistentStateComponent[Element] {
       patternValue <- Option(patternAttr.getValue).toList
     } yield new PatternItem(patternValue)
 
-    patterns.foreach(unboundedVersionInspectionSettings.addExcludedPattern)
+    if(patterns.isEmpty) {
+      // default value
+      unboundedVersionInspectionSettings.addExcludedPattern(new PatternItem("roave/security-advisories"))
+    } else {
+      unboundedVersionInspectionSettings.clear()
+      patterns.foreach(unboundedVersionInspectionSettings.addExcludedPattern)
+    }
   }
 
   private def loadCustomRepositoriesState(state: Element): Unit = {
@@ -132,21 +138,21 @@ object ProjectSettings {
   def apply(project: Project): ProjectSettings = getInstance(project)
 
   class UnboundedVersionInspectionSettings private[ProjectSettings]() extends TabularSettings[PatternItem] {
-    private val excludedPatterns: mutable.Set[PatternItem] = mutable.Set()
+    private val excludedPatterns: mutable.MutableList[PatternItem] = mutable.MutableList()
 
     def isExcluded(s: String): Boolean = excludedPatterns.exists(_.matches(s))
 
     override def getValues(): java.util.List[PatternItem] = {
-      excludedPatterns.map(_.clone).toList.asJava
+      excludedPatterns.map(_.clone).distinct.asJava
     }
 
     override def setValues(@NotNull patterns: java.util.List[PatternItem]) {
       excludedPatterns.clear()
-      patterns.asScala.map(_.clone).foreach(excludedPatterns.add)
+      patterns.asScala.map(_.clone).distinct.foreach(excludedPatterns.+=)
     }
 
     def addExcludedPattern(@NotNull pattern: PatternItem) {
-      excludedPatterns.add(pattern.clone)
+      excludedPatterns += pattern.clone
     }
 
     private[settings] def getConfigurationForScala = excludedPatterns
