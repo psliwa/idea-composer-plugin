@@ -103,6 +103,16 @@ class MisconfigurationInspectionTest extends InspectionTest {
     )
   }
 
+  def testLicenseProperty_itIsDefinedAsArray_warningShouldNotBeReported() = {
+    checkInspection(
+      s"""
+         |{
+         |  "name": "aaa/bbb",
+         |  "license": ["proprietary"]
+         |}
+      """.stripMargin
+    )
+  }
 
   def testTypeProperty_typeIsComposerInstaller_warningShouldBeReported() = {
     checkInspection(

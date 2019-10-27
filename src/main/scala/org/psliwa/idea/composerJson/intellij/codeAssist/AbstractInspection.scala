@@ -28,4 +28,6 @@ abstract class AbstractInspection extends LocalInspectionTool {
   }
 
   protected def collectProblems(element: PsiElement, schema: Schema, problems: ProblemsHolder): Unit
+
+  override def getStaticDescription: String = ""
 }

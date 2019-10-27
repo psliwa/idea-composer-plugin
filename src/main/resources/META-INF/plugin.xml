@@ -272,6 +272,7 @@ This plugin adds auto completion and inspections support for composer.json file 
                 level="ERROR"
                 enabledByDefault="true"
                 groupKey="inspection.group"
+                hasStaticDescription="true"
                 />
         <localInspection
                 bundle="org.psliwa.idea.composerJson.messages.ComposerBundle"
@@ -281,6 +282,7 @@ This plugin adds auto completion and inspections support for composer.json file 
                 enabledByDefault="true"
                 level="WARNING"
                 groupKey="inspection.group"
+                hasStaticDescription="true"
                 />
         <localInspection
                 bundle="org.psliwa.idea.composerJson.messages.ComposerBundle"
@@ -290,6 +292,7 @@ This plugin adds auto completion and inspections support for composer.json file 
                 enabledByDefault="true"
                 level="WEAK WARNING"
                 groupKey="inspection.group"
+                hasStaticDescription="true"
                 />
         <localInspection
                 bundle="org.psliwa.idea.composerJson.messages.ComposerBundle"
@@ -299,6 +302,7 @@ This plugin adds auto completion and inspections support for composer.json file 
                 enabledByDefault="true"
                 level="WEAK WARNING"
                 groupKey="inspection.group"
+                hasStaticDescription="true"
                 />
         <localInspection
                 bundle="org.psliwa.idea.composerJson.messages.ComposerBundle"
@@ -308,6 +312,7 @@ This plugin adds auto completion and inspections support for composer.json file 
                 enabledByDefault="true"
                 level="WEAK WARNING"
                 groupKey="inspection.group"
+                hasStaticDescription="true"
                 />
         <annotator
                 language="JSON"

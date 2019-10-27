@@ -5,6 +5,7 @@ import com.intellij.psi.PsiElement
 import org.psliwa.idea.composerJson.intellij.PsiExtractors
 import PropertyPath._
 import org.psliwa.idea.composerJson.intellij.PsiElements._
+import scala.collection.JavaConverters._
 
 import scala.util.matching.Regex
 
@@ -45,6 +46,7 @@ private[codeAssist] object Condition {
     element match {
       case JsonStringLiteral(value) => Some(value)
       case JsonBooleanLiteral(value) => Some(value)
+      case JsonArray(value) => Some(value.asScala.toList)
       case _ => None
     }
   }
