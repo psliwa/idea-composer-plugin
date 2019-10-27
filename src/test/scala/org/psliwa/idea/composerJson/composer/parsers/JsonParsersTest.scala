@@ -106,8 +106,7 @@ class JsonParsersTest {
 
       val result = JsonParsers.parseLockPackages(json)
 
-      assertTrue(packagesKey, result.isSuccess)
-      assertEquals(packagesKey, ComposerPackages(ComposerPackage("ps/image-optimizer", "1.0.0", dev), ComposerPackage("ps/fluent-traversable", "0.3.0", dev, Some("url"))), result.get)
+      assertEquals(packagesKey, ComposerPackages(ComposerPackage("ps/image-optimizer", "1.0.0", dev), ComposerPackage("ps/fluent-traversable", "0.3.0", dev, Some("url"))), result)
     })
   }
 
@@ -117,7 +116,7 @@ class JsonParsersTest {
 
     val result = JsonParsers.parseLockPackages(json)
 
-    assertTrue(result.isFailure)
+    assertTrue(result.isEmpty)
   }
 
   @Test

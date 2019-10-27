@@ -54,35 +54,33 @@ object JsonParsers {
     versions.map(Try(_)).getOrElse(Failure(new ParseException()))
   }
 
-  def parseLockPackages(data: String): Try[ComposerPackages] = {
+  def parseLockPackages(data: String): ComposerPackages = {
     import scalaz.Scalaz._
 
-    def parse(property: String, dev: Boolean) = for {
-      result <- JSON.parse(data)
-      o <- tryJsonObject(result)
-      packagesElement <- o.fields.get(property)
-      packagesArray <- tryJsonArray(packagesElement)
+    def parse(property: String, dev: Boolean): List[ComposerPackage] = for {
+      result <- JSON.parse(data).toList
+      o <- tryJsonObject(result).toList
+      packagesElement <- o.fields.get(property).toList
+      packagesArray <- tryJsonArray(packagesElement).toList
       packages <- packagesArray.elements.traverse(createLockPackage(dev))
-    } yield packages
+      pkg <- packages
+    } yield pkg
 
-    val packages = for {
-      prodPackages <- parse("packages", dev = false).orElse(Some(List()))
-      devPackages <- parse("packages-dev", dev = true).orElse(Some(List()))
-    } yield prodPackages ++ devPackages
+    val packages = parse("packages", dev = false) ++ parse("packages-dev", dev = true)
 
-    packages match {
-      case Some(pkgs) if pkgs.nonEmpty => Try(ComposerPackages(pkgs: _*))
-      case _ => Failure(new ParseException)
-    }
+    ComposerPackages(packages:_*)
   }
 
-  private def createLockPackage(dev: Boolean)(maybeJsonObject: JsValue): Option[ComposerPackage] = {
+  private def createLockPackage(dev: Boolean)(maybeJsonObject: JsValue): List[ComposerPackage] = {
     for {
-      jsonObject <- tryJsonObject(maybeJsonObject)
-      name <- jsonObject.fields.get("name").flatMap(tryJsonString)
-      version <- jsonObject.fields.get("version").flatMap(tryJsonString)
+      jsonObject <- tryJsonObject(maybeJsonObject).toList
+      name <- jsonObject.fields.get("name").flatMap(tryJsonString).toList
+      version <- jsonObject.fields.get("version").flatMap(tryJsonString).toList
       homepage = jsonObject.fields.get("homepage").flatMap(tryJsonString)
-    } yield ComposerPackage(name, version, dev, homepage)
+      replaces = jsonObject.fields.get("replace").flatMap(tryJsonObject).map(_.fields.keySet).getOrElse(Set.empty)
+      packages = ComposerPackage(name, version, dev, homepage) :: replaces.toList.map(ComposerPackage(_, version, dev, None))
+      pkg <- packages
+    } yield pkg
   }
 
   private def parsePackagesFromPackagesJson(data: String): Try[RepositoryPackages] = {

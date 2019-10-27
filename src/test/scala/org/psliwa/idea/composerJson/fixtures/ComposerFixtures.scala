@@ -18,20 +18,34 @@ object ComposerFixtures {
     writeAction(() => VfsUtil.saveText(file, text))
   }
 
-  private def makePackagesJson(pkgs: Iterable[ComposerPackage]): String = {
+  private def makePackagesJson(pkgs: Iterable[ComposerPackageWithReplaces]): String = {
+    def makeReplacesJson(pkg: ComposerPackageWithReplaces): String = {
+      if(pkg.replaces.isEmpty) {
+        ""
+      } else {
+        def x(pkg: String): String = s""""$pkg":"""""
+        s"""
+          |,"replace": {
+          |${pkg.replaces.map(x).mkString(",")}
+          |}
+          |""".stripMargin
+      }
+    }
+
     pkgs.map( pkg =>
       s"""{
-          |  "name": "${pkg.name}",
-          |  ${pkg.homepage.map(homepage => s""""homepage":"$homepage",""").getOrElse("")}
-          |  "version": "${pkg.version}"
+          |  "name": "${pkg.pkg.name}",
+          |  ${pkg.pkg.homepage.map(homepage => s""""homepage":"$homepage",""").getOrElse("")}
+          |  "version": "${pkg.pkg.version}"
+          |  ${makeReplacesJson(pkg)}
           |}
         """.stripMargin
     ).mkString(",\n")
   }
 
-  def createComposerLock(fixture: CodeInsightTestFixture, packages: ComposerPackages, dir: String = ".") = {
+  def createComposerLock(fixture: CodeInsightTestFixture, packages: List[ComposerPackageWithReplaces], dir: String = "."): VirtualFile = {
 
-    val (devPackages, prodPackages) = packages.values.partition(_.isDev)
+    val (devPackages, prodPackages) = packages.partition(_.pkg.isDev)
 
     val devPackagesJson = makePackagesJson(devPackages)
     val prodPackagesJson = makePackagesJson(prodPackages)
@@ -54,4 +68,6 @@ object ComposerFixtures {
 
     file
   }
+
+  case class ComposerPackageWithReplaces(pkg: ComposerPackage, replaces: Set[String] = Set.empty)
 }

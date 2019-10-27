@@ -1,10 +1,11 @@
 package org.psliwa.idea.composerJson.intellij.codeAssist.composer.versionRenderer
 
 import com.intellij.openapi.application.ApplicationManager
-import org.psliwa.idea.composerJson.fixtures.ComposerFixtures._
-import org.psliwa.idea.composerJson.composer.ComposerPackages
-import org.psliwa.idea.composerJson.composer.ComposerPackage
+import com.intellij.openapi.vfs.VirtualFile
 import org.junit.Assert._
+import org.psliwa.idea.composerJson.composer.ComposerPackage
+import org.psliwa.idea.composerJson.fixtures.ComposerFixtures
+import org.psliwa.idea.composerJson.fixtures.ComposerFixtures._
 import org.psliwa.idea.composerJson.intellij.codeAssist.InspectionTest
 
 class PackageVersionInspectionTest extends InspectionTest {
@@ -25,7 +26,7 @@ class PackageVersionInspectionTest extends InspectionTest {
   }
 
   def testGivenInstalledPackage_itsVersionShouldBeCollected(): Unit = {
-    createComposerLock(myFixture, ComposerPackages(ComposerPackage("some/pkg", "1.0.1")), ".")
+    createComposerLock(List(ComposerPackage("some/pkg", "1.0.1")), ".")
 
     checkInspection(
       s"""
@@ -38,6 +39,11 @@ class PackageVersionInspectionTest extends InspectionTest {
     )
 
     assertPackageVersions(List(PackageVersion(myFixture.getCaretOffset, "1.0.1")))
+  }
+
+
+  private def createComposerLock(packages: List[ComposerPackage], dir: String = "."): VirtualFile = {
+    ComposerFixtures.createComposerLock(myFixture, packages.map(ComposerPackageWithReplaces(_, Set.empty)), dir)
   }
 
   private def assertPackageVersions(expected: List[PackageVersion]): Unit = {

@@ -10,7 +10,7 @@ class InstalledPackagesTest extends BasePlatformTestCase {
 
   var composerJsonFile: VirtualFile = _
 
-  override def setUp() = {
+  override def setUp(): Unit = {
     super.setUp()
     composerJsonFile = createComposerJson()
   }
@@ -32,6 +32,14 @@ class InstalledPackagesTest extends BasePlatformTestCase {
     createComposerLock(packages)
 
     assertEquals(packages, installedPackages())
+  }
+
+  def testGivenComposerLockPackageWithReplacesProperty_installedPackagesShouldBeReplacedPackagesAsWell(): Unit = {
+    val packages = List(ComposerPackageWithReplaces(ComposerPackage("vendor/name", "1.0.0"), Set("replaced/name")))
+    ComposerFixtures.createComposerLock(myFixture, packages)
+
+    val expectedPackages = ComposerPackages(ComposerPackage("vendor/name", "1.0.0"), ComposerPackage("replaced/name", "1.0.0"))
+    assertEquals(expectedPackages, installedPackages())
   }
 
   def testGivenTwoComposerLockInDifferentLocations_installedPackagesDependOnRequestedFile() = {
@@ -67,7 +75,7 @@ class InstalledPackagesTest extends BasePlatformTestCase {
     assertTrue(installedPackages().isEmpty)
   }
 
-  def testGivenComposerLockWithFewPackages_moveIt_givenComposerJsonInMoveDest_installedPackagesShouldBeTheSame() = {
+  def testGivenComposerLockWithFewPackages_moveIt_givenComposerJsonInMoveDest_installedPackagesShouldBeTheSame(): Unit = {
     val packages = ComposerPackages(ComposerPackage("vendor/name", "1.0.0"))
     val file = createComposerLock(packages)
 
@@ -77,6 +85,7 @@ class InstalledPackagesTest extends BasePlatformTestCase {
     assertEquals(packages, installedPackages(composerJson))
   }
 
-  private def createComposerLock(packages: ComposerPackages, dir: String = ".") = ComposerFixtures.createComposerLock(myFixture, packages, dir)
+  private def createComposerLock(packages: ComposerPackages, dir: String = "."): VirtualFile =
+    ComposerFixtures.createComposerLock(myFixture, packages.values.toList.map(ComposerPackageWithReplaces(_, Set.empty)), dir)
   private def createComposerJson(dir: String = ".") = ComposerFixtures.createComposerJson(myFixture, dir)
 }

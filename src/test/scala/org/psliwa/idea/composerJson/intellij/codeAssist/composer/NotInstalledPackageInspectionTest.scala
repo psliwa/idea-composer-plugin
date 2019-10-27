@@ -1,6 +1,8 @@
 package org.psliwa.idea.composerJson.intellij.codeAssist.composer
 
+import com.intellij.openapi.vfs.VirtualFile
 import org.psliwa.idea.composerJson.composer
+import org.psliwa.idea.composerJson.fixtures.ComposerFixtures
 import org.psliwa.idea.composerJson.fixtures.ComposerFixtures._
 import org.psliwa.idea.composerJson.intellij.codeAssist.InspectionTest
 
@@ -35,7 +37,26 @@ class NotInstalledPackageInspectionTest extends InspectionTest {
   }
 
   def testGivenInstalledPackage_thatShouldNotBeReported() = {
-    createComposerLock(myFixture, composer.ComposerPackages(composer.ComposerPackage("vendor/pkg", "1.0.2")))
+    createComposerLock(composer.ComposerPackages(composer.ComposerPackage("vendor/pkg", "1.0.2")))
+
+    checkInspection(
+      """
+        |{
+        |  "require": {
+        |    "vendor/pkg": "1.0.2"
+        |  }
+        |}
+      """.stripMargin)
+  }
+
+  private def createComposerLock(packages: composer.ComposerPackages): VirtualFile = {
+    ComposerFixtures.createComposerLock(myFixture, packages.values.toList.map(ComposerPackageWithReplaces(_, Set.empty)))
+  }
+
+  def testGivenNotInstalledPackage_butReplacementIsInstalled_thatShouldNotBeReported(): Unit = {
+    ComposerFixtures.createComposerLock(myFixture, List(ComposerPackageWithReplaces(
+      composer.ComposerPackage("replacement/pkg", "1.0.2"), Set("vendor/pkg"))
+    ))
 
     checkInspection(
       """
@@ -48,7 +69,7 @@ class NotInstalledPackageInspectionTest extends InspectionTest {
   }
 
   def testGivenInstalledPackage_givenPackageNameInDifferentCase_thatShouldNotBeReported() = {
-    createComposerLock(myFixture, composer.ComposerPackages(composer.ComposerPackage("veNdor/pkg", "1.0.2")))
+    createComposerLock(composer.ComposerPackages(composer.ComposerPackage("veNdor/pkg", "1.0.2")))
 
     checkInspection(
       """
@@ -72,7 +93,7 @@ class NotInstalledPackageInspectionTest extends InspectionTest {
   }
 
   def testGivenInstalledProdPackage_thatPackageIsOnlyInRequireDev_thatShouldNotBeReported() = {
-    createComposerLock(myFixture, composer.ComposerPackages(composer.ComposerPackage("vendor/pkg", "1.0.2")))
+    createComposerLock(composer.ComposerPackages(composer.ComposerPackage("vendor/pkg", "1.0.2")))
 
     checkInspection(
       """
@@ -96,7 +117,7 @@ class NotInstalledPackageInspectionTest extends InspectionTest {
   }
 
   def testGivenInstalledDevPackage_thatPackageIsOnlyInRequireDev_thatShouldNotBeReported() = {
-    createComposerLock(myFixture, composer.ComposerPackages(composer.ComposerPackage("vendor/pkg", "1.0.2", isDev = true)))
+    createComposerLock(composer.ComposerPackages(composer.ComposerPackage("vendor/pkg", "1.0.2", isDev = true)))
 
     checkInspection(
       """
@@ -109,7 +130,7 @@ class NotInstalledPackageInspectionTest extends InspectionTest {
   }
 
   def testGivenInstalledDevPackage_thatPackageIsOnlyInRequire_thatShouldBeReported() = {
-    createComposerLock(myFixture, composer.ComposerPackages(composer.ComposerPackage("vendor/pkg", "1.0.2", isDev = true)))
+    createComposerLock(composer.ComposerPackages(composer.ComposerPackage("vendor/pkg", "1.0.2", isDev = true)))
 
     checkInspection(
       """
