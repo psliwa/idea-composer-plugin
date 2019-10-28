@@ -34,6 +34,10 @@
       "description": "Homepage URL for the project.",
       "format": "uri"
     },
+    "readme": {
+      "type": "string",
+      "description": "Relative path to the readme document."
+    },
     "version": {
       "type": "string",
       "description": "Package version."
@@ -246,10 +250,6 @@
           "type": "boolean",
           "description": "Always optimize when dumping the autoloader."
         },
-        "sort-packages": {
-          "type": "boolean",
-          "description": "The \"require\" command keeps packages sorted by name in composer.json when adding a new package."
-        },
         "prepend-autoloader": {
           "type": "boolean",
           "description": "If false, the composer autoloader will not be prepended to existing autoloaders, defaults to true."
@@ -280,6 +280,10 @@
             "type": "string"
           }
         },
+        "use-github-api": {
+          "type": "boolean",
+          "description": "Defaults to true.  If set to false, globally disables the use of the GitHub API for all GitHub repositories and clones the repository as it would for any other repository."
+        },
         "archive-format": {
           "type": "string",
           "description": "The default archiving format when not provided on cli, defaults to \"tar\"."
@@ -287,6 +291,18 @@
         "archive-dir": {
           "type": "filePath",
           "description": "The default archive path when not provided on cli, defaults to \".\"."
+        },
+        "htaccess-protect": {
+          "type": "boolean",
+          "description": "Defaults to true. If set to false, Composer will not create .htaccess files in the composer home, cache, and data directories."
+        },
+        "sort-packages": {
+          "type": "boolean",
+          "description": "Defaults to false. If set to true, Composer will sort packages when adding/updating a new dependency."
+        },
+        "lock": {
+          "type": "boolean",
+          "description": "Defaults to true. If set to false, Composer will not create a composer.lock file."
         }
       }
     },
@@ -407,11 +423,11 @@
       "description": "If set to true, stable packages will be preferred to dev packages when possible, even if the minimum-stability allows unstable packages."
     },
     "bin": {
-      "type": "array",
-      "description": "A set of files that should be treated as binaries and symlinked into bin-dir (from config).",
-      "items": {
-        "type": "filePath"
-      }
+      "oneOf": [
+        { "type":  "filePath" },
+        { "type": "array", "items": { "type": "filePath" } }
+      ],
+      "description": "A set of files that should be treated as binaries and symlinked into bin-dir (from config)."
     },
     "include-path": {
       "type": "array",
@@ -571,6 +587,11 @@
         "irc": {
           "type": "string",
           "description": "IRC channel for support, as irc://server/channel."
+        },
+        "chat": {
+          "type": "string",
+          "description": "URL to the support chat.",
+          "format": "uri"
         },
         "source": {
           "type": "string",
@@ -820,7 +841,9 @@
           "format": "uri"
         },
         "version": {
-          "type": "string"
+          "type": "string",
+          "description": "Package version, see https://getcomposer.org/doc/04-schema.md#version for more info on valid schemes.",
+          "pattern": "^v?\\d+(((\\.\\d+)?\\.\\d+)?\\.\\d+)?"
         },
         "time": {
           "type": "string"
@@ -886,11 +909,11 @@
           }
         },
         "bin": {
-          "type": ["array"],
-          "description": "A set of files that should be treated as binaries and symlinked into bin-dir (from config).",
-          "items": {
-            "type": "string"
-          }
+          "oneOf": [
+            { "type":  "filePath" },
+            { "type": "array", "items": { "type": "filePath" } }
+          ],
+          "description": "A set of files that should be treated as binaries and symlinked into bin-dir (from config)."
         },
         "include-path": {
           "type": ["array"],

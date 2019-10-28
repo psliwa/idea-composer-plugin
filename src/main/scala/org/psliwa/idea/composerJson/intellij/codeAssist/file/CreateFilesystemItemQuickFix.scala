@@ -78,7 +78,7 @@ private object CreateFilesystemItemQuickFix {
 
       createFilePath(dir, getPath.split("/").filter(!_.isEmpty).toList)
         .left.map(notifyError)
-        .right.filter(_ => !isUnitTestMode).foreach(x => x.right.foreach(_.navigate(false)))
+        .right.filter(_ => !isUnitTestMode).foreach(_.right.foreach(navigateTo))
     }
 
     private def isUnitTestMode = ApplicationManager.getApplication.isUnitTestMode
@@ -92,6 +92,10 @@ private object CreateFilesystemItemQuickFix {
           NotificationType.ERROR
         )
       )
+    }
+
+    private def navigateTo(item: PsiFileSystemItem): Unit = {
+      ApplicationManager.getApplication.invokeLater(() => item.navigate(false))
     }
 
     override def getFamilyName: String = ComposerBundle.message("inspection.group")

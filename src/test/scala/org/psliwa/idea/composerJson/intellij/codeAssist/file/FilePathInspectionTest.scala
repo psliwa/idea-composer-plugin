@@ -12,11 +12,33 @@ class FilePathInspectionTest extends InspectionTest {
     myFixture.enableInspections(classOf[FilePathInspection])
   }
 
-  def testGivenFilePathElement_givenFilePathDoesNotExist_warningShouldBeReported() = {
+  def testGivenFilePathElementInArray_givenFilePathDoesNotExist_warningShouldBeReported() = {
     checkInspection(
       """
         |{
         |  "bin": [ <warning descr="File 'some/unexisting' does not exist.">"some/unexisting"</warning> ]
+        |}
+      """.stripMargin
+    )
+  }
+
+  def testGivenFilePathElement_givenFilePathDoesNotExist_warningShouldBeReported() = {
+    checkInspection(
+      """
+        |{
+        |  "bin": <warning descr="File 'some/unexisting' does not exist.">"some/unexisting"</warning>
+        |}
+      """.stripMargin
+    )
+  }
+
+  def testGivenFilePathElementInArray_givenExistingFilePath_warningShouldNotBeReported() = {
+    writeAction(() => myFixture.getTempDirFixture.findOrCreateDir("some").createChildData(this, "existing"))
+
+    checkInspection(
+      """
+        |{
+        |  "bin": [ "some/existing" ]
         |}
       """.stripMargin
     )
@@ -28,7 +50,7 @@ class FilePathInspectionTest extends InspectionTest {
     checkInspection(
       """
         |{
-        |  "bin": [ "some/existing" ]
+        |  "bin": "some/existing"
         |}
       """.stripMargin
     )
