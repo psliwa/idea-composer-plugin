@@ -160,7 +160,7 @@ lazy val proguard: Project = (project in file("subprojects/proguard"))
   .settings(
     artifactPath := getBaseDir(baseDirectory.value) / "target" / "composer-json-plugin-proguard.zip",
     pack := {
-      val proguardUrl = "https://github.com/psliwa/proguard-fixd/raw/master/proguard6.0.3.jar"
+      val proguardUrl = "https://github.com/psliwa/proguard-fixd/raw/master/proguard6.2.0.jar"
       val proguardDest: File = getBaseDir(baseDirectory.value) / "proguard.jar"
 
       if(!proguardDest.exists()) {
@@ -173,7 +173,6 @@ lazy val proguard: Project = (project in file("subprojects/proguard"))
 
       val libraryJars = (javaRt :: ideaFullJars.in(root).value.map(_.data).toList)
         .map(_.getAbsolutePath)
-        .filterNot(_.contains("jshell")) // it is java 9.0 jar, this proguard version doesn't support it.
         .map(escape)
         .mkString(sys.props.getOrElse("path.separator", ":"))
 
