@@ -78,8 +78,7 @@ class FilePathReferenceTest extends CompletionTest {
         |    "some-vendor/some-pkg<caret>": ""
         |  }
         |}
-      """.stripMargin,
-      e => e.getParent.getParent
+      """.stripMargin
     )
 
     assertEquals(2, references.length)

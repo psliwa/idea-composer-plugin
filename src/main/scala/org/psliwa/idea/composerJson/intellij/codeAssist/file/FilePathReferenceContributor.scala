@@ -22,7 +22,7 @@ class FilePathReferenceContributor extends AbstractReferenceContributor  {
     case SPackages => {
       val property = psiElement(classOf[JsonProperty]).withParent(psiElement(classOf[JsonObject]).withParent(parent))
       List(
-        new ReferenceMatcher(property, PackageReferenceProvider),
+        new ReferenceMatcher(psiElement().beforeLeaf(":").withParent(property), PackageReferenceProvider),
         new ReferenceMatcher(psiElement().afterLeaf(":").withParent(property), PackageVersionReferenceProvider)
       )
     }
