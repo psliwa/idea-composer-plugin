@@ -11,14 +11,16 @@ import org.psliwa.idea.composerJson.intellij.codeAssist.problem.ProblemDescripto
 import org.psliwa.idea.composerJson.json._
 import org.psliwa.idea.composerJson.util.Files._
 
+import scala.collection.immutable
+
 class FilePathInspection extends AbstractInspection {
   // TODO: refactor with SchemaInspection or move common logic to AbstractInspection
   override protected def collectProblems(element: PsiElement, schema: Schema, problems: ProblemsHolder): Unit = {
-    val collectedProblems = collectProblems(element, schema).toSet
+    val collectedProblems = collectProblems(element, schema).toSet.flatten
     collectedProblems.foreach(problem => problems.registerProblem(problem.element, problem.message.getOrElse(""), problem.quickFixes:_*))
   }
 
-  private def collectProblems(element: PsiElement, schema: Schema): Seq[ProblemDescriptor[LocalQuickFix]] = {
+  private def collectProblems(element: PsiElement, schema: Schema): Option[Seq[ProblemDescriptor[LocalQuickFix]]] = {
     import scala.collection.JavaConverters._
 
     val maybeRootDir = Option(element.getContainingFile).flatMap(file => Option(file.getContainingDirectory))
@@ -28,65 +30,91 @@ class FilePathInspection extends AbstractInspection {
         schema match {
           case SObject(schemaProperties, _) => element match {
             case JsonObject(properties) => {
-              for {
+              val problemsPerProperty = for {
                 property <- properties.asScala
                 schemaProperty <- schemaProperties.get(property.getName).toList
                 value <- Option(property.getValue).toList
-                problem <- collectProblems(value, schemaProperty.schema)
-              } yield problem
+                problems = collectProblems(value, schemaProperty.schema)
+              } yield problems
+
+              bestMatchingProblems(problemsPerProperty)
             }
             case _ =>
-              List.empty
+              None
           }
           case SArray(itemType) => element match {
             case JsonArray(values) =>
-              values.asScala.flatMap(collectProblems(_, itemType))
+              val problems = values.asScala.toList.map(collectProblems(_, itemType))
+              if(problems.forall(_.isEmpty)) {
+                None
+              } else {
+                Some(problems.flatten.flatten)
+              }
             case _ =>
-              List.empty
+              None
           }
           case SOr(items) =>
-            items.flatMap(collectProblems(element, _))
+            val problemsPerItem = items.map(collectProblems(element, _))
+            problemsPerItem.collect {
+              case Some(problems) => problems
+            }.sortBy(_.size).headOption
           case SFilePath(true) => element match {
             case jsl@JsonStringLiteral(value) => {
               if(!pathExists(rootDir, value)) {
-                List(
+                Some(List(
                   ProblemDescriptor(element, ComposerBundle.message("inspection.filePath.fileMissing", value), Seq(
                     CreateFilesystemItemQuickFix.file(jsl), CreateFilesystemItemQuickFix.directory(jsl), removeValueQuickFix(element)
                   ))
-                )
+                ))
               } else {
-                List.empty
+                Some(List.empty)
               }
             }
             case _ =>
-              List.empty
+              None
           }
           case SFilePaths(true) => element match {
             case JsonObject(properties) =>
-              properties.asScala.flatMap(property => Option(property.getValue)).flatMap(collectProblems(_, schema))
+              val problems = properties.asScala.flatMap(property => Option(property.getValue)).map(collectProblems(_, schema))
+              bestMatchingProblems(problems)
             case jsl@JsonStringLiteral(value) => {
               if(!pathExists(rootDir, value)) {
-                List(
+                Some(List(
                   ProblemDescriptor(element, ComposerBundle.message("inspection.filePath.fileMissing", value), Seq(
                     CreateFilesystemItemQuickFix.file(jsl),
                     CreateFilesystemItemQuickFix.directory(jsl),
                     removePropertyQuickFix(getPropertyIfPossible(element))
                   ))
-                )
+                ))
               } else {
-                List.empty
+                Some(List.empty)
               }
             }
             case JsonArray(values) =>
-              values.asScala.flatMap(collectProblems(_, schema))
+              val problems: immutable.Seq[Option[Seq[ProblemDescriptor[LocalQuickFix]]]] = values.asScala.toList.map(collectProblems(_, schema))
+              bestMatchingProblems(problems)
             case _ =>
-              List.empty
+              None
+          }
+          case _: SString => element match {
+            case JsonStringLiteral(_) =>
+              Some(List.empty)
+            case _ =>
+              None
           }
           case _ =>
-            List.empty
+            None
         }
       case None =>
-        List.empty
+        None
+    }
+  }
+
+  private def bestMatchingProblems[Problem](problems: Seq[Option[Seq[Problem]]]): Option[Seq[Problem]] = {
+    if(problems.forall(_.isEmpty)) {
+      None
+    } else {
+      Some(problems.flatten.flatten)
     }
   }
 

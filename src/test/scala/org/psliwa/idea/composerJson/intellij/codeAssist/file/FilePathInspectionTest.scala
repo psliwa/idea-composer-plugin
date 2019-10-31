@@ -195,4 +195,19 @@ class FilePathInspectionTest extends InspectionTest {
       case e: ComparisonFailure => //ignore syntax error assertionError, check only scala MatchFailure
     }
   }
+
+  def testFilepathButAlsoAcceptsUrl_givenValidUrl_warningShouldNotBeReported() = {
+    checkInspection(
+      """
+        |{
+        |  "repositories": [
+        |    {
+        |      "type": "composer",
+        |      "url": "https://composer.typo3.org/"
+        |    }
+        |  ]
+        |}
+      """.stripMargin
+    )
+  }
 }
