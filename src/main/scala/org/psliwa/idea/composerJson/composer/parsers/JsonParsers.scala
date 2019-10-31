@@ -62,8 +62,8 @@ object JsonParsers {
       o <- tryJsonObject(result).toList
       packagesElement <- o.fields.get(property).toList
       packagesArray <- tryJsonArray(packagesElement).toList
-      packages <- packagesArray.elements.traverse(createLockPackage(dev))
-      pkg <- packages
+      packageElement <- packagesArray.elements
+      pkg <- createLockPackage(dev)(packageElement)
     } yield pkg
 
     val packages = parse("packages", dev = false) ++ parse("packages-dev", dev = true)

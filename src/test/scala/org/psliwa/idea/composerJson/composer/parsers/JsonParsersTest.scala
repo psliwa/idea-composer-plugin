@@ -1,8 +1,13 @@
 package org.psliwa.idea.composerJson.composer.parsers
 
+import java.io.File
+
+import com.intellij.openapi.application.PathManager
 import org.junit.Assert._
 import org.junit.Test
 import org.psliwa.idea.composerJson.composer.{ComposerPackage, ComposerPackages}
+
+import scala.io.Source
 
 class JsonParsersTest {
   @Test
@@ -117,6 +122,24 @@ class JsonParsersTest {
     val result = JsonParsers.parseLockPackages(json)
 
     assertTrue(result.isEmpty)
+  }
+
+  @Test
+  def parseRealComposerLockFile(): Unit = {
+    val composerLockContent: String = readFileFromClasspath("composer.lock")
+
+    val result = JsonParsers.parseLockPackages(composerLockContent)
+
+    assertTrue(result.nonEmpty)
+  }
+
+  private def readFileFromClasspath(filepath: String) = {
+    val file = new File(s"${PathManager.getHomePath}/../../src/test/resources/org/psliwa/idea/composerJson/$filepath")
+    val source = Source.fromFile(file)
+    val fileContent: String = source.mkString
+    source.close()
+
+    fileContent
   }
 
   @Test
