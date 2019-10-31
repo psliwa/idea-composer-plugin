@@ -42,6 +42,6 @@ class ValidComposerJsonFilesInspectionTest extends InspectionTest {
 
   private def checkComposerJson(pkg: String): Unit = {
     myFixture.copyDirectoryToProject(pkg, "/")
-    myFixture.testHighlighting(true, false, true, "/composer.json")
+    myFixture.testHighlighting(true, false, true, "composer.json")
   }
 }
