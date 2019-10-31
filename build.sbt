@@ -91,14 +91,15 @@ lazy val runner = (project in file("subprojects/idea-runner"))
     fork in run := true,
     mainClass in (Compile, run) := Some("com.intellij.idea.Main"),
     javaOptions in run ++= Seq(
-      "-Xmx800m",
-      "-XX:ReservedCodeCacheSize=64m",
+      "-Xmx1024m",
+      "-XX:ReservedCodeCacheSize=256m",
       "-XX:MaxPermSize=250m",
       "-XX:+HeapDumpOnOutOfMemoryError",
       "-ea",
       "-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005",
       "-Didea.is.internal=true",
       "-Didea.debug.mode=true",
+      "-Didea.case.sensitive.fs=true",
       "-Dapple.laf.useScreenMenuBar=true",
       s"-Dplugin.path=${packagedPluginDir.value}",
       "-Didea.ProcessCanceledException=disabled"
