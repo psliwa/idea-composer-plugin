@@ -69,5 +69,5 @@ object ComposerFixtures {
     file
   }
 
-  case class ComposerPackageWithReplaces(pkg: ComposerPackage, replaces: Set[String] = Set.empty)
+  case class ComposerPackageWithReplaces(pkg: PackageDescriptor, replaces: Set[String] = Set.empty)
 }

@@ -5,9 +5,14 @@ import com.intellij.psi.PsiElement
 
 import scala.util.matching.Regex
 
-case class ComposerPackage(name: String, version: String, isDev: Boolean = false, homepage: Option[String] = None)
+case class PackageName(name: String) extends AnyVal
+case class PackageDescriptor(name: String,
+                             version: String,
+                             isDev: Boolean = false,
+                             homepage: Option[String] = None,
+                             replacedBy: Option[PackageDescriptor] = None)
 
-object ComposerPackage {
+object PackageDescriptor {
   def `vendor/package`(s: String): Option[(String, String)] = {
     s.split("/") match {
       case Array(vendor, pkg) => Some((vendor, pkg))

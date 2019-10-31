@@ -55,9 +55,7 @@ object JsonParsers {
   }
 
   def parseLockPackages(data: String): ComposerPackages = {
-    import scalaz.Scalaz._
-
-    def parse(property: String, dev: Boolean): List[ComposerPackage] = for {
+    def parse(property: String, dev: Boolean): List[PackageDescriptor] = for {
       result <- JSON.parse(data).toList
       o <- tryJsonObject(result).toList
       packagesElement <- o.fields.get(property).toList
@@ -71,14 +69,15 @@ object JsonParsers {
     ComposerPackages(packages:_*)
   }
 
-  private def createLockPackage(dev: Boolean)(maybeJsonObject: JsValue): List[ComposerPackage] = {
+  private def createLockPackage(dev: Boolean)(maybeJsonObject: JsValue): List[PackageDescriptor] = {
     for {
       jsonObject <- tryJsonObject(maybeJsonObject).toList
       name <- jsonObject.fields.get("name").flatMap(tryJsonString).toList
       version <- jsonObject.fields.get("version").flatMap(tryJsonString).toList
       homepage = jsonObject.fields.get("homepage").flatMap(tryJsonString)
       replaces = jsonObject.fields.get("replace").flatMap(tryJsonObject).map(_.fields.keySet).getOrElse(Set.empty)
-      packages = ComposerPackage(name, version, dev, homepage) :: replaces.toList.map(ComposerPackage(_, version, dev, None))
+      mainPackage = PackageDescriptor(name, version, dev, homepage)
+      packages = mainPackage :: replaces.toList.map(PackageDescriptor(_, version, dev, None, Some(mainPackage)))
       pkg <- packages
     } yield pkg
   }

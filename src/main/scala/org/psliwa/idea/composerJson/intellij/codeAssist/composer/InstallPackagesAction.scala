@@ -29,7 +29,7 @@ private object InstallPackagesAction extends IntentionAction {
     val packages = for {
       jsonFile <- ensureJsonFile(file).toList
       topValue <- Option(jsonFile.getTopLevelValue).toList
-      pkg <- getNotInstalledPackageProperties(topValue, installedPackages).map(property => composer.ComposerPackage(property.getName, getPackageVersion(property)))
+      pkg <- getNotInstalledPackageProperties(topValue, installedPackages).map(property => composer.PackageName(property.getName))
     } yield pkg
 
     if(packages.nonEmpty) {

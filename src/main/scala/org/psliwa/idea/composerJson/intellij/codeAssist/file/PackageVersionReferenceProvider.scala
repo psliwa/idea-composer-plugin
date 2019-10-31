@@ -2,7 +2,7 @@ package org.psliwa.idea.composerJson.intellij.codeAssist.file
 
 import com.intellij.psi.{PsiReference, PsiElement, PsiReferenceProvider}
 import com.intellij.util.ProcessingContext
-import org.psliwa.idea.composerJson.composer.ComposerPackage._
+import org.psliwa.idea.composerJson.composer.PackageDescriptor._
 import org.psliwa.idea.composerJson.intellij.PsiElements._
 import org.psliwa.idea.composerJson.util.ImplicitConversions._
 

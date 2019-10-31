@@ -11,18 +11,18 @@ import com.jetbrains.php.composer.ComposerDataService
 import com.jetbrains.php.composer.execution.ComposerExecution
 import org.psliwa.idea.composerJson
 import org.psliwa.idea.composerJson.ComposerBundle
-import org.psliwa.idea.composerJson.composer.ComposerPackage
+import org.psliwa.idea.composerJson.composer.PackageName
 import org.psliwa.idea.composerJson.composer.command.DefaultPackagesInstaller.Result
 import org.psliwa.idea.composerJson.intellij.Notifications
 
 import scala.compat.Platform.EOL
 
 trait PackagesInstaller {
-  def install(packages: List[ComposerPackage]): Unit
+  def install(packages: List[PackageName]): Unit
 }
 
 class DefaultPackagesInstaller(project: Project, file: PsiFile) extends PackagesInstaller {
-  override def install(packages: List[ComposerPackage]): Unit = {
+  override def install(packages: List[PackageName]): Unit = {
     try {
       installInBackground(packages)
     } catch {
@@ -32,7 +32,7 @@ class DefaultPackagesInstaller(project: Project, file: PsiFile) extends Packages
     }
   }
 
-  private def installInBackground(packages: List[ComposerPackage]): Unit = {
+  private def installInBackground(packages: List[PackageName]): Unit = {
     val service = project.getComponent(classOf[ComposerDataService])
     if (service.askForValidConfigurationIfNeeded()) {
       val composerExecution = service.getComposerExecution
@@ -128,10 +128,10 @@ class DefaultPackagesInstaller(project: Project, file: PsiFile) extends Packages
     }
   }
 
-  private def handleFailure(packages: List[ComposerPackage], message: String): Unit = {
+  private def handleFailure(packages: List[PackageName], message: String): Unit = {
     val installationFailed = ComposerBundle.message(
       "inspection.notInstalledPackage.errorTitle",
-      packages.map(pkg => pkg.name + " (" + pkg.version + ")").mkString(", ")
+      packages.map(pkg => pkg.name).mkString(", ")
     )
 
     Notifications.error(installationFailed, message, Some(project))

@@ -37,7 +37,7 @@ class NotInstalledPackageInspectionTest extends InspectionTest {
   }
 
   def testGivenInstalledPackage_thatShouldNotBeReported() = {
-    createComposerLock(composer.ComposerPackages(composer.ComposerPackage("vendor/pkg", "1.0.2")))
+    createComposerLock(composer.ComposerPackages(composer.PackageDescriptor("vendor/pkg", "1.0.2")))
 
     checkInspection(
       """
@@ -55,7 +55,7 @@ class NotInstalledPackageInspectionTest extends InspectionTest {
 
   def testGivenNotInstalledPackage_butReplacementIsInstalled_thatShouldNotBeReported(): Unit = {
     ComposerFixtures.createComposerLock(myFixture, List(ComposerPackageWithReplaces(
-      composer.ComposerPackage("replacement/pkg", "1.0.2"), Set("vendor/pkg"))
+      composer.PackageDescriptor("replacement/pkg", "1.0.2"), Set("vendor/pkg"))
     ))
 
     checkInspection(
@@ -69,7 +69,7 @@ class NotInstalledPackageInspectionTest extends InspectionTest {
   }
 
   def testGivenInstalledPackage_givenPackageNameInDifferentCase_thatShouldNotBeReported() = {
-    createComposerLock(composer.ComposerPackages(composer.ComposerPackage("veNdor/pkg", "1.0.2")))
+    createComposerLock(composer.ComposerPackages(composer.PackageDescriptor("veNdor/pkg", "1.0.2")))
 
     checkInspection(
       """
@@ -93,7 +93,7 @@ class NotInstalledPackageInspectionTest extends InspectionTest {
   }
 
   def testGivenInstalledProdPackage_thatPackageIsOnlyInRequireDev_thatShouldNotBeReported() = {
-    createComposerLock(composer.ComposerPackages(composer.ComposerPackage("vendor/pkg", "1.0.2")))
+    createComposerLock(composer.ComposerPackages(composer.PackageDescriptor("vendor/pkg", "1.0.2")))
 
     checkInspection(
       """
@@ -117,7 +117,7 @@ class NotInstalledPackageInspectionTest extends InspectionTest {
   }
 
   def testGivenInstalledDevPackage_thatPackageIsOnlyInRequireDev_thatShouldNotBeReported() = {
-    createComposerLock(composer.ComposerPackages(composer.ComposerPackage("vendor/pkg", "1.0.2", isDev = true)))
+    createComposerLock(composer.ComposerPackages(composer.PackageDescriptor("vendor/pkg", "1.0.2", isDev = true)))
 
     checkInspection(
       """
@@ -130,7 +130,7 @@ class NotInstalledPackageInspectionTest extends InspectionTest {
   }
 
   def testGivenInstalledDevPackage_thatPackageIsOnlyInRequire_thatShouldBeReported() = {
-    createComposerLock(composer.ComposerPackages(composer.ComposerPackage("vendor/pkg", "1.0.2", isDev = true)))
+    createComposerLock(composer.ComposerPackages(composer.PackageDescriptor("vendor/pkg", "1.0.2", isDev = true)))
 
     checkInspection(
       """

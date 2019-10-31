@@ -2,7 +2,7 @@ package org.psliwa.idea.composerJson.intellij.codeAssist.composer
 
 import com.intellij.lang.documentation.DocumentationProvider
 import com.intellij.openapi.vfs.VirtualFile
-import org.psliwa.idea.composerJson.composer.ComposerPackage
+import org.psliwa.idea.composerJson.composer.PackageDescriptor
 import org.psliwa.idea.composerJson.fixtures.ComposerFixtures
 import org.psliwa.idea.composerJson.fixtures.ComposerFixtures._
 import org.psliwa.idea.composerJson.intellij.codeAssist.DocumentationTest
@@ -24,7 +24,7 @@ class PackageDocumentationProviderTest extends DocumentationTest {
   }
 
   def testGivenPackage_homepageExistsInComposerLock_theUrlShouldBeTheSameAsHomepage() = {
-    createComposerLock(List(ComposerPackage("vendor/pkg", "1.0.0", homepage = Some("some/url"))))
+    createComposerLock(List(PackageDescriptor("vendor/pkg", "1.0.0", homepage = Some("some/url"))))
 
     checkDocumentation(
       """
@@ -38,7 +38,7 @@ class PackageDocumentationProviderTest extends DocumentationTest {
     )
   }
 
-  private def createComposerLock(packages: List[ComposerPackage]): VirtualFile = {
+  private def createComposerLock(packages: List[PackageDescriptor]): VirtualFile = {
     ComposerFixtures.createComposerLock(myFixture, packages.map(ComposerPackageWithReplaces(_, Set.empty)))
   }
 }

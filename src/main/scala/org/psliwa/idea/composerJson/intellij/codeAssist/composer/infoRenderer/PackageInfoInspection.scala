@@ -1,20 +1,25 @@
-package org.psliwa.idea.composerJson.intellij.codeAssist.composer.versionRenderer
+package org.psliwa.idea.composerJson.intellij.codeAssist.composer.infoRenderer
 
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.psi.PsiElement
-import org.psliwa.idea.composerJson.composer.InstalledPackages
+import org.psliwa.idea.composerJson.composer.{InstalledPackages, PackageDescriptor}
 import org.psliwa.idea.composerJson.intellij.PsiElements
 import org.psliwa.idea.composerJson.intellij.codeAssist.AbstractInspection
 import org.psliwa.idea.composerJson.json.Schema
 import PsiElements._
+
 import scala.collection.JavaConverters._
 
-class PackageVersionInspection extends AbstractInspection {
+class PackageInfoInspection extends AbstractInspection {
   override protected def collectProblems(element: PsiElement, schema: Schema, problems: ProblemsHolder): Unit = {
     val installedPackages = InstalledPackages.forFile(element.getContainingFile.getVirtualFile)
 
-    val packageVersions = for {
+    def packageInfo(pkg: PackageDescriptor): String = {
+      pkg.replacedBy.map(p => s"replaced by: ${p.name} (${p.version})").getOrElse(pkg.version)
+    }
+
+    val packagesInfo = for {
       jsonObject <- ensureJsonObject(element).toList
       propertyName <- List("require", "require-dev")
       property <- findProperty(jsonObject, propertyName).toList
@@ -23,10 +28,10 @@ class PackageVersionInspection extends AbstractInspection {
       packageProperty <- packagesObject.getPropertyList.asScala
       pkg <- installedPackages.get(packageProperty.getName).toList
     } yield {
-      PackageVersion(packageProperty.getTextOffset, pkg.version)
+      PackageInfo(packageProperty.getTextOffset, packageInfo(pkg))
     }
 
-    Option(ApplicationManager.getApplication.getComponent(classOf[VersionOverlay]))
-      .foreach(_.setPackageVersions(element.getContainingFile.getVirtualFile.getCanonicalPath, packageVersions))
+    Option(ApplicationManager.getApplication.getComponent(classOf[PackageInfoOverlay]))
+      .foreach(_.setPackagesInfo(element.getContainingFile.getVirtualFile.getCanonicalPath, packagesInfo))
   }
 }

@@ -28,25 +28,28 @@ class InstalledPackagesTest extends BasePlatformTestCase {
   }
 
   def testGivenComposerLockWithFewPackages_installedPackagesShouldBeTheSame() = {
-    val packages = ComposerPackages(ComposerPackage("vendor/name", "1.0.0"), ComposerPackage("vendor2/name2", "2.0.0"))
+    val packages = ComposerPackages(PackageDescriptor("vendor/name", "1.0.0"), PackageDescriptor("vendor2/name2", "2.0.0"))
     createComposerLock(packages)
 
     assertEquals(packages, installedPackages())
   }
 
   def testGivenComposerLockPackageWithReplacesProperty_installedPackagesShouldBeReplacedPackagesAsWell(): Unit = {
-    val packages = List(ComposerPackageWithReplaces(ComposerPackage("vendor/name", "1.0.0"), Set("replaced/name")))
+    val packages = List(ComposerPackageWithReplaces(PackageDescriptor("vendor/name", "1.0.0"), Set("replaced/name")))
     ComposerFixtures.createComposerLock(myFixture, packages)
 
-    val expectedPackages = ComposerPackages(ComposerPackage("vendor/name", "1.0.0"), ComposerPackage("replaced/name", "1.0.0"))
+    val originalPackage = PackageDescriptor("vendor/name", "1.0.0")
+    val replacedPackage = PackageDescriptor("replaced/name", "1.0.0", replacedBy = Some(originalPackage))
+    val expectedPackages = ComposerPackages(originalPackage, replacedPackage)
+
     assertEquals(expectedPackages, installedPackages())
   }
 
   def testGivenTwoComposerLockInDifferentLocations_installedPackagesDependOnRequestedFile() = {
     val subComposerJson = createComposerJson("subdir")
 
-    val packages1 = ComposerPackages(ComposerPackage("vendor/name", "1.0.0"), ComposerPackage("vendor2/name2", "2.0.0"))
-    val packages2 = ComposerPackages(ComposerPackage("vendor3/name3", "1.0.0"), ComposerPackage("vendor24/name24", "2.0.0"))
+    val packages1 = ComposerPackages(PackageDescriptor("vendor/name", "1.0.0"), PackageDescriptor("vendor2/name2", "2.0.0"))
+    val packages2 = ComposerPackages(PackageDescriptor("vendor3/name3", "1.0.0"), PackageDescriptor("vendor24/name24", "2.0.0"))
 
     createComposerLock(packages1)
     createComposerLock(packages2, "subdir")
@@ -56,7 +59,7 @@ class InstalledPackagesTest extends BasePlatformTestCase {
   }
 
   def testGivenComposerLockWithFewPackages_deleteComposerLock_installedPackagesShouldBeEmpty() = {
-    val packages = ComposerPackages(ComposerPackage("vendor/name", "1.0.0"))
+    val packages = ComposerPackages(PackageDescriptor("vendor/name", "1.0.0"))
     val file = createComposerLock(packages)
 
     assertEquals(packages, installedPackages())
@@ -67,7 +70,7 @@ class InstalledPackagesTest extends BasePlatformTestCase {
   }
 
   def testGivenComposerLockWithFewPackages_moveIt_installedPackagesShouldBeEmpty() = {
-    val packages = ComposerPackages(ComposerPackage("vendor/name", "1.0.0"))
+    val packages = ComposerPackages(PackageDescriptor("vendor/name", "1.0.0"))
     val file = createComposerLock(packages)
 
     writeAction(() => file.move(this, myFixture.getTempDirFixture.findOrCreateDir("subdir")))
@@ -76,7 +79,7 @@ class InstalledPackagesTest extends BasePlatformTestCase {
   }
 
   def testGivenComposerLockWithFewPackages_moveIt_givenComposerJsonInMoveDest_installedPackagesShouldBeTheSame(): Unit = {
-    val packages = ComposerPackages(ComposerPackage("vendor/name", "1.0.0"))
+    val packages = ComposerPackages(PackageDescriptor("vendor/name", "1.0.0"))
     val file = createComposerLock(packages)
 
     writeAction(() => file.move(this, myFixture.getTempDirFixture.findOrCreateDir("subdir")))

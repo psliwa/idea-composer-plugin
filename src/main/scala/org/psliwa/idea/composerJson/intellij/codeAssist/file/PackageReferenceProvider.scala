@@ -6,7 +6,7 @@ import com.intellij.psi.impl.source.resolve.reference.impl.providers.{FileRefere
 import com.intellij.psi.{ElementManipulators, PsiElement, PsiReference, PsiReferenceProvider}
 import com.intellij.util.ProcessingContext
 import org.psliwa.idea.composerJson
-import org.psliwa.idea.composerJson.composer.ComposerPackage._
+import org.psliwa.idea.composerJson.composer.PackageDescriptor._
 import org.psliwa.idea.composerJson.intellij.PsiElements._
 
 private object PackageReferenceProvider extends PsiReferenceProvider {

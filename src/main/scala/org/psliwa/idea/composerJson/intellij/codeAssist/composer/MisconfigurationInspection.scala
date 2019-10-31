@@ -4,7 +4,7 @@ import com.intellij.codeInspection.{ProblemHighlightType, ProblemsHolder}
 import com.intellij.json.psi.JsonObject
 import com.intellij.psi.PsiElement
 import org.psliwa.idea.composerJson.ComposerBundle
-import org.psliwa.idea.composerJson.composer.ComposerPackage
+import org.psliwa.idea.composerJson.composer.PackageDescriptor
 import org.psliwa.idea.composerJson.intellij.PsiElements
 import org.psliwa.idea.composerJson.intellij.codeAssist.problem.checker.{ImplicitConversions, Checker}
 import org.psliwa.idea.composerJson.intellij.codeAssist.{RemoveJsonElementQuickFix, CreatePropertyQuickFix, AbstractInspection, SetPropertyValueQuickFix}
@@ -50,7 +50,7 @@ class MisconfigurationInspection extends AbstractInspection {
           nameProperty <- Some(jsonObject.findProperty("name"))
           nameValue <- Some(nameProperty.getValue)
           name <- getStringValue(nameValue)
-        } yield new SetPropertyValueQuickFix(jsonObject, "name", SString(), ComposerPackage.fixName(name))).toList
+        } yield new SetPropertyValueQuickFix(jsonObject, "name", SString(), PackageDescriptor.fixName(name))).toList
       },
       ProblemHighlightType.WEAK_WARNING
     ),

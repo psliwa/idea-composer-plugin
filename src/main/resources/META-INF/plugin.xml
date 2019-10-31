@@ -327,8 +327,8 @@ This plugin adds auto completion and inspections support for composer.json file 
         <localInspection
                 bundle="org.psliwa.idea.composerJson.messages.ComposerBundle"
                 language="JSON"
-                implementationClass="org.psliwa.idea.composerJson.intellij.codeAssist.composer.versionRenderer.PackageVersionInspection"
-                displayName="Package version renderer"
+                implementationClass="org.psliwa.idea.composerJson.intellij.codeAssist.composer.infoRenderer.PackageInfoInspection"
+                displayName="Package info renderer"
                 enabledByDefault="true"
                 level="WEAK WARNING"
                 groupKey="inspection.group"
@@ -375,7 +375,7 @@ This plugin adds auto completion and inspections support for composer.json file 
             <implementation-class>org.psliwa.idea.composerJson.composer.InstalledPackagesWatcher</implementation-class>
         </component>
         <component>
-            <implementation-class>org.psliwa.idea.composerJson.intellij.codeAssist.composer.versionRenderer.VersionOverlay</implementation-class>
+            <implementation-class>org.psliwa.idea.composerJson.intellij.codeAssist.composer.infoRenderer.PackageInfoOverlay</implementation-class>
         </component>
     </application-components>
 

@@ -6,7 +6,7 @@ import com.intellij.lang.documentation.DocumentationProvider
 import com.intellij.psi.{PsiManager, PsiElement}
 import com.intellij.patterns.PlatformPatterns._
 import org.psliwa.idea.composerJson.intellij.PsiElements._
-import org.psliwa.idea.composerJson.composer.ComposerPackage._
+import org.psliwa.idea.composerJson.composer.PackageDescriptor._
 
 class PackageDocumentationProvider extends DocumentationProvider {
   import PackageDocumentationProvider._

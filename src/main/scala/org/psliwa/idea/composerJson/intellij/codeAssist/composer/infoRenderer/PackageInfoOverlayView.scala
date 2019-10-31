@@ -1,11 +1,11 @@
-package org.psliwa.idea.composerJson.intellij.codeAssist.composer.versionRenderer
+package org.psliwa.idea.composerJson.intellij.codeAssist.composer.infoRenderer
 
 import java.awt.{Color, Font, Graphics}
 import javax.swing.JComponent
 
 import com.intellij.openapi.editor.Editor
 
-private class VersionOverlayView(editor: Editor, offset: Int, text: String, color: Color, font: Font) extends JComponent {
+private class PackageInfoOverlayView(editor: Editor, offset: Int, text: String, color: Color, font: Font) extends JComponent {
   private val horizontalMargin = 40
 
   override def paintComponent(g: Graphics): Unit = {

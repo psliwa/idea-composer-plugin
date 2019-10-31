@@ -1,4 +1,4 @@
-package org.psliwa.idea.composerJson.intellij.codeAssist.composer.versionRenderer
+package org.psliwa.idea.composerJson.intellij.codeAssist.composer.infoRenderer
 
 import com.intellij.json.highlighting.JsonSyntaxHighlighterFactory
 import com.intellij.openapi.editor.{LogicalPosition, Editor}
@@ -8,7 +8,7 @@ import com.intellij.openapi.editor.ex.EditorEx
 import com.intellij.openapi.util.text.StringUtil
 import org.psliwa.idea.composerJson.ComposerJson
 
-private class VersionCaretListener(packagesVersionMap: Map[String, List[PackageVersion]]) extends CaretAdapter {
+private class PackageInfoCaretListener(packagesInfoMap: Map[String, List[PackageInfo]]) extends CaretAdapter {
 
   override def caretPositionChanged(caretEvent: CaretEvent): Unit = {
     caretEvent.getEditor match {
@@ -27,7 +27,7 @@ private class VersionCaretListener(packagesVersionMap: Map[String, List[PackageV
 
     textToRender(editor, position) match {
       case Some((text, textPosition)) =>
-        val component = new VersionOverlayView(editor, editor.logicalPositionToOffset(textPosition), text, color, font)
+        val component = new PackageInfoOverlayView(editor, editor.logicalPositionToOffset(textPosition), text, color, font)
         editor.getContentComponent.add(component)
         val innerViewpoint = editor.getScrollPane.getViewport.getView
         component.setBounds(0, 0, innerViewpoint.getWidth, innerViewpoint.getHeight)
@@ -38,17 +38,17 @@ private class VersionCaretListener(packagesVersionMap: Map[String, List[PackageV
 
   private def removeOverlays(editor: EditorEx) = {
     editor.getContentComponent.getComponents.collect {
-      case overlay: VersionOverlayView => overlay
+      case overlay: PackageInfoOverlayView => overlay
     } foreach editor.getContentComponent.remove
   }
 
   private def textToRender(editor: EditorEx, position: LogicalPosition): Option[(String,LogicalPosition)] = {
     (for{
-      packageVersion <- packagesVersionMap.getOrElse(editor.getVirtualFile.getCanonicalPath, List.empty).view
+      packageVersion <- packagesInfoMap.getOrElse(editor.getVirtualFile.getCanonicalPath, List.empty).view
       offset <- endLineOffset(editor, packageVersion.offset)
       packageVersionPosition = editor.offsetToLogicalPosition(offset)
       if position.line == packageVersionPosition.line
-    } yield (packageVersion.version, packageVersionPosition)).headOption
+    } yield (packageVersion.info, packageVersionPosition)).headOption
   }
 
   private def endLineOffset(editor: Editor, offset: Int): Option[Int] = {
