@@ -76,15 +76,23 @@ object DefaultRepositoryProvider {
   }
 
   private def repositoryFromUrl(url: String): Repository[String] = {
-    packagistRepositoryFromUrl(url) orElse satisRepositoryFromUrl(IO.loadUrl, JsonParsers.parsePackages)(url) getOrElse EmptyRepository
+    privatePackagistRepositoryFromUrl(url) orElse
+      satisRepositoryFromUrl(IO.loadUrl, JsonParsers.parsePackages)(url) orElse
+      packagistRepositoryFromUrl(url) getOrElse
+      EmptyRepository
   }
 
-  private def rootUrlOf(url: String) = "http(s?)://[^/]+".r.findFirstIn(url).getOrElse(url)
+  private[repository] def privatePackagistRepositoryFromUrl(url: String): Option[Repository[String]] = {
+    // fail fast for private packagist - it is not supported
+    if(url.startsWith(Packagist.privatePackagistUrl)) Some(EmptyRepository)
+    else None
+  }
 
   private[repository] def satisRepositoryFromUrl(
     loadUrl: String => Try[String],
     parsePackages: String => Try[RepositoryPackages]
   )(url: String): Option[Repository[String]] = {
+    def rootUrlOf(url: String): String = url.replace("/packages.json", "")
 
     val rootUrl = rootUrlOf(url)
     def buildUrl(uri: String): String = rootUrl+"/"+uri
@@ -99,13 +107,13 @@ object DefaultRepositoryProvider {
     def loadPackagesFromUrls(urls: Seq[String]): Map[String,Seq[String]] = {
       urls.par
         .flatMap(loadPackages(_).toList)
-        .flatMap(pkgs => Seq(pkgs, new RepositoryPackages(loadPackagesFromUrls(pkgs.includes.map(buildUrl)), Nil)))
+        .flatMap(pkgs => Seq(pkgs, RepositoryPackages(loadPackagesFromUrls(pkgs.includes.map(buildUrl)), Nil)))
         .foldLeft(Map[String,Seq[String]]())((map, pkgs) => map ++ pkgs.packages)
     }
 
     loadPackages(url)
       .map(pkgs => pkgs.packages ++ loadPackagesFromUrls(pkgs.includes.map(buildUrl)))
-      .map(pkgs => new InMemoryRepository(pkgs.keys.toList, pkgs))
+      .map(pkgs => Repository.inMemory(pkgs.keys.toList, pkgs))
   }
 
   private def packagistRepositoryFromUrl(url: String): Option[Repository[String]] = {

@@ -103,6 +103,21 @@ class RepositoryFromUrlTest {
     assertTrue(repository.getPackages.contains("package"))
   }
 
+
+  @Test
+  def givenPrivatePackagistAsUrl_tryToGetPrivatePackagistRepo_emptyRepoShouldBeUsed(): Unit = {
+    val repository = DefaultRepositoryProvider.privatePackagistRepositoryFromUrl(Packagist.privatePackagistUrl+"/some-organization/packages.json")
+
+    assertEquals(Some(EmptyRepository), repository)
+  }
+
+  @Test
+  def givenPackagistOrgAsUrl_tryToGetPrivatePackagistRepo_emptyRepoShouldBeUsed(): Unit = {
+    val repository = DefaultRepositoryProvider.privatePackagistRepositoryFromUrl(Packagist.defaultUrl+"/packages.json")
+
+    assertEquals(None, repository)
+  }
+
   private def loadUrl(contents: Map[String, String])(url: String): Try[String] = {
     Try { contents.get(url).get }
   }

@@ -9,6 +9,8 @@ object Packagist {
 
   val defaultUrl: String = "https://packagist.org/"
 
+  val privatePackagistUrl: String = "https://repo.packagist.com"
+
   def loadPackages(url: String): Try[Seq[String]] = loadPackagesFromPackagist(url).flatMap(parsePackageNames)
   def loadVersions(url: String)(pkg: String): Try[Seq[String]] = loadUri(url)("packages/"+pkg+".json").flatMap(parseVersions)
 

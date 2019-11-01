@@ -2,7 +2,7 @@ package org.psliwa.idea.composerJson.util
 
 import java.net.{HttpURLConnection, URL}
 
-import scala.io.Source
+import scala.io.{Codec, Source}
 import scala.util.Try
 
 object IO {
@@ -17,7 +17,7 @@ object IO {
         case c => c
       }
 
-      val in = Source.fromInputStream(connection.getInputStream)
+      val in = Source.fromInputStream(connection.getInputStream, Codec.UTF8.charSet.name())
       try {
         in.getLines().mkString
       } finally {
