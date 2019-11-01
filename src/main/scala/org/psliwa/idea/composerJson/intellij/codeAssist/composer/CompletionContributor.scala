@@ -84,7 +84,7 @@ class CompletionContributor extends AbstractCompletionContributor {
     new Repository[BaseLookupElement] {
       override def getPackages: scala.Seq[BaseLookupElement] = packagesLoader()
       override def getPackageVersions(pkg: String): scala.Seq[String] = versionsLoader(pkg)
-      override def map[NewPackage](f: (BaseLookupElement) => NewPackage): Repository[NewPackage] = new CallbackRepository(getPackages.map(f), getPackageVersions)
+      override def map[NewPackage](f: (BaseLookupElement) => NewPackage): Repository[NewPackage] = Repository.callback(getPackages.map(f), getPackageVersions)
     }
   }
 

@@ -1,9 +1,9 @@
 package org.psliwa.idea.composerJson.intellij.codeAssist.composer
 
 import com.intellij.openapi.application.ApplicationManager
-import org.psliwa.idea.composerJson.composer.repository.{RepositoryInfo, InMemoryRepository, Repository, TestingRepositoryProvider}
-import org.psliwa.idea.composerJson.intellij.codeAssist.InspectionTest
 import org.junit.Assert._
+import org.psliwa.idea.composerJson.composer.repository.{Repository, RepositoryInfo, TestingRepositoryProvider}
+import org.psliwa.idea.composerJson.intellij.codeAssist.InspectionTest
 
 class RepositoryUpdaterTest extends InspectionTest {
 
@@ -196,7 +196,7 @@ class RepositoryUpdaterTest extends InspectionTest {
     assertTrue(repoInfo.isDefined)
     assertEquals(expectedUrls, repoInfo.get.urls)
     assertEquals(includePackagist, repoInfo.get.packagist)
-    val repository = repoInfo.get.repository.getOrElse(new InMemoryRepository[String](List()))
+    val repository = repoInfo.get.repository.getOrElse(Repository.inMemory[String](List()))
     assertRepository(repository, expectedPackages)
   }
 

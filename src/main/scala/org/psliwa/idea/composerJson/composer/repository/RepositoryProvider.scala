@@ -11,7 +11,7 @@ trait RepositoryProvider[Package] {
 }
 
 object EmptyRepositoryProvider extends RepositoryProvider[Nothing] {
-  override def repositoryFor(file: String) = EmptyRepository
+  override def repositoryFor(file: String): Repository[Nothing] = EmptyRepository
   override def updateRepository(file: String, info: RepositoryInfo): Boolean = false
   override def hasDefaultRepository(file: String): Boolean = true
 }

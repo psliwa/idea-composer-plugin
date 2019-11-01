@@ -4,14 +4,14 @@ import org.junit.Assert._
 import org.junit.Test
 
 class RepositoryProviderWrapperTest {
-  val innerRepository = new InMemoryRepository[String](List("package1"))
+  val innerRepository = Repository.inMemory[String](List("package1"))
   val innerRepositoryProvider = new RepositoryProvider[String] {
     override def repositoryFor(file: String): Repository[String] = innerRepository
     override def updateRepository(file: String, info: RepositoryInfo) = false
     override def hasDefaultRepository(file: String): Boolean = false
   }
 
-  val defaultRepository = new InMemoryRepository[String](List("package2"))
+  val defaultRepository = Repository.inMemory[String](List("package2"))
 
   @Test
   def defaultRepositoryShouldBeReturnedWhenPredicateIsTrue() = {

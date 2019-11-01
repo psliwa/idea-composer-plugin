@@ -10,7 +10,7 @@ import com.intellij.patterns.PlatformPatterns._
 import com.intellij.psi.PsiElement
 import com.intellij.ui.EditorNotifications
 import org.psliwa.idea.composerJson._
-import org.psliwa.idea.composerJson.composer.repository.{InMemoryRepository, Repository, RepositoryInfo, RepositoryProvider}
+import org.psliwa.idea.composerJson.composer.repository.{Repository, RepositoryInfo, RepositoryProvider}
 import org.psliwa.idea.composerJson.intellij.PsiElements._
 
 class RepositoryUpdater extends Annotator {
@@ -64,7 +64,7 @@ class RepositoryUpdater extends Annotator {
 
     val packagesMap = packages.foldLeft(Map[String,List[String]]())(update)
 
-    new InMemoryRepository(packagesMap.keys.toSeq, packagesMap)
+    Repository.inMemory(packagesMap.keys.toSeq, packagesMap)
   }
 
   private def getPackages(repositoriesElement: JsonArray): Seq[(String, String)] = {

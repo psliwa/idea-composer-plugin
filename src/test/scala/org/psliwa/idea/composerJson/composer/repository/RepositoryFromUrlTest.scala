@@ -86,9 +86,9 @@ class RepositoryFromUrlTest {
     val include1Content = "some-include1-content"
     val include2Content = "some-include2-content"
 
-    val repositoryPackages = new RepositoryPackages(Map(), List(include1Url))
-    val include1RepositoryPackages = new RepositoryPackages(Map(), List(include2Url))
-    val include2RepositoryPackages = new RepositoryPackages(Map("package" -> Seq("1.0.0")), List())
+    val repositoryPackages = RepositoryPackages(Map(), List(include1Url))
+    val include1RepositoryPackages = RepositoryPackages(Map(), List(include2Url))
+    val include2RepositoryPackages = RepositoryPackages(Map("package" -> Seq("1.0.0")), List())
 
     val load = loadUrl(Map(url -> content, rootUrl+"/"+include1Url -> include1Content, rootUrl+"/"+include2Url -> include2Content)) _
     val parse = parsePackages(Map(content -> repositoryPackages, include1Content -> include1RepositoryPackages, include2Content -> include2RepositoryPackages)) _

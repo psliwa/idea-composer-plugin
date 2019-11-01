@@ -1,13 +1,12 @@
 package org.psliwa.idea.composerJson.composer.repository
 
 import org.junit.Assert._
-import org.junit.{Before, Test}
-
-import DefaultRepositoryProvider._
+import org.junit.Test
+import org.psliwa.idea.composerJson.composer.repository.DefaultRepositoryProvider._
 
 class DefaultRepositoryFactoryTest {
 
-  val packagistRepository = new InMemoryRepository(List("packagist"))
+  val packagistRepository = Repository.inMemory(List("packagist"))
   val factory = new DefaultRepositoryFactory(url => new InMemoryRepository(List(url)), packagistRepository, pkg => pkg)
 
   @Test
@@ -15,7 +14,7 @@ class DefaultRepositoryFactoryTest {
 
     //when
 
-    val repository = factory.repositoryFor(new RepositoryInfo(List("url1", "url2"), false))
+    val repository = factory.repositoryFor(RepositoryInfo(List("url1", "url2"), false))
 
     //then
 

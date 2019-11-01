@@ -6,7 +6,7 @@ import org.psliwa.idea.composerJson.composer.repository.DefaultRepositoryProvide
 
 class DefaultRepositoryProviderTest {
   val repositoryFactory = new FakeRepositoryFactory()
-  val defaultRepository = new InMemoryRepository(List("some/package123321"))
+  val defaultRepository = Repository.inMemory(List("some/package123321"))
   val provider = new DefaultRepositoryProvider(repositoryFactory, defaultRepository)
 
   @Test

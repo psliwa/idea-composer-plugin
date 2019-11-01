@@ -22,7 +22,7 @@ class PackagesLoader extends ApplicationComponent {
     else Packagist.loadPackages(Packagist.defaultUrl).getOrElse(Nil)
   }
   private val versionsLoader: (String) => Seq[String] = memorize(30)(Packagist.loadVersions(Packagist.defaultUrl)(_).getOrElse(List()))
-  private lazy val packagistRepository = new CallbackRepository(loadPackageLookupElements, versionsLoader)
+  private lazy val packagistRepository = Repository.callback(loadPackageLookupElements, versionsLoader)
 
   private val defaultRepositoryProvider = new DefaultRepositoryProvider(packagistRepository, new BaseLookupElement(_))
 
