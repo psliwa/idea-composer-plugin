@@ -89,6 +89,6 @@ class InstalledPackagesTest extends BasePlatformTestCase {
   }
 
   private def createComposerLock(packages: ComposerPackages, dir: String = "."): VirtualFile =
-    ComposerFixtures.createComposerLock(myFixture, packages.values.toList.map(ComposerPackageWithReplaces(_, Set.empty)), dir)
+    ComposerFixtures.createComposerLock(myFixture, packages.descriptors.map(ComposerPackageWithReplaces(_, Set.empty)), dir)
   private def createComposerJson(dir: String = ".") = ComposerFixtures.createComposerJson(myFixture, dir)
 }

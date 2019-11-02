@@ -23,21 +23,25 @@ object Version {
       .getOrElse(List())
   }
 
-  def isGreater(version1: String, version2: String): Boolean = compare(version1, version2) != Ordering.LT
-
-  private val maxIntAsString = Int.MaxValue.toString
+  def isGreater(version1: String, version2: String): Boolean = compare(version1, version2) == Ordering.GT
 
   private def compare(version1: String, version2: String): Ordering = {
-    def isSemanticVersion(v: String): Boolean = !v.exists(_.isLetter)
-    def numeric(s: String) = Try { s.toInt }.toOption.getOrElse(0)
-    def normalize(v: String) = v.replace("*", maxIntAsString).split("\\.").map(numeric).toList
-    def dots(v: String) = v.count(_ == '.')
+    @inline def isSemanticVersion(v: String): Boolean = !v.exists(_.isLetter)
+    def numeric(versionPart: String): Int = {
+      if(versionPart == "*") Int.MaxValue
+      else Try { versionPart.toInt }.getOrElse(0)
+    }
+    def normalize(version: String): List[Int] = version.split('.').map(numeric).toList
+    @inline def dots(version: String): Int = version.count(_ == '.')
 
     val isSemanticVersion1 = isSemanticVersion(version1)
     val isSemanticVersion2 = isSemanticVersion(version2)
 
     if(isSemanticVersion1 && isSemanticVersion2) {
-      dots(version1) ?|? dots(version2) |+| normalize(version1) ?|? normalize(version2)
+      val diff = dots(version1).compareTo(dots(version2))
+      if(diff > 0) return Ordering.GT
+      else if(diff < 0) return Ordering.LT
+      normalize(version1) ?|? normalize(version2)
     } else {
       val semanticVersionOrdering = isSemanticVersion1 ?|? isSemanticVersion2
       semanticVersionOrdering |+| version1 ?|? version2

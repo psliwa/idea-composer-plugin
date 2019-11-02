@@ -2,7 +2,7 @@ package org.psliwa.idea.composerJson.intellij
 
 import com.intellij.json.psi.JsonObject
 import com.intellij.psi.PsiElement
-import org.psliwa.idea.composerJson.util.{Matcher, OffsetFinder}
+import org.psliwa.idea.composerJson.util.OffsetFinder
 
 import scala.language.implicitConversions
 
@@ -14,8 +14,4 @@ private object PsiElementOffsetFinder extends OffsetFinder[JsonObject,PsiElement
       .getOrElse(haystack.findElementAt(offset))
   }
   override protected def reverseStop(haystack: JsonObject)(offset: Int): Boolean = stop(haystack)(offset)
-
-  object ImplicitConversions {
-    implicit def typeToMatcher[A <: PsiElement](cls: Class[A]): Matcher[PsiElement] = Matcher(t => cls.isAssignableFrom(t.getClass))
-  }
 }

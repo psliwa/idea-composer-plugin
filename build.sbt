@@ -82,6 +82,10 @@ def getBaseDir(baseDir: File) = baseDir.getParentFile.getParentFile
 
 val getBaseDirPath = getBaseDir _ andThen (_.getAbsolutePath)
 
+lazy val benchmarks = (project in file("benchmarks"))
+  .enablePlugins(JmhPlugin)
+  .dependsOn(root)
+
 lazy val runner = (project in file("subprojects/idea-runner"))
   .dependsOn(root % Provided)
   .settings(

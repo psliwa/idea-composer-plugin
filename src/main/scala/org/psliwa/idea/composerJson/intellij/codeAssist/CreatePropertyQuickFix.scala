@@ -13,7 +13,6 @@ import org.psliwa.idea.composerJson.intellij.{PsiElementOffsetFinder, PsiElement
 import org.psliwa.idea.composerJson.intellij.codeAssist.QuickFix._
 import org.psliwa.idea.composerJson.json._
 import org.psliwa.idea.composerJson.util.Matcher
-import PsiElementOffsetFinder.ImplicitConversions._
 import PsiElementOffsetFinder._
 import PsiElements._
 
@@ -56,7 +55,7 @@ private class CreatePropertyQuickFix(element: PsiElement, propertyName: String, 
     val startOffset = e.getTextRange.getStartOffset + 1
     val headOffset = editorFor(e.getProject).map(_.getCaretModel.getOffset).getOrElse(startOffset)
 
-    val jsonElement: Matcher[PsiElement] = classOf[JsonElement]
+    val jsonElement: Matcher[PsiElement] = Matcher(t => classOf[JsonElement].isAssignableFrom(t.getClass))
 
     val insertInfo = for {
       offset <- findOffsetReverse(jsonElement)(headOffset)

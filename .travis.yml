@@ -12,7 +12,7 @@ env:
   - "IDEA_VERSION=193.4932-EAP-CANDIDATE-SNAPSHOT;PHP_PLUGIN_URL=https://plugins.jetbrains.com/files/6610/71513/php.zip"
 
 install:
-   - sbt -DIDEA_VERSION=$IDEA_VERSION -DPHP_PLUGIN_URL=$PHP_PLUGIN_URL test
+   - sbt -DIDEA_VERSION=$IDEA_VERSION -DPHP_PLUGIN_URL=$PHP_PLUGIN_URL "; test ; benchmarks/jmh:run"
 
 script:
    - sbt -DIDEA_VERSION=$IDEA_VERSION -DPHP_PLUGIN_URL=$PHP_PLUGIN_URL "; pluginPack ; pluginCompress ; pluginProguard"

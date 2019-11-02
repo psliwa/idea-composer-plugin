@@ -50,7 +50,7 @@ class NotInstalledPackageInspectionTest extends InspectionTest {
   }
 
   private def createComposerLock(packages: composer.ComposerPackages): VirtualFile = {
-    ComposerFixtures.createComposerLock(myFixture, packages.values.toList.map(ComposerPackageWithReplaces(_, Set.empty)))
+    ComposerFixtures.createComposerLock(myFixture, packages.descriptors.map(ComposerPackageWithReplaces(_, Set.empty)))
   }
 
   def testGivenNotInstalledPackage_butReplacementIsInstalled_thatShouldNotBeReported(): Unit = {
