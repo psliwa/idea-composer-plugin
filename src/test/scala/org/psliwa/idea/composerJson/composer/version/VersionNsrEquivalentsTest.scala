@@ -62,7 +62,7 @@ class VersionNsrEquivalentsTest extends BasePropSpec {
     }
   }
 
-  private def equivalentsFor(constraint: Constraint) = Version.equivalentsFor(constraint)
+  private def equivalentsFor(constraint: Constraint) = VersionEquivalents.equivalentsFor(constraint)
   def last(a: SemanticVersion) = (a.patch.toList ++ a.minor.toList ++ List(a.major)).head
   case class Range[T <: Ordered[T]](start: T, end: T) {
     def contains(value: T): Boolean = value >= start && value < end

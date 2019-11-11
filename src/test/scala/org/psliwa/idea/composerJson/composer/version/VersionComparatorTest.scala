@@ -2,37 +2,37 @@ package org.psliwa.idea.composerJson.composer.version
 
 import org.junit.Assert._
 import org.junit.Test
-
-import scala.annotation.tailrec
+import org.psliwa.idea.composerJson.composer.version.VersionSuggestions.SimplifiedVersionConstraint.{NonSemantic, PrefixedSemantic, PureSemantic, Wildcard}
+import org.psliwa.idea.composerJson.composer.version.VersionSuggestions._
 
 class VersionComparatorTest {
 
   @Test
-  def sortVersions() = {
-    val sortedVersions = List("1.0.0", "dev-master", "1.2", "1.0.100", "1.0.*", "1.1.x-dev", "1.1", "1.*", "1.1.0", "v1.1.0").sortWith(Version.isGreater)
-
-    assertDescendingVersionsOrder(sortedVersions)
+  def sortVersions(): Unit = {
+    val sortedVersions = sorted(List(
+      PureSemantic(new SemanticVersion(1, 0, 0)),
+      NonSemantic("dev-master"),
+      PureSemantic(new SemanticVersion(1, 2)),
+      PureSemantic(new SemanticVersion(1, 0, 100)),
+      Wildcard(PureSemantic(new SemanticVersion(1, 0))),
+      NonSemantic("1.1.x-dev"),
+      PureSemantic(new SemanticVersion(1, 1)),
+      Wildcard(PureSemantic(new SemanticVersion(1))),
+      PureSemantic(new SemanticVersion(1, 1, 0)),
+      PrefixedSemantic(PureSemantic(new SemanticVersion(1, 1, 0)))
+    ))
 
     assertEquals(List("1.1.0", "1.0.*", "1.0.100", "1.0.0", "1.*", "1.2", "1.1", "v1.1.0", "dev-master", "1.1.x-dev"), sortedVersions)
   }
 
-  @tailrec
-  private def assertDescendingVersionsOrder(versions: List[String]): Unit = {
-    versions.headOption match {
-      case Some(version) =>
-        val remainingVersions = versions.tail
-        remainingVersions.foreach { version2 =>
-          assertTrue(Version.isGreater(version, version2))
-        }
-        assertDescendingVersionsOrder(remainingVersions)
-      case None =>
-    }
-  }
-
   @Test
-  def sortSemanticVersionsNumerically() = {
-    val versions = List("3.9.0", "3.33.0").sortWith(Version.isGreater)
+  def sortSemanticVersionsNumerically(): Unit = {
+    val versions = sorted(List("3.9.0", "3.33.0").flatMap(VersionSuggestions.parseSemantic))
 
     assertEquals(List("3.33.0", "3.9.0"), versions)
+  }
+
+  private def sorted(versions: List[SimplifiedVersionConstraint]): List[String] = {
+    versions.sortWith(VersionSuggestions.isGreater).map(_.presentation)
   }
 }

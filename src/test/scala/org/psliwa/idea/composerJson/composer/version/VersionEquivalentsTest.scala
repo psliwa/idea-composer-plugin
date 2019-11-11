@@ -37,7 +37,7 @@ class VersionEquivalentsTest {
 
   private def equivalents(s: String): List[String] = {
     val constraint = Parser.parse(s).get
-    Version.equivalentsFor(constraint).map(_.presentation).toList
+    VersionEquivalents.equivalentsFor(constraint).map(_.presentation).toList
   }
 
   @Test

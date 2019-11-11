@@ -149,7 +149,7 @@ class PackageVersionAnnotator extends Annotator {
   def detectEquivalents(version: Option[Constraint], pkg: String, element: PsiElement): Seq[QuickFixGroup] = {
     version
       .toList.view
-      .flatMap(Version.equivalentsFor)
+      .flatMap(VersionEquivalents.equivalentsFor)
       .map(equivalentVersion => createQuickFixes(element, jsonObject => List(changeEquivalentPackageVersionQuickFix(pkg, equivalentVersion, jsonObject))))
       .map(quickFix => (None, quickFix))
   }

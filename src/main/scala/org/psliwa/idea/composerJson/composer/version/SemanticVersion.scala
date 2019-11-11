@@ -1,11 +1,11 @@
 package org.psliwa.idea.composerJson.composer.version
 
-case class SemanticVersion(major: Int, private val other: Option[(Int,Option[(Int)])]) extends Ordered[SemanticVersion] {
+case class SemanticVersion(major: Int, private[version] val other: Option[(Int,Option[(Int)])]) extends Ordered[SemanticVersion] {
   val minor: Option[Int] = other.map(_._1)
   val patch: Option[Int] = other.flatMap(_._2)
   private val maxPartsNumber: Int = 3
 
-  private lazy val parts = List(Some(major), minor, patch).takeWhile(_.isDefined).map(_.get)
+  private[version] lazy val parts = List(Some(major), minor, patch).takeWhile(_.isDefined).map(_.get)
   private[this] lazy val reversedParts = parts.reverse
 
   val partsNumber = parts.size

@@ -6,18 +6,16 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.Project
 import com.intellij.patterns.PlatformPatterns._
 import com.intellij.psi.PsiElement
-import org.psliwa.idea.composerJson.{intellij, Icons}
 import org.psliwa.idea.composerJson.composer.repository._
-import org.psliwa.idea.composerJson.composer.version.Version
-import org.psliwa.idea.composerJson.intellij.codeAssist.{BaseLookupElement, AbstractCompletionContributor}
-import org.psliwa.idea.composerJson.intellij.codeAssist.AbstractCompletionContributor.{LookupElementsCompletionProvider, ParametersDependantCompletionProvider}
-import org.psliwa.idea.composerJson.intellij.codeAssist.Capture
+import org.psliwa.idea.composerJson.composer.version.VersionSuggestions
 import org.psliwa.idea.composerJson.intellij._
-import intellij.codeAssist._
-import org.psliwa.idea.composerJson.json.{SPackages, Schema, SObject, SStringChoice}
+import org.psliwa.idea.composerJson.intellij.codeAssist.AbstractCompletionContributor.{LookupElementsCompletionProvider, ParametersDependantCompletionProvider}
+import org.psliwa.idea.composerJson.intellij.codeAssist.{AbstractCompletionContributor, BaseLookupElement, Capture, _}
+import org.psliwa.idea.composerJson.json.{SObject, SPackages, SStringChoice, Schema}
 import org.psliwa.idea.composerJson.util.CharOffsetFinder._
-import org.psliwa.idea.composerJson.util.OffsetFinder.ImplicitConversions._
 import org.psliwa.idea.composerJson.util.ImplicitConversions._
+import org.psliwa.idea.composerJson.util.OffsetFinder.ImplicitConversions._
+import org.psliwa.idea.composerJson.{Icons, intellij}
 
 import scala.annotation.tailrec
 import scala.collection.Seq
@@ -51,11 +49,8 @@ class CompletionContributor extends AbstractCompletionContributor {
             query match {
               case pattern() => minimumStabilities.map(new BaseLookupElement(_))
               case _ => {
-                loadVersions(context.completionParameters)(context.propertyName)
-                  .flatMap(Version.alternativesForPrefix(context.typedQuery))
-                  .distinct
-                  .view
-                  .sortWith((a,b) => !Version.isGreater(a, b))
+                VersionSuggestions
+                  .suggestionsForPrefix(loadVersions(context.completionParameters)(context.propertyName), context.typedQuery)
                   .zipWithIndex
                   .map{ case(version, index) => new BaseLookupElement(version, Option(Icons.Packagist), true, None, None, "", Some(index)) }
               }
@@ -111,8 +106,8 @@ class CompletionContributor extends AbstractCompletionContributor {
 }
 
 private object CompletionContributor {
-  import VersionCompletionProvider._
   import PsiExtractors._
+  import VersionCompletionProvider._
 
   class VersionCompletionProvider(loadElements: Context => Seq[BaseLookupElement]) extends ParametersDependantCompletionProvider(psiBased(loadElements)) {
     override protected def mapResult(result: CompletionResultSet): CompletionResultSet = {
