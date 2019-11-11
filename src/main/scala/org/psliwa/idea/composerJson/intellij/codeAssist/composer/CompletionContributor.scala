@@ -50,7 +50,7 @@ class CompletionContributor extends AbstractCompletionContributor {
               case pattern() => minimumStabilities.map(new BaseLookupElement(_))
               case _ => {
                 VersionSuggestions
-                  .suggestionsForPrefix(loadVersions(context.completionParameters)(context.propertyName), context.typedQuery)
+                  .suggestionsForVersions(loadVersions(context.completionParameters)(context.propertyName), context.typedQuery, mostSignificantFirst = false)
                   .zipWithIndex
                   .map{ case(version, index) => new BaseLookupElement(version, Option(Icons.Packagist), true, None, None, "", Some(index)) }
               }

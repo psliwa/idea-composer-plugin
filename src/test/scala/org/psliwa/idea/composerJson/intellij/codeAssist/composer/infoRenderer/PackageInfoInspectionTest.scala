@@ -41,7 +41,6 @@ class PackageInfoInspectionTest extends InspectionTest {
     assertPackageVersions(List(PackageInfo(myFixture.getCaretOffset, "1.0.1")))
   }
 
-
   private def createComposerLock(packages: List[PackageDescriptor], dir: String = "."): VirtualFile = {
     ComposerFixtures.createComposerLock(myFixture, packages.map(ComposerPackageWithReplaces(_, Set.empty)), dir)
   }

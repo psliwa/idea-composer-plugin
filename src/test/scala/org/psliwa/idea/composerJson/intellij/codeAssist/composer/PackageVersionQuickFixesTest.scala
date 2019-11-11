@@ -1,7 +1,11 @@
 package org.psliwa.idea.composerJson.intellij.codeAssist.composer
 
+import com.intellij.openapi.vfs.VirtualFile
 import org.junit.Assert._
 import org.psliwa.idea.composerJson.ComposerBundle
+import org.psliwa.idea.composerJson.composer.PackageDescriptor
+import org.psliwa.idea.composerJson.fixtures.ComposerFixtures
+import org.psliwa.idea.composerJson.fixtures.ComposerFixtures.ComposerPackageWithReplaces
 import org.psliwa.idea.composerJson.intellij.codeAssist.InspectionTest
 import org.psliwa.idea.composerJson.settings.ProjectSettings
 
@@ -236,6 +240,48 @@ class PackageVersionQuickFixesTest extends InspectionTest {
     )
   }
 
+  def testSetVersionQuickFix_givenUnboundVersion_replaceByInstalledVersion(): Unit = {
+    createComposerLock(List(PackageDescriptor("vendor/pkg", "1.3.1")))
+
+    checkQuickFix(SetPackageVersionQuickFix("1.3.1"))(
+      """
+        |{
+        |  "require": {
+        |    "vendor/pkg": "*"
+        |  }
+        |}
+      """.stripMargin,
+      """
+        |{
+        |  "require": {
+        |    "vendor/pkg": "1.3.1"
+        |  }
+        |}
+      """.stripMargin
+    )
+  }
+
+  def testSetVersionQuickFix_givenUnboundVersion_replaceByWildcardedInstalledVersion(): Unit = {
+    createComposerLock(List(PackageDescriptor("vendor/pkg", "1.3.*")))
+
+    checkQuickFix(SetPackageVersionQuickFix("1.3.*"))(
+      """
+        |{
+        |  "require": {
+        |    "vendor/pkg": "*"
+        |  }
+        |}
+      """.stripMargin,
+      """
+        |{
+        |  "require": {
+        |    "vendor/pkg": "1.3.*"
+        |  }
+        |}
+      """.stripMargin
+    )
+  }
+
   private def assertPatternExcluded(pkg: String) {
     import scala.collection.JavaConverters._
     assertTrue(
@@ -245,5 +291,9 @@ class PackageVersionQuickFixesTest extends InspectionTest {
 
   private def checkQuickFix(quickFix: String, actual: String): Unit = {
     checkQuickFix(quickFix)(actual, actual)
+  }
+
+  private def createComposerLock(packages: List[PackageDescriptor], dir: String = "."): VirtualFile = {
+    ComposerFixtures.createComposerLock(myFixture, packages.map(ComposerPackageWithReplaces(_, Set.empty)), dir)
   }
 }

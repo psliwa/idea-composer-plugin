@@ -35,11 +35,11 @@ object VersionSuggestions {
     case class NonSemantic(presentation: String) extends SimplifiedVersionConstraint
   }
 
-  def suggestionsForPrefix(versions: Seq[String], prefix: String): Seq[String] = {
-    versions.flatMap(suggestionsForPrefix(prefix))
+  def suggestionsForVersions(versions: Seq[String], prefix: String, mostSignificantFirst: Boolean = true): Seq[String] = {
+    versions.flatMap(suggestionsAsConstraintsForVersions(_, prefix))
       .distinct
       .view
-      .sortWith((a,b) => !isGreater(a, b))
+      .sortWith((a,b) => mostSignificantFirst == isGreater(a, b))
       .map(_.presentation)
   }
 
@@ -82,7 +82,7 @@ object VersionSuggestions {
     }
   }
 
-  private[version] def suggestionsForPrefix(prefix: String)(version: String): List[SimplifiedVersionConstraint] = {
+  private def suggestionsAsConstraintsForVersions(version: String, prefix: String): List[SimplifiedVersionConstraint] = {
     parseSemantic(version) match {
       case Some(semanticVersion) =>
         semanticWildcards(prefix)(semanticVersion)
@@ -91,6 +91,14 @@ object VersionSuggestions {
       case None =>
         List.empty
     }
+  }
+
+  def suggestionsForVersion(version: String, prefix: String, mostSignificantFirst: Boolean = true): Seq[String] = {
+    suggestionsAsConstraintsForVersions(version, prefix)
+      .distinct
+      .view
+      .sortWith((a,b) => mostSignificantFirst == isGreater(a, b))
+      .map(_.presentation)
   }
 
   private def uniqList[A](a: A, b: A): List[A] = if(a == b) List(a) else List(a, b)

@@ -21,6 +21,6 @@ class VersionSuggestionsBenchmark {
 
   @Benchmark
   def versionSuggestions(): Unit = {
-    VersionSuggestions.suggestionsForPrefix(versions, "")
+    VersionSuggestions.suggestionsForVersions(versions, "")
   }
 }

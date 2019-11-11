@@ -24,7 +24,7 @@ class VersionSuggestionsTest extends BasePropSpec {
 
   property("suggestions for pure semantic version") {
     forAll(semanticVersionGen(prefix = "")) { (version: GeneratedVersion) =>
-      val suggestions = VersionSuggestions.suggestionsForPrefix("")(version.get).map(_.presentation)
+      val suggestions = VersionSuggestions.suggestionsForVersion(version.get, "")
 
       checkSemanticVersionAlternatives(version.get, suggestions)
     }
@@ -32,8 +32,8 @@ class VersionSuggestionsTest extends BasePropSpec {
 
   property("suggestions for pure semantic version and prefix") {
     forAll(prefixGen, semanticVersionGen(prefix = "")) { (prefix: Prefix, version: GeneratedVersion) =>
-      val suggestions = VersionSuggestions.suggestionsForPrefix(prefix.get)(version.get).map(_.presentation)
-      val suggestionsForPrefixedVersion = VersionSuggestions.suggestionsForPrefix(prefix.get)(s"v${version.get}").map(_.presentation)
+      val suggestions = VersionSuggestions.suggestionsForVersion(version.get, prefix.get)
+      val suggestionsForPrefixedVersion = VersionSuggestions.suggestionsForVersion(s"v${version.get}", prefix.get)
 
       suggestions.contains(version.get)                  :| "suggestions contain original version" &&
         (!suggestions.exists(_.contains('*')))           :| "suggestions don't contain wildcarded versions" &&
@@ -43,7 +43,7 @@ class VersionSuggestionsTest extends BasePropSpec {
 
   property("suggestions for prefixed semantic version") {
     forAll(semanticVersionGen(prefix = "v")) { (version: GeneratedVersion) =>
-      val suggestions = VersionSuggestions.suggestionsForPrefix("")(version.get).map(_.presentation)
+      val suggestions = VersionSuggestions.suggestionsForVersion(version.get, "")
 
       val pureSemanticVersion = version.get.drop(1)
       val suggestionsWithoutOriginal = suggestions.filterNot(_ == version.get)
@@ -55,14 +55,14 @@ class VersionSuggestionsTest extends BasePropSpec {
 
   property("suggestions for non semantic version") {
     forAll(nonSemanticVersionGen) { (version: GeneratedVersion) =>
-      val suggestions = VersionSuggestions.suggestionsForPrefix("")(version.get).map(_.presentation)
+      val suggestions = VersionSuggestions.suggestionsForVersion(version.get, "")
 
       suggestions.contains(version.get)    :| "suggestions contain original version" &&
         (suggestions.size == 1)            :| "suggestions contain only one suggestion"
     }
   }
 
-  def checkSemanticVersionAlternatives(version: String, suggestions: List[String]): Prop = {
+  def checkSemanticVersionAlternatives(version: String, suggestions: Seq[String]): Prop = {
     val wildcards = wildcard(suggestions)
 
     suggestions.contains(version)                             :| "suggestions contain original pure semantic version" &&
@@ -74,7 +74,7 @@ class VersionSuggestionsTest extends BasePropSpec {
       wildcards.forall(_.startsWith(version.substring(0, 1))) :| "wildcard suggestions start as same as original one"
   }
 
-  def wildcard(suggestions: List[String]): List[String] = suggestions.filter(_.contains("*"))
+  def wildcard(suggestions: Seq[String]): Seq[String] = suggestions.filter(_.contains("*"))
   def matches(wildcard: String, version: String): Boolean = {
     val regexp = ("^"+wildcard.replace(".", "\\.").replace("*", ".*")+"$").r
 

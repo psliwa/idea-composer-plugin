@@ -11,6 +11,7 @@ import com.intellij.patterns.{PatternCondition, StringPattern}
 import com.intellij.psi.PsiElement
 import com.intellij.util.ProcessingContext
 import org.psliwa.idea.composerJson._
+import org.psliwa.idea.composerJson.composer.InstalledPackages
 import org.psliwa.idea.composerJson.composer.version._
 import org.psliwa.idea.composerJson.intellij.Patterns._
 import org.psliwa.idea.composerJson.intellij.PsiElements._
@@ -62,15 +63,31 @@ class PackageVersionAnnotator extends Annotator {
       
   }
 
-  private def detectUnboundedVersionProblem(version: Option[Constraint], pkg: String, element: PsiElement): Seq[QuickFixGroup] = {
+  private def detectUnboundedVersionProblem(version: Option[Constraint], packageName: String, element: PsiElement): Seq[QuickFixGroup] = {
     version
       .filter(!_.isBounded)
-      .map(versionConstraint => (
-        Some(ComposerBundle.message("inspection.version.unboundVersion")),
-        versionQuickFixes(getUnboundVersionFixers)(pkg, versionConstraint, element) ++ List(new ExcludePatternAction(pkg)) ++
-          packageVendorPattern(pkg).map(new ExcludePatternAction(_)).toList
+      .map(versionConstraint => {
+        val installedPackages = InstalledPackages.forFile(element.getContainingFile.getVirtualFile)
+        def createChangeVersionQuickFixes(jsonObject: JsonObject): List[IntentionAction] = {
+          installedPackages.get(packageName).toList
+            .filter(_.replacedBy.isEmpty)
+            .map(_.version)
+            .flatMap(VersionSuggestions.suggestionsForVersion(_, ""))
+            .zipWithIndex
+            .map { case(version, index) =>
+              val message = (index+1)+". " +ComposerBundle.message("inspection.quickfix.setPackageVersion", version)
+              changePackageVersionQuickFix(packageName, version, jsonObject, message)
+            }
+        }
+
+        (
+          Some(ComposerBundle.message("inspection.version.unboundVersion")),
+          createQuickFixes(element, createChangeVersionQuickFixes) ++
+            versionQuickFixes(getUnboundVersionFixers)(packageName, versionConstraint, element) ++
+            List(new ExcludePatternAction(packageName)) ++
+            packageVendorPattern(packageName).map(new ExcludePatternAction(_)).toList
         )
-      )
+      })
       .toList
   }
 
@@ -83,7 +100,7 @@ class PackageVersionAnnotator extends Annotator {
       fixers
         .map(version.replace)
         .filter(_ != version)
-        .map(fixedVersion => changePackageVersionQuickFix(pkg, fixedVersion, jsonObject))
+        .map(fixedVersion => changePackageVersionQuickFix(pkg, fixedVersion.presentation, jsonObject))
     }
 
     createQuickFixes(element, create)
@@ -154,16 +171,16 @@ class PackageVersionAnnotator extends Annotator {
       .map(quickFix => (None, quickFix))
   }
 
-  private def changePackageVersionQuickFix(pkg: String, fixedVersion: Constraint, jsonObject: JsonObject): IntentionAction = {
-    changePackageVersionQuickFix(pkg, fixedVersion, jsonObject, ComposerBundle.message("inspection.quickfix.setPackageVersion", fixedVersion.presentation))
+  private def changePackageVersionQuickFix(packageName: String, fixedVersion: String, jsonObject: JsonObject): IntentionAction = {
+    changePackageVersionQuickFix(packageName, fixedVersion, jsonObject, ComposerBundle.message("inspection.quickfix.setPackageVersion", fixedVersion))
   }
 
   private def changeEquivalentPackageVersionQuickFix(pkg: String, fixedVersion: Constraint, jsonObject: JsonObject): IntentionAction = {
-    changePackageVersionQuickFix(pkg, fixedVersion, jsonObject, ComposerBundle.message("inspection.quickfix.setPackageEquivalentVersion", fixedVersion.presentation))
+    changePackageVersionQuickFix(pkg, fixedVersion.presentation, jsonObject, ComposerBundle.message("inspection.quickfix.setPackageEquivalentVersion", fixedVersion.presentation))
   }
 
-  private def changePackageVersionQuickFix(pkg: String, fixedVersion: Constraint, jsonObject: JsonObject, message: String): IntentionAction = {
-    new QuickFixIntentionActionAdapter(new SetPropertyValueQuickFix(jsonObject, pkg, SString(), fixedVersion.presentation) {
+  private def changePackageVersionQuickFix(packageName: String, newVersion: String, jsonObject: JsonObject, message: String): IntentionAction = {
+    new QuickFixIntentionActionAdapter(new SetPropertyValueQuickFix(jsonObject, packageName, SString(), newVersion) {
       override def getText: String = message
     })
   }
