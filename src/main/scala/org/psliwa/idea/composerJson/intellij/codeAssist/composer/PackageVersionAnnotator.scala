@@ -16,7 +16,7 @@ import org.psliwa.idea.composerJson.composer.version._
 import org.psliwa.idea.composerJson.intellij.Patterns._
 import org.psliwa.idea.composerJson.intellij.PsiElements._
 import org.psliwa.idea.composerJson.intellij.codeAssist.problem.ProblemDescriptor
-import org.psliwa.idea.composerJson.intellij.codeAssist.{QuickFixIntentionActionAdapter, SetPropertyValueQuickFix}
+import org.psliwa.idea.composerJson.intellij.codeAssist.{QuickFixIntentionActionAdapter, QuickFixIntentionActionAdapterWithPriority, SetPropertyValueQuickFix}
 import org.psliwa.idea.composerJson.json.SString
 import org.psliwa.idea.composerJson.settings.ProjectSettings
 
@@ -72,11 +72,11 @@ class PackageVersionAnnotator extends Annotator {
           installedPackages.get(packageName).toList
             .filter(_.replacedBy.isEmpty)
             .map(_.version)
-            .flatMap(VersionSuggestions.suggestionsForVersion(_, ""))
+            .flatMap(VersionSuggestions.suggestionsForVersion(_, "", mostSignificantFirst = false))
             .zipWithIndex
-            .map { case(version, index) =>
-              val message = (index+1)+". " +ComposerBundle.message("inspection.quickfix.setPackageVersion", version)
-              changePackageVersionQuickFix(packageName, version, jsonObject, message)
+            .map { case(version, priority) =>
+              val message = ComposerBundle.message("inspection.quickfix.setPackageVersion", version)
+              changePackageVersionQuickFix(packageName, version, jsonObject, message, Some(priority))
             }
         }
 
@@ -179,10 +179,17 @@ class PackageVersionAnnotator extends Annotator {
     changePackageVersionQuickFix(pkg, fixedVersion.presentation, jsonObject, ComposerBundle.message("inspection.quickfix.setPackageEquivalentVersion", fixedVersion.presentation))
   }
 
-  private def changePackageVersionQuickFix(packageName: String, newVersion: String, jsonObject: JsonObject, message: String): IntentionAction = {
-    new QuickFixIntentionActionAdapter(new SetPropertyValueQuickFix(jsonObject, packageName, SString(), newVersion) {
+  private def changePackageVersionQuickFix(packageName: String, newVersion: String, jsonObject: JsonObject, message: String, maybePriority: Option[Int] = None): IntentionAction = {
+    val quickFix = new SetPropertyValueQuickFix(jsonObject, packageName, SString(), newVersion) {
       override def getText: String = message
-    })
+    }
+    maybePriority match {
+      case Some(priority) =>
+        new QuickFixIntentionActionAdapterWithPriority(quickFix, priority)
+      case None =>
+        new QuickFixIntentionActionAdapter(quickFix)
+    }
+
   }
 
   private def packageVendorPattern(pkg: String): Option[String] = pkg.split('/').headOption.map(_ + "/*")
