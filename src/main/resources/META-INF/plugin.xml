@@ -1,7 +1,7 @@
 <idea-plugin>
   <id>org.psliwa.idea.composer</id>
   <name>PHP composer.json support</name>
-  <version>1.0.34</version>
+  <version>1.0.35</version>
   <vendor email="me@psliwa.org" url="https://github.com/psliwa/idea-composer-plugin">psliwa</vendor>
 
     <description><![CDATA[
@@ -14,6 +14,15 @@ This plugin adds auto completion and inspections support for composer.json file 
     ]]></description>
 
   <change-notes><![CDATA[
+<h2>1.0.35</h2>
+<ul>
+  <li>[#34] Optimizations for version suggestions</li>
+  <li>[#71] Explicitly skip http request for private packagist, fix satis support</li>
+  <li>[#72] Skip asking for version for built-in packages</li>
+  <li>Visualise packages replaced by other package</li>
+  <li>[#75] Fix navigation to package sources</li>
+</ul>
+
 <h2>1.0.34</h2>
 <ul>
   <li>[#85] Fix memory issue in 1.0.32 version</li>
