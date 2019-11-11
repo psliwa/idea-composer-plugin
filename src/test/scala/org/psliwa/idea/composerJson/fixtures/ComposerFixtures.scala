@@ -6,6 +6,7 @@ import com.intellij.openapi.vfs.{VfsUtil, VirtualFile}
 import com.intellij.testFramework.fixtures.CodeInsightTestFixture
 import org.psliwa.idea.composerJson
 import org.psliwa.idea.composerJson.composer._
+import org.psliwa.idea.composerJson.composer.model.PackageDescriptor
 
 object ComposerFixtures {
   def writeAction[A](f: () => A): A = {
@@ -34,7 +35,7 @@ object ComposerFixtures {
 
     pkgs.map( pkg =>
       s"""{
-          |  "name": "${pkg.pkg.name}",
+          |  "name": "${pkg.pkg.name.presentation}",
           |  ${pkg.pkg.homepage.map(homepage => s""""homepage":"$homepage",""").getOrElse("")}
           |  "version": "${pkg.pkg.version}"
           |  ${makeReplacesJson(pkg)}

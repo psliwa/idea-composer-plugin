@@ -4,16 +4,16 @@ import com.intellij.codeInspection.{ProblemHighlightType, ProblemsHolder}
 import com.intellij.json.psi.JsonObject
 import com.intellij.psi.PsiElement
 import org.psliwa.idea.composerJson.ComposerBundle
-import org.psliwa.idea.composerJson.composer.PackageDescriptor
 import org.psliwa.idea.composerJson.intellij.PsiElements
-import org.psliwa.idea.composerJson.intellij.codeAssist.problem.checker.{ImplicitConversions, Checker}
-import org.psliwa.idea.composerJson.intellij.codeAssist.{RemoveJsonElementQuickFix, CreatePropertyQuickFix, AbstractInspection, SetPropertyValueQuickFix}
+import org.psliwa.idea.composerJson.intellij.codeAssist.problem.checker.{Checker, ImplicitConversions}
+import org.psliwa.idea.composerJson.intellij.codeAssist.{AbstractInspection, CreatePropertyQuickFix, RemoveJsonElementQuickFix, SetPropertyValueQuickFix}
 import Checker._
 import ImplicitConversions._
 import org.psliwa.idea.composerJson.intellij.codeAssist.problem._
-import org.psliwa.idea.composerJson.json.{SStringChoice, SBoolean, SString, Schema}
+import org.psliwa.idea.composerJson.json.{SBoolean, SString, SStringChoice, Schema}
 import PsiElements._
 import PropertyPath._
+import org.psliwa.idea.composerJson.composer.model.PackageDescriptor
 
 class MisconfigurationInspection extends AbstractInspection {
 

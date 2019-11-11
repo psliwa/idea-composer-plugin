@@ -6,8 +6,9 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.Project
 import com.intellij.patterns.PlatformPatterns._
 import com.intellij.psi.PsiElement
-import org.psliwa.idea.composerJson.composer.repository._
-import org.psliwa.idea.composerJson.composer.version.VersionSuggestions
+import org.psliwa.idea.composerJson.composer.model.PackageName
+import org.psliwa.idea.composerJson.composer.model.repository._
+import org.psliwa.idea.composerJson.composer.model.version.VersionSuggestions
 import org.psliwa.idea.composerJson.intellij._
 import org.psliwa.idea.composerJson.intellij.codeAssist.AbstractCompletionContributor.{LookupElementsCompletionProvider, ParametersDependantCompletionProvider}
 import org.psliwa.idea.composerJson.intellij.codeAssist.{AbstractCompletionContributor, BaseLookupElement, Capture, _}
@@ -45,12 +46,13 @@ class CompletionContributor extends AbstractCompletionContributor {
           psiElement().withSuperParent(2, psiElement().and(propertyCapture(parent))).afterLeaf(":"),
           new VersionCompletionProvider(context => {
             val query = context.typedQuery.stripQuotes
+//            val packageName = PackageNa
             val pattern = "^(?i).*@[a-z]*$".r
             query match {
               case pattern() => minimumStabilities.map(new BaseLookupElement(_))
               case _ => {
                 VersionSuggestions
-                  .suggestionsForVersions(loadVersions(context.completionParameters)(context.propertyName), context.typedQuery, mostSignificantFirst = false)
+                  .suggestionsForVersions(loadVersions(context.completionParameters)(context.packageName), context.typedQuery, mostSignificantFirst = false)
                   .zipWithIndex
                   .map{ case(version, index) => new BaseLookupElement(version, Option(Icons.Packagist), true, None, None, "", Some(index)) }
               }
@@ -64,8 +66,9 @@ class CompletionContributor extends AbstractCompletionContributor {
   private def loadPackages(context: CompletionParameters) = {
     repositoryProvider(context.getOriginalFile.getProject, context.getOriginalFile.getVirtualFile.getCanonicalPath).getPackages
   }
-  private def loadVersions(context: CompletionParameters)(pkg: String) = {
-    repositoryProvider(context.getOriginalFile.getProject, context.getOriginalFile.getVirtualFile.getCanonicalPath).getPackageVersions(pkg)
+
+  private def loadVersions(context: CompletionParameters)(packageName: PackageName): Seq[String] = {
+    repositoryProvider(context.getOriginalFile.getProject, context.getOriginalFile.getVirtualFile.getCanonicalPath).getPackageVersions(packageName)
   }
 
   protected[composer] def setPackagesLoader(l: () => Seq[BaseLookupElement]): Unit = {
@@ -75,18 +78,18 @@ class CompletionContributor extends AbstractCompletionContributor {
     }
   }
 
-  private def createRepository(packagesLoader: () => Seq[BaseLookupElement], versionsLoader: (String) => Seq[String]) = {
+  private def createRepository(packagesLoader: () => Seq[BaseLookupElement], versionsLoader: PackageName => Seq[String]): Repository[BaseLookupElement] = {
     new Repository[BaseLookupElement] {
       override def getPackages: scala.Seq[BaseLookupElement] = packagesLoader()
-      override def getPackageVersions(pkg: String): scala.Seq[String] = versionsLoader(pkg)
+      override def getPackageVersions(packageName: PackageName): scala.Seq[String] = versionsLoader(packageName)
       override def map[NewPackage](f: (BaseLookupElement) => NewPackage): Repository[NewPackage] = Repository.callback(getPackages.map(f), getPackageVersions)
     }
   }
 
-  protected[composer] def setVersionsLoader(l: (String) => Seq[String]): Unit = {
+  protected[composer] def setVersionsLoader(loader: PackageName => Seq[String]): Unit = {
     val previousRepositoryProvider = repositoryProvider
     repositoryProvider = (project: Project, file: String) => {
-      createRepository(previousRepositoryProvider(project, file).getPackages _, l)
+      createRepository(previousRepositoryProvider(project, file).getPackages _, loader)
     }
   }
 
@@ -119,11 +122,11 @@ private object CompletionContributor {
   }
 
   object VersionCompletionProvider {
-    case class Context(propertyName: String, typedQuery: String, completionParameters: CompletionParameters)
+    case class Context(packageName: PackageName, typedQuery: String, completionParameters: CompletionParameters)
 
     def psiBased(f: Context => Seq[BaseLookupElement]): CompletionParameters => Seq[BaseLookupElement] = parameters => {
       val typedQuery = getTypedText(parameters.getPosition).getOrElse("")
-      firstNamedProperty(parameters.getPosition).map(p => Context(p.getName, typedQuery, parameters)).map(f).getOrElse(List())
+      firstNamedProperty(parameters.getPosition).map(p => Context(PackageName(p.getName), typedQuery, parameters)).map(f).getOrElse(List())
     }
   }
 

@@ -7,16 +7,16 @@ import org.psliwa.idea.composerJson.intellij.PsiElementWrapper
 
 private class UrlPsiReference(element: PsiElement) extends PsiReferenceBase[PsiElement](element) {
 
-  protected def url: String = getValue
+  protected def url: Option[String] = Some(getValue)
 
   override def resolve: PsiElement = {
     new PsiElementWrapper(element) with NavigatablePsiElement {
       override def getParent: PsiElement = element.getParent
-      override def navigate(requestFocus: Boolean) = BrowserUtil.browse(url)
+      override def navigate(requestFocus: Boolean): Unit = url.foreach(BrowserUtil.browse)
       override def canNavigate: Boolean = true
       override def canNavigateToSource: Boolean = true
-      override def getNavigationElement = this
-      override def getName: String = url
+      override def getNavigationElement: PsiElement = this
+      override def getName: String = url.getOrElse("")
       override def getPresentation: ItemPresentation = null
     }
   }

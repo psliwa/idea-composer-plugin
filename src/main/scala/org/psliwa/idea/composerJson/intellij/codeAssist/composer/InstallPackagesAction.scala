@@ -5,8 +5,9 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiFile
-import org.psliwa.idea.composerJson.composer.InstalledPackages
+import org.psliwa.idea.composerJson.composer._
 import org.psliwa.idea.composerJson.composer.command.DefaultPackagesInstaller
+import org.psliwa.idea.composerJson.composer.model.PackageName
 import org.psliwa.idea.composerJson.intellij.PsiElements._
 import org.psliwa.idea.composerJson.intellij.codeAssist.composer.NotInstalledPackages._
 import org.psliwa.idea.composerJson.{ComposerBundle, composer}
@@ -29,7 +30,7 @@ private object InstallPackagesAction extends IntentionAction {
     val packages = for {
       jsonFile <- ensureJsonFile(file).toList
       topValue <- Option(jsonFile.getTopLevelValue).toList
-      pkg <- getNotInstalledPackageProperties(topValue, installedPackages).map(property => composer.PackageName(property.getName))
+      pkg <- getNotInstalledPackageProperties(topValue, installedPackages).map(property => PackageName(property.getName))
     } yield pkg
 
     if(packages.nonEmpty) {

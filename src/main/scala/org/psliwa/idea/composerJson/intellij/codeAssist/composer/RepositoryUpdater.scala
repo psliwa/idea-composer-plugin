@@ -10,7 +10,7 @@ import com.intellij.patterns.PlatformPatterns._
 import com.intellij.psi.PsiElement
 import com.intellij.ui.EditorNotifications
 import org.psliwa.idea.composerJson._
-import org.psliwa.idea.composerJson.composer.repository.{Repository, RepositoryInfo, RepositoryProvider}
+import org.psliwa.idea.composerJson.composer.model.repository.{Repository, RepositoryInfo, RepositoryProvider}
 import org.psliwa.idea.composerJson.intellij.PsiElements._
 
 class RepositoryUpdater extends Annotator {

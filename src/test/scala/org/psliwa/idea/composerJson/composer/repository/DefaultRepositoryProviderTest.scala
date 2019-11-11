@@ -2,11 +2,12 @@ package org.psliwa.idea.composerJson.composer.repository
 
 import org.junit.Assert._
 import org.junit.Test
-import org.psliwa.idea.composerJson.composer.repository.DefaultRepositoryProviderTest._
+import org.psliwa.idea.composerJson.composer.model.repository.{InMemoryRepository, Repository, RepositoryInfo}
+import org.psliwa.idea.composerJson.composer.repository.DefaultRepositoryProviderTest.FakeRepositoryFactory
 
 class DefaultRepositoryProviderTest {
   val repositoryFactory = new FakeRepositoryFactory()
-  val defaultRepository = Repository.inMemory(List("some/package123321"))
+  val defaultRepository: Repository[String] = Repository.inMemory(List("some/package123321"))
   val provider = new DefaultRepositoryProvider(repositoryFactory, defaultRepository)
 
   @Test
@@ -15,8 +16,8 @@ class DefaultRepositoryProviderTest {
     //given
 
     val file = "someFile"
-    val repositoryInfo = new RepositoryInfo(List("a"), false)
-    val repository = new InMemoryRepository[String](List())
+    val repositoryInfo = RepositoryInfo(List("a"), packagist = false)
+    val repository = Repository.inMemory[String](List())
 
     repositoryFactory.setRepositories(repositoryInfo, repository)
     provider.updateRepository(file, repositoryInfo)
@@ -38,8 +39,8 @@ class DefaultRepositoryProviderTest {
     val file = "someFile"
     val repositoryInfo = new RepositoryInfo(List("a"), false)
     val changedRepositoryInfo = new RepositoryInfo(List("b"), false)
-    val repository = new InMemoryRepository(List("package1"))
-    val changedRepository = new InMemoryRepository(List("package2"))
+    val repository = Repository.inMemory(List("package1"))
+    val changedRepository = Repository.inMemory(List("package2"))
 
     repositoryFactory.setRepositories(repositoryInfo, repository)
     repositoryFactory.setRepositories(changedRepositoryInfo, changedRepository)
@@ -165,8 +166,8 @@ class DefaultRepositoryProviderTest {
     //given
 
     val file = "someFile"
-    val repositoryInfo = new RepositoryInfo(List("a"), false)
-    val repository = new InMemoryRepository[String](List())
+    val repositoryInfo = RepositoryInfo(List("a"), packagist = false)
+    val repository = Repository.inMemory[String](List())
 
     repositoryFactory.setRepositories(repositoryInfo, repository)
     provider.updateRepository(file, repositoryInfo)
@@ -190,7 +191,7 @@ object DefaultRepositoryProviderTest {
 
     override def repositoryFor(repositoryInfo: RepositoryInfo): Repository[String] = {
       calls += repositoryInfo -> (callsFor(repositoryInfo) + 1)
-      repositories.get(repositoryInfo).get
+      repositories(repositoryInfo)
     }
 
     def callsFor(repositoryInfo: RepositoryInfo): Int = calls.getOrElse(repositoryInfo, 0)

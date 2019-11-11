@@ -2,7 +2,8 @@ package org.psliwa.idea.composerJson.intellij.codeAssist.composer
 
 import com.intellij.openapi.application.ApplicationManager
 import org.junit.Assert._
-import org.psliwa.idea.composerJson.composer.repository.{Repository, RepositoryInfo, TestingRepositoryProvider}
+import org.psliwa.idea.composerJson.composer.model.PackageName
+import org.psliwa.idea.composerJson.composer.model.repository.{Repository, RepositoryInfo, TestingRepositoryProvider}
 import org.psliwa.idea.composerJson.intellij.codeAssist.InspectionTest
 
 class RepositoryUpdaterTest extends InspectionTest {
@@ -206,18 +207,18 @@ class RepositoryUpdaterTest extends InspectionTest {
 
   private def assertRepository[A](repository: Repository[A], expectedPackages: Map[String,List[String]]): Unit = {
     assertTrue(
-      expectedPackages.forall{case(pkg, versions) => {
-        repository.getPackages.contains(pkg) && versions.forall(repository.getPackageVersions(pkg).contains)
+      expectedPackages.forall { case(packageName, versions) => {
+        repository.getPackages.contains(packageName) && versions.forall(repository.getPackageVersions(PackageName(packageName)).contains)
       }}
     )
   }
 
-  override def setUp() = {
+  override def setUp(): Unit = {
     super.setUp()
     clearRepositories()
   }
 
-  private def clearRepositories() = {
+  private def clearRepositories(): Unit = {
     getRepositoryProvider.infos.clear()
   }
 

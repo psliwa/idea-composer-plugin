@@ -3,7 +3,7 @@ package org.psliwa.idea.composerJson.intellij.codeAssist.composer.infoRenderer
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.vfs.VirtualFile
 import org.junit.Assert._
-import org.psliwa.idea.composerJson.composer.PackageDescriptor
+import org.psliwa.idea.composerJson.composer.model.PackageDescriptor
 import org.psliwa.idea.composerJson.fixtures.ComposerFixtures
 import org.psliwa.idea.composerJson.fixtures.ComposerFixtures._
 import org.psliwa.idea.composerJson.intellij.codeAssist.InspectionTest

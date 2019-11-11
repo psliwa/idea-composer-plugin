@@ -3,10 +3,11 @@ package org.psliwa.idea.composerJson.intellij.codeAssist.composer
 import java.util
 
 import com.intellij.lang.documentation.DocumentationProvider
-import com.intellij.psi.{PsiManager, PsiElement}
+import com.intellij.psi.{PsiElement, PsiManager}
 import com.intellij.patterns.PlatformPatterns._
 import org.psliwa.idea.composerJson.intellij.PsiElements._
-import org.psliwa.idea.composerJson.composer.PackageDescriptor._
+import org.psliwa.idea.composerJson.composer.model.PackageDescriptor._
+import org.psliwa.idea.composerJson.composer.model.PackageName
 
 class PackageDocumentationProvider extends DocumentationProvider {
   import PackageDocumentationProvider._
@@ -21,7 +22,8 @@ class PackageDocumentationProvider extends DocumentationProvider {
 
   override def getUrlFor(element: PsiElement, originalElement: PsiElement): util.List[String] = {
     if(packageNamePattern.accepts(originalElement)) {
-      util.Arrays.asList(documentationUrl(originalElement, getStringValue(originalElement.getParent).getOrElse("")))
+      import scala.collection.JavaConverters._
+      documentationUrl(originalElement, PackageName(getStringValue(originalElement.getParent).getOrElse(""))).toList.asJava
     } else {
       null
     }

@@ -6,22 +6,24 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.ApplicationComponent
 import com.intellij.openapi.vfs._
 import org.psliwa.idea.composerJson.ComposerLock
+import org.psliwa.idea.composerJson.composer.model.Packages
 import org.psliwa.idea.composerJson.composer.parsers.JsonParsers
+
 import scala.collection.mutable
 
 class InstalledPackagesWatcher extends ApplicationComponent {
 
   //packages are lazy loaded
-  private val packages = mutable.Map[VirtualFile, () => ComposerPackages]()
+  private val packages = mutable.Map[VirtualFile, () => Packages]()
   private val listener = new ComposerLockListener()
 
-  private[composer] def getPackages(file: VirtualFile) = {
+  private[composer] def getPackages(file: VirtualFile): Packages = {
     val maybePackages = for {
       parent <- Option(file.getParent)
       lock <- Option(parent.findChild(ComposerLock)).filter(!_.isDirectory)
     } yield packages.getOrElse(lock, loadPackagesAndSet(lock))()
 
-    maybePackages.getOrElse(ComposerPackages())
+    maybePackages.getOrElse(Packages())
   }
 
   override def initComponent(): Unit = {
@@ -38,7 +40,7 @@ class InstalledPackagesWatcher extends ApplicationComponent {
   private[InstalledPackagesWatcher] def loadPackages(file: VirtualFile) = {
     readFile(file)
       .map(JsonParsers.parseLockPackages)
-      .getOrElse(ComposerPackages())
+      .getOrElse(Packages())
   }
 
   private def loadPackagesAndSet(file: VirtualFile) = {
@@ -110,7 +112,7 @@ class InstalledPackagesWatcher extends ApplicationComponent {
 }
 
 object InstalledPackages {
-  def forFile(composerJsonFile: VirtualFile): ComposerPackages = {
+  def forFile(composerJsonFile: VirtualFile): Packages = {
     ApplicationManager.getApplication.getComponent(classOf[InstalledPackagesWatcher]).getPackages(composerJsonFile)
   }
 }

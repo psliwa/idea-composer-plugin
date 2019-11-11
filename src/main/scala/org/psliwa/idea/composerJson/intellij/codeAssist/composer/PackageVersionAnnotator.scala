@@ -12,7 +12,8 @@ import com.intellij.psi.PsiElement
 import com.intellij.util.ProcessingContext
 import org.psliwa.idea.composerJson._
 import org.psliwa.idea.composerJson.composer.InstalledPackages
-import org.psliwa.idea.composerJson.composer.version._
+import org.psliwa.idea.composerJson.composer.model.PackageName
+import org.psliwa.idea.composerJson.composer.model.version._
 import org.psliwa.idea.composerJson.intellij.Patterns._
 import org.psliwa.idea.composerJson.intellij.PsiElements._
 import org.psliwa.idea.composerJson.intellij.codeAssist.problem.ProblemDescriptor
@@ -35,8 +36,8 @@ class PackageVersionAnnotator extends Annotator {
     if(pattern.accepts(element)) {
       val problemDescriptors = for {
         version <- getStringValue(element).toList
-        pkg <- ensureJsonProperty(element.getParent).map(_.getName).toList
-        (message, quickFixes) <- detectProblemsInVersion(pkg, version, element)
+        packageName <- ensureJsonProperty(element.getParent).map(_.getName).toList
+        (message, quickFixes) <- detectProblemsInVersion(PackageName(packageName), version, element)
       } yield ProblemDescriptor(element, message, quickFixes)
 
       problemDescriptors.foreach(problem => {
@@ -54,16 +55,16 @@ class PackageVersionAnnotator extends Annotator {
     }
   }
 
-  private def detectProblemsInVersion(pkg: String, version: String, element: PsiElement): Seq[QuickFixGroup] = {
+  private def detectProblemsInVersion(packageName: PackageName, version: String, element: PsiElement): Seq[QuickFixGroup] = {
     val versionConstraint = parseVersion(version)
 
-    detectUnboundedVersionProblem(versionConstraint, pkg, element) ++ 
-      detectWildcardAndOperatorCombo(versionConstraint, pkg, element) ++
-      detectEquivalents(versionConstraint, pkg, element)
+    detectUnboundedVersionProblem(versionConstraint, packageName, element) ++
+      detectWildcardAndOperatorCombo(versionConstraint, packageName, element) ++
+      detectEquivalents(versionConstraint, packageName, element)
       
   }
 
-  private def detectUnboundedVersionProblem(version: Option[Constraint], packageName: String, element: PsiElement): Seq[QuickFixGroup] = {
+  private def detectUnboundedVersionProblem(version: Option[Constraint], packageName: PackageName, element: PsiElement): Seq[QuickFixGroup] = {
     version
       .filter(!_.isBounded)
       .map(versionConstraint => {
@@ -84,7 +85,7 @@ class PackageVersionAnnotator extends Annotator {
           Some(ComposerBundle.message("inspection.version.unboundVersion")),
           createQuickFixes(element, createChangeVersionQuickFixes) ++
             versionQuickFixes(getUnboundVersionFixers)(packageName, versionConstraint, element) ++
-            List(new ExcludePatternAction(packageName)) ++
+            List(new ExcludePatternAction(packageName.presentation)) ++
             packageVendorPattern(packageName).map(new ExcludePatternAction(_)).toList
         )
       })
@@ -92,7 +93,7 @@ class PackageVersionAnnotator extends Annotator {
   }
 
   private def versionQuickFixes(fixers: Seq[Constraint => Option[Constraint]])(
-    pkg: String,
+    packageName: PackageName,
     version: Constraint,
     element: PsiElement
   ): Seq[IntentionAction] = {
@@ -100,7 +101,7 @@ class PackageVersionAnnotator extends Annotator {
       fixers
         .map(version.replace)
         .filter(_ != version)
-        .map(fixedVersion => changePackageVersionQuickFix(pkg, fixedVersion.presentation, jsonObject))
+        .map(fixedVersion => changePackageVersionQuickFix(packageName, fixedVersion.presentation, jsonObject))
     }
 
     createQuickFixes(element, create)
@@ -130,12 +131,12 @@ class PackageVersionAnnotator extends Annotator {
     )
   })
 
-  private def detectWildcardAndOperatorCombo(version: Option[Constraint], pkg: String, element: PsiElement): Seq[QuickFixGroup] = {
+  private def detectWildcardAndOperatorCombo(version: Option[Constraint], packageName: PackageName, element: PsiElement): Seq[QuickFixGroup] = {
     version
       .filter(_ contains wildcardAndOperatorCombination)
       .map(versionConstraint => (
         Some(ComposerBundle.message("inspection.version.wildcardAndComparison")),
-        versionQuickFixes(getWildcardAndOperatorComboFixers)(pkg, versionConstraint, element)
+        versionQuickFixes(getWildcardAndOperatorComboFixers)(packageName, versionConstraint, element)
       ))
       .toList
   }
@@ -163,24 +164,24 @@ class PackageVersionAnnotator extends Annotator {
     )
   }
 
-  def detectEquivalents(version: Option[Constraint], pkg: String, element: PsiElement): Seq[QuickFixGroup] = {
+  def detectEquivalents(version: Option[Constraint], packageName: PackageName, element: PsiElement): Seq[QuickFixGroup] = {
     version
       .toList.view
       .flatMap(VersionEquivalents.equivalentsFor)
-      .map(equivalentVersion => createQuickFixes(element, jsonObject => List(changeEquivalentPackageVersionQuickFix(pkg, equivalentVersion, jsonObject))))
+      .map(equivalentVersion => createQuickFixes(element, jsonObject => List(changeEquivalentPackageVersionQuickFix(packageName, equivalentVersion, jsonObject))))
       .map(quickFix => (None, quickFix))
   }
 
-  private def changePackageVersionQuickFix(packageName: String, fixedVersion: String, jsonObject: JsonObject): IntentionAction = {
+  private def changePackageVersionQuickFix(packageName: PackageName, fixedVersion: String, jsonObject: JsonObject): IntentionAction = {
     changePackageVersionQuickFix(packageName, fixedVersion, jsonObject, ComposerBundle.message("inspection.quickfix.setPackageVersion", fixedVersion))
   }
 
-  private def changeEquivalentPackageVersionQuickFix(pkg: String, fixedVersion: Constraint, jsonObject: JsonObject): IntentionAction = {
-    changePackageVersionQuickFix(pkg, fixedVersion.presentation, jsonObject, ComposerBundle.message("inspection.quickfix.setPackageEquivalentVersion", fixedVersion.presentation))
+  private def changeEquivalentPackageVersionQuickFix(packageName: PackageName, fixedVersion: Constraint, jsonObject: JsonObject): IntentionAction = {
+    changePackageVersionQuickFix(packageName, fixedVersion.presentation, jsonObject, ComposerBundle.message("inspection.quickfix.setPackageEquivalentVersion", fixedVersion.presentation))
   }
 
-  private def changePackageVersionQuickFix(packageName: String, newVersion: String, jsonObject: JsonObject, message: String, maybePriority: Option[Int] = None): IntentionAction = {
-    val quickFix = new SetPropertyValueQuickFix(jsonObject, packageName, SString(), newVersion) {
+  private def changePackageVersionQuickFix(packageName: PackageName, newVersion: String, jsonObject: JsonObject, message: String, maybePriority: Option[Int] = None): IntentionAction = {
+    val quickFix = new SetPropertyValueQuickFix(jsonObject, packageName.presentation, SString(), newVersion) {
       override def getText: String = message
     }
     maybePriority match {
@@ -192,7 +193,7 @@ class PackageVersionAnnotator extends Annotator {
 
   }
 
-  private def packageVendorPattern(pkg: String): Option[String] = pkg.split('/').headOption.map(_ + "/*")
+  private def packageVendorPattern(packageName: PackageName): Option[String] = packageName.vendor.map(vendor => s"$vendor/*")
 
   private def excluded(project: Project): StringPattern = {
     string().`with`(new PatternCondition[String]("matches") {

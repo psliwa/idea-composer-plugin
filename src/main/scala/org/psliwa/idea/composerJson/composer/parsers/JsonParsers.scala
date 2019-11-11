@@ -1,19 +1,18 @@
 package org.psliwa.idea.composerJson.composer.parsers
 
-import org.psliwa.idea.composerJson.composer._
+import org.psliwa.idea.composerJson.composer.model.{PackageDescriptor, PackageName, Packages}
 import org.psliwa.idea.composerJson.util.TryMonoid
+import org.psliwa.idea.composerJson.util.parsers.JSON
+import scalaz.Scalaz._
 import spray.json._
 
 import scala.util.{Failure, Success, Try}
-import scalaz._
-import Scalaz._
-import org.psliwa.idea.composerJson.util.parsers.JSON
 
 object JsonParsers {
 
   class ParseException() extends RuntimeException
 
-  private implicit val tryMonoid = new TryMonoid[RepositoryPackages](new ParseException)
+  private implicit val tryMonoid: TryMonoid[RepositoryPackages] = new TryMonoid[RepositoryPackages](new ParseException)
 
   def parsePackageNames(data: String): Try[Seq[String]] = {
     val packages = for {
@@ -54,7 +53,7 @@ object JsonParsers {
     versions.map(Try(_)).getOrElse(Failure(new ParseException()))
   }
 
-  def parseLockPackages(data: String): ComposerPackages = {
+  def parseLockPackages(data: String): Packages = {
     def parse(property: String, dev: Boolean): List[PackageDescriptor] = for {
       result <- JSON.parse(data).toList
       o <- tryJsonObject(result).toList
@@ -66,18 +65,18 @@ object JsonParsers {
 
     val packages = parse("packages", dev = false) ++ parse("packages-dev", dev = true)
 
-    ComposerPackages(packages:_*)
+    Packages(packages:_*)
   }
 
   private def createLockPackage(dev: Boolean)(maybeJsonObject: JsValue): List[PackageDescriptor] = {
     for {
       jsonObject <- tryJsonObject(maybeJsonObject).toList
-      name <- jsonObject.fields.get("name").flatMap(tryJsonString).toList
+      packageName <- jsonObject.fields.get("name").flatMap(tryJsonString).toList.map(PackageName)
       version <- jsonObject.fields.get("version").flatMap(tryJsonString).toList
       homepage = jsonObject.fields.get("homepage").flatMap(tryJsonString)
       replaces = jsonObject.fields.get("replace").flatMap(tryJsonObject).map(_.fields.keySet).getOrElse(Set.empty)
-      mainPackage = PackageDescriptor(name, version, dev, homepage)
-      packages = mainPackage :: replaces.toList.map(PackageDescriptor(_, version, dev, None, Some(mainPackage)))
+      mainPackage = PackageDescriptor(packageName, version, dev, homepage, replacedBy = None)
+      packages = mainPackage :: replaces.map(PackageName).toList.map(PackageDescriptor(_, version, dev, None, Some(mainPackage)))
       pkg <- packages
     } yield pkg
   }

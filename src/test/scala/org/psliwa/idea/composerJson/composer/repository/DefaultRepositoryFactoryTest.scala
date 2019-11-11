@@ -2,12 +2,14 @@ package org.psliwa.idea.composerJson.composer.repository
 
 import org.junit.Assert._
 import org.junit.Test
+import org.psliwa.idea.composerJson.composer.model.PackageName
+import org.psliwa.idea.composerJson.composer.model.repository.{Repository, RepositoryInfo}
 import org.psliwa.idea.composerJson.composer.repository.DefaultRepositoryProvider._
 
 class DefaultRepositoryFactoryTest {
 
   val packagistRepository = Repository.inMemory(List("packagist"))
-  val factory = new DefaultRepositoryFactory(url => new InMemoryRepository(List(url)), packagistRepository, pkg => pkg)
+  val factory = new DefaultRepositoryFactory(url => Repository.inMemory(List(url)), packagistRepository, pkg => pkg)
 
   @Test
   def givenFewUrls_createRepositoryFromFewUrls(): Unit = {
@@ -43,11 +45,11 @@ class DefaultRepositoryFactoryTest {
 
     //when
 
-    val repository = factory.repositoryFor(new RepositoryInfo(List(), false, Some(new InMemoryRepository[String](packages, versions))))
+    val repository = factory.repositoryFor(new RepositoryInfo(List(), false, Some(Repository.inMemory[String](packages, versions))))
 
     //then
 
     assertEquals(packages, repository.getPackages)
-    assertEquals(versions.getOrElse(packageName, List()), repository.getPackageVersions(packageName))
+    assertEquals(versions.getOrElse(packageName, List()), repository.getPackageVersions(PackageName(packageName)))
   }
 }

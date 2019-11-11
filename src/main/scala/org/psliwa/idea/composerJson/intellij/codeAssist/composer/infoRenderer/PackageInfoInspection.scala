@@ -3,11 +3,12 @@ package org.psliwa.idea.composerJson.intellij.codeAssist.composer.infoRenderer
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.psi.PsiElement
-import org.psliwa.idea.composerJson.composer.{InstalledPackages, PackageDescriptor}
+import org.psliwa.idea.composerJson.composer.InstalledPackages
 import org.psliwa.idea.composerJson.intellij.PsiElements
 import org.psliwa.idea.composerJson.intellij.codeAssist.AbstractInspection
 import org.psliwa.idea.composerJson.json.Schema
 import PsiElements._
+import org.psliwa.idea.composerJson.composer.model.{PackageDescriptor, PackageName}
 
 import scala.collection.JavaConverters._
 
@@ -16,7 +17,7 @@ class PackageInfoInspection extends AbstractInspection {
     val installedPackages = InstalledPackages.forFile(element.getContainingFile.getVirtualFile)
 
     def packageInfo(pkg: PackageDescriptor): String = {
-      pkg.replacedBy.map(p => s"replaced by: ${p.name} (${p.version})").getOrElse(pkg.version)
+      pkg.replacedBy.map(p => s"replaced by: ${p.name.presentation} (${p.version})").getOrElse(pkg.version)
     }
 
     val packagesInfo = for {
@@ -26,7 +27,7 @@ class PackageInfoInspection extends AbstractInspection {
       packagesObject <- Option(property.getValue).toList
       packagesObject <- ensureJsonObject(packagesObject).toList
       packageProperty <- packagesObject.getPropertyList.asScala
-      pkg <- installedPackages.get(packageProperty.getName).toList
+      pkg <- installedPackages.get(PackageName(packageProperty.getName)).toList
     } yield {
       PackageInfo(packageProperty.getTextOffset, packageInfo(pkg))
     }

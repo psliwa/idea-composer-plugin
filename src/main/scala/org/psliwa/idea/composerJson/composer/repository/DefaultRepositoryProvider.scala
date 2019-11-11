@@ -1,8 +1,10 @@
 package org.psliwa.idea.composerJson.composer.repository
 
-import org.psliwa.idea.composerJson.composer.repository.DefaultRepositoryProvider.{DefaultRepositoryFactory, RepositoryFactory}
+import org.psliwa.idea.composerJson.composer.model.repository._
 import org.psliwa.idea.composerJson.composer.parsers.{JsonParsers, RepositoryPackages}
+import org.psliwa.idea.composerJson.composer.repository.DefaultRepositoryProvider.{DefaultRepositoryFactory, RepositoryFactory}
 import org.psliwa.idea.composerJson.util.IO
+
 import scala.collection.mutable
 import scala.util.Try
 
@@ -65,13 +67,11 @@ object DefaultRepositoryProvider {
     mapPackage: String => Package
   ) extends RepositoryFactory[Package] {
     override def repositoryFor(repositoryInfo: RepositoryInfo): Repository[Package] = {
-      new SkipBuiltInPackagesVersionRepository(
-        new ComposedRepository(
-          repositoryInfo.urls.map(repositoryFromUrl).map(_.map(mapPackage)) ++
-            List(packagistRepository).filter(_ => repositoryInfo.packagist) ++
-            repositoryInfo.repository.map(_.map(mapPackage)).toList
-        )
-      )
+      val repositories = repositoryInfo.urls.map(repositoryFromUrl).map(_.map(mapPackage)) ++
+        List(packagistRepository).filter(_ => repositoryInfo.packagist) ++
+        repositoryInfo.repository.map(_.map(mapPackage)).toList
+
+      Repository.composed(repositories)
     }
   }
 
@@ -79,12 +79,12 @@ object DefaultRepositoryProvider {
     privatePackagistRepositoryFromUrl(url) orElse
       satisRepositoryFromUrl(IO.loadUrl, JsonParsers.parsePackages)(url) orElse
       packagistRepositoryFromUrl(url) getOrElse
-      EmptyRepository
+      Repository.empty
   }
 
   private[repository] def privatePackagistRepositoryFromUrl(url: String): Option[Repository[String]] = {
     // fail fast for private packagist - it is not supported
-    if(url.startsWith(Packagist.privatePackagistUrl)) Some(EmptyRepository)
+    if(url.startsWith(Packagist.privatePackagistUrl)) Some(Repository.empty)
     else None
   }
 
@@ -120,6 +120,6 @@ object DefaultRepositoryProvider {
     import org.psliwa.idea.composerJson.util.Funcs._
     val packages: Try[Seq[String]] = Packagist.loadPackages(url)
     packages.toOption
-      .map(packages => new CallbackRepository[String](packages, memorize(30)(Packagist.loadVersions(url)(_).getOrElse(List.empty))))
+      .map(packages => Repository.callback[String](packages, memorize(30)(Packagist.loadVersions(url)(_).getOrElse(List.empty))))
   }
 }

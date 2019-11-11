@@ -2,6 +2,8 @@ package org.psliwa.idea.composerJson.composer.repository
 
 import org.junit.Assert._
 import org.junit.Test
+import org.psliwa.idea.composerJson.composer.model.PackageName
+import org.psliwa.idea.composerJson.composer.model.repository.Repository
 import org.psliwa.idea.composerJson.composer.parsers.RepositoryPackages
 
 import scala.util.Try
@@ -15,19 +17,19 @@ class RepositoryFromUrlTest {
 
     val url = "http://some-url"
     val content = "content"
-    val repositoryPackages = new RepositoryPackages(Map("package" -> List("1.0.0")), List())
+    val repositoryPackages = RepositoryPackages(Map("package" -> List("1.0.0")), List())
 
     val load = loadUrl(Map(url -> content)) _
     val parse = parsePackages(Map(content -> repositoryPackages)) _
 
     //when
 
-    val repository = DefaultRepositoryProvider.satisRepositoryFromUrl(load, parse)(url).getOrElse(EmptyRepository)
+    val repository = DefaultRepositoryProvider.satisRepositoryFromUrl(load, parse)(url).getOrElse(Repository.empty)
 
     //then
 
     assertTrue(repository.getPackages.contains("package"))
-    assertTrue(repository.getPackageVersions("package").contains("1.0.0"))
+    assertTrue(repository.getPackageVersions(PackageName("package")).contains("1.0.0"))
   }
 
   @Test
@@ -39,7 +41,7 @@ class RepositoryFromUrlTest {
 
     //when
 
-    val repository = DefaultRepositoryProvider.satisRepositoryFromUrl(load, parse)("some-url").getOrElse(EmptyRepository)
+    val repository = DefaultRepositoryProvider.satisRepositoryFromUrl(load, parse)("some-url").getOrElse(Repository.empty)
 
     //then
 
@@ -65,7 +67,7 @@ class RepositoryFromUrlTest {
 
     //when
 
-    val repository = DefaultRepositoryProvider.satisRepositoryFromUrl(load, parse)(url).getOrElse(EmptyRepository)
+    val repository = DefaultRepositoryProvider.satisRepositoryFromUrl(load, parse)(url).getOrElse(Repository.empty)
 
     //then
 
@@ -96,7 +98,7 @@ class RepositoryFromUrlTest {
 
     //when
 
-    val repository = DefaultRepositoryProvider.satisRepositoryFromUrl(load, parse)(url).getOrElse(EmptyRepository)
+    val repository = DefaultRepositoryProvider.satisRepositoryFromUrl(load, parse)(url).getOrElse(Repository.empty)
 
     //then
 
@@ -108,7 +110,7 @@ class RepositoryFromUrlTest {
   def givenPrivatePackagistAsUrl_tryToGetPrivatePackagistRepo_emptyRepoShouldBeUsed(): Unit = {
     val repository = DefaultRepositoryProvider.privatePackagistRepositoryFromUrl(Packagist.privatePackagistUrl+"/some-organization/packages.json")
 
-    assertEquals(Some(EmptyRepository), repository)
+    assertEquals(Some(Repository.empty), repository)
   }
 
   @Test

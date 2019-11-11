@@ -2,7 +2,8 @@ package org.psliwa.idea.composerJson.intellij.codeAssist.composer
 
 import com.intellij.codeInsight
 import com.intellij.json.JsonLanguage
-import org.psliwa.idea.composerJson.intellij.codeAssist.{CompletionTest, BaseLookupElement}
+import org.psliwa.idea.composerJson.composer.model.PackageName
+import org.psliwa.idea.composerJson.intellij.codeAssist.{BaseLookupElement, CompletionTest}
 
 abstract class AbstractPackagesTest extends CompletionTest {
 
@@ -18,11 +19,11 @@ abstract class AbstractPackagesTest extends CompletionTest {
       .map(_.asInstanceOf[CompletionContributor])
   }
 
-  def setCompletionPackageLoader(f: () => Seq[BaseLookupElement]) = {
+  def setCompletionPackageLoader(f: () => Seq[BaseLookupElement]): Unit = {
     getCompletionContributors.foreach(_.setPackagesLoader(f))
   }
 
-  def setCompletionVersionsLoader(f: String => Seq[String]) = {
-    getCompletionContributors.foreach(_.setVersionsLoader(f))
+  def setCompletionVersionsLoader(f: String => Seq[String]): Unit = {
+    getCompletionContributors.foreach(_.setVersionsLoader(f.compose[PackageName](_.presentation)))
   }
 }

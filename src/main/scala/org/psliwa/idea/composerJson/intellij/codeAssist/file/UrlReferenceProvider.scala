@@ -10,7 +10,7 @@ private object UrlReferenceProvider extends PsiReferenceProvider {
 
     if(EmailFormat.isValid(text)) {
       Array(new UrlPsiReference(element) {
-        override protected def url: String = "mailto:" + super.url
+        override protected def url: Option[String] = Some("mailto:" + super.url)
       })
     } else if(UriFormat.isValid(text)) {
       Array(new UrlPsiReference(element))

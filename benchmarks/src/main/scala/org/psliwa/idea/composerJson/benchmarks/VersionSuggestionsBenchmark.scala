@@ -3,7 +3,7 @@ package org.psliwa.idea.composerJson.benchmarks
 import java.util.concurrent.TimeUnit
 
 import org.openjdk.jmh.annotations._
-import org.psliwa.idea.composerJson.composer.version.VersionSuggestions
+import org.psliwa.idea.composerJson.composer.model.version.VersionSuggestions
 
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
 @BenchmarkMode(Array(Mode.SingleShotTime))

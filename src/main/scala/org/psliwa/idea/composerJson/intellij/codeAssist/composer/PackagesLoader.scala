@@ -6,12 +6,14 @@ import com.intellij.openapi.fileEditor.{FileEditorManager, FileEditorManagerAdap
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import org.psliwa.idea.composerJson._
-import org.psliwa.idea.composerJson.composer.repository._
+import org.psliwa.idea.composerJson.composer.model.PackageName
+import org.psliwa.idea.composerJson.composer.model.repository._
+import org.psliwa.idea.composerJson.composer.repository.{DefaultRepositoryProvider, Packagist}
 import org.psliwa.idea.composerJson.intellij.codeAssist.BaseLookupElement
 import org.psliwa.idea.composerJson.settings.ProjectSettings
 import org.psliwa.idea.composerJson.util.Funcs._
 
-import scala.collection.{mutable, Seq}
+import scala.collection.{Seq, mutable}
 
 class PackagesLoader extends ApplicationComponent {
   private val repositoryProviders = mutable.Map[Project,RepositoryProvider[_ <: BaseLookupElement]]()
@@ -21,7 +23,7 @@ class PackagesLoader extends ApplicationComponent {
     if(isUnitTestMode) Nil
     else Packagist.loadPackages(Packagist.defaultUrl).getOrElse(Nil)
   }
-  private val versionsLoader: (String) => Seq[String] = memorize(30)(Packagist.loadVersions(Packagist.defaultUrl)(_).getOrElse(List()))
+  private val versionsLoader: PackageName => Seq[String] = memorize(30)(Packagist.loadVersions(Packagist.defaultUrl)(_).getOrElse(List()))
   private lazy val packagistRepository = Repository.callback(loadPackageLookupElements, versionsLoader)
 
   private val defaultRepositoryProvider = new DefaultRepositoryProvider(packagistRepository, new BaseLookupElement(_))

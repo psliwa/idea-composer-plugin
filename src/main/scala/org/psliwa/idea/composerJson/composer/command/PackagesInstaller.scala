@@ -11,8 +11,8 @@ import com.jetbrains.php.composer.ComposerDataService
 import com.jetbrains.php.composer.execution.ComposerExecution
 import org.psliwa.idea.composerJson
 import org.psliwa.idea.composerJson.ComposerBundle
-import org.psliwa.idea.composerJson.composer.PackageName
 import org.psliwa.idea.composerJson.composer.command.DefaultPackagesInstaller.Result
+import org.psliwa.idea.composerJson.composer.model.PackageName
 import org.psliwa.idea.composerJson.intellij.Notifications
 
 import scala.compat.Platform.EOL
@@ -39,7 +39,7 @@ class DefaultPackagesInstaller(project: Project, file: PsiFile) extends Packages
 
       val task: Backgroundable = new Backgroundable(project, ComposerBundle.message("inspection.notInstalledPackage.installing"), true, PerformInBackgroundOption.DEAF) {
         override def run(indicator: ProgressIndicator): Unit = {
-          val packageNames = packages.map(_.name).mkString(", ")
+          val packageNames = packages.map(_.presentation).mkString(", ")
 
           install(indicator) match {
             case Result.Failure(message) => {
@@ -70,7 +70,7 @@ class DefaultPackagesInstaller(project: Project, file: PsiFile) extends Packages
           def installInBackground(composerExecution: ComposerExecution): Result = {
             indicator.setIndeterminate(true)
 
-            val packagesParams = packages.map(pkg => pkg.name)
+            val packagesParams = packages.map(packageName => packageName.presentation)
             indicator.setText(s"installing packages: ${packagesParams.mkString(", ")}")
 
             val message = new StringBuilder()
@@ -78,7 +78,7 @@ class DefaultPackagesInstaller(project: Project, file: PsiFile) extends Packages
             try {
               import scala.collection.JavaConverters._
               val handler = composerExecution
-                .createProcessHandler(project, file.getVirtualFile.getParent.getCanonicalPath, ("update" :: packages.map(_.name)).asJava, "")
+                .createProcessHandler(project, file.getVirtualFile.getParent.getCanonicalPath, ("update" :: packages.map(_.presentation)).asJava, "")
 
               handler.addProcessListener(new ProcessAdapter {
                 override def onTextAvailable(event: ProcessEvent, outputType: Key[_]): Unit = {
@@ -128,10 +128,10 @@ class DefaultPackagesInstaller(project: Project, file: PsiFile) extends Packages
     }
   }
 
-  private def handleFailure(packages: List[PackageName], message: String): Unit = {
+  private def handleFailure(packageNames: List[PackageName], message: String): Unit = {
     val installationFailed = ComposerBundle.message(
       "inspection.notInstalledPackage.errorTitle",
-      packages.map(pkg => pkg.name).mkString(", ")
+      packageNames.map(name => name.presentation).mkString(", ")
     )
 
     Notifications.error(installationFailed, message, Some(project))

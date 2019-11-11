@@ -29,7 +29,7 @@ object SNumber extends Schema
 object SPackages extends Schema
 object SAny extends Schema
 
-final class Properties(val named: Map[String,Property], val patterned: Map[Regex,Property]) {
+final class Properties(val named: Map[String, Property], val patterned: Map[Regex, Property]) {
 
   private lazy val patternedNamed = patterned.map(property => property._1.toString() -> property._2)
 

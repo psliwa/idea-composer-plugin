@@ -7,7 +7,7 @@ import com.intellij.openapi.util.Key
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.ui.{EditorNotificationPanel, EditorNotifications}
 import org.psliwa.idea.composerJson._
-import org.psliwa.idea.composerJson.composer.repository.RepositoryProvider
+import org.psliwa.idea.composerJson.composer.model.repository.RepositoryProvider
 import org.psliwa.idea.composerJson.intellij.codeAssist.BaseLookupElement
 import org.psliwa.idea.composerJson.settings.ProjectSettings
 
