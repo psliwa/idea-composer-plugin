@@ -5,6 +5,7 @@ import java.io.File
 
 import org.jetbrains.sbtidea.Keys._
 
+addCommandAlias("createRunConfiguration", "; idea-runner/createIDEARunConfiguration ; idea-runner/createIDEAArtifactXml")
 addCommandAlias("release", "proguard/package")
 
 val phpPluginVersion = settingKey[String]("Php plugin version")
