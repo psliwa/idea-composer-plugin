@@ -64,7 +64,7 @@ class InstalledPackagesWatcher extends ApplicationComponent {
         var line: String = null
         val content = new StringBuilder()
 
-        while({ line = in.readLine(); line != null }) {
+        while ({ line = in.readLine(); line != null }) {
           content.append(line)
         }
 
@@ -79,21 +79,24 @@ class InstalledPackagesWatcher extends ApplicationComponent {
 
   private class ComposerLockListener extends VirtualFileListener {
 
-    override def fileCreated(event: VirtualFileEvent): Unit = ensureComposerLock(event)(() => {
-      refresh(event.getFile)
-    })
+    override def fileCreated(event: VirtualFileEvent): Unit =
+      ensureComposerLock(event)(() => {
+        refresh(event.getFile)
+      })
 
     private def ensureComposerLock(event: VirtualFileEvent)(f: () => Unit) = {
-      if(event.getFileName == ComposerLock) f()
+      if (event.getFileName == ComposerLock) f()
     }
 
-    override def contentsChanged(event: VirtualFileEvent): Unit = ensureComposerLock(event)(() => {
-      refresh(event.getFile)
-    })
+    override def contentsChanged(event: VirtualFileEvent): Unit =
+      ensureComposerLock(event)(() => {
+        refresh(event.getFile)
+      })
 
-    override def fileDeleted(event: VirtualFileEvent): Unit = ensureComposerLock(event)(() => {
-      packages - event.getFile
-    })
+    override def fileDeleted(event: VirtualFileEvent): Unit =
+      ensureComposerLock(event)(() => {
+        packages - event.getFile
+      })
 
     override def fileMoved(event: VirtualFileMoveEvent): Unit = {}
 

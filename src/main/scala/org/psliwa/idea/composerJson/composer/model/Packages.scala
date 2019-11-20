@@ -1,6 +1,6 @@
 package org.psliwa.idea.composerJson.composer.model
 
-case class Packages private(packages: Map[String,PackageDescriptor]) {
+case class Packages private (packages: Map[String, PackageDescriptor]) {
   def get(name: PackageName): Option[PackageDescriptor] = packages.get(name.presentation.toLowerCase)
   def descriptors: List[PackageDescriptor] = packages.values.toList
   def isEmpty: Boolean = packages.isEmpty

@@ -16,7 +16,8 @@ class LoadVersionsTest {
 
   @Test
   def loadFromPackagist_givenInvalidPackage_expectError() = {
-    val result = Packagist.loadVersions(Packagist.defaultUrl)(PackageName("some-unexisting-vendor/some-unexisting-package-123"))
+    val result =
+      Packagist.loadVersions(Packagist.defaultUrl)(PackageName("some-unexisting-vendor/some-unexisting-package-123"))
 
     assertTrue(result.isFailure)
   }

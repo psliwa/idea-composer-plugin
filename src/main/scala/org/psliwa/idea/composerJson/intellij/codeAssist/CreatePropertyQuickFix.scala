@@ -16,7 +16,8 @@ import org.psliwa.idea.composerJson.util.Matcher
 import PsiElementOffsetFinder._
 import PsiElements._
 
-private class CreatePropertyQuickFix(element: PsiElement, propertyName: String, propertySchema: Schema) extends LocalQuickFixOnPsiElement(element) {
+private class CreatePropertyQuickFix(element: PsiElement, propertyName: String, propertySchema: Schema)
+    extends LocalQuickFixOnPsiElement(element) {
   override def getText: String = ComposerBundle.message("inspection.quickfix.createProperty", propertyName)
 
   override def invoke(project: Project, file: PsiFile, startElement: PsiElement, endElement: PsiElement): Unit = {
@@ -35,17 +36,17 @@ private class CreatePropertyQuickFix(element: PsiElement, propertyName: String, 
     val prefixText = previousElement
       .filter(_ => nextElement.isEmpty)
       .map(_ => ",")
-      .getOrElse("")+"\n"
+      .getOrElse("") + "\n"
 
     document.insertString(offset, prefixText)
 
     val emptyValue = getEmptyValue(propertySchema)
-    val propertyCode = "\""+propertyName+"\": "+emptyValue
-    val fixedPropertyCode = propertyCode+(if(nextElement.isDefined) "," else "")+"\n"
-    document.insertString(offset+prefixText.length, fixedPropertyCode)
+    val propertyCode = "\"" + propertyName + "\": " + emptyValue
+    val fixedPropertyCode = propertyCode + (if (nextElement.isDefined) "," else "") + "\n"
+    document.insertString(offset + prefixText.length, fixedPropertyCode)
 
     editorFor(project)
-      .foreach(_.getCaretModel.moveToOffset(offset + prefixText.length + propertyCode.length - emptyValue.length/2))
+      .foreach(_.getCaretModel.moveToOffset(offset + prefixText.length + propertyCode.length - emptyValue.length / 2))
 
     (offset, offset + fixedPropertyCode.length + prefixText.length)
   }
@@ -64,17 +65,19 @@ private class CreatePropertyQuickFix(element: PsiElement, propertyName: String, 
       (Some(element), getEndOffset(findTrailingComma(element).getOrElse(element)))
     }
 
-    insertInfo.orElse(Some((None, startOffset)))
+    insertInfo
+      .orElse(Some((None, startOffset)))
       .map(info => (info._1, info._2, e.getChildren.find(getEndOffset(_) > info._2)))
       .get
   }
 
   private def getEndOffset(element: PsiElement) = element.getTextRange.getEndOffset
-  private def findTrailingComma(element: PsiElement): Option[LeafPsiElement] = findNextComma(element.getNode.getTreeNext)
+  private def findTrailingComma(element: PsiElement): Option[LeafPsiElement] =
+    findNextComma(element.getNode.getTreeNext)
   private def findNextComma(node: ASTNode): Option[LeafPsiElement] = {
     node match {
       case PsiExtractors.PsiWhiteSpace(()) => findNextComma(node.getTreeNext)
-      case x@PsiExtractors.LeafPsiElement(",") => Some(x)
+      case x @ PsiExtractors.LeafPsiElement(",") => Some(x)
       case _ => None
     }
   }

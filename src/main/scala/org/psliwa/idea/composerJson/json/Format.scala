@@ -29,6 +29,6 @@ object UriFormat extends Format {
   }
 }
 
-object AnyFormat extends Format{
+object AnyFormat extends Format {
   override def isValid(s: String) = true
 }

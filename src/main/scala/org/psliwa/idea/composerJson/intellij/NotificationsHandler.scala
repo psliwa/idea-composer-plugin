@@ -6,9 +6,9 @@ import org.psliwa.idea.composerJson.settings.AppSettings
 
 class NotificationsHandler(project: Project) extends ProjectComponent {
   override def projectOpened(): Unit = {
-    if(AppSettings.getInstance.wasCharityNotificationShown &&
-      !AppSettings.getInstance.wasCharitySummaryNotificationShown &&
-      AppSettings.getInstance.isCharityNotificationStillValid) {
+    if (AppSettings.getInstance.wasCharityNotificationShown &&
+        !AppSettings.getInstance.wasCharitySummaryNotificationShown &&
+        AppSettings.getInstance.isCharityNotificationStillValid) {
       AppSettings.getInstance.charitySummaryNotificationWasShown()
 
       val title = "Thank you dear programmer! :)"

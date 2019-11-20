@@ -20,7 +20,8 @@ class RepositoryProviderWrapperTest {
     val defaultFile = "defaultFile"
     val predicate = (file: String) => file == defaultFile
 
-    val repositoryProvider = new RepositoryProviderWrapper[String](innerRepositoryProvider, defaultRepository, predicate)
+    val repositoryProvider =
+      new RepositoryProviderWrapper[String](innerRepositoryProvider, defaultRepository, predicate)
 
     //when & then
 

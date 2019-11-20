@@ -13,24 +13,26 @@ abstract class CompletionTest extends BasePlatformTestCase {
   override def isWriteActionRequired: Boolean = false
 
   protected def suggestions(
-    contents: String,
-    expectedSuggestions: Array[String],
-    unexpectedSuggestions: Array[String] = Array()
-  ): Unit = suggestions(UsefulTestCase.assertContainsElements(_, _:_*))(contents, expectedSuggestions, unexpectedSuggestions)
+      contents: String,
+      expectedSuggestions: Array[String],
+      unexpectedSuggestions: Array[String] = Array()
+  ): Unit =
+    suggestions(UsefulTestCase.assertContainsElements(_, _: _*))(contents, expectedSuggestions, unexpectedSuggestions)
 
   protected def orderedSuggestions(
-    contents: String,
-    expectedSuggestions: Array[String],
-    unexpectedSuggestions: Array[String] = Array()
-  ): Unit = suggestions(UsefulTestCase.assertContainsOrdered(_, _:_*))(contents, expectedSuggestions, unexpectedSuggestions)
+      contents: String,
+      expectedSuggestions: Array[String],
+      unexpectedSuggestions: Array[String] = Array()
+  ): Unit =
+    suggestions(UsefulTestCase.assertContainsOrdered(_, _: _*))(contents, expectedSuggestions, unexpectedSuggestions)
 
   protected def suggestions(
-    containsElements: (java.util.List[String], Array[String]) => Unit
+      containsElements: (java.util.List[String], Array[String]) => Unit
   )(
-    contents: String, 
-    expectedSuggestions: Array[String],
-    unexpectedSuggestions: Array[String]
-  ) = {
+      contents: String,
+      expectedSuggestions: Array[String],
+      unexpectedSuggestions: Array[String]
+  ): Unit = {
     myFixture.configureByText(ComposerJson, contents)
     myFixture.completeBasic()
 
@@ -38,14 +40,14 @@ abstract class CompletionTest extends BasePlatformTestCase {
 
     assertNotNull(lookupElements)
     containsElements(lookupElements, expectedSuggestions)
-    UsefulTestCase.assertDoesntContain(lookupElements, unexpectedSuggestions:_*)
+    UsefulTestCase.assertDoesntContain(lookupElements, unexpectedSuggestions: _*)
   }
 
-  protected def completion(contents: String, expected: String) = {
+  protected def completion(contents: String, expected: String): Unit = {
     myFixture.configureByText(ComposerJson, contents)
     val elements = myFixture.completeBasic()
 
-    if(elements != null && elements.length == 1) {
+    if (elements != null && elements.length == 1) {
       //finish completion if there is only one item
       myFixture.finishLookup(Lookup.NORMAL_SELECT_CHAR)
     }
@@ -55,7 +57,7 @@ abstract class CompletionTest extends BasePlatformTestCase {
 
   def writeAction(f: () => Unit): Unit = {
     ApplicationManager.getApplication.runWriteAction(new Computable[Unit] {
-      override def compute = f()
+      override def compute: Unit = f()
     })
   }
 }

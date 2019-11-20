@@ -6,8 +6,9 @@ import org.psliwa.idea.composerJson.util.OffsetFinder
 
 import scala.language.implicitConversions
 
-private object PsiElementOffsetFinder extends OffsetFinder[JsonObject,PsiElement] {
-  override protected def stop(haystack: JsonObject)(offset: Int): Boolean = !haystack.getTextRange.containsOffset(offset)
+private object PsiElementOffsetFinder extends OffsetFinder[JsonObject, PsiElement] {
+  override protected def stop(haystack: JsonObject)(offset: Int): Boolean =
+    !haystack.getTextRange.containsOffset(offset)
   override def objectAt(haystack: JsonObject, offset: Int): PsiElement = {
     haystack.getChildren
       .find(_.getTextRange.contains(offset))

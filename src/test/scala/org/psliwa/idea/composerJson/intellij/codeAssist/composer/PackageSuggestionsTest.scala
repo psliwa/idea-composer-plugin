@@ -1,7 +1,7 @@
 package org.psliwa.idea.composerJson.intellij.codeAssist.composer
 
 import org.junit.Assert._
-import org.psliwa.idea.composerJson.intellij.codeAssist.{CompletionTest, BaseLookupElement}
+import org.psliwa.idea.composerJson.intellij.codeAssist.{BaseLookupElement, CompletionTest}
 
 class PackageSuggestionsTest extends AbstractPackagesTest {
 
@@ -197,7 +197,7 @@ class PackageSuggestionsTest extends AbstractPackagesTest {
     val versions = List("1.2.1", "1.3.1", "dev-master")
     setCompletionVersionsLoader(_ => versions)
 
-    for(prefix <- List(">", "<", ">=", "<=")) {
+    for (prefix <- List(">", "<", ">=", "<=")) {
       suggestions(
         s"""
           |{
@@ -216,7 +216,7 @@ class PackageSuggestionsTest extends AbstractPackagesTest {
     val versions = List("1.2.1", "1.3.1", "dev-master")
     setCompletionVersionsLoader(_ => versions)
 
-    for(prefix <- List(">", "<", ">=", "<=")) {
+    for (prefix <- List(">", "<", ">=", "<=")) {
       suggestions(
         s"""
           |{

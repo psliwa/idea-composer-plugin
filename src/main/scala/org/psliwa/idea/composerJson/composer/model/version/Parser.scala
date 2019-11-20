@@ -1,6 +1,6 @@
 package org.psliwa.idea.composerJson.composer.model.version
 
-import org.psliwa.idea.composerJson.util.parsers.{Parsers, Parser}
+import org.psliwa.idea.composerJson.util.parsers.{Parser, Parsers}
 import org.psliwa.idea.composerJson.util.parsers.ParserMonad._
 import org.psliwa.idea.composerJson.util.parsers.Implicits._
 
@@ -59,7 +59,9 @@ object Parser {
   } yield AliasedConstraint(version, as, separator)
 
   private val sortedOperators = ConstraintOperator.values.toList.sortWith(_.toString.length < _.toString.length)
-  private val operator = sortedOperators.map(operator => string(operator.toString).map(_ => operator)).foldLeft(fail[ConstraintOperator]())((f, o) => o | f)
+  private val operator = sortedOperators
+    .map(operator => string(operator.toString).map(_ => operator))
+    .foldLeft(fail[ConstraintOperator]())((f, o) => o | f)
 
   private val operatorVersion = for {
     op <- operator
@@ -91,15 +93,15 @@ object Parser {
     separator <- andSeparator
     second <- singleVersion
     other <- andSeparator.flatMap(_ => singleVersion).many
-  } yield LogicalConstraint(first::second::other, LogicalOperator.AND, separator)
+  } yield LogicalConstraint(first :: second :: other, LogicalOperator.AND, separator)
 
   private val or = for {
     first <- and | singleVersion
     separator <- orSeparator
     second <- and | singleVersion
     other <- orSeparator.flatMap(_ => and | singleVersion).many
-  } yield LogicalConstraint(first::second::other, LogicalOperator.OR, separator)
+  } yield LogicalConstraint(first :: second :: other, LogicalOperator.OR, separator)
 
-  private def guard[A](value: A) = Parsers.whole().flatMap(s => if(s.isEmpty) succeed(value) else fail())
+  private def guard[A](value: A) = Parsers.whole().flatMap(s => if (s.isEmpty) succeed(value) else fail())
   private val parser = (or | and | singleVersion).flatMap(guard)
 }

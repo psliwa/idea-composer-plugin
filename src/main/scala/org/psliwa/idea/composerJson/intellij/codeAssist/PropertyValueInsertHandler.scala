@@ -51,9 +51,9 @@ private[codeAssist] case class PropertyValueInsertHandler(wrapper: String) exten
     }
   }
 
-  private def oppositeChar(s: Char): Option[(CharMatcher,Int)] = {
-    val map = Map[Char,CharMatcher]('"' -> '"', '{' -> '}', '[' -> ']').mapValues((_,1))
-    map.get(s).orElse(Some((not(Alphnum || '.'),0)))
+  private def oppositeChar(s: Char): Option[(CharMatcher, Int)] = {
+    val map = Map[Char, CharMatcher]('"' -> '"', '{' -> '}', '[' -> ']').mapValues((_, 1))
+    map.get(s).orElse(Some((not(Alphnum || '.'), 0)))
   }
 
   private def fixTrailingComma(trailingOffset: Int)(implicit document: Document) {
@@ -65,16 +65,17 @@ private[codeAssist] case class PropertyValueInsertHandler(wrapper: String) exten
     }
   }
 
-  private def findCloseCharOffset(openChar: CharMatcher, closeChar: CharMatcher)(offset: Int)(implicit text: CharSequence): Option[Int] = {
+  private def findCloseCharOffset(openChar: CharMatcher,
+                                  closeChar: CharMatcher)(offset: Int)(implicit text: CharSequence): Option[Int] = {
     def loop(offset: Int, deep: Int): Option[Int] = {
       val foundOffset = findOffset(openChar || closeChar)(offset)
       val success = foundOffset.map(ensure(closeChar)(_).isDefined)
 
       success match {
         case None => None
-        case Some(true) if deep > 0 => loop(foundOffset.get+1, deep - 1)
+        case Some(true) if deep > 0 => loop(foundOffset.get + 1, deep - 1)
         case Some(true) => foundOffset
-        case Some(false) => loop(foundOffset.get+1, deep + 1)
+        case Some(false) => loop(foundOffset.get + 1, deep + 1)
       }
     }
 
@@ -82,7 +83,7 @@ private[codeAssist] case class PropertyValueInsertHandler(wrapper: String) exten
   }
 
   private def replaceCharIf(char: Char, is: CharMatcher, replacement: Char): Option[Char] = {
-    if(is is char) Some(replacement)
+    if (is is char) Some(replacement)
     else Some(char)
   }
 
@@ -110,7 +111,7 @@ private object PropertyValueInsertHandler {
     val wrapper = openChar.map(_.toString).getOrElse("") + closeChar.map(_.toString).getOrElse("")
 
     def eatWrapper = Range(ho, to, None, None)
-    def eatWrapperIf(b: Boolean) = if(b) eatWrapper else this
+    def eatWrapperIf(b: Boolean) = if (b) eatWrapper else this
   }
 
   val OpenControlChar = '"' || '{' || '['

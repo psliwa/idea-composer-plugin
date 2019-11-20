@@ -6,7 +6,8 @@ class PhpInspectionTest extends InspectionTest {
   override def setUp(): Unit = {
     super.setUp()
 
-    myFixture.configureByText("classes.php",
+    myFixture.configureByText(
+      "classes.php",
       """
         |<?php
         |
@@ -42,8 +43,7 @@ class PhpInspectionTest extends InspectionTest {
   }
 
   def testCallbackValidity_givenCallbackIsValidHook_isShouldNotBeReported(): Unit = {
-    checkInspection(
-      """
+    checkInspection("""
         |{
         |  "scripts": {
         |    "post-create-project-cmd": "ComposerJson\\Example1\\ScriptHandler::clearCache1"
@@ -53,8 +53,7 @@ class PhpInspectionTest extends InspectionTest {
   }
 
   def testCallbackValidity_givenCallbackAcceptsInstallerPackageEvent_isShouldNotBeReported(): Unit = {
-    checkInspection(
-      """
+    checkInspection("""
         |{
         |  "scripts": {
         |    "post-create-project-cmd": "ComposerJson\\Example1\\ScriptHandler::clearCache3"
@@ -64,8 +63,7 @@ class PhpInspectionTest extends InspectionTest {
   }
 
   def testCallbackValidity_givenScriptsAsArray_givenCallbackIsValidHook_isShouldNotBeReported(): Unit = {
-    checkInspection(
-      """
+    checkInspection("""
         |{
         |  "scripts": {
         |    "post-create-project-cmd": [ "ComposerJson\\Example1\\ScriptHandler::clearCache1" ]
@@ -82,7 +80,8 @@ class PhpInspectionTest extends InspectionTest {
         |    "post-create-project-cmd": "ComposerJson\\Example1\\ScriptHandler::<warning>unexistingMethod</warning>"
         |  }
         |}
-      """.stripMargin)
+      """.stripMargin
+    )
   }
 
   def testCallbackValidity__givenScriptAsArray_givenMethodDoesNotExist_isShouldBeReported(): Unit = {
@@ -93,7 +92,8 @@ class PhpInspectionTest extends InspectionTest {
         |    "post-create-project-cmd": [ "ComposerJson\\Example1\\ScriptHandler::<warning>unexistingMethod</warning>" ]
         |  }
         |}
-      """.stripMargin)
+      """.stripMargin
+    )
   }
 
   def testCallbackValidity_givenClassDoesNotExist_isShouldBeReported(): Unit = {
@@ -104,7 +104,8 @@ class PhpInspectionTest extends InspectionTest {
         |    "post-create-project-cmd": "<warning>ComposerJson\\Example1\\UnexistingClass::clearCache1</warning>"
         |  }
         |}
-      """.stripMargin)
+      """.stripMargin
+    )
   }
 
   def testCallbackValidity_givenMethodIsPrivate_isShouldBeReported() = {
@@ -115,7 +116,8 @@ class PhpInspectionTest extends InspectionTest {
         |    "post-create-project-cmd": "ComposerJson\\Example1\\ScriptHandler::<warning>clearCachePrivate</warning>"
         |  }
         |}
-      """.stripMargin)
+      """.stripMargin
+    )
   }
 
   def testCallbackValidity_givenMethodIsNotStatic_isShouldBeReported() = {
@@ -126,7 +128,8 @@ class PhpInspectionTest extends InspectionTest {
         |    "post-create-project-cmd": "ComposerJson\\Example1\\ScriptHandler::<warning>clearCacheNonStatic</warning>"
         |  }
         |}
-      """.stripMargin)
+      """.stripMargin
+    )
   }
 
   def testCallbackValidity_givenMethodHasInvalidArgumentType_isShouldBeReported() = {
@@ -137,7 +140,8 @@ class PhpInspectionTest extends InspectionTest {
         |    "post-create-project-cmd": "ComposerJson\\Example1\\ScriptHandler::<warning>invalidArgTypeHook</warning>"
         |  }
         |}
-      """.stripMargin)
+      """.stripMargin
+    )
   }
 
   def testCallbackValidity_givenMethodHasTooManyArgs_isShouldBeReported() = {
@@ -148,12 +152,12 @@ class PhpInspectionTest extends InspectionTest {
         |    "post-create-project-cmd": "ComposerJson\\Example1\\ScriptHandler::<warning>tooManyArgsHook</warning>"
         |  }
         |}
-      """.stripMargin)
+      """.stripMargin
+    )
   }
 
   def testCallbackValidity_givenMethodOptionalExtraArg_isShouldNotBeReported() = {
-    checkInspection(
-      """
+    checkInspection("""
         |{
         |  "scripts": {
         |    "post-create-project-cmd": "ComposerJson\\Example1\\ScriptHandler::optionalExtraArgHook"
@@ -170,12 +174,12 @@ class PhpInspectionTest extends InspectionTest {
         |    "post-create-project-cmd": "ComposerJson\\Example1\\ScriptHandler::<warning>abstractHook</warning>"
         |  }
         |}
-      """.stripMargin)
+      """.stripMargin
+    )
   }
 
   def testCallbackValidity_givenMethodWithoutEventTypeHint_isShouldNotBeReported() = {
-    checkInspection(
-      """
+    checkInspection("""
         |{
         |  "scripts": {
         |    "post-create-project-cmd": "ComposerJson\\Example1\\ScriptHandler::withoutTypeHintHook"
@@ -185,8 +189,7 @@ class PhpInspectionTest extends InspectionTest {
   }
 
   def testCallbackValidity_givenCallbackIsACommand_isShouldNotBeReported() = {
-    checkInspection(
-      """
+    checkInspection("""
         |{
         |  "scripts": {
         |    "post-create-project-cmd": "ls -l"
@@ -196,8 +199,7 @@ class PhpInspectionTest extends InspectionTest {
   }
 
   def testCallbackValidity_methodIsEmpty_isShouldBeReported() = {
-    checkInspection(
-      """
+    checkInspection("""
         |{
         |  "scripts": {
         |    "post-create-project-cmd": "<warning>ComposerJson\\Example1\\ScriptHandler::</warning>"

@@ -1,7 +1,7 @@
 package org.psliwa.idea.composerJson.composer.model.version
 
 import org.psliwa.idea.composerJson.BasePropSpec
-import org.scalacheck.Prop.{BooleanOperators, forAll}
+import org.scalacheck.Prop.{forAll, BooleanOperators}
 import org.scalacheck.{Gen, Prop}
 
 import scala.util.Try
@@ -46,7 +46,7 @@ class SemanticVersionTest extends BasePropSpec {
       val decremented = original.decrementLast
 
       decremented.isDefined &&
-        decremented.get.incrementLast == original
+      decremented.get.incrementLast == original
     } && forAll(minorOptionalZero) { (minor: Minor) =>
       val original = SemanticVersion(0, minor)
       val decremented = original.decrementLast
@@ -65,21 +65,22 @@ class SemanticVersionTest extends BasePropSpec {
   }
 
   property("append to version with missing patch part") {
-    forAll(major, minorOptional(positiveZero, Gen.const[Patch](None)), positiveZero) { (major: Int, minor: Minor, part: Int) =>
-      val original = SemanticVersion(major, minor)
-      val updated = original.append(part)
+    forAll(major, minorOptional(positiveZero, Gen.const[Patch](None)), positiveZero) {
+      (major: Int, minor: Minor, part: Int) =>
+        val original = SemanticVersion(major, minor)
+        val updated = original.append(part)
 
-      updated.map(parts).contains(parts(original) ++ List(part))
+        updated.map(parts).contains(parts(original) ++ List(part))
     }
   }
 
-
   property("appending to full semantic version shouldn't be possible") {
-    forAll(major, minor(positiveZero, positiveZero.map(Some(_))).map(Some(_)), positiveZero) { (major: Int, minor: Minor, part: Int) =>
-      val original = SemanticVersion(major, minor)
-      val updated = original.append(part)
+    forAll(major, minor(positiveZero, positiveZero.map(Some(_))).map(Some(_)), positiveZero) {
+      (major: Int, minor: Minor, part: Int) =>
+        val original = SemanticVersion(major, minor)
+        val updated = original.append(part)
 
-      updated.isEmpty
+        updated.isEmpty
     }
   }
 
@@ -97,9 +98,9 @@ class SemanticVersionTest extends BasePropSpec {
     val diffIs0 = parts(original).diff(parts(updated)).forall(_ == 0)
     val addedOnly0 = parts(updated).drop(parts(original).size).forall(_ == 0)
 
-    sizeIsOk    :| "size == #3" &&
-    diffIs0     :| "difference is only 0" &&
-    addedOnly0  :| "only zeros were added"
+    sizeIsOk   :| "size == #3" &&
+    diffIs0    :| "difference is only 0" &&
+    addedOnly0 :| "only zeros were added"
   }
 
   property("ensure parts") {
@@ -117,7 +118,7 @@ class SemanticVersionTest extends BasePropSpec {
       val original = SemanticVersion(major, minor)
       val updated = original.ensureExactlyParts(size)
 
-      if(size >= parts(original).size) checkFillZero(original, updated, size)
+      if (size >= parts(original).size) checkFillZero(original, updated, size)
       else Prop { parts(original).dropRight(parts(original).size - size) == parts(updated) }
     }
   }

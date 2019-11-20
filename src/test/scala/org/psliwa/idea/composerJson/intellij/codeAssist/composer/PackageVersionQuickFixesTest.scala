@@ -12,7 +12,8 @@ import org.psliwa.idea.composerJson.settings.ProjectSettings
 class PackageVersionQuickFixesTest extends InspectionTest {
   val ExcludePatternQuickFix = ComposerBundle.message("inspection.quickfix.excludePackagePattern", _: String)
   val SetPackageVersionQuickFix = ComposerBundle.message("inspection.quickfix.setPackageVersion", _: String)
-  val SetEquivalentPackageVersionQuickFix = ComposerBundle.message("inspection.quickfix.setPackageEquivalentVersion", _: String)
+  val SetEquivalentPackageVersionQuickFix =
+    ComposerBundle.message("inspection.quickfix.setPackageEquivalentVersion", _: String)
 
   override def setUp(): Unit = {
     super.setUp()
@@ -22,22 +23,21 @@ class PackageVersionQuickFixesTest extends InspectionTest {
 
   def testExcludePatternQuickFix_givenExactPattern() = {
     val pkg = "vendor/pkg321"
-    checkQuickFix(ExcludePatternQuickFix(pkg),
-      s"""
+    checkQuickFix(ExcludePatternQuickFix(pkg), s"""
         |{
         |  "require": {
         |    "$pkg": ">2<caret>"
         |  }
         |}
-      """.stripMargin
-    )
+      """.stripMargin)
 
     assertPatternExcluded(pkg)
   }
 
   def testExcludePatternQuickFix_givenVendorWildcardPattern() = {
     val pkg = "vendor/pkg321"
-    checkQuickFix(ExcludePatternQuickFix("vendor/*"),
+    checkQuickFix(
+      ExcludePatternQuickFix("vendor/*"),
       s"""
         |{
         |  "require": {
@@ -285,7 +285,10 @@ class PackageVersionQuickFixesTest extends InspectionTest {
   private def assertPatternExcluded(pkg: String) {
     import scala.jdk.CollectionConverters._
     assertTrue(
-      ProjectSettings(myFixture.getProject).getUnboundedVersionInspectionSettings.getValues().asScala.exists(_.getPattern == pkg)
+      ProjectSettings(myFixture.getProject).getUnboundedVersionInspectionSettings
+        .getValues()
+        .asScala
+        .exists(_.getPattern == pkg)
     )
   }
 

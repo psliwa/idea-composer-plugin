@@ -1,12 +1,12 @@
 package org.psliwa.idea.composerJson.composer.model.repository
 
 class RepositoryProviderWrapper[Package](
-  repositoryProvider: RepositoryProvider[Package], 
-  defaultRepository: Repository[Package],
-  useDefaultRepository: String => Boolean
+    repositoryProvider: RepositoryProvider[Package],
+    defaultRepository: Repository[Package],
+    useDefaultRepository: String => Boolean
 ) extends RepositoryProvider[Package] {
   override def repositoryFor(file: String): Repository[Package] = {
-    if(useDefaultRepository(file)) defaultRepository
+    if (useDefaultRepository(file)) defaultRepository
     else repositoryProvider.repositoryFor(file)
   }
   override def updateRepository(file: String, info: RepositoryInfo) = repositoryProvider.updateRepository(file, info)

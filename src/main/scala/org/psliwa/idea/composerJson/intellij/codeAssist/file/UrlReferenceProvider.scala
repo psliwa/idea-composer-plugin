@@ -6,13 +6,13 @@ import org.psliwa.idea.composerJson.json.{EmailFormat, UriFormat}
 
 private object UrlReferenceProvider extends PsiReferenceProvider {
   override def getReferencesByElement(element: PsiElement, context: ProcessingContext): Array[PsiReference] = {
-    val text = element.getText.substring(1, element.getText.length-1)
+    val text = element.getText.substring(1, element.getText.length - 1)
 
-    if(EmailFormat.isValid(text)) {
+    if (EmailFormat.isValid(text)) {
       Array(new UrlPsiReference(element) {
         override protected def url: Option[String] = Some("mailto:" + super.url)
       })
-    } else if(UriFormat.isValid(text)) {
+    } else if (UriFormat.isValid(text)) {
       Array(new UrlPsiReference(element))
     } else {
       Array()

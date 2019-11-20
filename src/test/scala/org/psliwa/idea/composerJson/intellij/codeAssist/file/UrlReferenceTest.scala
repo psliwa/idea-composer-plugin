@@ -4,7 +4,6 @@ import org.junit.Assert._
 import org.psliwa.idea.composerJson.ComposerJson
 import org.psliwa.idea.composerJson.intellij.codeAssist.CompletionTest
 
-
 class UrlReferenceTest extends CompletionTest {
 
   def testGivenUrlProperty_givenUrlValue_valueShouldBeUrlReference() = {

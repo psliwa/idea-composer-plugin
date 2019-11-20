@@ -15,14 +15,17 @@ package object codeAssist {
   private[codeAssist] type InsertHandlerFinder = BaseLookupElement => Option[InsertHandler[LookupElement]]
   private[codeAssist] type LookupElements = (CompletionParameters) => Iterable[BaseLookupElement]
 
-
   private val autoPopupCondition = (context: InsertionContext) => {
     val text = context.getEditor.getDocument.getCharsSequence
-    ensure('"' || ' ')(context.getEditor.getCaretModel.getOffset-1)(text).isDefined
+    ensure('"' || ' ')(context.getEditor.getCaretModel.getOffset - 1)(text).isDefined
   }
 
-  private[codeAssist] val StringPropertyValueInsertHandler = new AutoPopupInsertHandler(Some(new PropertyValueInsertHandler("\"\"")), autoPopupCondition)
-  private[codeAssist] val ObjectPropertyValueInsertHandler = new AutoPopupInsertHandler(Some(new PropertyValueInsertHandler("{}")), autoPopupCondition)
-  private[codeAssist] val ArrayPropertyValueInsertHandler = new AutoPopupInsertHandler(Some(new PropertyValueInsertHandler("[]")), autoPopupCondition)
-  private[codeAssist] val EmptyPropertyValueInsertHandler = new AutoPopupInsertHandler(Some(new PropertyValueInsertHandler("")), autoPopupCondition)
+  private[codeAssist] val StringPropertyValueInsertHandler =
+    new AutoPopupInsertHandler(Some(new PropertyValueInsertHandler("\"\"")), autoPopupCondition)
+  private[codeAssist] val ObjectPropertyValueInsertHandler =
+    new AutoPopupInsertHandler(Some(new PropertyValueInsertHandler("{}")), autoPopupCondition)
+  private[codeAssist] val ArrayPropertyValueInsertHandler =
+    new AutoPopupInsertHandler(Some(new PropertyValueInsertHandler("[]")), autoPopupCondition)
+  private[codeAssist] val EmptyPropertyValueInsertHandler =
+    new AutoPopupInsertHandler(Some(new PropertyValueInsertHandler("")), autoPopupCondition)
 }

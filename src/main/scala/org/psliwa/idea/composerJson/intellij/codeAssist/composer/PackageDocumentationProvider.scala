@@ -14,14 +14,15 @@ class PackageDocumentationProvider extends DocumentationProvider {
 
   override def getQuickNavigateInfo(element: PsiElement, originalElement: PsiElement): String = null
 
-  override def getDocumentationElementForLookupItem(psiManager: PsiManager, `object`: scala.Any,
-    element: PsiElement): PsiElement = null
+  override def getDocumentationElementForLookupItem(psiManager: PsiManager,
+                                                    `object`: scala.Any,
+                                                    element: PsiElement): PsiElement = null
 
-  override def getDocumentationElementForLink(psiManager: PsiManager, link: String,
-    context: PsiElement): PsiElement = null
+  override def getDocumentationElementForLink(psiManager: PsiManager, link: String, context: PsiElement): PsiElement =
+    null
 
   override def getUrlFor(element: PsiElement, originalElement: PsiElement): util.List[String] = {
-    if(packageNamePattern.accepts(originalElement)) {
+    if (packageNamePattern.accepts(originalElement)) {
       import scala.jdk.CollectionConverters._
       documentationUrl(originalElement, PackageName(getStringValue(originalElement.getParent).getOrElse(""))).toList.asJava
     } else {

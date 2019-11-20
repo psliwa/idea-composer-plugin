@@ -5,7 +5,8 @@ import javax.swing.JComponent
 
 import com.intellij.openapi.editor.Editor
 
-private class PackageInfoOverlayView(editor: Editor, offset: Int, text: String, color: Color, font: Font) extends JComponent {
+private class PackageInfoOverlayView(editor: Editor, offset: Int, text: String, color: Color, font: Font)
+    extends JComponent {
   private val horizontalMargin = 40
 
   override def paintComponent(g: Graphics): Unit = {

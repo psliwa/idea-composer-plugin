@@ -11,7 +11,8 @@ class PhpReferenceTest extends CompletionTest {
   override def setUp(): Unit = {
     super.setUp()
 
-    myFixture.configureByText("classes.php",
+    myFixture.configureByText(
+      "classes.php",
       """
         |<?php
         |

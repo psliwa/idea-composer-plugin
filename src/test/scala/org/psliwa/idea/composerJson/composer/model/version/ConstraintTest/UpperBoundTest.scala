@@ -30,7 +30,7 @@ class UpperBoundTest {
       checkBounded(new OperatorConstraint(operator, boundedConstraint))
     })
   }
-  
+
   @Test
   def givenBoundedConstraintWithComparisonOperatorWithoutUpperBound_itShouldBeUnbounded() = {
     import org.psliwa.idea.composerJson.composer.model.version.ConstraintOperator._
@@ -56,9 +56,10 @@ class UpperBoundTest {
     import org.psliwa.idea.composerJson.composer.model.version.ConstraintOperator._
     import org.psliwa.idea.composerJson.composer.model.version.LogicalOperator._
 
-    List(List(>, <), List(>=, <), List(>, <=), List(>=, <=), List(<=, <=), List(<, <=), List(<, ConstraintOperator.!=)).foreach(operators => {
-      checkBounded(LogicalConstraint(operators.map(OperatorConstraint(_, boundedConstraint)), AND, " "))
-    })
+    List(List(>, <), List(>=, <), List(>, <=), List(>=, <=), List(<=, <=), List(<, <=), List(<, ConstraintOperator.!=))
+      .foreach(operators => {
+        checkBounded(LogicalConstraint(operators.map(OperatorConstraint(_, boundedConstraint)), AND, " "))
+      })
   }
 
   @Test

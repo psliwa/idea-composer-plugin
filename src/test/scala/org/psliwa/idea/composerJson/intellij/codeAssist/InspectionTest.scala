@@ -46,7 +46,10 @@ abstract class InspectionTest extends BasePlatformTestCase {
     val caretOffset = myFixture.getEditor.getCaretModel.getOffset
 
     //side effect of getAllQuickFixes - caret is moved to "0" offset
-    val quickFixes = myFixture.getAllQuickFixes(ComposerJson).asScala.filter(qf => qf.getFamilyName.contains(quickFix) || qf.getText.contains(quickFix))
+    val quickFixes = myFixture
+      .getAllQuickFixes(ComposerJson)
+      .asScala
+      .filter(qf => qf.getFamilyName.contains(quickFix) || qf.getText.contains(quickFix))
     val quickFixesCount = quickFixes.length
 
     val msg = s"Expected $expectedQuickFixCount '$quickFix' quick fix, $quickFixesCount found"
@@ -59,7 +62,7 @@ abstract class InspectionTest extends BasePlatformTestCase {
 
   def writeAction(f: () => Unit): Unit = {
     ApplicationManager.getApplication.runWriteAction(new Computable[Unit] {
-      override def compute = f()
+      override def compute: Unit = f()
     })
   }
 

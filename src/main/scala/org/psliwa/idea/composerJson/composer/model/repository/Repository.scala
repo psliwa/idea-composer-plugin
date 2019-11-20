@@ -10,7 +10,7 @@ trait Repository[+Package] {
 
 object Repository {
   def inMemory[Package](packages: Seq[Package], versions: Map[String, Seq[String]] = Map()): Repository[Package] = {
-    InMemoryRepository(packages, versions.map { case(packageName, versions) => PackageName(packageName) -> versions })
+    InMemoryRepository(packages, versions.map { case (packageName, versions) => PackageName(packageName) -> versions })
   }
 
   def callback[Package](packages: => Seq[Package], versions: PackageName => Seq[String]): Repository[Package] = {

@@ -6,6 +6,6 @@ import org.scalatest.prop.Checkers
 
 abstract class BasePropSpec extends PropSpec with Checkers {
   protected def property(testName: String)(testFun: => Prop, params: PropertyCheckConfigParam*): Unit = {
-    super.property(testName)(check(testFun, params:_*))
+    super.property(testName)(check(testFun, params: _*))
   }
 }

@@ -2,7 +2,7 @@ package org.psliwa.idea.composerJson.intellij.codeAssist.composer
 
 import org.psliwa.idea.composerJson.ComposerBundle
 import org.psliwa.idea.composerJson.intellij.codeAssist.InspectionTest
-import org.psliwa.idea.composerJson.settings.{ProjectSettings, PatternItem}
+import org.psliwa.idea.composerJson.settings.{PatternItem, ProjectSettings}
 
 class PackageVersionInspectionTest extends InspectionTest {
 
@@ -16,8 +16,7 @@ class PackageVersionInspectionTest extends InspectionTest {
   }
 
   def testGivenUnboundVersion_thatShouldBeReported() = {
-    checkInspection(
-      s"""
+    checkInspection(s"""
         |{
         |  "require": {
         |    <warning descr="$UnboundedVersionConstraintWarning">"vendor/pkg": ">=2.1.0"</warning>
@@ -27,8 +26,7 @@ class PackageVersionInspectionTest extends InspectionTest {
   }
 
   def testGivenBoundVersion_thatIsOk() = {
-    checkInspection(
-      """
+    checkInspection("""
         |{
         |  "require": {
         |    "vendor/pkg": "2.1.0"
@@ -38,8 +36,7 @@ class PackageVersionInspectionTest extends InspectionTest {
   }
 
   def testGivenSemVerBoundedVersion_thatIsOk() = {
-    checkInspection(
-      """
+    checkInspection("""
         |{
         |  "require": {
         |    "vendor/pkg": "~1.4"
@@ -53,8 +50,7 @@ class PackageVersionInspectionTest extends InspectionTest {
 
     ProjectSettings(myFixture.getProject).getUnboundedVersionInspectionSettings.addExcludedPattern(new PatternItem(pkg))
 
-    checkInspection(
-      s"""
+    checkInspection(s"""
         |{
         |  "require": {
         |    "$pkg": ">=2.1.0"
@@ -64,8 +60,7 @@ class PackageVersionInspectionTest extends InspectionTest {
   }
 
   def testGivenComparisonWildcardedVersion_thatShouldBeReported() = {
-    checkInspection(
-      s"""
+    checkInspection(s"""
         |{
         |  "require": {
         |    <warning descr="$WildcardAndComparisonWarning">"vendor/pkg": "<2.1.*"</warning>
@@ -75,8 +70,7 @@ class PackageVersionInspectionTest extends InspectionTest {
   }
 
   def testGivenComparisonAndWrappedWildcardComboVersion_thatShouldBeReported() = {
-    checkInspection(
-      s"""
+    checkInspection(s"""
         |{
         |  "require": {
         |    <warning descr="$WildcardAndComparisonWarning">"vendor/pkg": "<2.1.*@dev"</warning>
@@ -86,8 +80,7 @@ class PackageVersionInspectionTest extends InspectionTest {
   }
 
   def testGivenComparisonAnWildcardComboInLogicalConstraint_thatShouldBeReported() = {
-    checkInspection(
-      s"""
+    checkInspection(s"""
         |{
         |  "require": {
         |    <warning descr="$WildcardAndComparisonWarning">"vendor/pkg": ">=2.1.*, <2.2"</warning>

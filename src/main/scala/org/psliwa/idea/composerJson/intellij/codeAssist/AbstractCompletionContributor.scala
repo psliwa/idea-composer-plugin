@@ -5,7 +5,7 @@ import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.json.JsonLanguage
 import com.intellij.json.psi.{JsonArray, JsonFile, JsonObject, JsonProperty}
 import com.intellij.patterns.PlatformPatterns._
-import com.intellij.patterns.{StringPattern, PsiElementPattern}
+import com.intellij.patterns.{PsiElementPattern, StringPattern}
 import com.intellij.psi.PsiElement
 import com.intellij.util.ProcessingContext
 import org.psliwa.idea.composerJson._
@@ -30,42 +30,60 @@ abstract class AbstractCompletionContributor extends com.intellij.codeInsight.co
     }
   }
 
-  private def completionProvidersForSchema(s: Schema, parent: Capture): List[(Capture, CompletionProvider[CompletionParameters])] = s match {
-    case SObject(properties, _) => {
-      propertyCompletionProvider(parent, properties.named) ++
-        completionProvidersForProperties(properties.named, parent, string().equalTo(_: String)) ++
-        completionProvidersForProperties(properties.patterned, parent, stringMatches)
+  private def completionProvidersForSchema(s: Schema,
+                                           parent: Capture): List[(Capture, CompletionProvider[CompletionParameters])] =
+    s match {
+      case SObject(properties, _) => {
+        propertyCompletionProvider(parent, properties.named) ++
+          completionProvidersForProperties(properties.named, parent, string().equalTo(_: String)) ++
+          completionProvidersForProperties(properties.patterned, parent, stringMatches)
+      }
+      case SOr(l) => l.flatMap(completionProvidersForSchema(_, parent))
+      case SArray(i) => completionProvidersForSchema(i, psiElement(classOf[JsonArray]).withParent(parent))
+      case _ => getCompletionProvidersForSchema(s, parent)
     }
-    case SOr(l) => l.flatMap(completionProvidersForSchema(_, parent))
-    case SArray(i) => completionProvidersForSchema(i, psiElement(classOf[JsonArray]).withParent(parent))
-    case _ => getCompletionProvidersForSchema(s, parent)
+
+  private def completionProvidersForProperties[Name](properties: Map[Name, Property],
+                                                     parent: Capture,
+                                                     namePattern: Name => StringPattern) = {
+    properties.flatMap(
+      t =>
+        completionProvidersForSchema(t._2.schema, psiElement().and(propertyCapture(parent)).withName(namePattern(t._1)))
+    )
   }
 
-  private def completionProvidersForProperties[Name](properties: Map[Name,Property], parent: Capture, namePattern: Name => StringPattern) = {
-    properties.flatMap(t => completionProvidersForSchema(t._2.schema, psiElement().and(propertyCapture(parent)).withName(namePattern(t._1))))
-  }
-
-  protected def propertyCompletionProvider(parent: Capture, properties: Map[String, Property]): List[(Capture, CompletionProvider[CompletionParameters])] = List()
+  protected def propertyCompletionProvider(
+      parent: Capture,
+      properties: Map[String, Property]
+  ): List[(Capture, CompletionProvider[CompletionParameters])] = List()
 
   protected def insertHandlerFor(schema: Schema): Option[InsertHandler[LookupElement]] = None
 
-  protected def getCompletionProvidersForSchema(s: Schema, parent: Capture): List[(Capture, CompletionProvider[CompletionParameters])]
+  protected def getCompletionProvidersForSchema(
+      s: Schema,
+      parent: Capture
+  ): List[(Capture, CompletionProvider[CompletionParameters])]
 
   protected def propertyCompletionProvider(
-    parent: Capture, completionProvider: CompletionProvider[CompletionParameters]
+      parent: Capture,
+      completionProvider: CompletionProvider[CompletionParameters]
   ): List[(Capture, CompletionProvider[CompletionParameters])] = {
-    List((
-      psiElement()
-        .withSuperParent(2,
-          psiElement().and(propertyCapture(parent))
-            .withName(stringContains(EmptyNamePlaceholder))
-        ),
-      completionProvider
-    ))
+    List(
+      (
+        psiElement()
+          .withSuperParent(2,
+                           psiElement()
+                             .and(propertyCapture(parent))
+                             .withName(stringContains(EmptyNamePlaceholder))),
+        completionProvider
+      )
+    )
   }
 
   protected def propertyCompletionProvider(
-    parent: Capture, es: LookupElements, getInsertHandler: InsertHandlerFinder = _ => None
+      parent: Capture,
+      es: LookupElements,
+      getInsertHandler: InsertHandlerFinder = _ => None
   ): List[(Capture, CompletionProvider[CompletionParameters])] = {
     propertyCompletionProvider(parent, PropertyCompletionProvider(es, getInsertHandler))
   }
@@ -107,8 +125,12 @@ object AbstractCompletionContributor {
     case null => None
   }
 
-  class ParametersDependantCompletionProvider(loadElements: CompletionParameters => Seq[BaseLookupElement], getInsertHandler: InsertHandlerFinder = _ => None) extends AbstractCompletionProvider {
-    override def addCompletions(parameters: CompletionParameters, context: ProcessingContext, result: CompletionResultSet): Unit = {
+  class ParametersDependantCompletionProvider(loadElements: CompletionParameters => Seq[BaseLookupElement],
+                                              getInsertHandler: InsertHandlerFinder = _ => None)
+      extends AbstractCompletionProvider {
+    override def addCompletions(parameters: CompletionParameters,
+                                context: ProcessingContext,
+                                result: CompletionResultSet): Unit = {
       val es = loadElements(parameters)
 
       addLookupElementsToResult(es, getInsertHandler)(parameters, mapResult(result))
@@ -117,26 +139,33 @@ object AbstractCompletionContributor {
     protected def mapResult(result: CompletionResultSet) = result
   }
 
-  abstract class AbstractCompletionProvider extends com.intellij.codeInsight.completion.CompletionProvider[CompletionParameters] {
-    protected def addLookupElementsToResult(es: Iterable[BaseLookupElement], getInsertHandler: InsertHandlerFinder = _ => None)
-        (parameters: CompletionParameters, result: CompletionResultSet) {
+  abstract class AbstractCompletionProvider
+      extends com.intellij.codeInsight.completion.CompletionProvider[CompletionParameters] {
+    protected def addLookupElementsToResult(
+        es: Iterable[BaseLookupElement],
+        getInsertHandler: InsertHandlerFinder = _ => None
+    )(parameters: CompletionParameters, result: CompletionResultSet) {
 
       es.toList.reverse.foreach(e => {
-        val item = e.withPsiElement(parameters.getPosition).withInsertHandler(insertHandler(parameters.getPosition, e, getInsertHandler))
+        val item = e
+          .withPsiElement(parameters.getPosition)
+          .withInsertHandler(insertHandler(parameters.getPosition, e, getInsertHandler))
         result.addElement(item.priority.map(PrioritizedLookupElement.withPriority(item, _)).getOrElse(item))
       })
     }
 
     protected def insertHandler(element: PsiElement, le: BaseLookupElement, getInsertHandler: InsertHandlerFinder) = {
-      if(!le.quoted) null
+      if (!le.quoted) null
       else getInsertHandler(le).getOrElse(QuoteInsertHandler)
     }
   }
 
   class LookupElementsCompletionProvider(es: LookupElements, getInsertHandler: InsertHandlerFinder = _ => None)
-    extends AbstractCompletionProvider {
+      extends AbstractCompletionProvider {
 
-    override def addCompletions(parameters: CompletionParameters, context: ProcessingContext, result: CompletionResultSet): Unit = {
+    override def addCompletions(parameters: CompletionParameters,
+                                context: ProcessingContext,
+                                result: CompletionResultSet): Unit = {
       addLookupElementsToResult(es(parameters), getInsertHandler)(parameters, result)
     }
   }

@@ -2,18 +2,16 @@ package org.psliwa.idea.composerJson.json
 
 import org.junit.Assert._
 import org.junit.Test
+import org.psliwa.idea.composerJson.json.SchemaConversions._
 
 import scala.language.implicitConversions
-import SchemaConversions._
-
-import scala.util.matching.Regex
 
 class SchemaTest {
 
   @Test
   def parseEmptyObject() = {
     assertSchemaEquals(
-      new SObject(Map[String,Property](), true),
+      new SObject(Map[String, Property](), true),
       Schema.parse(
         """
           {
@@ -28,7 +26,7 @@ class SchemaTest {
   @Test
   def parseEmptyObject_additionalPropertiesAreNotAllowed() = {
     assertSchemaEquals(
-      new SObject(Map[String,Property](), false),
+      new SObject(Map[String, Property](), false),
       Schema.parse(
         """
           {
@@ -45,7 +43,7 @@ class SchemaTest {
   def parseSchemaWithOnlyScalarValues() = {
     assertSchemaEquals(
       new SObject(
-        Map[String,Property](
+        Map[String, Property](
           "stringProp",
           "numberProp" -> SNumber,
           "booleanProp" -> SBoolean
@@ -69,7 +67,7 @@ class SchemaTest {
     assertSchemaEquals(
       new SObject(
         Map(
-          "stringProp" -> Property(SString(), required=true, "some description")
+          "stringProp" -> Property(SString(), required = true, "some description")
         )
       ),
       Schema.parse("""
@@ -86,11 +84,13 @@ class SchemaTest {
   @Test
   def parseSchemaWithScalarArrayValues() = {
     assertSchemaEquals(
-      new SObject(Map[String,Property](
-        "arrayNumberProp" -> SArray(SNumber),
-        "arrayStringProp" -> SArray(SString()),
-        "arrayBooleanProp" -> SArray(SBoolean)
-      )),
+      new SObject(
+        Map[String, Property](
+          "arrayNumberProp" -> SArray(SNumber),
+          "arrayStringProp" -> SArray(SString()),
+          "arrayBooleanProp" -> SArray(SBoolean)
+        )
+      ),
       Schema.parse(
         """
           | {
@@ -118,9 +118,11 @@ class SchemaTest {
   @Test
   def parseStringSchemaWithFormat() = {
     assertSchemaEquals(
-      new SObject(Map[String,Property](
-        "property" -> SString(UriFormat)
-      )),
+      new SObject(
+        Map[String, Property](
+          "property" -> SString(UriFormat)
+        )
+      ),
       Schema.parse(
         """
           |{
@@ -137,10 +139,12 @@ class SchemaTest {
   @Test
   def parseSchemaWithNestedArrayValues() = {
     assertSchemaEquals(
-      new SObject(Map[String,Property](
-        "arrayNumberProp" -> SArray(SArray(SNumber)),
-        "arrayBooleanProp" -> SArray(SArray(SBoolean))
-      )),
+      new SObject(
+        Map[String, Property](
+          "arrayNumberProp" -> SArray(SArray(SNumber)),
+          "arrayBooleanProp" -> SArray(SArray(SBoolean))
+        )
+      ),
       Schema.parse(
         """
           | {
@@ -170,16 +174,20 @@ class SchemaTest {
       )
     )
   }
-
-
   @Test
   def parseSchemaWithArrayOfObjects() = {
     assertSchemaEquals(
-      new SObject(Map[String,Property](
-        "arrayProp" -> SArray(new SObject(Map[String,Property](
-          "stringProp"
-        )))
-      )),
+      new SObject(
+        Map[String, Property](
+          "arrayProp" -> SArray(
+            new SObject(
+              Map[String, Property](
+                "stringProp"
+              )
+            )
+          )
+        )
+      ),
       Schema.parse(
         """
           | {
@@ -206,9 +214,11 @@ class SchemaTest {
   @Test
   def parseSchemaWithStringChoice() = {
     assertSchemaEquals(
-      new SObject(Map[String,Property](
-        "enumProp" -> SStringChoice(List("value1", "value2"))
-      )),
+      new SObject(
+        Map[String, Property](
+          "enumProp" -> SStringChoice(List("value1", "value2"))
+        )
+      ),
       Schema.parse(
         """
           | {
@@ -227,9 +237,11 @@ class SchemaTest {
   @Test
   def parseSchemaWithOr() = {
     assertSchemaEquals(
-      new SObject(Map[String,Property](
-        "orProp" -> SOr(List(SBoolean, SString()))
-      )),
+      new SObject(
+        Map[String, Property](
+          "orProp" -> SOr(List(SBoolean, SString()))
+        )
+      ),
       Schema.parse(
         """
           | {
@@ -251,9 +263,11 @@ class SchemaTest {
   @Test
   def parseSchemaWithInlineOr() = {
     assertSchemaEquals(
-      new SObject(Map[String,Property](
-        "orProp" -> SOr(List(SString(), SNumber))
-      )),
+      new SObject(
+        Map[String, Property](
+          "orProp" -> SOr(List(SString(), SNumber))
+        )
+      ),
       Schema.parse(
         """
           | {
@@ -272,7 +286,7 @@ class SchemaTest {
   @Test
   def parseSchemaWithWildcardObject() = {
     assertSchemaEquals(
-      new SObject(Map[String,Property]()),
+      new SObject(Map[String, Property]()),
       Schema.parse(
         """
           | { "type": "object" }
@@ -284,9 +298,11 @@ class SchemaTest {
   @Test
   def parseSchemaWithWildcardArray() = {
     assertSchemaEquals(
-      new SObject(Map[String,Property](
-        "arrProp" -> SArray(SAny)
-      )),
+      new SObject(
+        Map[String, Property](
+          "arrProp" -> SArray(SAny)
+        )
+      ),
       Schema.parse(
         """
           | {
@@ -303,9 +319,11 @@ class SchemaTest {
   @Test
   def parsePackagesType() = {
     assertSchemaEquals(
-      new SObject(Map[String,Property](
-        "require" -> SPackages
-      )),
+      new SObject(
+        Map[String, Property](
+          "require" -> SPackages
+        )
+      ),
       Schema.parse(
         """
           | {
@@ -321,19 +339,22 @@ class SchemaTest {
 
   @Test
   def givenSchemaIsInvalid_expectNone() = {
-    assertEquals(None, Schema.parse(
-      """
+    assertEquals(None,
+                 Schema.parse(
+                   """
         | { "type": "invalid" }
       """.stripMargin
-    ))
+                 ))
   }
 
   @Test
   def parseSchemaWithPathProperty() = {
     assertSchemaEquals(
-      new SObject(Map[String,Property](
-        "name" -> SFilePath(existingFilePath = true)
-      )),
+      new SObject(
+        Map[String, Property](
+          "name" -> SFilePath(existingFilePath = true)
+        )
+      ),
       Schema.parse(
         """
           | {
@@ -350,9 +371,11 @@ class SchemaTest {
   @Test
   def parseSchemaWithPathProperty_filePathCouldNotExist() = {
     assertSchemaEquals(
-      new SObject(Map[String,Property](
-        "name" -> SFilePath(existingFilePath = false)
-      )),
+      new SObject(
+        Map[String, Property](
+          "name" -> SFilePath(existingFilePath = false)
+        )
+      ),
       Schema.parse(
         """
           | {
@@ -369,12 +392,16 @@ class SchemaTest {
   @Test
   def parseSchemaWithRefs_refsShouldBeResolved() = {
     assertSchemaEquals(
-      new SObject(Map[String,Property](
-        "name" -> new SObject(Map[String,Property](
-          "street" -> SString(),
-          "number" -> SNumber
-        ))
-      )),
+      new SObject(
+        Map[String, Property](
+          "name" -> new SObject(
+            Map[String, Property](
+              "street" -> SString(),
+              "number" -> SNumber
+            )
+          )
+        )
+      ),
       Schema.parse(
         """
           | {
@@ -399,8 +426,10 @@ class SchemaTest {
 
   @Test
   def parseSchemaWithRefs_givenInvalidRef_parsingShouldFail() = {
-    assertEquals(None, Schema.parse(
-      """
+    assertEquals(
+      None,
+      Schema.parse(
+        """
         | {
         |   "type": "object",
         |   "properties": {
@@ -417,15 +446,18 @@ class SchemaTest {
         |   }
         | }
       """.stripMargin
-    ))
+      )
+    )
   }
 
   @Test
   def parseObjectSchema_givenEnumRef_expectedValidObject() = {
     assertSchemaEquals(
-      new SObject(Map[String,Property](
-        "license" -> SStringChoice(List("a", "b"))
-      )),
+      new SObject(
+        Map[String, Property](
+          "license" -> SStringChoice(List("a", "b"))
+        )
+      ),
       Schema.parse(
         """
           | {
@@ -445,7 +477,7 @@ class SchemaTest {
   @Test
   def parseObjectSchema_givenPatternProperties_expectObjectWithPatternProperties() = {
     assertSchemaEquals(
-      new SObject(new Properties(Map(), Map("(.*)".r -> Property(SString(), required = false, "")))),
+      SObject(new Properties(Map(), Map("(.*)".r -> Property(SString(), required = false, "")))),
       Schema.parse(
         """
           | {

@@ -13,14 +13,17 @@ class NotInstalledPackageInspection extends AbstractInspection {
 
   override protected def collectProblems(element: PsiElement, schema: Schema, problems: ProblemsHolder): Unit = {
     val installedPackages = InstalledPackages.forFile(element.getContainingFile.getVirtualFile)
-    val notInstalledPackageProperties = NotInstalledPackages.getNotInstalledPackageProperties(element, installedPackages)
+    val notInstalledPackageProperties =
+      NotInstalledPackages.getNotInstalledPackageProperties(element, installedPackages)
 
     notInstalledPackageProperties
       .map(createProblem)
-      .foreach(problem => problems.registerProblem(problem.element, problem.message.getOrElse(""), problem.quickFixes:_*))
+      .foreach(
+        problem => problems.registerProblem(problem.element, problem.message.getOrElse(""), problem.quickFixes: _*)
+      )
   }
 
-  private def createProblem(property: JsonProperty) = {
+  private def createProblem(property: JsonProperty): ProblemDescriptor[IntentionActionQuickFixAdapter] = {
     ProblemDescriptor(
       property,
       ComposerBundle.message("inspection.notInstalledPackage.packageIsNotInstalled", property.getName),

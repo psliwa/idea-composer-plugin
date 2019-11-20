@@ -24,10 +24,10 @@ private[codeAssist] object ImplicitConversions {
   implicit def stringToPropertyPath(property: String): PropertyPath = PropertyPath(property, List.empty)
 }
 
-private[codeAssist] case class AndChecker(checker1: Checker, checker2: Checker) extends Checker{
+private[codeAssist] case class AndChecker(checker1: Checker, checker2: Checker) extends Checker {
   override def check(jsonObject: JsonObject): CheckResult = checker1.check(jsonObject) && checker2.check(jsonObject)
 }
 
-private[codeAssist] case class OrChecker(checker1: Checker, checker2: Checker) extends Checker{
+private[codeAssist] case class OrChecker(checker1: Checker, checker2: Checker) extends Checker {
   override def check(jsonObject: JsonObject): CheckResult = checker1.check(jsonObject) || checker2.check(jsonObject)
 }

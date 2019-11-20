@@ -13,8 +13,15 @@ class CompletionContributor extends AbstractCompletionContributor {
 
   import AbstractCompletionContributor._
 
-  override protected def getCompletionProvidersForSchema(s: Schema, parent: Capture): List[(Capture, CompletionProvider[CompletionParameters])] = s match {
-    case SStringChoice(m) => List((psiElement().withSuperParent(2, parent), new LookupElementsCompletionProvider(_ => m.map(new BaseLookupElement(_)))))
+  override protected def getCompletionProvidersForSchema(
+      s: Schema,
+      parent: Capture
+  ): List[(Capture, CompletionProvider[CompletionParameters])] = s match {
+    case SStringChoice(m) =>
+      List(
+        (psiElement().withSuperParent(2, parent),
+         new LookupElementsCompletionProvider(_ => m.map(new BaseLookupElement(_))))
+      )
     case _ => List()
   }
 
@@ -22,17 +29,17 @@ class CompletionContributor extends AbstractCompletionContributor {
     propertyCompletionProvider(
       parent,
       (_: CompletionParameters) => properties.map(x => new BaseLookupElement(x._1, description = x._2.description)),
-      (k) => insertHandlerFor(properties.get(k.name).get.schema)
+      k => insertHandlerFor(properties.get(k.name).get.schema)
     )
   }
 
   @tailrec
-  override final protected def insertHandlerFor(schema: Schema): Option[InsertHandler[LookupElement]] = schema match {
+  final override protected def insertHandlerFor(schema: Schema): Option[InsertHandler[LookupElement]] = schema match {
     case SString(_) | SStringChoice(_) | SFilePath(_) => Some(StringPropertyValueInsertHandler)
     case SObject(_, _) | SPackages | SFilePaths(_) => Some(ObjectPropertyValueInsertHandler)
     case SArray(_) => Some(ArrayPropertyValueInsertHandler)
     case SBoolean | SNumber => Some(EmptyPropertyValueInsertHandler)
-    case SOr(h::_) => insertHandlerFor(h)
+    case SOr(h :: _) => insertHandlerFor(h)
     case _ => None
   }
 }

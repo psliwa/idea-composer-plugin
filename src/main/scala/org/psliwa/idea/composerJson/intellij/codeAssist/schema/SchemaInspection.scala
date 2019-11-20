@@ -5,7 +5,11 @@ import com.intellij.json.psi.{JsonNumberLiteral, JsonProperty, _}
 import com.intellij.psi.PsiElement
 import org.psliwa.idea.composerJson.ComposerBundle
 import org.psliwa.idea.composerJson.intellij.codeAssist.problem.ProblemDescriptor
-import org.psliwa.idea.composerJson.intellij.codeAssist.{AbstractInspection, CreatePropertyQuickFix, RemoveJsonElementQuickFix}
+import org.psliwa.idea.composerJson.intellij.codeAssist.{
+  AbstractInspection,
+  CreatePropertyQuickFix,
+  RemoveJsonElementQuickFix
+}
 import org.psliwa.idea.composerJson.intellij.PsiExtractors
 import org.psliwa.idea.composerJson.json._
 
@@ -19,97 +23,124 @@ class SchemaInspection extends AbstractInspection {
 
   override protected def collectProblems(element: PsiElement, schema: Schema, problems: ProblemsHolder): Unit = {
     val collectedProblems = collectProblems(element, schema).toSet
-    collectedProblems.foreach(problem => problems.registerProblem(problem.element, problem.message.getOrElse(""), problem.quickFixes:_*))
+    collectedProblems.foreach(
+      problem => problems.registerProblem(problem.element, problem.message.getOrElse(""), problem.quickFixes: _*)
+    )
   }
 
   private def collectProblems(element: PsiElement, schema: Schema): Seq[ProblemDescriptor[LocalQuickFix]] = {
     import scala.jdk.CollectionConverters._
     import PsiExtractors._
 
-    def collectNotAllowedPropertyProblems(property: JsonProperty, schemaProperties: Properties, additionalProperties: Boolean): Seq[ProblemDescriptor[LocalQuickFix]] = {
+    def collectNotAllowedPropertyProblems(property: JsonProperty,
+                                          schemaProperties: Properties,
+                                          additionalProperties: Boolean): Seq[ProblemDescriptor[LocalQuickFix]] = {
       schemaProperties.get(property.getName) match {
         case Some(schemaProperty) => Option(property.getValue).toList.flatMap(collectProblems(_, schemaProperty.schema))
-        case None if !additionalProperties => List(ProblemDescriptor(
-          property.getNameElement.getContext,
-          ComposerBundle.message("inspection.schema.notAllowedProperty", property.getName),
-          Seq(removeJsonPropertyQuickFix(property))
-        ))
+        case None if !additionalProperties =>
+          List(
+            ProblemDescriptor(
+              property.getNameElement.getContext,
+              ComposerBundle.message("inspection.schema.notAllowedProperty", property.getName),
+              Seq(removeJsonPropertyQuickFix(property))
+            )
+          )
         case _ => List.empty
       }
     }
 
     schema match {
-      case so@SObject(schemaProperties, additionalProperties) => element match {
-        case JsonObject(properties) => {
-          val notAllowedPropertyProblems = for {
-            property <- properties.asScala
-            problem <- collectNotAllowedPropertyProblems(property, schemaProperties, additionalProperties)
-          } yield problem
+      case so @ SObject(schemaProperties, additionalProperties) =>
+        element match {
+          case JsonObject(properties) => {
+            val notAllowedPropertyProblems = for {
+              property <- properties.asScala
+              problem <- collectNotAllowedPropertyProblems(property, schemaProperties, additionalProperties)
+            } yield problem
 
-          val alreadyDefinedPropertiesProblems = getAlreadyDefinedProperties(properties.asScala.toList)
-            .map(property => ProblemDescriptor(
-              property,
-              ComposerBundle.message("inspection.schema.alreadyDefinedProperty", property.getName),
-              Seq(removeJsonPropertyQuickFix(property))
-            )
-          ).toList
+            val alreadyDefinedPropertiesProblems = getAlreadyDefinedProperties(properties.asScala.toList)
+              .map(
+                property =>
+                  ProblemDescriptor(
+                    property,
+                    ComposerBundle.message("inspection.schema.alreadyDefinedProperty", property.getName),
+                    Seq(removeJsonPropertyQuickFix(property))
+                  )
+              )
+              .toList
 
-          lazy val propertyNames = properties.asScala.map(_.getName).toSet
+            lazy val propertyNames = properties.asScala.map(_.getName).toSet
 
-          val requiredPropertiesProblems = for((name, property) <- so.requiredProperties if !propertyNames.contains(name)) yield {
-            ProblemDescriptor(
-              element,
-              ComposerBundle.message("inspection.schema.required", name),
-              Seq(new CreatePropertyQuickFix(element, name, property.schema): LocalQuickFix)
+            val requiredPropertiesProblems =
+              for ((name, property) <- so.requiredProperties if !propertyNames.contains(name)) yield {
+                ProblemDescriptor(
+                  element,
+                  ComposerBundle.message("inspection.schema.required", name),
+                  Seq(new CreatePropertyQuickFix(element, name, property.schema): LocalQuickFix)
+                )
+              }
+
+            notAllowedPropertyProblems.toList ::: alreadyDefinedPropertiesProblems ::: requiredPropertiesProblems.toList
+          }
+          case _ => List(invalidTypeProblem(element, schema))
+        }
+      case SPackages | SFilePaths(_) =>
+        element match {
+          case JsonObject(_) => List.empty
+          case _ => List(invalidTypeProblem(element, schema))
+        }
+      case SString(format) =>
+        element match {
+          case JsonStringLiteral(value) =>
+            if (!format.isValid(value)) {
+              List(
+                ProblemDescriptor(
+                  element,
+                  ComposerBundle.message("inspection.schema.format", prependPrefix(readableFormat(format))),
+                  Seq()
+                )
+              )
+            } else {
+              List.empty
+            }
+          case _ => List(invalidTypeProblem(element, schema))
+        }
+      case SFilePath(_) =>
+        element match {
+          case JsonStringLiteral(_) => List.empty
+          case _ => List(invalidTypeProblem(element, schema))
+        }
+      case SStringChoice(choices) =>
+        element match {
+          case x @ JsonStringLiteral(value) if !choices.contains(value) => {
+            List(
+              ProblemDescriptor(
+                element,
+                ComposerBundle.message("inspection.schema.notAllowedPropertyValue",
+                                       value,
+                                       choices.map("'" + _ + "'").mkString(" or ")),
+                Seq(new ShowValidValuesQuickFix(x))
+              )
             )
           }
-
-          notAllowedPropertyProblems.toList ::: alreadyDefinedPropertiesProblems ::: requiredPropertiesProblems.toList
+          case JsonStringLiteral(_) => List.empty
+          case _ => List(invalidTypeProblem(element, schema))
         }
-        case _ => List(invalidTypeProblem(element, schema))
-      }
-      case SPackages | SFilePaths(_) => element match {
-        case JsonObject(_) => List.empty
-        case _ => List(invalidTypeProblem(element, schema))
-      }
-      case SString(format) => element match {
-        case JsonStringLiteral(value) => if(!format.isValid(value)) {
-          List(ProblemDescriptor(
-            element,
-            ComposerBundle.message("inspection.schema.format", prependPrefix(readableFormat(format))),
-            Seq()
-          ))
-        } else {
-          List.empty
+      case SBoolean =>
+        element match {
+          case JsonBooleanLiteral(_) => List.empty
+          case _ =>
+            List(invalidTypeProblem(element, schema, removeQuotesQuickFixWhenMatches(element, booleanPattern): _*))
         }
-        case _ => List(invalidTypeProblem(element, schema))
-      }
-      case SFilePath(_) => element match {
-        case JsonStringLiteral(_) => List.empty
-        case _ => List(invalidTypeProblem(element, schema))
-      }
-      case SStringChoice(choices) => element match {
-        case x@JsonStringLiteral(value) if !choices.contains(value) => {
-          List(ProblemDescriptor(
-            element,
-            ComposerBundle.message("inspection.schema.notAllowedPropertyValue", value, choices.map("'"+_+"'").mkString(" or ")),
-            Seq(new ShowValidValuesQuickFix(x))
-          ))
+      case SArray(item) =>
+        element match {
+          case JsonArray(values) =>
+            for {
+              value <- values.asScala.toList
+              problem <- collectProblems(value, item)
+            } yield problem
+          case _ => List(invalidTypeProblem(element, schema))
         }
-        case JsonStringLiteral(_) => List.empty
-        case _ => List(invalidTypeProblem(element, schema))
-      }
-      case SBoolean => element match {
-        case JsonBooleanLiteral(_) => List.empty
-        case _ => List(invalidTypeProblem(element, schema, removeQuotesQuickFixWhenMatches(element, booleanPattern):_*))
-      }
-      case SArray(item) => element match {
-        case JsonArray(values) => for {
-          value <- values.asScala.toList
-          problem <- collectProblems(value, item)
-        } yield problem
-        case _ => List(invalidTypeProblem(element, schema))
-      }
       case SOr(items) => {
         // TODO: find the better matching item and report problems for it
         val problemsForItems = items.map(collectProblems(element, _))
@@ -120,15 +151,17 @@ class SchemaInspection extends AbstractInspection {
             val problems = problemsForItems.filter(_.nonEmpty).flatten
             val innerProblems = problems.filterNot(_.element == element)
 
-            if(innerProblems.nonEmpty) innerProblems
-            else if(problems.size >= items.length) List(invalidTypeProblem(element, schema))
+            if (innerProblems.nonEmpty) innerProblems
+            else if (problems.size >= items.length) List(invalidTypeProblem(element, schema))
             else List.empty
         }
       }
-      case SNumber => element match {
-        case PsiExtractors.JsonNumberLiteral(_) => List.empty
-        case _ => List(invalidTypeProblem(element, schema, removeQuotesQuickFixWhenMatches(element, numberPattern):_*))
-      }
+      case SNumber =>
+        element match {
+          case PsiExtractors.JsonNumberLiteral(_) => List.empty
+          case _ =>
+            List(invalidTypeProblem(element, schema, removeQuotesQuickFixWhenMatches(element, numberPattern): _*))
+        }
       case _ => List.empty
     }
   }
@@ -136,11 +169,10 @@ class SchemaInspection extends AbstractInspection {
   override def getShortName: String = "ComposerJsonSchema"
 
   private def getAlreadyDefinedProperties(properties: List[JsonProperty]): Iterable[JsonProperty] = {
-    properties
-      .view
+    properties.view
       .groupBy(_.getName)
       .filter(_._2.size > 1)
-      .map { case (key, values) => key -> values.tail}
+      .map { case (key, values) => key -> values.tail }
       .values
       .flatten
   }
@@ -150,7 +182,7 @@ class SchemaInspection extends AbstractInspection {
   }
 
   private def removeQuotesQuickFixWhenMatches(e: PsiElement, pattern: Regex): List[LocalQuickFix] = {
-    if(pattern.findFirstMatchIn(e.getText).isDefined) {
+    if (pattern.findFirstMatchIn(e.getText).isDefined) {
       List(new RemoveQuotesQuickFix(e))
     } else {
       Nil
@@ -160,7 +192,9 @@ class SchemaInspection extends AbstractInspection {
   private def invalidTypeProblem(element: PsiElement, schema: Schema, quickFixes: LocalQuickFix*) = {
     ProblemDescriptor(
       element,
-      Some(ComposerBundle.message("inspection.schema.type", prependPrefix(readableType(schema)), readableType(element))),
+      Some(
+        ComposerBundle.message("inspection.schema.type", prependPrefix(readableType(schema)), readableType(element))
+      ),
       quickFixes
     )
   }
@@ -191,6 +225,6 @@ class SchemaInspection extends AbstractInspection {
     case _ => "unknown"
   }
 
-  private def prependPrefix(s: String) = prefix(s)+" "+s
-  private def prefix(s: String) = if(vowels.contains(s(0))) "an" else "a"
+  private def prependPrefix(s: String) = prefix(s) + " " + s
+  private def prefix(s: String) = if (vowels.contains(s(0))) "an" else "a"
 }

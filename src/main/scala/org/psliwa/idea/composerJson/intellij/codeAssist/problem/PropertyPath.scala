@@ -18,11 +18,14 @@ private[codeAssist] case class PropertyPath(headProperty: String, tailProperties
 private[codeAssist] object PropertyPath {
   def findPropertiesInPath(jsonObject: JsonObject, propertyPath: PropertyPath): List[JsonProperty] = {
     @tailrec
-    def loop(jsonObjects: List[JsonObject], propertyPath: PropertyPath, foundProperties: List[JsonProperty]): List[JsonProperty] = {
+    def loop(jsonObjects: List[JsonObject],
+             propertyPath: PropertyPath,
+             foundProperties: List[JsonProperty]): List[JsonProperty] = {
       (jsonObjects.flatMap(findProperties(_, propertyPath.headProperty)), propertyPath) match {
         case (properties, PropertyPath(_, Nil)) => properties
         case (properties, PropertyPath(_, head :: tail)) =>
-          val newJsonObjects: List[JsonObject] = properties.flatMap(property => Option(property.getValue)).flatMap(ensureJsonObject)
+          val newJsonObjects: List[JsonObject] =
+            properties.flatMap(property => Option(property.getValue)).flatMap(ensureJsonObject)
           loop(newJsonObjects, PropertyPath(head, tail), properties)
         case _ => foundProperties
       }
@@ -38,6 +41,7 @@ private[codeAssist] object PropertyPath {
 
   def siblingPropertyPath(propertyPath: PropertyPath, siblingPropertyName: String): PropertyPath = propertyPath match {
     case PropertyPath(_, Nil) => PropertyPath(siblingPropertyName, List.empty)
-    case PropertyPath(rootProperty, tailProperties) => PropertyPath(rootProperty, tailProperties.dropRight(1) ++ List(siblingPropertyName))
+    case PropertyPath(rootProperty, tailProperties) =>
+      PropertyPath(rootProperty, tailProperties.dropRight(1) ++ List(siblingPropertyName))
   }
 }

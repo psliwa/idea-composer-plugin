@@ -1,7 +1,7 @@
 package org.psliwa.idea.composerJson.intellij.codeAssist.composer
 
 import com.intellij.openapi.vfs.VirtualFile
-import org.psliwa.idea.composerJson.composer.model.{Packages, PackageDescriptor}
+import org.psliwa.idea.composerJson.composer.model.{PackageDescriptor, Packages}
 import org.psliwa.idea.composerJson.fixtures.ComposerFixtures
 import org.psliwa.idea.composerJson.fixtures.ComposerFixtures._
 import org.psliwa.idea.composerJson.intellij.codeAssist.InspectionTest
@@ -15,8 +15,7 @@ class NotInstalledPackageInspectionTest extends InspectionTest {
   }
 
   def testGivenUninstalledPackage_thatShouldBeReported() = {
-    checkInspection(
-      """
+    checkInspection("""
         |{
         |  "require": {
         |    <weak_warning>"vendor/pkg": "1.0.2"</weak_warning>
@@ -26,8 +25,7 @@ class NotInstalledPackageInspectionTest extends InspectionTest {
   }
 
   def testGivenVirtualPackage_thatShouldNotBeReported() = {
-    checkInspection(
-      """
+    checkInspection("""
         |{
         |  "require": {
         |    "php": ">=5.3"
@@ -39,8 +37,7 @@ class NotInstalledPackageInspectionTest extends InspectionTest {
   def testGivenInstalledPackage_thatShouldNotBeReported() = {
     createComposerLock(Packages(PackageDescriptor("vendor/pkg", "1.0.2")))
 
-    checkInspection(
-      """
+    checkInspection("""
         |{
         |  "require": {
         |    "vendor/pkg": "1.0.2"
@@ -54,12 +51,12 @@ class NotInstalledPackageInspectionTest extends InspectionTest {
   }
 
   def testGivenNotInstalledPackage_butReplacementIsInstalled_thatShouldNotBeReported(): Unit = {
-    ComposerFixtures.createComposerLock(myFixture, List(ComposerPackageWithReplaces(
-      PackageDescriptor("replacement/pkg", "1.0.2"), Set("vendor/pkg"))
-    ))
+    ComposerFixtures.createComposerLock(
+      myFixture,
+      List(ComposerPackageWithReplaces(PackageDescriptor("replacement/pkg", "1.0.2"), Set("vendor/pkg")))
+    )
 
-    checkInspection(
-      """
+    checkInspection("""
         |{
         |  "require": {
         |    "vendor/pkg": "1.0.2"
@@ -71,8 +68,7 @@ class NotInstalledPackageInspectionTest extends InspectionTest {
   def testGivenInstalledPackage_givenPackageNameInDifferentCase_thatShouldNotBeReported() = {
     createComposerLock(Packages(PackageDescriptor("veNdor/pkg", "1.0.2")))
 
-    checkInspection(
-      """
+    checkInspection("""
         |{
         |  "require": {
         |    "Vendor/Pkg": "1.0.2"
@@ -82,8 +78,7 @@ class NotInstalledPackageInspectionTest extends InspectionTest {
   }
 
   def testGivenUninstalledPackage_packageHasNotVersionYet_thatShouldNotBeReported() = {
-    checkInspection(
-      """
+    checkInspection("""
         |{
         |  "require": {
         |    "vendor/pkg": ""
@@ -95,8 +90,7 @@ class NotInstalledPackageInspectionTest extends InspectionTest {
   def testGivenInstalledProdPackage_thatPackageIsOnlyInRequireDev_thatShouldNotBeReported() = {
     createComposerLock(Packages(PackageDescriptor("vendor/pkg", "1.0.2")))
 
-    checkInspection(
-      """
+    checkInspection("""
         |{
         |  "require-dev": {
         |    "vendor/pkg": "1.0.2"
@@ -106,8 +100,7 @@ class NotInstalledPackageInspectionTest extends InspectionTest {
   }
 
   def testGivenUninstalledPackage_givenPackageIsInRequireDev_thatShouldBeReported() = {
-    checkInspection(
-      """
+    checkInspection("""
         |{
         |  "require-dev": {
         |    <weak_warning>"vendor/pkg": "1.0.2"</weak_warning>
@@ -119,8 +112,7 @@ class NotInstalledPackageInspectionTest extends InspectionTest {
   def testGivenInstalledDevPackage_thatPackageIsOnlyInRequireDev_thatShouldNotBeReported() = {
     createComposerLock(Packages(PackageDescriptor("vendor/pkg", "1.0.2", isDev = true)))
 
-    checkInspection(
-      """
+    checkInspection("""
         |{
         |  "require-dev": {
         |    "vendor/pkg": "1.0.2"
@@ -132,8 +124,7 @@ class NotInstalledPackageInspectionTest extends InspectionTest {
   def testGivenInstalledDevPackage_thatPackageIsOnlyInRequire_thatShouldBeReported() = {
     createComposerLock(Packages(PackageDescriptor("vendor/pkg", "1.0.2", isDev = true)))
 
-    checkInspection(
-      """
+    checkInspection("""
         |{
         |  "require": {
         |    <weak_warning>"vendor/pkg": "1.0.2"</weak_warning>

@@ -5,8 +5,14 @@ import org.psliwa.idea.composerJson.intellij.codeAssist.CompletionTest
 class FilePathTest extends CompletionTest {
   def testSuggestions_givenEmptyPrefix_suggestPathOnTopLevel() = {
     writeAction(() => {
-      myFixture.getTempDirFixture.findOrCreateDir("dir1").createChildDirectory(this, "dir1.1").createChildData(this, "file1.txt")
-      myFixture.getTempDirFixture.findOrCreateDir("dir2").createChildDirectory(this, "dir2.1").createChildData(this, "file2.txt")
+      myFixture.getTempDirFixture
+        .findOrCreateDir("dir1")
+        .createChildDirectory(this, "dir1.1")
+        .createChildData(this, "file1.txt")
+      myFixture.getTempDirFixture
+        .findOrCreateDir("dir2")
+        .createChildDirectory(this, "dir2.1")
+        .createChildData(this, "file2.txt")
       myFixture.getTempDirFixture.createFile("file3.txt")
     })
 
@@ -41,7 +47,10 @@ class FilePathTest extends CompletionTest {
 
   def testSuggestions_givenDirectoryPrefix_givenFileInDirectory_suggestFileFromGivenDirectory() = {
     writeAction(() => {
-      myFixture.getTempDirFixture.findOrCreateDir("dir1").createChildDirectory(this, "dir1.1").createChildData(this, "file.txt")
+      myFixture.getTempDirFixture
+        .findOrCreateDir("dir1")
+        .createChildDirectory(this, "dir1.1")
+        .createChildData(this, "file.txt")
     })
 
     suggestions(

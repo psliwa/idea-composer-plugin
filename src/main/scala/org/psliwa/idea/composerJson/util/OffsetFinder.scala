@@ -24,15 +24,17 @@ trait OffsetFinder[Haystack, A] {
     findOffset(stop(haystack) _, 1)(expectedMatcher)(offset)
   }
 
-  private def findOffset(stop: Int => Boolean, delta: Int)(expectedMatcher: Matcher[A])(offset: Int)(implicit haystack: Haystack): Option[Int] = {
+  private def findOffset(stop: Int => Boolean, delta: Int)(
+      expectedMatcher: Matcher[A]
+  )(offset: Int)(implicit haystack: Haystack): Option[Int] = {
     @tailrec
     def loop(offset: Int): Option[Int] = {
-      if(stop(offset)) {
+      if (stop(offset)) {
         None
       } else {
         val obj = objectAt(haystack, offset)
 
-        if(expectedMatcher is obj) Some(offset)
+        if (expectedMatcher is obj) Some(offset)
         else loop(offset + delta)
       }
     }
@@ -47,7 +49,7 @@ trait OffsetFinder[Haystack, A] {
   def ensure(s: Matcher[A]*)(offset: Int)(implicit haystack: Haystack) = {
     val obj = objectAt(haystack, offset)
 
-    if(s.exists(_ is obj)) Some(obj)
+    if (s.exists(_ is obj)) Some(obj)
     else None
   }
 }

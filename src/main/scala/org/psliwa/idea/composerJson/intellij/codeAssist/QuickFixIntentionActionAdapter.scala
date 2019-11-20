@@ -17,18 +17,19 @@ private class QuickFixIntentionActionAdapter(quickFix: LocalQuickFixOnPsiElement
       project,
       file,
       quickFix.getStartElement,
-      if(quickFix.getEndElement == null) quickFix.getStartElement else quickFix.getEndElement
+      if (quickFix.getEndElement == null) quickFix.getStartElement else quickFix.getEndElement
     )
   }
 }
 
 private class QuickFixIntentionActionAdapterWithPriority(quickFix: LocalQuickFixOnPsiElement, private val priority: Int)
-  extends QuickFixIntentionActionAdapter(quickFix) with Comparable[IntentionAction] {
+    extends QuickFixIntentionActionAdapter(quickFix)
+    with Comparable[IntentionAction] {
   override def compareTo(o: IntentionAction): Int = {
     o match {
       case p: QuickFixIntentionActionAdapterWithPriority =>
         val diff = p.priority - priority
-        if(diff == 0) {
+        if (diff == 0) {
           Comparing.compare(getText, o.getText)
         } else {
           p.priority - priority

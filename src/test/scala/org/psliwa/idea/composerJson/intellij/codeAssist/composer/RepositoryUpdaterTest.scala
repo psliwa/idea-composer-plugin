@@ -37,7 +37,7 @@ class RepositoryUpdaterTest extends InspectionTest {
          |}""".stripMargin
     )
 
-    assertRepositories(List(url+"/packages.json"))
+    assertRepositories(List(url + "/packages.json"))
   }
 
   def testGivenPathRepository_givenPathIsRelative_thereShouldBeOneUrlRepository() = {
@@ -190,7 +190,9 @@ class RepositoryUpdaterTest extends InspectionTest {
     assertRepositories(List(), includePackagist = true, Map("inline/package" -> List("1.0.8", "1.0.9")))
   }
 
-  private def assertRepositories(expectedUrls: List[String], includePackagist: Boolean = true, expectedPackages: Map[String,List[String]] = Map()): Unit = {
+  private def assertRepositories(expectedUrls: List[String],
+                                 includePackagist: Boolean = true,
+                                 expectedPackages: Map[String, List[String]] = Map()): Unit = {
     val repoInfo = getRepositoryInfo
 
     assertEquals(1, getRepositoryProvider.infos.size)
@@ -205,11 +207,15 @@ class RepositoryUpdaterTest extends InspectionTest {
     getRepositoryProvider.infos.get(myFixture.getFile.getVirtualFile.getCanonicalPath)
   }
 
-  private def assertRepository[A](repository: Repository[A], expectedPackages: Map[String,List[String]]): Unit = {
+  private def assertRepository[A](repository: Repository[A], expectedPackages: Map[String, List[String]]): Unit = {
     assertTrue(
-      expectedPackages.forall { case(packageName, versions) => {
-        repository.getPackages.contains(packageName) && versions.forall(repository.getPackageVersions(PackageName(packageName)).contains)
-      }}
+      expectedPackages.forall {
+        case (packageName, versions) => {
+          repository.getPackages.contains(packageName) && versions.forall(
+            repository.getPackageVersions(PackageName(packageName)).contains
+          )
+        }
+      }
     )
   }
 

@@ -96,7 +96,7 @@ class ParserTest {
     List(" as ", " AS ").foreach(as => {
       assertConstraintEquals(
         AliasedConstraint(DevConstraint("master"), SemanticConstraint(new SemanticVersion(1, 2, 0)), as),
-        "dev-master"+as+"1.2.0"
+        "dev-master" + as + "1.2.0"
       )
     })
   }
@@ -125,7 +125,7 @@ class ParserTest {
     } yield {
       assertConstraintEquals(
         OperatorConstraint(operator, SemanticConstraint(new SemanticVersion(1, 2)), separator),
-        operator+separator+"1.2"
+        operator + separator + "1.2"
       )
     }
   }
@@ -135,7 +135,7 @@ class ParserTest {
     List(",", ", ", " ").foreach(separator => {
       assertConstraintEquals(
         LogicalConstraint(List(DevConstraint("master"), DevConstraint("trunk")), LogicalOperator.AND, separator),
-        "dev-master"+separator+"dev-trunk"
+        "dev-master" + separator + "dev-trunk"
       )
     })
   }
@@ -144,8 +144,10 @@ class ParserTest {
   def parseHyphenRangeConstraint() = {
     List("-", " - ").foreach(separator => {
       assertConstraintEquals(
-        HyphenRangeConstraint(SemanticConstraint(new SemanticVersion(1, 2)), SemanticConstraint(new SemanticVersion(2, 0)), separator),
-        "1.2"+separator+"2.0"
+        HyphenRangeConstraint(SemanticConstraint(new SemanticVersion(1, 2)),
+                              SemanticConstraint(new SemanticVersion(2, 0)),
+                              separator),
+        "1.2" + separator + "2.0"
       )
     })
   }
@@ -160,7 +162,7 @@ class ParserTest {
     List("||", " || ", "|", " | ").foreach(separator => {
       assertConstraintEquals(
         LogicalConstraint(List(DevConstraint("master"), DevConstraint("trunk")), LogicalOperator.OR, separator),
-        "dev-master"+separator+"dev-trunk"
+        "dev-master" + separator + "dev-trunk"
       )
     })
   }
@@ -198,7 +200,10 @@ class ParserTest {
   @Test
   def parseOperatorWithWrappedWildcard() = {
     assertConstraintEquals(
-      OperatorConstraint(ConstraintOperator.>, WrappedConstraint(WildcardConstraint(Some(SemanticConstraint(new SemanticVersion(1, 2)))), None, Some("@dev"))),
+      OperatorConstraint(
+        ConstraintOperator.>,
+        WrappedConstraint(WildcardConstraint(Some(SemanticConstraint(new SemanticVersion(1, 2)))), None, Some("@dev"))
+      ),
       ">1.2.*@dev"
     )
   }

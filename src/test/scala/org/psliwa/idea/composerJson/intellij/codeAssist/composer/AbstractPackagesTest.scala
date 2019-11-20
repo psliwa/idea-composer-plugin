@@ -14,7 +14,9 @@ abstract class AbstractPackagesTest extends CompletionTest {
   def getCompletionContributors = {
     import scala.jdk.CollectionConverters._
 
-    codeInsight.completion.CompletionContributor.forLanguage(JsonLanguage.INSTANCE).asScala
+    codeInsight.completion.CompletionContributor
+      .forLanguage(JsonLanguage.INSTANCE)
+      .asScala
       .filter(_.isInstanceOf[CompletionContributor])
       .map(_.asInstanceOf[CompletionContributor])
   }

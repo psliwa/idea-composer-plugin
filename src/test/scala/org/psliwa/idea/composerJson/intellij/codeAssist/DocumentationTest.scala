@@ -9,14 +9,21 @@ abstract class DocumentationTest extends BasePlatformTestCase {
 
   override def isWriteActionRequired: Boolean = true
 
-  protected def checkDocumentation(s: String, externalUrls: List[String], maybeExpectedDoc: Option[String] = None, filename: String = ComposerJson): Unit = {
-    def externalUrlsAssertion(urls: List[String]): Unit =  externalUrls.foreach(url => assertTrue(urls.exists(_.contains(url))))
+  protected def checkDocumentation(s: String,
+                                   externalUrls: List[String],
+                                   maybeExpectedDoc: Option[String] = None,
+                                   filename: String = ComposerJson): Unit = {
+    def externalUrlsAssertion(urls: List[String]): Unit =
+      externalUrls.foreach(url => assertTrue(urls.exists(_.contains(url))))
     def docAssertion(doc: String): Unit = maybeExpectedDoc.foreach(assertEquals(_, doc))
 
     checkDocumentation(s, externalUrlsAssertion _, docAssertion _, filename)
   }
 
-  protected def checkDocumentation(s: String, externalUrlsAssertion: List[String] => Unit, docAssertion: String => Unit, filename: String): Unit = {
+  protected def checkDocumentation(s: String,
+                                   externalUrlsAssertion: List[String] => Unit,
+                                   docAssertion: String => Unit,
+                                   filename: String): Unit = {
     import scala.jdk.CollectionConverters._
 
     myFixture.configureByText(filename, s.replace("\r", ""))
@@ -30,7 +37,8 @@ abstract class DocumentationTest extends BasePlatformTestCase {
     docAssertion(doc)
   }
 
-  protected def checkDocumentation(s: String, expectedDoc: String): Unit = checkDocumentation(s, List(), Option(expectedDoc))
+  protected def checkDocumentation(s: String, expectedDoc: String): Unit =
+    checkDocumentation(s, List(), Option(expectedDoc))
 
   protected def documentationProvider: DocumentationProvider
 }

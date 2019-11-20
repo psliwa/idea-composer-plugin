@@ -10,8 +10,10 @@ import PsiElements._
 abstract class AbstractInspection extends LocalInspectionTool {
   val schema = ComposerSchema
 
-  override final def checkFile(file: PsiFile, manager: InspectionManager, isOnTheFly: Boolean): Array[ProblemDescriptor] = {
-    if(file.getName != ComposerJson) Array()
+  final override def checkFile(file: PsiFile,
+                               manager: InspectionManager,
+                               isOnTheFly: Boolean): Array[ProblemDescriptor] = {
+    if (file.getName != ComposerJson) Array()
     else doCheckFile(file, manager, isOnTheFly)
   }
 

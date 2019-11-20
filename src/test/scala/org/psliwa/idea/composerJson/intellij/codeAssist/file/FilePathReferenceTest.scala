@@ -10,19 +10,18 @@ class FilePathReferenceTest extends CompletionTest {
   def testGivenFileInArrayOfFilePaths_referenceShouldBeCreated() = {
     val file = "file.txt"
 
-    checkFileReference(file,
-      s"""
+    checkFileReference(file, s"""
         |{
         |  "bin": [ "$file<caret>" ]
         |}
-      """.stripMargin
-    )
+      """.stripMargin)
   }
 
   def testGivenFileInFilePathsObject_referenceShouldBeCreated() = {
     val file = "file.txt"
 
-    checkFileReference(file,
+    checkFileReference(
+      file,
       s"""
         |{
         |  "autoload": {
@@ -38,7 +37,8 @@ class FilePathReferenceTest extends CompletionTest {
   def testGivenFileInArrayInFilePathsObject_referenceShouldBeCreated() = {
     val file = "file.txt"
 
-    checkFileReference(file,
+    checkFileReference(
+      file,
       s"""
         |{
         |  "autoload": {
@@ -54,13 +54,11 @@ class FilePathReferenceTest extends CompletionTest {
   def testGivenNonFilePathProperty_referenceShouldNotBeCreated() = {
     val file = "file.txt"
 
-    checkEmptyFileReferences(file,
-      s"""
+    checkEmptyFileReferences(file, s"""
         |{
         |  "name": "$file<caret>"
         |}
-      """.stripMargin
-    )
+      """.stripMargin)
   }
 
   def testGivenRequireProperty_referenceToVendorDirShouldBeCreated() = {
@@ -71,7 +69,8 @@ class FilePathReferenceTest extends CompletionTest {
         .createChildDirectory(this, "some-pkg")
     })
 
-    val references =  getResolvedFileReferences(_.contains("vendor"),
+    val references = getResolvedFileReferences(
+      _.contains("vendor"),
       """
         |{
         |  "require": {
@@ -97,7 +96,9 @@ class FilePathReferenceTest extends CompletionTest {
 
   private def endsWith(suffix: String)(s: String) = s.endsWith(suffix)
 
-  private def getResolvedFileReferences(fileComparator: String => Boolean, s: String, mapElement: PsiElement => PsiElement = _.getParent) = {
+  private def getResolvedFileReferences(fileComparator: String => Boolean,
+                                        s: String,
+                                        mapElement: PsiElement => PsiElement = _.getParent) = {
     myFixture.configureByText(ComposerJson, s)
 
     val element = mapElement(myFixture.getFile.findElementAt(myFixture.getCaretOffset))

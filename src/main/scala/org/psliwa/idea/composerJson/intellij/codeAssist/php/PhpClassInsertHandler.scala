@@ -1,6 +1,6 @@
 package org.psliwa.idea.composerJson.intellij.codeAssist.php
 
-import com.intellij.codeInsight.completion.{InsertionContext, InsertHandler}
+import com.intellij.codeInsight.completion.{InsertHandler, InsertionContext}
 import com.intellij.codeInsight.lookup.LookupElement
 import com.jetbrains.php.lang.psi.elements.PhpClass
 import PhpUtils._

@@ -2,7 +2,7 @@ package org.psliwa.idea.composerJson.composer.model.repository
 
 import org.psliwa.idea.composerJson.composer.model.PackageName
 
-private class ComposedRepository[Package](repositories: List[Repository[Package]]) extends Repository[Package]{
+private class ComposedRepository[Package](repositories: List[Repository[Package]]) extends Repository[Package] {
   override def getPackages: Seq[Package] = {
     repositories.flatMap(_.getPackages)
   }
@@ -12,5 +12,6 @@ private class ComposedRepository[Package](repositories: List[Repository[Package]
       .flatMap(_.getPackageVersions(packageName))
   }
 
-  override def map[NewPackage](f: (Package) => NewPackage): Repository[NewPackage] = new ComposedRepository(repositories.map(_ map f))
+  override def map[NewPackage](f: (Package) => NewPackage): Repository[NewPackage] =
+    new ComposedRepository(repositories.map(_ map f))
 }

@@ -6,7 +6,7 @@ import org.psliwa.idea.composerJson.intellij.codeAssist.AbstractReferenceContrib
 import org.psliwa.idea.composerJson.json._
 import org.psliwa.idea.composerJson.intellij.codeAssist.Capture
 
-class FilePathReferenceContributor extends AbstractReferenceContributor  {
+class FilePathReferenceContributor extends AbstractReferenceContributor {
 
   override protected def schemaToPatterns(schema: Schema, parent: Capture): List[ReferenceMatcher] = schema match {
     case SFilePath(_) => {
@@ -15,8 +15,12 @@ class FilePathReferenceContributor extends AbstractReferenceContributor  {
     case SFilePaths(_) => {
       val root = psiElement(classOf[JsonProperty]).withParent(psiElement(classOf[JsonObject]).withParent(parent))
       List(
-        new ReferenceMatcher(psiElement(classOf[JsonStringLiteral]).withParent(root).afterLeaf(":"), FilePathReferenceProvider),
-        new ReferenceMatcher(psiElement(classOf[JsonStringLiteral]).withParent(psiElement(classOf[JsonArray]).withParent(root)), FilePathReferenceProvider)
+        new ReferenceMatcher(psiElement(classOf[JsonStringLiteral]).withParent(root).afterLeaf(":"),
+                             FilePathReferenceProvider),
+        new ReferenceMatcher(
+          psiElement(classOf[JsonStringLiteral]).withParent(psiElement(classOf[JsonArray]).withParent(root)),
+          FilePathReferenceProvider
+        )
       )
     }
     case SPackages => {

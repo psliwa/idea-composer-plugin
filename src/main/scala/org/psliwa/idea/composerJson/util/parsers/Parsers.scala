@@ -7,7 +7,7 @@ import Implicits._
 object Parsers { self =>
 
   def string(s: String): Parser[String] = loc => {
-    if(loc.input.startsWith(s)) Success(s, s.length)
+    if (loc.input.startsWith(s)) Success(s, s.length)
     else Failure
   }
 
@@ -15,7 +15,7 @@ object Parsers { self =>
 
   def regex(r: Regex): Parser[String] = loc => {
     r.findFirstMatchIn(loc.input)
-      .map(m => Success(m.toString(),m.end))
+      .map(m => Success(m.toString(), m.end))
       .getOrElse(Failure)
   }
 

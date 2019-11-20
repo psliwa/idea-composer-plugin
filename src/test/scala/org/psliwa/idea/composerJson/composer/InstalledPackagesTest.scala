@@ -3,7 +3,7 @@ package org.psliwa.idea.composerJson.composer
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.testFramework.fixtures.BasePlatformTestCase
 import org.junit.Assert._
-import org.psliwa.idea.composerJson.composer.model.{Packages, PackageDescriptor}
+import org.psliwa.idea.composerJson.composer.model.{PackageDescriptor, Packages}
 import org.psliwa.idea.composerJson.fixtures.ComposerFixtures
 import org.psliwa.idea.composerJson.fixtures.ComposerFixtures._
 
@@ -79,7 +79,8 @@ class InstalledPackagesTest extends BasePlatformTestCase {
     assertTrue(installedPackages().isEmpty)
   }
 
-  def testGivenComposerLockWithFewPackages_moveIt_givenComposerJsonInMoveDest_installedPackagesShouldBeTheSame(): Unit = {
+  def testGivenComposerLockWithFewPackages_moveIt_givenComposerJsonInMoveDest_installedPackagesShouldBeTheSame()
+      : Unit = {
     val packages = Packages(PackageDescriptor("vendor/name", "1.0.0"))
     val file = createComposerLock(packages)
 
@@ -90,6 +91,8 @@ class InstalledPackagesTest extends BasePlatformTestCase {
   }
 
   private def createComposerLock(packages: Packages, dir: String = "."): VirtualFile =
-    ComposerFixtures.createComposerLock(myFixture, packages.descriptors.map(ComposerPackageWithReplaces(_, Set.empty)), dir)
+    ComposerFixtures.createComposerLock(myFixture,
+                                        packages.descriptors.map(ComposerPackageWithReplaces(_, Set.empty)),
+                                        dir)
   private def createComposerJson(dir: String = ".") = ComposerFixtures.createComposerJson(myFixture, dir)
 }

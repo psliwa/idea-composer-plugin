@@ -10,8 +10,8 @@ import com.intellij.psi.scope.PsiScopeProcessor
 import com.intellij.psi.search.{GlobalSearchScope, SearchScope}
 
 /**
- * Wrapper for PsiElement
- */
+  * Wrapper for PsiElement
+  */
 private class PsiElementWrapper(element: PsiElement) extends PsiElement {
   override def getProject: Project = element.getProject
 
@@ -43,8 +43,11 @@ private class PsiElementWrapper(element: PsiElement) extends PsiElement {
 
   override def getUseScope: SearchScope = element.getUseScope
 
-  override def processDeclarations(processor: PsiScopeProcessor, state: ResolveState, lastParent: PsiElement,
-    place: PsiElement): Boolean = element.processDeclarations(processor, state, lastParent, place)
+  override def processDeclarations(processor: PsiScopeProcessor,
+                                   state: ResolveState,
+                                   lastParent: PsiElement,
+                                   place: PsiElement): Boolean =
+    element.processDeclarations(processor, state, lastParent, place)
 
   override def delete(): Unit = element.delete()
 
@@ -78,7 +81,8 @@ private class PsiElementWrapper(element: PsiElement) extends PsiElement {
 
   override def getTextRange: TextRange = element.getTextRange
 
-  override def addRangeAfter(first: PsiElement, last: PsiElement, anchor: PsiElement): PsiElement = element.addRangeAfter(first, last, anchor)
+  override def addRangeAfter(first: PsiElement, last: PsiElement, anchor: PsiElement): PsiElement =
+    element.addRangeAfter(first, last, anchor)
 
   override def getContainingFile: PsiFile = element.getContainingFile
 
@@ -102,7 +106,8 @@ private class PsiElementWrapper(element: PsiElement) extends PsiElement {
 
   override def getTextOffset: Int = element.getTextOffset
 
-  override def addRangeBefore(first: PsiElement, last: PsiElement, anchor: PsiElement): PsiElement = element.addRangeBefore(first, last, anchor)
+  override def addRangeBefore(first: PsiElement, last: PsiElement, anchor: PsiElement): PsiElement =
+    element.addRangeBefore(first, last, anchor)
 
   override def getNavigationElement: PsiElement = element.getNavigationElement
 

@@ -1,7 +1,7 @@
 package org.psliwa.idea.composerJson.intellij.codeAssist.composer.infoRenderer
 
 import com.intellij.json.highlighting.JsonSyntaxHighlighterFactory
-import com.intellij.openapi.editor.{LogicalPosition, Editor}
+import com.intellij.openapi.editor.{Editor, LogicalPosition}
 import com.intellij.openapi.editor.colors.EditorFontType
 import com.intellij.openapi.editor.event.{CaretAdapter, CaretEvent}
 import com.intellij.openapi.editor.ex.EditorEx
@@ -27,7 +27,8 @@ private class PackageInfoCaretListener(packagesInfoMap: Map[String, List[Package
 
     textToRender(editor, position) match {
       case Some((text, textPosition)) =>
-        val component = new PackageInfoOverlayView(editor, editor.logicalPositionToOffset(textPosition), text, color, font)
+        val component =
+          new PackageInfoOverlayView(editor, editor.logicalPositionToOffset(textPosition), text, color, font)
         editor.getContentComponent.add(component)
         val innerViewpoint = editor.getScrollPane.getViewport.getView
         component.setBounds(0, 0, innerViewpoint.getWidth, innerViewpoint.getHeight)
@@ -42,8 +43,8 @@ private class PackageInfoCaretListener(packagesInfoMap: Map[String, List[Package
     } foreach editor.getContentComponent.remove
   }
 
-  private def textToRender(editor: EditorEx, position: LogicalPosition): Option[(String,LogicalPosition)] = {
-    (for{
+  private def textToRender(editor: EditorEx, position: LogicalPosition): Option[(String, LogicalPosition)] = {
+    (for {
       packageVersion <- packagesInfoMap.getOrElse(editor.getVirtualFile.getCanonicalPath, List.empty).view
       offset <- endLineOffset(editor, packageVersion.offset)
       packageVersionPosition = editor.offsetToLogicalPosition(offset)
@@ -58,7 +59,7 @@ private class PackageInfoCaretListener(packagesInfoMap: Map[String, List[Package
   private def lineNumber(editor: Editor, offset: Int): Option[Int] = {
     val lineNumber = StringUtil.offsetToLineNumber(editor.getDocument.getCharsSequence, offset)
 
-    if(lineNumber >= 0) Option(lineNumber)
+    if (lineNumber >= 0) Option(lineNumber)
     else None
   }
 }

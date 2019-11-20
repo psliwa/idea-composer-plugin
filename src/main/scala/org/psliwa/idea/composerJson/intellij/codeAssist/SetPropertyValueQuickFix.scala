@@ -12,18 +12,19 @@ import org.psliwa.idea.composerJson.intellij.PsiElements.findProperty
 import QuickFix._
 
 private class SetPropertyValueQuickFix(
-  element: JsonObject,
-  propertyName: String,
-  propertySchema: Schema,
-  propertyValue: String
+    element: JsonObject,
+    propertyName: String,
+    propertySchema: Schema,
+    propertyValue: String
 ) extends LocalQuickFixOnPsiElement(element) {
-  override def getText: String = ComposerBundle.message("inspection.quickfix.setPropertyValue", propertyName, propertyValue)
+  override def getText: String =
+    ComposerBundle.message("inspection.quickfix.setPropertyValue", propertyName, propertyValue)
 
   override def invoke(project: Project, file: PsiFile, startElement: PsiElement, endElement: PsiElement): Unit = {
     import org.psliwa.idea.composerJson.intellij.PsiExtractors.JsonProperty
 
     findProperty(element, propertyName) match {
-      case Some(p@JsonProperty(_, _)) => setPropertyValue(p)
+      case Some(p @ JsonProperty(_, _)) => setPropertyValue(p)
       case None => createProperty()
     }
   }
@@ -62,7 +63,7 @@ private class SetPropertyValueQuickFix(
 
   private def wrapValue(s: String): CharSequence = {
     val wrapper = getEmptyValue(propertySchema)
-    val (prefix, suffix) = wrapper.splitAt(wrapper.length/2)
+    val (prefix, suffix) = wrapper.splitAt(wrapper.length / 2)
 
     prefix + s + suffix
   }

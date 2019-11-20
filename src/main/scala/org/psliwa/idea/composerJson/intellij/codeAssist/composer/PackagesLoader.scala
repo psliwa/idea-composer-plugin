@@ -16,14 +16,15 @@ import org.psliwa.idea.composerJson.util.Funcs._
 import scala.collection.mutable
 
 class PackagesLoader extends ApplicationComponent {
-  private val repositoryProviders = mutable.Map[Project,RepositoryProvider[_ <: BaseLookupElement]]()
+  private val repositoryProviders = mutable.Map[Project, RepositoryProvider[_ <: BaseLookupElement]]()
 
   private lazy val loadPackageLookupElements = loadPackages.map(new BaseLookupElement(_, Some(Icons.Packagist)))
   private lazy val loadPackages = {
-    if(isUnitTestMode) Nil
+    if (isUnitTestMode) Nil
     else Packagist.loadPackages(Packagist.defaultUrl).getOrElse(Nil)
   }
-  private val versionsLoader: PackageName => Seq[String] = memorize(30)(Packagist.loadVersions(Packagist.defaultUrl)(_).getOrElse(List()))
+  private val versionsLoader: PackageName => Seq[String] =
+    memorize(30)(Packagist.loadVersions(Packagist.defaultUrl)(_).getOrElse(List()))
   private lazy val packagistRepository = Repository.callback(loadPackageLookupElements, versionsLoader)
 
   private val defaultRepositoryProvider = new DefaultRepositoryProvider(packagistRepository, new BaseLookupElement(_))
@@ -33,14 +34,18 @@ class PackagesLoader extends ApplicationComponent {
     val bus = app.getMessageBus.connect(app)
 
     //load packages first time, when composer.json file is opened
-    bus.subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, new FileEditorManagerAdapter{
-      override def fileOpened(source: FileEditorManager, file: VirtualFile): Unit = file.getName match {
-        case ComposerJson => app.executeOnPooledThread(new Runnable {
-          override def run(): Unit = loadPackageLookupElements
-        })
-        case _ =>
+    bus.subscribe(
+      FileEditorManagerListener.FILE_EDITOR_MANAGER,
+      new FileEditorManagerAdapter {
+        override def fileOpened(source: FileEditorManager, file: VirtualFile): Unit = file.getName match {
+          case ComposerJson =>
+            app.executeOnPooledThread(new Runnable {
+              override def run(): Unit = loadPackageLookupElements
+            })
+          case _ =>
+        }
       }
-    })
+    )
   }
 
   override def disposeComponent(): Unit = {
@@ -54,7 +59,7 @@ class PackagesLoader extends ApplicationComponent {
 
   private def createRepositoryProvider(project: Project): RepositoryProvider[_ <: BaseLookupElement] = {
     val settings = ProjectSettings.getInstance(project)
-    if(isUnitTestMode) new TestingRepositoryProvider
+    if (isUnitTestMode) new TestingRepositoryProvider
     else {
       new RepositoryProviderWrapper(
         defaultRepositoryProvider,

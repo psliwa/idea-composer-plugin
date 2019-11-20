@@ -8,7 +8,9 @@ import org.psliwa.idea.composerJson.ComposerBundle
 object Notifications {
 
   private val logOnlyGroup = NotificationGroup.logOnlyGroup(ComposerBundle.message("notifications.group.log"))
-  private val balloonGroup = new NotificationGroup(ComposerBundle.message("notifications.group.balloon"), NotificationDisplayType.TOOL_WINDOW, true)
+  private val balloonGroup = new NotificationGroup(ComposerBundle.message("notifications.group.balloon"),
+                                                   NotificationDisplayType.TOOL_WINDOW,
+                                                   true)
 
   def info(title: String, message: String, project: Option[Project] = None): Unit = {
     notify(title, message, project)
@@ -28,7 +30,10 @@ object Notifications {
                      notificationType: NotificationType = NotificationType.INFORMATION,
                      notificationGroup: NotificationGroup = logOnlyGroup): Unit = {
     notification.Notifications.Bus.notify(
-      notificationGroup.createNotification(title, message, notificationType, new NotificationListener.UrlOpeningListener(false)),
+      notificationGroup.createNotification(title,
+                                           message,
+                                           notificationType,
+                                           new NotificationListener.UrlOpeningListener(false)),
       project.orNull
     )
   }

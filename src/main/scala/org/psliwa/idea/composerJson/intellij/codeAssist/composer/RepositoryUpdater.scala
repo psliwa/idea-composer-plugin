@@ -17,7 +17,7 @@ class RepositoryUpdater extends Annotator {
   import RepositoryUpdater._
 
   override def annotate(element: PsiElement, holder: AnnotationHolder): Unit = {
-    if(pattern.accepts(element)) {
+    if (pattern.accepts(element)) {
       val notifications = Option(element.getProject.getComponent(classOf[EditorNotifications]))
       val urls = getComposerRepositoryUrls(element)
       val repository = getInlineRepository(element)
@@ -36,10 +36,11 @@ class RepositoryUpdater extends Annotator {
   private def getFilePath(element: PsiElement) = getFile(element).getCanonicalPath
   private def getFile(element: PsiElement) = element.getContainingFile.getVirtualFile
 
-  private def getComposerRepositoryUrls(element: PsiElement): List[String] = for {
-    repositoriesElement <- repositoriesJsonArray(element)
-    url <- getRepositoryUrls(repositoriesElement)
-  } yield url
+  private def getComposerRepositoryUrls(element: PsiElement): List[String] =
+    for {
+      repositoriesElement <- repositoriesJsonArray(element)
+      url <- getRepositoryUrls(repositoriesElement)
+    } yield url
 
   private def getJsonPropertyValue(objectElement: JsonObject, propertyName: String): Option[JsonElement] = {
     for {
@@ -48,7 +49,9 @@ class RepositoryUpdater extends Annotator {
     } yield packageValue
   }
 
-  private def getJsonPropertyValue[A](objectElement: JsonObject, propertyName: String, f: JsonElement => Option[A]): Option[A] = {
+  private def getJsonPropertyValue[A](objectElement: JsonObject,
+                                      propertyName: String,
+                                      f: JsonElement => Option[A]): Option[A] = {
     getJsonPropertyValue(objectElement, propertyName).flatMap(f)
   }
 
@@ -58,17 +61,17 @@ class RepositoryUpdater extends Annotator {
       (pkg, version) <- getPackages(repositoriesElement)
     } yield (pkg, version)
 
-    def update[A,B](map: Map[A,List[B]], pair: (A,B)): Map[A,List[B]] = {
+    def update[A, B](map: Map[A, List[B]], pair: (A, B)): Map[A, List[B]] = {
       map + (pair._1 -> (pair._2 :: map.getOrElse(pair._1, List[B]())))
     }
 
-    val packagesMap = packages.foldLeft(Map[String,List[String]]())(update)
+    val packagesMap = packages.foldLeft(Map[String, List[String]]())(update)
 
     Repository.inMemory(packagesMap.keys.toSeq, packagesMap)
   }
 
   private def getPackages(repositoriesElement: JsonArray): Seq[(String, String)] = {
-    def mapPackage(objectElement: JsonObject): Option[(String,String)] = {
+    def mapPackage(objectElement: JsonObject): Option[(String, String)] = {
       for {
         packageValue <- getJsonPropertyValue(objectElement, "package", ensureJsonObject)
         packageName <- getJsonPropertyValue(packageValue, "name", getStringValue)
@@ -79,7 +82,9 @@ class RepositoryUpdater extends Annotator {
     mapRepositoryElements(repositoriesElement, "package", mapPackage)
   }
 
-  private def mapRepositoryElements[A](repositoriesElement: JsonArray, requiredRepositoryType: String, f: JsonObject => Option[A]): Seq[A] = {
+  private def mapRepositoryElements[A](repositoriesElement: JsonArray,
+                                       requiredRepositoryType: String,
+                                       f: JsonObject => Option[A]): Seq[A] = {
     for {
       child <- repositoriesElement.getChildren.toList
       objectElement <- ensureJsonObject(child).toList
@@ -108,7 +113,8 @@ class RepositoryUpdater extends Annotator {
   }
 
   private def getRepositoryProvider(project: Project): Option[RepositoryProvider[_]] = {
-    Option(ApplicationManager.getApplication.getComponent(classOf[PackagesLoader])).map(_.repositoryProviderFor(project))
+    Option(ApplicationManager.getApplication.getComponent(classOf[PackagesLoader]))
+      .map(_.repositoryProviderFor(project))
   }
 
   private def getRepositoryUrls(repositoriesElement: JsonArray): Iterable[String] = {
@@ -117,26 +123,30 @@ class RepositoryUpdater extends Annotator {
     }
 
     def mapPath(objectElement: JsonObject): Option[String] = {
-      getJsonPropertyValue(objectElement, "url", getStringValue).flatMap { path =>
-        path.headOption match {
-          case Some('/') =>
-            Some(s"file://${path.stripSuffix("/")}/composer.json")
-          case _ =>
-            Option(objectElement.getContainingFile.getContainingDirectory)
-              .map(_.getVirtualFile.getUrl + s"/${path.stripSuffix("/")}/composer.json")
+      getJsonPropertyValue(objectElement, "url", getStringValue)
+        .flatMap { path =>
+          path.headOption match {
+            case Some('/') =>
+              Some(s"file://${path.stripSuffix("/")}/composer.json")
+            case _ =>
+              Option(objectElement.getContainingFile.getContainingDirectory)
+                .map(_.getVirtualFile.getUrl + s"/${path.stripSuffix("/")}/composer.json")
+          }
         }
-      }.map(fixFileUrl)
+        .map(fixFileUrl)
     }
 
     def fixFileUrl(url: String): String = {
-      if(SystemInfo.isWindows && "file://[^/]".r.findFirstMatchIn(url).isDefined) {
+      if (SystemInfo.isWindows && "file://[^/]".r.findFirstMatchIn(url).isDefined) {
         url.replaceFirst("file://", "file:///")
       } else {
         url
       }
     }
 
-    mapRepositoryElements(repositoriesElement, "composer", mapUrl).toList ::: mapRepositoryElements(repositoriesElement, "path", mapPath).toList
+    mapRepositoryElements(repositoriesElement, "composer", mapUrl).toList ::: mapRepositoryElements(repositoriesElement,
+                                                                                                    "path",
+                                                                                                    mapPath).toList
   }
 }
 

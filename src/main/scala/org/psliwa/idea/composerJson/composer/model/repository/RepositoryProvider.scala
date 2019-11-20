@@ -4,8 +4,8 @@ trait RepositoryProvider[Package] {
   def repositoryFor(file: String): Repository[Package]
 
   /**
-   * @return Return true when repositoryInfo was changed, false otherwise
-   */
+    * @return Return true when repositoryInfo was changed, false otherwise
+    */
   def updateRepository(file: String, info: RepositoryInfo): Boolean
   def hasDefaultRepository(file: String): Boolean
 }

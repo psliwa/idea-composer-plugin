@@ -22,10 +22,10 @@ class PhpCallbackAnnotator extends Annotator {
   private val callbackRegexp = "^(?i)[a-z0-9_\\\\]+(::[a-z0-9_]*)?$".r
 
   override def annotate(element: PsiElement, holder: AnnotationHolder): Unit = {
-    if(PhpCallbackAnnotator.pattern.accepts(element)) {
+    if (PhpCallbackAnnotator.pattern.accepts(element)) {
       val phpIndex = PhpIndex.getInstance(element.getProject)
 
-      for(problem <- getProblems(element, phpIndex)) {
+      for (problem <- getProblems(element, phpIndex)) {
         holder.createWarningAnnotation(problem.range, problem.message.getOrElse(""))
       }
     }
@@ -47,12 +47,12 @@ class PhpCallbackAnnotator extends Annotator {
 
     val problems = ListBuffer[ProblemDescriptor[IntentionAction]]()
 
-    if(classes.size() == 0) {
+    if (classes.size() == 0) {
       val message = ComposerBundle.message("inspection.php.classDoesNotExist", className)
       problems += ProblemDescriptor(element, Some(message), Seq(), Some(elementRange))
     }
 
-    if(methodName.isEmpty) {
+    if (methodName.isEmpty) {
       val message = ComposerBundle.message("inspection.php.methodIsEmpty")
       problems += ProblemDescriptor(element, Some(message), Seq(), Some(elementRange))
     } else {
@@ -62,40 +62,44 @@ class PhpCallbackAnnotator extends Annotator {
     problems.toList
   }
 
-  private def getMethodProblems(element: PsiElement, methodName: String, classes: util.Collection[PhpClass], elementRange: TextRange) = {
+  private def getMethodProblems(element: PsiElement,
+                                methodName: String,
+                                classes: util.Collection[PhpClass],
+                                elementRange: TextRange) = {
     import scala.jdk.CollectionConverters._
 
     val problems = ListBuffer[ProblemDescriptor[IntentionAction]]()
-    
+
     def findMethod(cls: PhpClass, methodName: String): Option[Method] = {
       Option(cls.findMethodByName(methodName))
     }
 
-    for(cls <- classes.asScala) {
+    for (cls <- classes.asScala) {
       findMethod(cls, methodName) match {
         case Some(method) => {
-          if(!method.getAccess.isPublic) {
+          if (!method.getAccess.isPublic) {
             problems += createMethodProblem(element, elementRange, methodName, "inspection.php.methodIsNotPublic")
           }
 
-          if(!method.isStatic) {
+          if (!method.isStatic) {
             problems += createMethodProblem(element, elementRange, methodName, "inspection.php.methodIsNotStatic")
           }
 
-          if(method.isAbstract) {
+          if (method.isAbstract) {
             problems += createMethodProblem(element, elementRange, methodName, "inspection.php.methodIsAbstract")
           }
 
-          if(method.getParameters.nonEmpty) {
+          if (method.getParameters.nonEmpty) {
             val firstParameter = method.getParameters.head
             val otherParameters = method.getParameters.tail
 
-            if(firstParameter.getType.getTypes.size() > 0 && !PhpCallbackReference.ComposerEventTypes.exists(
-              firstParameter.getType.getTypes.contains(_))) {
+            if (firstParameter.getType.getTypes.size() > 0 && !PhpCallbackReference.ComposerEventTypes.exists(
+                  firstParameter.getType.getTypes.contains(_)
+                )) {
               problems += createMethodProblem(element, elementRange, methodName, "inspection.php.invalidParameterType")
             }
 
-            if(otherParameters.exists(!_.isOptional)) {
+            if (otherParameters.exists(!_.isOptional)) {
               problems += createMethodProblem(element, elementRange, methodName, "inspection.php.tooManyArgs")
             }
           }
@@ -105,11 +109,14 @@ class PhpCallbackAnnotator extends Annotator {
         }
       }
     }
-    
+
     problems.toList
   }
 
-  private def createMethodProblem(element: PsiElement, elementRange: TextRange, methodName: String, messageTemplate: String): ProblemDescriptor[IntentionAction] = {
+  private def createMethodProblem(element: PsiElement,
+                                  elementRange: TextRange,
+                                  methodName: String,
+                                  messageTemplate: String): ProblemDescriptor[IntentionAction] = {
     val range = new TextRange(elementRange.getEndOffset - methodName.length, elementRange.getEndOffset)
     val message = ComposerBundle.message(messageTemplate, methodName)
 
@@ -121,7 +128,7 @@ private object PhpCallbackAnnotator {
   import com.intellij.patterns.StandardPatterns._
 
   private val scriptsPattern = psiElement(classOf[JsonProperty]).withParent(
-      psiElement(classOf[JsonObject]).withParent(
+    psiElement(classOf[JsonObject]).withParent(
       psiElement(classOf[JsonProperty]).withName("scripts")
     )
   )
@@ -131,7 +138,8 @@ private object PhpCallbackAnnotator {
     .withLanguage(JsonLanguage.INSTANCE)
     .and(
       or(
-        psiElement().afterLeaf(":")
+        psiElement()
+          .afterLeaf(":")
           .withParent(scriptsPattern),
         psiElement()
           .withParent(

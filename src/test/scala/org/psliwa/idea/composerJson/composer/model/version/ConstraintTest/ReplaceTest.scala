@@ -31,7 +31,7 @@ class ReplaceTest {
   def givenWrappedConstraint_givenFuncChangesInnerConstraint() = {
     assertEquals(
       WrappedConstraint(DevConstraint("trunk"), None, None),
-      WrappedConstraint(DevConstraint("master"), None, None).replace{
+      WrappedConstraint(DevConstraint("master"), None, None).replace {
         case DevConstraint(_) => Some(DevConstraint("trunk"))
         case _ => None
       }
@@ -42,7 +42,7 @@ class ReplaceTest {
   def givenWrappedConstraint_givenFuncChangesOuterConstraint() = {
     assertEquals(
       DevConstraint("trunk"),
-      WrappedConstraint(DevConstraint("master"), None, None).replace{
+      WrappedConstraint(DevConstraint("master"), None, None).replace {
         case WrappedConstraint(_, _, _) => Some(DevConstraint("trunk"))
         case _ => None
       }
@@ -53,7 +53,7 @@ class ReplaceTest {
   def givenWildcardConstraint_givenFuncChangesInnerConstraint() = {
     assertEquals(
       WildcardConstraint(Some(semVer121)),
-      WildcardConstraint(Some(semVer120)).replace{
+      WildcardConstraint(Some(semVer120)).replace {
         case SemanticConstraint(_) => Some(semVer121)
         case _ => None
       }
@@ -64,7 +64,7 @@ class ReplaceTest {
   def givenWildcardConstraint_givenFuncChangesInnerConstraint_changedConstraintIsNotSupportedByWildcard_originalConstraintShouldBeReturned() = {
     assertEquals(
       WildcardConstraint(Some(semVer120)),
-      WildcardConstraint(Some(semVer120)).replace{
+      WildcardConstraint(Some(semVer120)).replace {
         case SemanticConstraint(_) => Some(DevConstraint("master"))
         case _ => None
       }
@@ -75,7 +75,7 @@ class ReplaceTest {
   def givenOperatorConstraint_givenFuncChangesInnerConstraint() = {
     assertEquals(
       OperatorConstraint(ConstraintOperator.>, semVer121),
-      OperatorConstraint(ConstraintOperator.>, semVer120).replace{
+      OperatorConstraint(ConstraintOperator.>, semVer120).replace {
         case SemanticConstraint(_) => Some(semVer121)
         case _ => None
       }
@@ -86,7 +86,7 @@ class ReplaceTest {
   def givenAliasedConstraint_givenFuncChangesInnerConstraint() = {
     assertEquals(
       AliasedConstraint(semVer121, semVer121),
-      AliasedConstraint(semVer120, semVer121).replace{
+      AliasedConstraint(semVer120, semVer121).replace {
         case SemanticConstraint(_) => Some(semVer121)
         case _ => None
       }
@@ -97,7 +97,7 @@ class ReplaceTest {
   def givenHyphenRangeConstraint_givenFuncChangesInnerConstraints() = {
     assertEquals(
       HyphenRangeConstraint(semVer121, semVer121),
-      HyphenRangeConstraint(semVer120, semVer121).replace{
+      HyphenRangeConstraint(semVer120, semVer121).replace {
         case SemanticConstraint(_) => Some(semVer121)
         case _ => None
       }
@@ -109,7 +109,7 @@ class ReplaceTest {
     List(LogicalOperator.AND, LogicalOperator.OR).foreach(operator => {
       assertEquals(
         LogicalConstraint(List(semVer121, semVer121), operator, " "),
-        LogicalConstraint(List(semVer120, semVer121), operator, " ").replace{
+        LogicalConstraint(List(semVer120, semVer121), operator, " ").replace {
           case SemanticConstraint(_) => Some(semVer121)
           case _ => None
         }

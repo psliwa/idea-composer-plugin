@@ -36,8 +36,6 @@ class JsonParsersTest {
     val result = JsonParsers.parsePackageNames(s)
     assertTrue(result.isFailure)
   }
-
-
   @Test
   def parseVersions_givenValidJson_expectList(): Unit = {
     val json =
@@ -88,7 +86,7 @@ class JsonParsersTest {
   @Test
   def parseLockPackages_givenValidJson_expectList(): Unit = {
     List(true, false).foreach(dev => {
-      val packagesKey = "packages"+(if(dev) "-dev" else "")
+      val packagesKey = "packages" + (if (dev) "-dev" else "")
       val json =
         s"""
           |{
@@ -108,7 +106,10 @@ class JsonParsersTest {
 
       val result = JsonParsers.parseLockPackages(json)
 
-      assertEquals(packagesKey, Packages(PackageDescriptor("ps/image-optimizer", "1.0.0", dev), PackageDescriptor("ps/fluent-traversable", "0.3.0", dev, Some("url"))), result)
+      assertEquals(packagesKey,
+                   Packages(PackageDescriptor("ps/image-optimizer", "1.0.0", dev),
+                            PackageDescriptor("ps/fluent-traversable", "0.3.0", dev, Some("url"))),
+                   result)
     })
   }
 
@@ -159,11 +160,11 @@ class JsonParsersTest {
 
     assertTrue(result.isSuccess)
     assertEquals(RepositoryPackages(Map(
-        "some/package" -> Seq("1.0.0", "2.0.0"),
-        "some/package2" -> Seq("3.0.0")
-      ), List()),
-      result.get
-    )
+                                      "some/package" -> Seq("1.0.0", "2.0.0"),
+                                      "some/package2" -> Seq("3.0.0")
+                                    ),
+                                    List()),
+                 result.get)
   }
 
   @Test

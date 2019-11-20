@@ -28,7 +28,7 @@ object PackageDescriptor {
     def firstPackageLetter(m: Regex.Match) = m.start > 0 && name.charAt(m.start - 1) == '/'
     def dashAhead(m: Regex.Match) = m.start > 0 && name.charAt(m.start - 1) == '-'
     def firstVendorLetter(m: Regex.Match) = m.start == 0
-    def letterPrefix(m: Regex.Match) = if(firstVendorLetter(m) || firstPackageLetter(m) || dashAhead(m)) "" else "-"
+    def letterPrefix(m: Regex.Match) = if (firstVendorLetter(m) || firstPackageLetter(m) || dashAhead(m)) "" else "-"
 
     "([A-Z])".r.replaceAllIn(name, (m: Regex.Match) => letterPrefix(m) + m.group(0).toLowerCase)
   }

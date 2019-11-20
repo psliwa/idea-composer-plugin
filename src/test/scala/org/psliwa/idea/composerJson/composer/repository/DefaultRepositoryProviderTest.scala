@@ -187,7 +187,7 @@ class DefaultRepositoryProviderTest {
 object DefaultRepositoryProviderTest {
   class FakeRepositoryFactory extends DefaultRepositoryProvider.RepositoryFactory[String] {
     private var repositories = Map[RepositoryInfo, Repository[String]]()
-    private var calls = Map[RepositoryInfo,Int]()
+    private var calls = Map[RepositoryInfo, Int]()
 
     override def repositoryFor(repositoryInfo: RepositoryInfo): Repository[String] = {
       calls += repositoryInfo -> (callsFor(repositoryInfo) + 1)

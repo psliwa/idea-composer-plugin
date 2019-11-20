@@ -1,6 +1,6 @@
 package org.psliwa.idea.composerJson.intellij.codeAssist.php
 
-import com.intellij.json.psi.{JsonArray, JsonStringLiteral, JsonProperty}
+import com.intellij.json.psi.{JsonArray, JsonProperty, JsonStringLiteral}
 import com.intellij.psi._
 import com.intellij.patterns.PlatformPatterns._
 import com.intellij.patterns.StandardPatterns._
@@ -41,11 +41,13 @@ class PhpReferenceContributor extends PsiReferenceContributor {
 
     registrar.registerReferenceProvider(
       psiElement(classOf[JsonStringLiteral])
-        .and(or(
-          psiElement().beforeLeaf(psiElement().withText(":")),
-          //1 element is property name, second PsiErrorElement
-          psiElement().withParent(psiElement().withChildren(collection().last(psiElement(classOf[PsiErrorElement]))))
-        ))
+        .and(
+          or(
+            psiElement().beforeLeaf(psiElement().withText(":")),
+            //1 element is property name, second PsiErrorElement
+            psiElement().withParent(psiElement().withChildren(collection().last(psiElement(classOf[PsiErrorElement]))))
+          )
+        )
         .withParent(classOf[JsonProperty])
         .withSuperParent(
           3,

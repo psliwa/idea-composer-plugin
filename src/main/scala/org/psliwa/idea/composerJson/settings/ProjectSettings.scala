@@ -10,14 +10,10 @@ import scala.collection.mutable
 import org.jdom.Element
 import org.psliwa.idea.composerJson.settings
 
-@State(
-  name = "ComposerJsonPluginSettings",
-  storages = Array(
-    new Storage("/composerJson.xml")
-  )
-)
+@State(name = "ComposerJsonPluginSettings", storages = Array(new Storage("/composerJson.xml")))
 class ProjectSettings extends PersistentStateComponent[Element] {
-  private val unboundedVersionInspectionSettings: ProjectSettings.UnboundedVersionInspectionSettings = new ProjectSettings.UnboundedVersionInspectionSettings
+  private val unboundedVersionInspectionSettings: ProjectSettings.UnboundedVersionInspectionSettings =
+    new ProjectSettings.UnboundedVersionInspectionSettings
   private val customRepositoriesSettings = new ProjectSettings.CustomRepositoriesSettings()
   private val composerUpdateOptions = new settings.ProjectSettings.ComposerUpdateOptions()
 
@@ -50,7 +46,9 @@ class ProjectSettings extends PersistentStateComponent[Element] {
 
     val customRepositories = customRepositoriesSettings.getConfigurationForScala
     customRepositories
-      .map{ case(file, enabled) => new Element("file").setAttribute("path", file).setAttribute("enabled", enabled.toString)}
+      .map {
+        case (file, enabled) => new Element("file").setAttribute("path", file).setAttribute("enabled", enabled.toString)
+      }
       .foreach(customRepositoriesElement.addContent)
   }
 
@@ -60,7 +58,9 @@ class ProjectSettings extends PersistentStateComponent[Element] {
     val composerUpdateOptionsElement = new Element("composerUpdateOptions")
     element.addContent(composerUpdateOptionsElement)
 
-    composerUpdateOptions.getValues().asScala
+    composerUpdateOptions
+      .getValues()
+      .asScala
       .map(textItem => new Element("option").setAttribute("name", textItem.getText))
       .foreach(composerUpdateOptionsElement.addContent)
   }
@@ -82,7 +82,7 @@ class ProjectSettings extends PersistentStateComponent[Element] {
       patternValue <- Option(patternAttr.getValue).toList
     } yield new PatternItem(patternValue)
 
-    if(patterns.isEmpty) {
+    if (patterns.isEmpty) {
       // default value
       unboundedVersionInspectionSettings.addExcludedPattern(new PatternItem("roave/security-advisories"))
     } else {
@@ -94,7 +94,7 @@ class ProjectSettings extends PersistentStateComponent[Element] {
   private def loadCustomRepositoriesState(state: Element): Unit = {
     import scala.jdk.CollectionConverters._
 
-    val config: Seq[(String,Boolean)] = for {
+    val config: Seq[(String, Boolean)] = for {
       customRepositoriesSettings <- state.getChildren("customRepositories").asScala.toList
       file <- customRepositoriesSettings.getChildren("file").asScala
       pathAttr <- Option(file.getAttribute("path")).toList
@@ -104,7 +104,7 @@ class ProjectSettings extends PersistentStateComponent[Element] {
       enabled = rawEnabled == "true"
     } yield path -> enabled
 
-    config.foreach{ case(file, enabled) => customRepositoriesSettings.setConfigurationForFile(file, enabled)}
+    config.foreach { case (file, enabled) => customRepositoriesSettings.setConfigurationForFile(file, enabled) }
   }
 
   private def loadComposerUpdateOptionsState(state: Element): Unit = {
@@ -137,7 +137,7 @@ object ProjectSettings {
   def getInstance(project: Project): ProjectSettings = ServiceManager.getService(project, classOf[ProjectSettings])
   def apply(project: Project): ProjectSettings = getInstance(project)
 
-  class UnboundedVersionInspectionSettings private[ProjectSettings]() extends TabularSettings[PatternItem] {
+  class UnboundedVersionInspectionSettings private[ProjectSettings] () extends TabularSettings[PatternItem] {
     private val excludedPatterns: mutable.ListBuffer[PatternItem] = mutable.ListBuffer()
 
     def isExcluded(s: String): Boolean = excludedPatterns.exists(_.matches(s))
@@ -160,7 +160,7 @@ object ProjectSettings {
     def clear(): Unit = excludedPatterns.clear()
   }
 
-  class CustomRepositoriesSettings private[ProjectSettings]() extends TabularSettings[EnabledItem] {
+  class CustomRepositoriesSettings private[ProjectSettings] () extends TabularSettings[EnabledItem] {
     private val customRepositories: mutable.Map[String, Boolean] = mutable.Map()
 
     def isUnspecified(file: String): Boolean = !customRepositories.contains(file)
@@ -168,14 +168,14 @@ object ProjectSettings {
 
     override def setValues(config: java.util.List[EnabledItem]): Unit = {
       customRepositories.clear()
-      for(item <- config.asScala) {
+      for (item <- config.asScala) {
         customRepositories(item.getName) = item.isEnabled
       }
     }
 
     override def getValues(): java.util.List[EnabledItem] = {
       customRepositories
-        .map { case(file, enabled) => new EnabledItem(file, enabled) }
+        .map { case (file, enabled) => new EnabledItem(file, enabled) }
         .toList
         .asJava
     }
@@ -192,7 +192,7 @@ object ProjectSettings {
     def clear(): Unit = customRepositories.clear()
   }
 
-  class ComposerUpdateOptions private[ProjectSettings]() extends TabularSettings[TextItem] {
+  class ComposerUpdateOptions private[ProjectSettings] () extends TabularSettings[TextItem] {
     private val items: mutable.Set[TextItem] = mutable.Set()
 
     override def getValues(): util.List[TextItem] = {

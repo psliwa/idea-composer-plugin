@@ -13,7 +13,7 @@ private class RemoveJsonElementQuickFix(element: PsiElement, text: String) exten
   import org.psliwa.idea.composerJson.intellij.PsiExtractors.{JsonProperty, LeafPsiElement}
 
   override def invoke(project: Project, file: PsiFile, startElement: PsiElement, endElement: PsiElement): Unit = {
-    if(nextPropertyElementOf(startElement).isEmpty) {
+    if (nextPropertyElementOf(startElement).isEmpty) {
       previousCommaElementOf(startElement).foreach(_.delete())
     }
 
@@ -21,10 +21,13 @@ private class RemoveJsonElementQuickFix(element: PsiElement, text: String) exten
 
     startElement.delete()
   }
-  
-  private def nextCommaElementOf = findSibling(isCommaElement, x => Option(x.getNextSibling), isJsonProperty) _
-  private def previousCommaElementOf = findSibling(isCommaElement, x => Option(x.getPrevSibling), isJsonProperty) _
-  private def nextPropertyElementOf = findSibling(isJsonProperty, x => Option(x.getNextSibling)) _
+
+  private def nextCommaElementOf: PsiElement => Option[PsiElement] =
+    findSibling(isCommaElement, x => Option(x.getNextSibling), isJsonProperty) _
+  private def previousCommaElementOf: PsiElement => Option[PsiElement] =
+    findSibling(isCommaElement, x => Option(x.getPrevSibling), isJsonProperty) _
+  private def nextPropertyElementOf: PsiElement => Option[PsiElement] =
+    findSibling(isJsonProperty, x => Option(x.getNextSibling)) _
 
   private def isCommaElement(e: PsiElement): Boolean = e match {
     case LeafPsiElement(",") => true
@@ -37,9 +40,9 @@ private class RemoveJsonElementQuickFix(element: PsiElement, text: String) exten
   }
 
   private def findSibling(
-    thatsIt: PsiElement => Boolean,
-    nextSibling: PsiElement => Option[PsiElement],
-    stop: PsiElement => Boolean = _ => false
+      thatsIt: PsiElement => Boolean,
+      nextSibling: PsiElement => Option[PsiElement],
+      stop: PsiElement => Boolean = _ => false
   )(e: PsiElement): Option[PsiElement] = {
     @tailrec
     def loop(e: Option[PsiElement]): Option[PsiElement] = {

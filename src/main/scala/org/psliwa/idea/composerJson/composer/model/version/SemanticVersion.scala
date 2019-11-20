@@ -1,6 +1,7 @@
 package org.psliwa.idea.composerJson.composer.model.version
 
-case class SemanticVersion(major: Int, private[version] val other: Option[(Int,Option[(Int)])]) extends Ordered[SemanticVersion] {
+case class SemanticVersion(major: Int, private[version] val other: Option[(Int, Option[Int])])
+    extends Ordered[SemanticVersion] {
   val minor: Option[Int] = other.map(_._1)
   val patch: Option[Int] = other.flatMap(_._2)
   private val maxPartsNumber: Int = 3
@@ -31,27 +32,27 @@ case class SemanticVersion(major: Int, private[version] val other: Option[(Int,O
   }
 
   def incrementLast: SemanticVersion = {
-    new SemanticVersion(((reversedParts.head+1) :: reversedParts.tail).reverse.toArray)
+    new SemanticVersion(((reversedParts.head + 1) :: reversedParts.tail).reverse.toArray)
   }
 
   def incrementMajor: SemanticVersion = {
-    new SemanticVersion(major + 1, minor.flatMap(i => Some((i,patch))))
+    new SemanticVersion(major + 1, minor.flatMap(i => Some((i, patch))))
   }
 
   def decrementLast: Option[SemanticVersion] = {
     val parts = ((reversedParts.head - 1) :: reversedParts.tail).reverse.toArray
 
-    if(parts.last < 0) None
+    if (parts.last < 0) None
     else Some(new SemanticVersion(parts))
   }
 
   def dropLast: Option[SemanticVersion] = {
-    if(reversedParts.size == 1) None
+    if (reversedParts.size == 1) None
     else Some(new SemanticVersion(reversedParts.tail.reverse.toArray))
   }
 
   def append(part: Int) = {
-    if(reversedParts.size == maxPartsNumber) None
+    if (reversedParts.size == maxPartsNumber) None
     else Some(new SemanticVersion((part :: reversedParts).reverse.toArray))
   }
 
@@ -60,15 +61,15 @@ case class SemanticVersion(major: Int, private[version] val other: Option[(Int,O
   def ensureParts(i: Int): SemanticVersion = {
     ensure(i <= maxPartsNumber && i > 0)
 
-    if(parts.size >= i) this
+    if (parts.size >= i) this
     else new SemanticVersion((parts.toList ++ List.fill(i - parts.size)(0)).toArray)
   }
 
   def ensureExactlyParts(i: Int): SemanticVersion = {
     ensure(i <= maxPartsNumber && i > 0)
 
-    if(parts.size == i) this
-    else if(parts.size >= i) new SemanticVersion(parts.take(i).toArray)
+    if (parts.size == i) this
+    else if (parts.size >= i) new SemanticVersion(parts.take(i).toArray)
     else ensureParts(i)
   }
 
@@ -77,23 +78,24 @@ case class SemanticVersion(major: Int, private[version] val other: Option[(Int,O
   }
 
   override def toString: String = {
-    def partToString(p: Option[Int]) = p.map("."+_).getOrElse("")
+    def partToString(p: Option[Int]) = p.map("." + _).getOrElse("")
 
-    ""+major+partToString(minor)+partToString(patch)
+    "" + major + partToString(minor) + partToString(patch)
   }
 
-  private def ensure(b: Boolean): Unit = if(!b) throw new IllegalArgumentException
+  private def ensure(b: Boolean): Unit = if (!b) throw new IllegalArgumentException
 
   override def compare(that: SemanticVersion): Int = {
-    fillZero.parts.zip(that.fillZero.parts).map{ case(a, b) => a - b }.find(_ != 0).getOrElse(0)
+    fillZero.parts.zip(that.fillZero.parts).map { case (a, b) => a - b }.find(_ != 0).getOrElse(0)
   }
 }
 
 private object SemanticVersion {
-  private def tryGet[A](as: Array[A])(index: Int): Option[A] = if(index >= as.length) None else Option(as(index))
-  private def getOrThrow[A](as: Array[A])(index: Int): A = if(index >= as.length) throw new IllegalArgumentException else as(index)
+  private def tryGet[A](as: Array[A])(index: Int): Option[A] = if (index >= as.length) None else Option(as(index))
+  private def getOrThrow[A](as: Array[A])(index: Int): A =
+    if (index >= as.length) throw new IllegalArgumentException else as(index)
 
-  private def getOther(versions: Array[Int]): Option[(Int,Option[Int])] = {
+  private def getOther(versions: Array[Int]): Option[(Int, Option[Int])] = {
     val getVersionPart = tryGet(versions) _
 
     getVersionPart(1).map(minor => (minor, getVersionPart(2)))

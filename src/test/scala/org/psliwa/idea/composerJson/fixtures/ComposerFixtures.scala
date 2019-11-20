@@ -21,7 +21,7 @@ object ComposerFixtures {
 
   private def makePackagesJson(pkgs: Iterable[ComposerPackageWithReplaces]): String = {
     def makeReplacesJson(pkg: ComposerPackageWithReplaces): String = {
-      if(pkg.replaces.isEmpty) {
+      if (pkg.replaces.isEmpty) {
         ""
       } else {
         def x(pkg: String): String = s""""$pkg":"""""
@@ -33,38 +33,41 @@ object ComposerFixtures {
       }
     }
 
-    pkgs.map( pkg =>
-      s"""{
+    pkgs.map(pkg => s"""{
           |  "name": "${pkg.pkg.name.presentation}",
           |  ${pkg.pkg.homepage.map(homepage => s""""homepage":"$homepage",""").getOrElse("")}
           |  "version": "${pkg.pkg.version}"
           |  ${makeReplacesJson(pkg)}
           |}
-        """.stripMargin
-    ).mkString(",\n")
+        """.stripMargin).mkString(",\n")
   }
 
-  def createComposerLock(fixture: CodeInsightTestFixture, packages: List[ComposerPackageWithReplaces], dir: String = "."): VirtualFile = {
+  def createComposerLock(fixture: CodeInsightTestFixture,
+                         packages: List[ComposerPackageWithReplaces],
+                         dir: String = "."): VirtualFile = {
 
     val (devPackages, prodPackages) = packages.partition(_.pkg.isDev)
 
     val devPackagesJson = makePackagesJson(devPackages)
     val prodPackagesJson = makePackagesJson(prodPackages)
 
-    val file = writeAction(() => fixture.getTempDirFixture.findOrCreateDir(dir).createChildData(this, composerJson.ComposerLock))
+    val file = writeAction(
+      () => fixture.getTempDirFixture.findOrCreateDir(dir).createChildData(this, composerJson.ComposerLock)
+    )
     saveText(file, s"""
         |{
         |  "packages": [ $prodPackagesJson ],
         |  "packages-dev": [ $devPackagesJson ]
         |}
-      """.stripMargin
-    )
+      """.stripMargin)
 
     file
   }
 
   def createComposerJson(fixture: CodeInsightTestFixture, dir: String = ".") = {
-    val file = writeAction(() => fixture.getTempDirFixture.findOrCreateDir(dir).createChildData(this, composerJson.ComposerJson))
+    val file = writeAction(
+      () => fixture.getTempDirFixture.findOrCreateDir(dir).createChildData(this, composerJson.ComposerJson)
+    )
     saveText(file, "{}")
 
     file

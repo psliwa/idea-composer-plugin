@@ -7,11 +7,12 @@ import org.psliwa.idea.composerJson.intellij.codeAssist.problem.{CheckResult, Co
 
 import scala.jdk.CollectionConverters._
 
-private[codeAssist] case class MultiplePropertiesChecker(propertyPath: PropertyPath, condition: Condition) extends Checker {
+private[codeAssist] case class MultiplePropertiesChecker(propertyPath: PropertyPath, condition: Condition)
+    extends Checker {
   override def check(jsonObject: JsonObject): CheckResult = {
     val propertyPaths = (for {
       property <- findPropertiesInPath(jsonObject, propertyPath)
-      propertyValue <-  Option(property.getValue).toList
+      propertyValue <- Option(property.getValue).toList
       propertyObject <- ensureJsonObject(propertyValue).toList
       propertyName <- propertyObject.getPropertyList.asScala.map(_.getName)
     } yield propertyPath / propertyName).toSet

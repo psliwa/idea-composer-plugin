@@ -34,7 +34,7 @@ private object QuickFix {
     case SObject(_, _) => "{}"
     case SArray(_) => "[]"
     case SString(_) | SStringChoice(_) => "\"\""
-    case SOr(h::_) => getEmptyValue(h)
+    case SOr(h :: _) => getEmptyValue(h)
     case _ => ""
   }
 }

@@ -7,9 +7,10 @@ private object PhpUtils {
 
   def getFixedFQN(phpClass: PhpClass) = escapeSlashes(phpClass.getFQN.stripPrefix("\\"))
 
-  def getFixedReferenceName(s: String) = s.replace("IntellijIdeaRulezzz ", "").replace("\\\\", "\\").stripPrefix("\"").stripSuffix("\"")
+  def getFixedReferenceName(s: String) =
+    s.replace("IntellijIdeaRulezzz ", "").replace("\\\\", "\\").stripPrefix("\"").stripSuffix("\"")
 
-  def ensureLandingSlash(s: String) = if(s.isEmpty || s.charAt(0) != '\\') "\\"+s else s
+  def ensureLandingSlash(s: String) = if (s.isEmpty || s.charAt(0) != '\\') "\\" + s else s
 
   def escapeSlashes(s: String) = s.replace("\\", "\\\\")
 
@@ -18,7 +19,7 @@ private object PhpUtils {
   }
 
   private def positive(i: Int, default: => Int): Int = {
-    if(i >= 0) i
+    if (i >= 0) i
     else default
   }
 }

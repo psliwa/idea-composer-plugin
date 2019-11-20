@@ -45,7 +45,8 @@ class DefaultRepositoryFactoryTest {
 
     //when
 
-    val repository = factory.repositoryFor(new RepositoryInfo(List(), false, Some(Repository.inMemory[String](packages, versions))))
+    val repository =
+      factory.repositoryFor(new RepositoryInfo(List(), false, Some(Repository.inMemory[String](packages, versions))))
 
     //then
 

@@ -6,12 +6,12 @@ import com.intellij.CommonBundle
 import org.jetbrains.annotations.PropertyKey
 
 object ComposerBundle {
-  private final val BundleName = "org.psliwa.idea.composerJson.messages.ComposerBundle"
+  final private val BundleName = "org.psliwa.idea.composerJson.messages.ComposerBundle"
   private val Bundle = ResourceBundle.getBundle(BundleName)
 
   def message(@PropertyKey(resourceBundle = BundleName) key: String, params: AnyRef*): String = {
-    CommonBundle.message(Bundle, key, params:_*)
+    CommonBundle.message(Bundle, key, params: _*)
   }
 
-  def message(@PropertyKey(resourceBundle = BundleName) key: String): String = message(key, Nil:_*)
+  def message(@PropertyKey(resourceBundle = BundleName) key: String): String = message(key, Nil: _*)
 }

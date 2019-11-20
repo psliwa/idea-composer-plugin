@@ -17,20 +17,26 @@ class AppSettings extends PersistentStateComponent[Element] {
 
   private def loadBoolean(element: Element, name: String) = {
     Option(element.getChild(name))
-      .exists(child => child.getValue match {
-        case "true" => true
-        case _ => false
-      })
+      .exists(
+        child =>
+          child.getValue match {
+            case "true" => true
+            case _ => false
+          }
+      )
   }
 
   override def getState: Element = {
     val element = new Element("ComposerJsonPluginAppSettings")
     element.addContent(new Element("charityNotificationShown").addContent(charityNotificationShown.toString))
-    element.addContent(new Element("charitySummaryNotificationShown").addContent(charitySummaryNotificationShown.toString))
+    element.addContent(
+      new Element("charitySummaryNotificationShown").addContent(charitySummaryNotificationShown.toString)
+    )
   }
 
   def wasCharityNotificationShown: Boolean = charityNotificationShown
-  def isCharityNotificationStillValid: Boolean = LocalDate.now().isBefore(LocalDate.of(2018, Month.JANUARY.getValue, 17))
+  def isCharityNotificationStillValid: Boolean =
+    LocalDate.now().isBefore(LocalDate.of(2018, Month.JANUARY.getValue, 17))
 
   def wasCharitySummaryNotificationShown: Boolean = charitySummaryNotificationShown
   def charitySummaryNotificationWasShown(): Unit = charitySummaryNotificationShown = true

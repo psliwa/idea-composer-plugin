@@ -41,7 +41,8 @@ class RepositoryFromUrlTest {
 
     //when
 
-    val repository = DefaultRepositoryProvider.satisRepositoryFromUrl(load, parse)("some-url").getOrElse(Repository.empty)
+    val repository =
+      DefaultRepositoryProvider.satisRepositoryFromUrl(load, parse)("some-url").getOrElse(Repository.empty)
 
     //then
 
@@ -54,7 +55,7 @@ class RepositoryFromUrlTest {
     //given
 
     val rootUrl = "http://some-url.com"
-    val url = rootUrl+"/packages.json"
+    val url = rootUrl + "/packages.json"
     val includePath = "some-include-url"
     val content = "some-content"
     val includeContent = "some-include-content"
@@ -62,7 +63,7 @@ class RepositoryFromUrlTest {
     val repositoryPackages = new RepositoryPackages(Map("package" -> List("1.0.0")), List(includePath))
     val includeRepositoryPackages = new RepositoryPackages(Map("package2" -> List("2.0.0")), List())
 
-    val load = loadUrl(Map(url -> content, rootUrl+"/"+includePath -> includeContent)) _
+    val load = loadUrl(Map(url -> content, rootUrl + "/" + includePath -> includeContent)) _
     val parse = parsePackages(Map(content -> repositoryPackages, includeContent -> includeRepositoryPackages)) _
 
     //when
@@ -80,7 +81,7 @@ class RepositoryFromUrlTest {
     //given
 
     val rootUrl = "http://some-url.com"
-    val url = rootUrl+"/packages.json"
+    val url = rootUrl + "/packages.json"
     val include1Url = "some-include1-url"
     val include2Url = "some-include2-url"
 
@@ -92,9 +93,16 @@ class RepositoryFromUrlTest {
     val include1RepositoryPackages = RepositoryPackages(Map(), List(include2Url))
     val include2RepositoryPackages = RepositoryPackages(Map("package" -> Seq("1.0.0")), List())
 
-    val load = loadUrl(Map(url -> content, rootUrl+"/"+include1Url -> include1Content, rootUrl+"/"+include2Url -> include2Content)) _
-    val parse = parsePackages(Map(content -> repositoryPackages, include1Content -> include1RepositoryPackages, include2Content -> include2RepositoryPackages)) _
-
+    val load = loadUrl(
+      Map(url -> content,
+          rootUrl + "/" + include1Url -> include1Content,
+          rootUrl + "/" + include2Url -> include2Content)
+    ) _
+    val parse = parsePackages(
+      Map(content -> repositoryPackages,
+          include1Content -> include1RepositoryPackages,
+          include2Content -> include2RepositoryPackages)
+    ) _
 
     //when
 
@@ -104,18 +112,19 @@ class RepositoryFromUrlTest {
 
     assertTrue(repository.getPackages.contains("package"))
   }
-
-
   @Test
   def givenPrivatePackagistAsUrl_tryToGetPrivatePackagistRepo_emptyRepoShouldBeUsed(): Unit = {
-    val repository = DefaultRepositoryProvider.privatePackagistRepositoryFromUrl(Packagist.privatePackagistUrl+"/some-organization/packages.json")
+    val repository = DefaultRepositoryProvider.privatePackagistRepositoryFromUrl(
+      Packagist.privatePackagistUrl + "/some-organization/packages.json"
+    )
 
     assertEquals(Some(Repository.empty), repository)
   }
 
   @Test
   def givenPackagistOrgAsUrl_tryToGetPrivatePackagistRepo_emptyRepoShouldBeUsed(): Unit = {
-    val repository = DefaultRepositoryProvider.privatePackagistRepositoryFromUrl(Packagist.defaultUrl+"/packages.json")
+    val repository =
+      DefaultRepositoryProvider.privatePackagistRepositoryFromUrl(Packagist.defaultUrl + "/packages.json")
 
     assertEquals(None, repository)
   }

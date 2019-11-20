@@ -13,7 +13,7 @@ private class CharContainsMatcher(prefix: String) extends PrefixMatcher(prefix) 
         case "" => true
         case _ => {
           val index = name.indexOf(prefix.head)
-          if(index >= 0) loop(prefix.tail, name.substring(index+1))
+          if (index >= 0) loop(prefix.tail, name.substring(index + 1))
           else false
         }
       }

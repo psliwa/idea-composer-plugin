@@ -8,7 +8,7 @@ import scalaz.Monad
 class ParserOps[A](p: Parser[A]) {
 
   def run(input: String): Option[A] = p(Location(input)) match {
-    case Success(a,_) => Some(a)
+    case Success(a, _) => Some(a)
     case Failure => None
   }
 

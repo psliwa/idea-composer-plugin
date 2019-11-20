@@ -2,7 +2,7 @@ package org.psliwa.idea.composerJson.util.parsers
 
 sealed trait Result[+A] {
   def advanceSuccess(n: Int): Result[A] = this match {
-    case Success(a, c) => Success(a, c+n)
+    case Success(a, c) => Success(a, c + n)
     case _ => this
   }
 }

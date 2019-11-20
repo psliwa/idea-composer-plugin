@@ -5,7 +5,8 @@ import java.io.File
 
 import org.jetbrains.sbtidea.Keys._
 
-addCommandAlias("createRunConfiguration", "; idea-runner/createIDEARunConfiguration ; idea-runner/createIDEAArtifactXml")
+addCommandAlias("createRunConfiguration",
+                "; idea-runner/createIDEARunConfiguration ; idea-runner/createIDEAArtifactXml")
 addCommandAlias("release", "proguard/package")
 
 val phpPluginVersion = settingKey[String]("Php plugin version")
@@ -30,8 +31,8 @@ lazy val ideaComposerPlugin = (project in file("."))
       "org.scala-lang" % "scala-library" % Versions.scala,
       "org.scala-lang" % "scala-compiler" % Versions.scala,
       "org.scala-lang.modules" %% "scala-parser-combinators" % Versions.scalaParsers,
-      "org.scala-lang.modules" %% "scala-parallel-collections" % "0.2.0",
-      "io.spray" %%  "spray-json" % Versions.sprayJson,
+      "org.scala-lang.modules" %% "scala-parallel-collections" % Versions.scalaParallelCollections,
+      "io.spray" %% "spray-json" % Versions.sprayJson,
       "org.scalaz" %% "scalaz-core" % Versions.scalaz,
       "com.novocode" % "junit-interface" % Versions.junitInterface % "test",
       "org.scalacheck" %% "scalacheck" % Versions.scalacheck % "test",
@@ -67,16 +68,16 @@ lazy val proguard: Project = (project in file("target/proguard"))
       val proguardUrl = "https://github.com/psliwa/proguard-fixd/raw/master/proguard6.2.0.jar"
       val proguardDest: File = getBaseDir(baseDirectory.value) / "proguard.jar"
 
-     def download(url: URL, to: File): Unit =
-       sbt.io.Using.urlInputStream(url) { inputStream =>
-         IO.transfer(inputStream, to)
-       }
+      def download(url: URL, to: File): Unit =
+        sbt.io.Using.urlInputStream(url) { inputStream =>
+          IO.transfer(inputStream, to)
+        }
 
-      if(!proguardDest.exists()) {
+      if (!proguardDest.exists()) {
         download(new URL(proguardUrl), proguardDest)
       }
 
-      def escape(s: String) = if(File.pathSeparatorChar == '\\') "\""+s+"\"" else s
+      def escape(s: String) = if (File.pathSeparatorChar == '\\') "\"" + s + "\"" else s
 
       val javaRt = file(System.getProperty("java.home")) / "lib" / "rt.jar"
 
@@ -85,18 +86,26 @@ lazy val proguard: Project = (project in file("target/proguard"))
         .map(escape)
         .mkString(sys.props.getOrElse("path.separator", ":"))
 
-
       val cmd = Seq(
-        "java", "-jar", escape(proguardDest.getAbsolutePath), "@"+escape(getBaseDirPath(baseDirectory.value)+"/proguard.pro"), "-injars", escape(packageArtifactZip.in(ideaComposerPlugin).value.getAbsolutePath), "-outjars", escape(artifactPath.value.getAbsolutePath),
-        "-libraryjars", libraryJars
+        "java",
+        "-jar",
+        escape(proguardDest.getAbsolutePath),
+        "@" + escape(getBaseDirPath(baseDirectory.value) + "/proguard.pro"),
+        "-injars",
+        escape(packageArtifactZip.in(ideaComposerPlugin).value.getAbsolutePath),
+        "-outjars",
+        escape(artifactPath.value.getAbsolutePath),
+        "-libraryjars",
+        libraryJars
       )
 
       val result = cmd !
 
-      if(result != 0) {
+      if (result != 0) {
         sys.error(s"Proguard exit status: $result")
       }
 
       artifactPath.value
     }
-  ).enablePlugins(SbtIdeaPlugin)
+  )
+  .enablePlugins(SbtIdeaPlugin)

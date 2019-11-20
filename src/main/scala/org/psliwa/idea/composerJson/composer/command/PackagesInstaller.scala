@@ -37,7 +37,10 @@ class DefaultPackagesInstaller(project: Project, file: PsiFile) extends Packages
     if (service.askForValidConfigurationIfNeeded()) {
       val composerExecution = service.getComposerExecution
 
-      val task: Backgroundable = new Backgroundable(project, ComposerBundle.message("inspection.notInstalledPackage.installing"), true, PerformInBackgroundOption.DEAF) {
+      val task: Backgroundable = new Backgroundable(project,
+                                                    ComposerBundle.message("inspection.notInstalledPackage.installing"),
+                                                    true,
+                                                    PerformInBackgroundOption.DEAF) {
         override def run(indicator: ProgressIndicator): Unit = {
           val packageNames = packages.map(_.presentation).mkString(", ")
 
@@ -62,7 +65,8 @@ class DefaultPackagesInstaller(project: Project, file: PsiFile) extends Packages
               Notifications.info(
                 ComposerBundle.message("inspection.notInstalledPackage.cancelledTitle"),
                 ComposerBundle.message("inspection.notInstalledPackage.cancelled", packageNames),
-                Some(project))
+                Some(project)
+              )
           }
         }
 
@@ -78,7 +82,10 @@ class DefaultPackagesInstaller(project: Project, file: PsiFile) extends Packages
             try {
               import scala.jdk.CollectionConverters._
               val handler = composerExecution
-                .createProcessHandler(project, file.getVirtualFile.getParent.getCanonicalPath, ("update" :: packages.map(_.presentation)).asJava, "")
+                .createProcessHandler(project,
+                                      file.getVirtualFile.getParent.getCanonicalPath,
+                                      ("update" :: packages.map(_.presentation)).asJava,
+                                      "")
 
               handler.addProcessListener(new ProcessAdapter {
                 override def onTextAvailable(event: ProcessEvent, outputType: Key[_]): Unit = {
@@ -143,7 +150,7 @@ private object DefaultPackagesInstaller {
   object Result {
     case class Failure(message: String) extends Result
     object Failure {
-      def apply(e: Throwable): Failure = Failure(e.toString+"\n\n"+e.getStackTrace.mkString("", EOL, EOL))
+      def apply(e: Throwable): Failure = Failure(e.toString + "\n\n" + e.getStackTrace.mkString("", EOL, EOL))
     }
     case object Success extends Result
     case object Cancelled extends Result

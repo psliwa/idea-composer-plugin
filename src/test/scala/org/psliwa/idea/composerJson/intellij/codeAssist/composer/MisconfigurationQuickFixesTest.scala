@@ -6,10 +6,12 @@ import org.psliwa.idea.composerJson.intellij.codeAssist.InspectionTest
 class MisconfigurationQuickFixesTest extends InspectionTest {
 
   val FixPreferStable = ComposerBundle.message("inspection.quickfix.setPropertyValue", "prefer-stable", "true")
-  val FixMinimumStability = ComposerBundle.message("inspection.quickfix.setPropertyValue", "minimum-stability", "stable")
+  val FixMinimumStability =
+    ComposerBundle.message("inspection.quickfix.setPropertyValue", "minimum-stability", "stable")
   val CreateNameProperty = ComposerBundle.message("inspection.quickfix.createProperty", "name")
   val CreateLicenseProperty = ComposerBundle.message("inspection.quickfix.createProperty", "license")
-  val SetTypeToComposerPlugin = ComposerBundle.message("inspection.quickfix.setPropertyValue", "type", "composer-plugin")
+  val SetTypeToComposerPlugin =
+    ComposerBundle.message("inspection.quickfix.setPropertyValue", "type", "composer-plugin")
   val SetNameTo = ComposerBundle.message("inspection.quickfix.setPropertyValue", "name", _: String)
   val RemoveDependency = ComposerBundle.message("inspection.quickfix.removeDependency", _: String)
 

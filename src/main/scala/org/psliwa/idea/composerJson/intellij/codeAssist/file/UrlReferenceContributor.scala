@@ -8,7 +8,8 @@ import org.psliwa.idea.composerJson.intellij.codeAssist._
 
 class UrlReferenceContributor extends AbstractReferenceContributor {
   override protected def schemaToPatterns(schema: Schema, parent: Capture): List[ReferenceMatcher] = schema match {
-    case SString(UriFormat | EmailFormat) => List(new ReferenceMatcher(psiElement(classOf[JsonStringLiteral]).withParent(parent), UrlReferenceProvider))
+    case SString(UriFormat | EmailFormat) =>
+      List(new ReferenceMatcher(psiElement(classOf[JsonStringLiteral]).withParent(parent), UrlReferenceProvider))
     case _ => Nil
   }
 }

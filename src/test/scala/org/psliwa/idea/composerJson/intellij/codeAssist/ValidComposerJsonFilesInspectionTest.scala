@@ -7,8 +7,8 @@ import org.psliwa.idea.composerJson.intellij.codeAssist.file.FilePathInspection
 import org.psliwa.idea.composerJson.intellij.codeAssist.schema.SchemaInspection
 
 /**
- * Tests for inspections on few real-live composer.json files
- */
+  * Tests for inspections on few real-live composer.json files
+  */
 class ValidComposerJsonFilesInspectionTest extends InspectionTest {
 
   override def setUp(): Unit = {

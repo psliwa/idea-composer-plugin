@@ -11,31 +11,35 @@ import org.psliwa.idea.composerJson.composer.model.repository.RepositoryProvider
 import org.psliwa.idea.composerJson.intellij.codeAssist.BaseLookupElement
 import org.psliwa.idea.composerJson.settings.ProjectSettings
 
-class CustomRepositoriesEditorNotificationProvider(
-  notifications: EditorNotifications,
-  project: Project
-) extends EditorNotifications.Provider[EditorNotificationPanel] {
+class CustomRepositoriesEditorNotificationProvider(notifications: EditorNotifications, project: Project)
+    extends EditorNotifications.Provider[EditorNotificationPanel] {
   import CustomRepositoriesEditorNotificationProvider._
 
   override def getKey: Key[EditorNotificationPanel] = key
 
   override def createNotificationPanel(file: VirtualFile, fileEditor: FileEditor): EditorNotificationPanel = {
-    if(file.getName == ComposerJson && isCustomRepositoriesSupportUnspecified(file)) {
+    if (file.getName == ComposerJson && isCustomRepositoriesSupportUnspecified(file)) {
       val panel = new EditorNotificationPanel()
         .text(ComposerBundle.message("editorNotifications.customRepositories"))
 
-      panel.createActionLabel(ComposerBundle.message("editorNotifications.customRepositories.yes"), new Runnable {
-        override def run(): Unit = {
-          getSettings().enable(file.getCanonicalPath)
-          notifications.updateNotifications(file)
+      panel.createActionLabel(
+        ComposerBundle.message("editorNotifications.customRepositories.yes"),
+        new Runnable {
+          override def run(): Unit = {
+            getSettings().enable(file.getCanonicalPath)
+            notifications.updateNotifications(file)
+          }
         }
-      })
-      panel.createActionLabel(ComposerBundle.message("editorNotifications.customRepositories.no"), new Runnable {
-        override def run(): Unit = {
-          getSettings().disable(file.getCanonicalPath)
-          notifications.updateNotifications(file)
+      )
+      panel.createActionLabel(
+        ComposerBundle.message("editorNotifications.customRepositories.no"),
+        new Runnable {
+          override def run(): Unit = {
+            getSettings().disable(file.getCanonicalPath)
+            notifications.updateNotifications(file)
+          }
         }
-      })
+      )
 
       panel
     } else {
@@ -43,13 +47,13 @@ class CustomRepositoriesEditorNotificationProvider(
     }
   }
 
-  private def getSettings() = {
+  private def getSettings(): ProjectSettings.CustomRepositoriesSettings = {
     ProjectSettings.getInstance(project).getCustomRepositoriesSettings
   }
 
   private def isCustomRepositoriesSupportUnspecified(file: VirtualFile): Boolean = {
     !getRepositoryProvider.hasDefaultRepository(file.getCanonicalPath) &&
-      getSettings().isUnspecified(file.getCanonicalPath)
+    getSettings().isUnspecified(file.getCanonicalPath)
   }
 
   private def getRepositoryProvider: RepositoryProvider[_ <: BaseLookupElement] = {

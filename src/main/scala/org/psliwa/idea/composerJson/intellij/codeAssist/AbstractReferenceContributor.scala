@@ -6,29 +6,35 @@ import com.intellij.patterns.PlatformPatterns._
 import com.intellij.psi.{PsiElement, PsiReferenceContributor, PsiReferenceProvider, PsiReferenceRegistrar}
 import org.psliwa.idea.composerJson._
 import org.psliwa.idea.composerJson.intellij.PsiElements
-import org.psliwa.idea.composerJson.json.{SOr, SArray, SObject, Schema}
+import org.psliwa.idea.composerJson.json.{SArray, SObject, SOr, Schema}
 import PsiElements.rootPsiElementPattern
 
 abstract class AbstractReferenceContributor extends PsiReferenceContributor {
   private val schema = ComposerSchema
 
-  override final def registerReferenceProviders(registrar: PsiReferenceRegistrar): Unit = {
+  final override def registerReferenceProviders(registrar: PsiReferenceRegistrar): Unit = {
     schema
       .map(schemaToPatterns)
       .foreach(
-        _.foreach { matcher => registrar.registerReferenceProvider(matcher.pattern, matcher.provider) }
+        _.foreach { matcher =>
+          registrar.registerReferenceProvider(matcher.pattern, matcher.provider)
+        }
       )
   }
 
   private def schemaToPatterns(s: Schema): List[ReferenceMatcher] = {
     def loop(s: Schema, parent: Capture): List[ReferenceMatcher] = s match {
       case SObject(properties, _) => {
-        properties.named.toList.flatMap{ case(name, property) => {
-          loop(
-            property.schema,
-            psiElement(classOf[JsonProperty]).withName(name).withParent(psiElement(classOf[JsonObject]).withParent(parent))
-          )
-        }}
+        properties.named.toList.flatMap {
+          case (name, property) => {
+            loop(
+              property.schema,
+              psiElement(classOf[JsonProperty])
+                .withName(name)
+                .withParent(psiElement(classOf[JsonObject]).withParent(parent))
+            )
+          }
+        }
       }
       case SArray(item) => {
         loop(item, psiElement(classOf[JsonArray]).withParent(parent))

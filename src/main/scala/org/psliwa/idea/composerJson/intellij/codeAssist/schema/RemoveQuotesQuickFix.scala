@@ -10,7 +10,7 @@ import QuickFix._
 import org.psliwa.idea.composerJson.intellij.codeAssist.QuickFix
 import PsiElements._
 
-private class RemoveQuotesQuickFix(element: PsiElement) extends LocalQuickFixOnPsiElement(element){
+private class RemoveQuotesQuickFix(element: PsiElement) extends LocalQuickFixOnPsiElement(element) {
 
   override def invoke(project: Project, file: PsiFile, startElement: PsiElement, endElement: PsiElement): Unit = {
     for {
@@ -20,8 +20,8 @@ private class RemoveQuotesQuickFix(element: PsiElement) extends LocalQuickFixOnP
       val headOffset = getHeadOffset(stringLiteral)
       val trailingOffset = headOffset + stringLiteral.getText.length - 2
 
-      document.replaceString(headOffset, headOffset+1, "")
-      document.replaceString(trailingOffset, trailingOffset+1, "")
+      document.replaceString(headOffset, headOffset + 1, "")
+      document.replaceString(trailingOffset, trailingOffset + 1, "")
     }
   }
 
