@@ -10,8 +10,8 @@ addCommandAlias("release", "proguard/package")
 
 val phpPluginVersion = settingKey[String]("Php plugin version")
 
-intellijBuild in ThisBuild := sys.props.getOrElse("IDEA_VERSION", "2019.2.3")
-phpPluginVersion in ThisBuild := sys.props.getOrElse("PHP_PLUGIN_VERSION", "192.6817.12")
+intellijBuild in ThisBuild := sys.props.getOrElse("IDEA_VERSION", Versions.idea)
+phpPluginVersion in ThisBuild := sys.props.getOrElse("PHP_PLUGIN_VERSION", Versions.phpPlugin)
 intellijPlatform in ThisBuild := IntelliJPlatform.IdeaUltimate
 scalaVersion in ThisBuild := Versions.scala
 intellijDownloadDirectory in ThisBuild := file("./idea")
@@ -32,9 +32,9 @@ lazy val ideaComposerPlugin = (project in file("."))
       "org.scala-lang.modules" %% "scala-parser-combinators" % Versions.scalaParsers,
       "io.spray" %%  "spray-json" % Versions.sprayJson,
       "org.scalaz" %% "scalaz-core" % Versions.scalaz,
-      "com.novocode" % "junit-interface" % "0.11" % "test",
-      "org.scalacheck" %% "scalacheck" % "1.14.2" % "test",
-      "org.scalatest" %% "scalatest" % "3.0.8" % "test"
+      "com.novocode" % "junit-interface" % Versions.junitInterface % "test",
+      "org.scalacheck" %% "scalacheck" % Versions.scalacheck % "test",
+      "org.scalatest" %% "scalatest" % Versions.scalatest % "test"
     ),
     intellijInternalPlugins ++= Seq(
       "java-i18n",
