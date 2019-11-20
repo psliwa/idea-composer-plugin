@@ -16,38 +16,32 @@ object VersionEquivalents {
 
     Option(version.replace {
       //~ support
-      case OperatorConstraint(ConstraintOperator.~, SemanticConstraint(versionFrom), _) => {
+      case OperatorConstraint(ConstraintOperator.~, SemanticConstraint(versionFrom), _) =>
         incrementVersion(versionFrom.ensureParts(2))
           .map(versionTo => versionRange(versionFrom.ensureParts(2), versionTo.fillZero))
-      }
       //example: >=1.2 <3.0.0 to ~1.2
       case VersionRange(versionFrom, versionTo)
           if versionFrom.dropZeros.partsNumber < 3 && incrementVersion(versionFrom.ensureExactlyParts(2))
-            .exists(_.fillZero == versionTo.fillZero) => {
+            .exists(_.fillZero == versionTo.fillZero) =>
         Some(OperatorConstraint(ConstraintOperator.~, SemanticConstraint(versionFrom.dropZeros.ensureParts(2)), ""))
-      }
       //example: >=1.2.1 <1.3.0 to ~1.2.1
       case VersionRange(versionFrom, versionTo)
-          if incrementVersion(versionFrom.fillZero).exists(_.fillZero == versionTo.fillZero) => {
+          if incrementVersion(versionFrom.fillZero).exists(_.fillZero == versionTo.fillZero) =>
         Some(OperatorConstraint(ConstraintOperator.~, SemanticConstraint(versionFrom.ensureParts(3)), ""))
-      }
       //^ support for pre-release: ^0.3.1 to >=0.3.1 <0.4.0
       case OperatorConstraint(ConstraintOperator.^, SemanticConstraint(versionFrom), _)
-          if versionFrom.partsNumber > 1 && versionFrom.major == 0 => {
+          if versionFrom.partsNumber > 1 && versionFrom.major == 0 =>
         incrementVersion(versionFrom.ensureParts(3))
           .map(versionTo => versionRange(versionFrom, versionTo.fillZero))
-      }
       //^ support
-      case OperatorConstraint(ConstraintOperator.^, SemanticConstraint(versionFrom), _) => {
+      case OperatorConstraint(ConstraintOperator.^, SemanticConstraint(versionFrom), _) =>
         incrementVersion(versionFrom.ensureExactlyParts(2))
           .map(versionTo => versionRange(versionFrom, versionTo.fillZero))
-      }
       //example: >=1.2.1 <2.0.0 to ^1.2.1
       case VersionRange(versionFrom, versionTo)
           if versionFrom.partsNumber == 3 && incrementVersion(versionFrom.ensureExactlyParts(2))
-            .exists(_.fillZero == versionTo.fillZero) => {
+            .exists(_.fillZero == versionTo.fillZero) =>
         Some(OperatorConstraint(ConstraintOperator.^, SemanticConstraint(versionFrom)))
-      }
       case _ => None
     }).filter(_ != version)
   }

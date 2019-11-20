@@ -37,8 +37,8 @@ class DefaultRepositoryProviderTest {
     //given
 
     val file = "someFile"
-    val repositoryInfo = new RepositoryInfo(List("a"), false)
-    val changedRepositoryInfo = new RepositoryInfo(List("b"), false)
+    val repositoryInfo = RepositoryInfo(List("a"), false)
+    val changedRepositoryInfo = RepositoryInfo(List("b"), false)
     val repository = Repository.inMemory(List("package1"))
     val changedRepository = Repository.inMemory(List("package2"))
 
@@ -59,18 +59,18 @@ class DefaultRepositoryProviderTest {
   }
 
   @Test
-  def givenFileHasNotRepositoryInfo_defaultRepositoryShouldBeUsed() = {
+  def givenFileHasNotRepositoryInfo_defaultRepositoryShouldBeUsed(): Unit = {
     val repository = provider.repositoryFor("some-file")
 
     assertEquals(defaultRepository, repository)
   }
 
   @Test
-  def givenFileHasRepositoryInfoOnlyWithPackagistRepo_itShouldHasDefaultRepository() = {
+  def givenFileHasRepositoryInfoOnlyWithPackagistRepo_itShouldHasDefaultRepository(): Unit = {
     //given
 
     val file = "file"
-    provider.updateRepository(file, new RepositoryInfo(List(), true))
+    provider.updateRepository(file, RepositoryInfo(List(), true))
 
     //when & then
 
@@ -78,16 +78,16 @@ class DefaultRepositoryProviderTest {
   }
 
   @Test
-  def givenFileHasNotRepositoryInfo_itShouldToHaveDefaultRepository() = {
+  def givenFileHasNotRepositoryInfo_itShouldToHaveDefaultRepository(): Unit = {
     assertTrue(provider.hasDefaultRepository("some-file"))
   }
 
   @Test
-  def givenFileHasPackagistRepoTurnedOff_itShouldNotToHaveDefaultRepository() = {
+  def givenFileHasPackagistRepoTurnedOff_itShouldNotToHaveDefaultRepository(): Unit = {
     //given
 
     val file = "file"
-    provider.updateRepository(file, new RepositoryInfo(List(), false))
+    provider.updateRepository(file, RepositoryInfo(List(), false))
 
     //when & then
 
@@ -95,11 +95,11 @@ class DefaultRepositoryProviderTest {
   }
 
   @Test
-  def givenFileHasPackagistRepoTurnedOff_packagistRepoIsSpecifiedAsCustormRepo_isShouldHaveDefaultRepository() = {
+  def givenFileHasPackagistRepoTurnedOff_packagistRepoIsSpecifiedAsCustormRepo_isShouldHaveDefaultRepository(): Unit = {
     //given
 
     val file = "file"
-    provider.updateRepository(file, new RepositoryInfo(List("https://packagist.org/"), false))
+    provider.updateRepository(file, RepositoryInfo(List("https://packagist.org/"), false))
 
     //when & then
 
@@ -107,11 +107,11 @@ class DefaultRepositoryProviderTest {
   }
 
   @Test
-  def givenFileHasFewUrlsInRepositoryInfo_itShouldNotToHaveDefaultRepository() = {
+  def givenFileHasFewUrlsInRepositoryInfo_itShouldNotToHaveDefaultRepository(): Unit = {
     //given
 
     val file = "file"
-    provider.updateRepository(file, new RepositoryInfo(List("url1"), true))
+    provider.updateRepository(file, RepositoryInfo(List("url1"), true))
 
     //when & then
 
@@ -119,18 +119,19 @@ class DefaultRepositoryProviderTest {
   }
 
   @Test
-  def givenFileHasNotRepositoryInfo_updateRepositoryInfo_trueShouldBeReturnedToIndicateChange() = {
-    val changed = provider.updateRepository("file", new RepositoryInfo(List("url1"), true))
+  def givenFileHasNotRepositoryInfo_updateRepositoryInfo_trueShouldBeReturnedToIndicateChange(): Unit = {
+    val changed = provider.updateRepository("file", RepositoryInfo(List("url1"), true))
 
     assertTrue(changed)
   }
 
   @Test
-  def givenFileHasRepositoryInfo_updateRepositoryInfoWithTheSameObject_falseShouldBeReturnedToIndicateNoChange() = {
+  def givenFileHasRepositoryInfo_updateRepositoryInfoWithTheSameObject_falseShouldBeReturnedToIndicateNoChange()
+      : Unit = {
     //given
 
     val file = "file"
-    val repoInfo = new RepositoryInfo(List("url1"), true)
+    val repoInfo = RepositoryInfo(List("url1"), true)
 
     provider.updateRepository(file, repoInfo)
 
@@ -144,11 +145,11 @@ class DefaultRepositoryProviderTest {
   }
 
   @Test
-  def givenFileHasRepositoryInfo_updateRepositoryInfoWithDifferentObject_trueShouldBeReturned() = {
+  def givenFileHasRepositoryInfo_updateRepositoryInfoWithDifferentObject_trueShouldBeReturned(): Unit = {
     //given
 
     val file = "file"
-    val repoInfo = new RepositoryInfo(List("url1"), true)
+    val repoInfo = RepositoryInfo(List("url1"), true)
 
     provider.updateRepository(file, repoInfo)
 
@@ -162,7 +163,7 @@ class DefaultRepositoryProviderTest {
   }
 
   @Test
-  def givenFileHasRepositoryInfo_repositoryFactoryShouldBeCalledOnlyOnce() = {
+  def givenFileHasRepositoryInfo_repositoryFactoryShouldBeCalledOnlyOnce(): Unit = {
     //given
 
     val file = "someFile"
@@ -196,7 +197,7 @@ object DefaultRepositoryProviderTest {
 
     def callsFor(repositoryInfo: RepositoryInfo): Int = calls.getOrElse(repositoryInfo, 0)
 
-    def setRepositories(repositoryInfo: RepositoryInfo, repository: Repository[String]) = {
+    def setRepositories(repositoryInfo: RepositoryInfo, repository: Repository[String]): Unit = {
       repositories += (repositoryInfo -> repository)
     }
   }

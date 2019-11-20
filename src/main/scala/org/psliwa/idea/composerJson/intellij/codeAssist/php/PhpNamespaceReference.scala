@@ -58,7 +58,8 @@ private class PhpNamespaceReference(element: JsonStringLiteral)
 }
 
 private object PhpNamespaceReference {
-  lazy val NamespaceStubIndexKey = StubIndexKey.createIndexKey("org.psliwa.idea.composerJson.phpNamespace")
+  lazy val NamespaceStubIndexKey: StubIndexKey[Nothing, Nothing] =
+    StubIndexKey.createIndexKey("org.psliwa.idea.composerJson.phpNamespace")
 
   private class PhpNamespaceLookupElement(project: Project, namespace: String)
       extends PhpLookupElement(

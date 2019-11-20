@@ -27,13 +27,12 @@ private object PackageReferenceProvider extends PsiReferenceProvider {
 
     packageName.`vendor/project`
       .map {
-        case (vendor, project) if !project.contains(composerJson.EmptyPsiElementNamePlaceholder) => {
+        case (vendor, project) if !project.contains(composerJson.EmptyPsiElementNamePlaceholder) =>
           val set = new FileReferenceSet(s"vendor/$vendor/$project", nameElement, range.getStartOffset, this, true)
           Array[PsiReference](
             new FileReference(set, new TextRange(1, vendor.length + 1), 0, s"vendor/$vendor"),
             new FileReference(set, new TextRange(1, vendor.length + project.length + 2), 0, s"vendor/$vendor/$project")
           )
-        }
         case _ => Array()
       }
   }

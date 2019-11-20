@@ -49,7 +49,7 @@ private class SetPropertyValueQuickFix(
   private def setPropertyValue(property: JsonProperty): Unit = {
     for {
       document <- documentFor(element.getProject, element.getContainingFile)
-      editor <- editorFor(element.getProject)
+      _ <- editorFor(element.getProject)
       range <- Option(property.getValue).map(_.getTextRange).orElse(Some(valueTextRangeFor(property)))
     } yield {
       val wrappedValue = fixValue(wrapValue(propertyValue), document, range.getStartOffset)

@@ -32,7 +32,7 @@ class FilePathInspection extends AbstractInspection {
         schema match {
           case SObject(schemaProperties, _) =>
             element match {
-              case JsonObject(properties) => {
+              case JsonObject(properties) =>
                 val problemsPerProperty = for {
                   property <- properties.asScala.toList
                   schemaProperty <- schemaProperties.get(property.getName).toList
@@ -41,7 +41,6 @@ class FilePathInspection extends AbstractInspection {
                 } yield problems
 
                 bestMatchingProblems(problemsPerProperty)
-              }
               case _ =>
                 None
             }
@@ -67,7 +66,7 @@ class FilePathInspection extends AbstractInspection {
               .headOption
           case SFilePath(true) =>
             element match {
-              case jsl @ JsonStringLiteral(value) => {
+              case jsl @ JsonStringLiteral(value) =>
                 if (!pathExists(rootDir, value)) {
                   Some(
                     List(
@@ -85,7 +84,6 @@ class FilePathInspection extends AbstractInspection {
                 } else {
                   Some(List.empty)
                 }
-              }
               case _ =>
                 None
             }
@@ -96,7 +94,7 @@ class FilePathInspection extends AbstractInspection {
                   .flatMap(property => Option(property.getValue))
                   .map(collectProblems(_, schema))
                 bestMatchingProblems(problems)
-              case jsl @ JsonStringLiteral(value) => {
+              case jsl @ JsonStringLiteral(value) =>
                 if (!pathExists(rootDir, value)) {
                   Some(
                     List(
@@ -114,7 +112,6 @@ class FilePathInspection extends AbstractInspection {
                 } else {
                   Some(List.empty)
                 }
-              }
               case JsonArray(values) =>
                 val problems: immutable.Seq[Option[Seq[ProblemDescriptor[LocalQuickFix]]]] =
                   values.asScala.toList.map(collectProblems(_, schema))

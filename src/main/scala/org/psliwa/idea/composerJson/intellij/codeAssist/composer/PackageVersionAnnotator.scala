@@ -7,7 +7,7 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.Project
 import com.intellij.patterns.PlatformPatterns._
 import com.intellij.patterns.StandardPatterns._
-import com.intellij.patterns.{PatternCondition, StringPattern}
+import com.intellij.patterns.{PatternCondition, PsiElementPattern, StringPattern}
 import com.intellij.psi.PsiElement
 import com.intellij.util.ProcessingContext
 import org.psliwa.idea.composerJson._
@@ -28,7 +28,7 @@ import org.psliwa.idea.composerJson.settings.ProjectSettings
 class PackageVersionAnnotator extends Annotator {
   import org.psliwa.idea.composerJson.intellij.codeAssist.composer.PackageVersionAnnotator._
 
-  val suggestionHighlightSeverity =
+  val suggestionHighlightSeverity: HighlightSeverity =
     if (ApplicationManager.getApplication.isUnitTestMode) HighlightSeverity.INFORMATION
     else `HighlightSeverity.SUGGESTION`
 
@@ -177,18 +177,16 @@ class PackageVersionAnnotator extends Annotator {
     List(
       (c: Constraint) =>
         c match {
-          case OperatorConstraint(operator, WildcardConstraint(Some(constraint)), separator) => {
+          case OperatorConstraint(operator, WildcardConstraint(Some(constraint)), separator) =>
             Some(OperatorConstraint(operator, constraint, separator))
-          }
           case _ => None
         },
       (c: Constraint) =>
         c match {
           case OperatorConstraint(operator,
                                   WrappedConstraint(WildcardConstraint(Some(constraint)), prefix, suffix),
-                                  separator) => {
+                                  separator) =>
             Some(OperatorConstraint(operator, WrappedConstraint(constraint, prefix, suffix), separator))
-          }
           case _ => None
         }
     )
@@ -259,8 +257,8 @@ class PackageVersionAnnotator extends Annotator {
 
 private object PackageVersionAnnotator {
   import org.psliwa.idea.composerJson.util.Funcs._
-  val parseVersion: (String) => Option[Constraint] = memorize(40)(Parser.parse)
-  val pattern = packageElement.afterLeaf(":")
+  val parseVersion: String => Option[Constraint] = memorize(40)(Parser.parse)
+  val pattern: PsiElementPattern.Capture[JsonStringLiteral] = packageElement.afterLeaf(":")
   val `HighlightSeverity.SUGGESTION` =
     new HighlightSeverity(HighlightSeverity.INFORMATION.myName, HighlightSeverity.WEAK_WARNING.myVal - 2)
 }

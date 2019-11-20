@@ -16,19 +16,19 @@ class InstalledPackagesTest extends BasePlatformTestCase {
     composerJsonFile = createComposerJson()
   }
 
-  def testComposerLockNotExist_installedPackagesShouldBeEmpty() = {
+  def testComposerLockNotExist_installedPackagesShouldBeEmpty(): Unit = {
     assertTrue(installedPackages().isEmpty)
   }
 
   private def installedPackages(file: VirtualFile = composerJsonFile) = InstalledPackages.forFile(file)
 
-  def testEmptyComposerLockExist_installedPackagesShouldBeEmpty() = {
+  def testEmptyComposerLockExist_installedPackagesShouldBeEmpty(): Unit = {
     createComposerLock(Packages())
 
     assertTrue(installedPackages().isEmpty)
   }
 
-  def testGivenComposerLockWithFewPackages_installedPackagesShouldBeTheSame() = {
+  def testGivenComposerLockWithFewPackages_installedPackagesShouldBeTheSame(): Unit = {
     val packages = Packages(PackageDescriptor("vendor/name", "1.0.0"), PackageDescriptor("vendor2/name2", "2.0.0"))
     createComposerLock(packages)
 
@@ -46,7 +46,7 @@ class InstalledPackagesTest extends BasePlatformTestCase {
     assertEquals(expectedPackages, installedPackages())
   }
 
-  def testGivenTwoComposerLockInDifferentLocations_installedPackagesDependOnRequestedFile() = {
+  def testGivenTwoComposerLockInDifferentLocations_installedPackagesDependOnRequestedFile(): Unit = {
     val subComposerJson = createComposerJson("subdir")
 
     val packages1 = Packages(PackageDescriptor("vendor/name", "1.0.0"), PackageDescriptor("vendor2/name2", "2.0.0"))
@@ -59,7 +59,7 @@ class InstalledPackagesTest extends BasePlatformTestCase {
     assertEquals(packages2, installedPackages(subComposerJson))
   }
 
-  def testGivenComposerLockWithFewPackages_deleteComposerLock_installedPackagesShouldBeEmpty() = {
+  def testGivenComposerLockWithFewPackages_deleteComposerLock_installedPackagesShouldBeEmpty(): Unit = {
     val packages = Packages(PackageDescriptor("vendor/name", "1.0.0"))
     val file = createComposerLock(packages)
 
@@ -70,7 +70,7 @@ class InstalledPackagesTest extends BasePlatformTestCase {
     assertTrue(installedPackages().isEmpty)
   }
 
-  def testGivenComposerLockWithFewPackages_moveIt_installedPackagesShouldBeEmpty() = {
+  def testGivenComposerLockWithFewPackages_moveIt_installedPackagesShouldBeEmpty(): Unit = {
     val packages = Packages(PackageDescriptor("vendor/name", "1.0.0"))
     val file = createComposerLock(packages)
 

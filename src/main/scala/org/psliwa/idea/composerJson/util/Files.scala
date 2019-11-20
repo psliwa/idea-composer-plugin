@@ -21,7 +21,7 @@ object Files {
             case None => None
           }
         case "." :: t => loop(rootDir, t)
-        case h :: t => {
+        case h :: t =>
           val subPath = Option(rootDir.findSubdirectory(h))
             .orElse(Option(rootDir.findFile(h)))
 
@@ -30,7 +30,6 @@ object Files {
             case Some(x: PsiFile) if t.isEmpty => Some(x)
             case _ => None
           }
-        }
       }
     }
 

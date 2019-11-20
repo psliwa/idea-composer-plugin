@@ -10,7 +10,7 @@ import org.psliwa.idea.composerJson.intellij.codeAssist.DocumentationTest
 class PackageDocumentationProviderTest extends DocumentationTest {
   override protected def documentationProvider: DocumentationProvider = new PackageDocumentationProvider
 
-  def testGivenPackage_thereShouldBeUrlToPackagistAsExternalDocumentation() = {
+  def testGivenPackage_thereShouldBeUrlToPackagistAsExternalDocumentation(): Unit = {
     checkDocumentation(
       """
         |{
@@ -23,7 +23,7 @@ class PackageDocumentationProviderTest extends DocumentationTest {
     )
   }
 
-  def testGivenPackage_homepageExistsInComposerLock_theUrlShouldBeTheSameAsHomepage() = {
+  def testGivenPackage_homepageExistsInComposerLock_theUrlShouldBeTheSameAsHomepage(): Unit = {
     createComposerLock(List(PackageDescriptor("vendor/pkg", "1.0.0", homepage = Some("some/url"))))
 
     checkDocumentation(

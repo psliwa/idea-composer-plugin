@@ -9,6 +9,7 @@ class RepositoryProviderWrapper[Package](
     if (useDefaultRepository(file)) defaultRepository
     else repositoryProvider.repositoryFor(file)
   }
-  override def updateRepository(file: String, info: RepositoryInfo) = repositoryProvider.updateRepository(file, info)
+  override def updateRepository(file: String, info: RepositoryInfo): Boolean =
+    repositoryProvider.updateRepository(file, info)
   override def hasDefaultRepository(file: String): Boolean = repositoryProvider.hasDefaultRepository(file)
 }

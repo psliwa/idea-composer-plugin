@@ -6,7 +6,7 @@ import org.psliwa.idea.composerJson.intellij.codeAssist.CompletionTest
 
 class UrlReferenceTest extends CompletionTest {
 
-  def testGivenUrlProperty_givenUrlValue_valueShouldBeUrlReference() = {
+  def testGivenUrlProperty_givenUrlValue_valueShouldBeUrlReference(): Unit = {
     checkUrlReference(
       """
         |{
@@ -16,7 +16,7 @@ class UrlReferenceTest extends CompletionTest {
     )
   }
 
-  def testGivenUrlProperty_givenInvalidUrlValue_valueShouldNotBeUrlReference() = {
+  def testGivenUrlProperty_givenInvalidUrlValue_valueShouldNotBeUrlReference(): Unit = {
     checkUrlReference(
       """
         |{
@@ -27,7 +27,7 @@ class UrlReferenceTest extends CompletionTest {
     )
   }
 
-  def testGivenEmailProperty_givenEmailValue_valueShouldBeUrlReference() = {
+  def testGivenEmailProperty_givenEmailValue_valueShouldBeUrlReference(): Unit = {
     checkUrlReference(
       """
         |{
@@ -39,7 +39,7 @@ class UrlReferenceTest extends CompletionTest {
     )
   }
 
-  def testGivenEmailProperty_givenInvalidEmailValue_valueShouldNotBeUrlReference() = {
+  def testGivenEmailProperty_givenInvalidEmailValue_valueShouldNotBeUrlReference(): Unit = {
     checkUrlReference(
       """
         |{
@@ -52,7 +52,7 @@ class UrlReferenceTest extends CompletionTest {
     )
   }
 
-  def testGivenUrlProperty_givenUrlPropertyIsInFactOrProperty_givenValidUrl_valueShouldBeUrlReference() = {
+  def testGivenUrlProperty_givenUrlPropertyIsInFactOrProperty_givenValidUrl_valueShouldBeUrlReference(): Unit = {
     checkUrlReference(
       """
         |{
@@ -66,7 +66,7 @@ class UrlReferenceTest extends CompletionTest {
     )
   }
 
-  def testGivenPackageVersionProperty_valueShouldBeUrlReference() = {
+  def testGivenPackageVersionProperty_valueShouldBeUrlReference(): Unit = {
     checkUrlReference(
       """
         |{
@@ -78,7 +78,7 @@ class UrlReferenceTest extends CompletionTest {
     )
   }
 
-  private def checkUrlReference(s: String, expectedCount: Int = 1) = {
+  private def checkUrlReference(s: String, expectedCount: Int = 1): Unit = {
     myFixture.configureByText(ComposerJson, s)
 
     val element = myFixture.getFile.findElementAt(myFixture.getCaretOffset).getParent

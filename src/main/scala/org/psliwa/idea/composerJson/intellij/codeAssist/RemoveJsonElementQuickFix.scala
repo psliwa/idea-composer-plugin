@@ -23,11 +23,11 @@ private class RemoveJsonElementQuickFix(element: PsiElement, text: String) exten
   }
 
   private def nextCommaElementOf: PsiElement => Option[PsiElement] =
-    findSibling(isCommaElement, x => Option(x.getNextSibling), isJsonProperty) _
+    findSibling(isCommaElement, x => Option(x.getNextSibling), isJsonProperty)
   private def previousCommaElementOf: PsiElement => Option[PsiElement] =
-    findSibling(isCommaElement, x => Option(x.getPrevSibling), isJsonProperty) _
+    findSibling(isCommaElement, x => Option(x.getPrevSibling), isJsonProperty)
   private def nextPropertyElementOf: PsiElement => Option[PsiElement] =
-    findSibling(isJsonProperty, x => Option(x.getNextSibling)) _
+    findSibling(isJsonProperty, x => Option(x.getNextSibling))
 
   private def isCommaElement(e: PsiElement): Boolean = e match {
     case LeafPsiElement(",") => true

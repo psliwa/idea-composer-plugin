@@ -27,5 +27,5 @@ object Repository {
 private object EmptyRepository extends Repository[Nothing] {
   override def getPackages: Seq[Nothing] = Nil
   override def getPackageVersions(packageName: PackageName): Seq[String] = Nil
-  override def map[NewPackage](f: (Nothing) => NewPackage): Repository[NewPackage] = this
+  override def map[NewPackage](f: Nothing => NewPackage): Repository[NewPackage] = this
 }

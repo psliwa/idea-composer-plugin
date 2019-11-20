@@ -51,7 +51,7 @@ class InstalledPackagesWatcher extends ApplicationComponent {
     pkgs
   }
 
-  private[InstalledPackagesWatcher] def refresh(file: VirtualFile) = {
+  private[InstalledPackagesWatcher] def refresh(file: VirtualFile): Unit = {
     //lazy load: parse composer.lock only once and on first read
     lazy val loadedPackages = loadPackages(file)
     packages(file) = () => loadedPackages
@@ -73,7 +73,7 @@ class InstalledPackagesWatcher extends ApplicationComponent {
         in.close()
       }
     } catch {
-      case e: IOException => None
+      case _: IOException => None
     }
   }
 
@@ -84,7 +84,7 @@ class InstalledPackagesWatcher extends ApplicationComponent {
         refresh(event.getFile)
       })
 
-    private def ensureComposerLock(event: VirtualFileEvent)(f: () => Unit) = {
+    private def ensureComposerLock(event: VirtualFileEvent)(f: () => Unit): Unit = {
       if (event.getFileName == ComposerLock) f()
     }
 
@@ -95,7 +95,7 @@ class InstalledPackagesWatcher extends ApplicationComponent {
 
     override def fileDeleted(event: VirtualFileEvent): Unit =
       ensureComposerLock(event)(() => {
-        packages - event.getFile
+        packages.remove(event.getFile)
       })
 
     override def fileMoved(event: VirtualFileMoveEvent): Unit = {}

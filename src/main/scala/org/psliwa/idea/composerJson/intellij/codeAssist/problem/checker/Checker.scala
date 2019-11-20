@@ -13,7 +13,7 @@ private[codeAssist] trait Checker {
 }
 
 private[codeAssist] object Checker {
-  def not(checker: Checker) = new Checker {
+  def not(checker: Checker): Checker = new Checker {
     override def check(jsonObject: JsonObject): CheckResult = checker.check(jsonObject).not
   }
 }

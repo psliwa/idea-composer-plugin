@@ -11,11 +11,11 @@ import org.psliwa.idea.composerJson.composer.model.PackageDescriptor
 object ComposerFixtures {
   def writeAction[A](f: () => A): A = {
     ApplicationManager.getApplication.runWriteAction(new Computable[A] {
-      override def compute = f()
+      override def compute: A = f()
     })
   }
 
-  def saveText(file: VirtualFile, text: String) = {
+  def saveText(file: VirtualFile, text: String): Unit = {
     writeAction(() => VfsUtil.saveText(file, text))
   }
 
@@ -64,7 +64,7 @@ object ComposerFixtures {
     file
   }
 
-  def createComposerJson(fixture: CodeInsightTestFixture, dir: String = ".") = {
+  def createComposerJson(fixture: CodeInsightTestFixture, dir: String = "."): VirtualFile = {
     val file = writeAction(
       () => fixture.getTempDirFixture.findOrCreateDir(dir).createChildData(this, composerJson.ComposerJson)
     )

@@ -43,7 +43,7 @@ class PhpReferenceTest extends CompletionTest {
     )
   }
 
-  def testCallbackReference_givenExistingClassAndMethod_referenceShouldBeFound() = {
+  def testCallbackReference_givenExistingClassAndMethod_referenceShouldBeFound(): Unit = {
     checkPhpReference(
       """
         |{
@@ -56,7 +56,7 @@ class PhpReferenceTest extends CompletionTest {
     )
   }
 
-  def testCallbackReference_givenArrayElement_givenExistingClassAndMethod_referenceShouldBeFound() = {
+  def testCallbackReference_givenArrayElement_givenExistingClassAndMethod_referenceShouldBeFound(): Unit = {
     checkPhpReference(
       """
         |{
@@ -69,7 +69,7 @@ class PhpReferenceTest extends CompletionTest {
     )
   }
 
-  def testCallbackReference_givenExistingClass_givenUnexistingMethod_referenceOnlyToClassShouldBeFound() = {
+  def testCallbackReference_givenExistingClass_givenUnexistingMethod_referenceOnlyToClassShouldBeFound(): Unit = {
     checkPhpReference(
       """
         |{
@@ -82,7 +82,7 @@ class PhpReferenceTest extends CompletionTest {
     )
   }
 
-  def testCallbackReference_givenUnexistingClass_referenceShouldNotBeFound() = {
+  def testCallbackReference_givenUnexistingClass_referenceShouldNotBeFound(): Unit = {
     checkPhpReference(
       """
         |{
@@ -95,7 +95,7 @@ class PhpReferenceTest extends CompletionTest {
     )
   }
 
-  def testCallbackReference_givenExistingClass_referenceShouldBeFound() = {
+  def testCallbackReference_givenExistingClass_referenceShouldBeFound(): Unit = {
     checkPhpReference(
       """
         |{
@@ -108,7 +108,7 @@ class PhpReferenceTest extends CompletionTest {
     )
   }
 
-  def testNamespaceReference_givenExistingNamespace_referenceShouldBeFound() = {
+  def testNamespaceReference_givenExistingNamespace_referenceShouldBeFound(): Unit = {
     checkPhpReference(
       """
         |{
@@ -123,7 +123,7 @@ class PhpReferenceTest extends CompletionTest {
     )
   }
 
-  def testNamespaceReference_givenExistingNamespace_givenPropertyIsIncomplete_referenceShouldBeFound() = {
+  def testNamespaceReference_givenExistingNamespace_givenPropertyIsIncomplete_referenceShouldBeFound(): Unit = {
     checkPhpReference(
       """
         |{
@@ -138,7 +138,7 @@ class PhpReferenceTest extends CompletionTest {
     )
   }
 
-  def testNamespaceReference_givenExistingNamespaceAsValue_referenceShouldNotBeFound() = {
+  def testNamespaceReference_givenExistingNamespaceAsValue_referenceShouldNotBeFound(): Unit = {
     checkPhpReference(
       """
         |{
@@ -153,7 +153,7 @@ class PhpReferenceTest extends CompletionTest {
     )
   }
 
-  def testCallbackSuggestion_givenClassPrefix_suggestMatchingClasses() = {
+  def testCallbackSuggestion_givenClassPrefix_suggestMatchingClasses(): Unit = {
     suggestions(
       """
         |{
@@ -167,7 +167,7 @@ class PhpReferenceTest extends CompletionTest {
     )
   }
 
-  def testCallbackSuggestion_givenMethodPrefix_suggestMatchingMethods() = {
+  def testCallbackSuggestion_givenMethodPrefix_suggestMatchingMethods(): Unit = {
     val className = "ComposerJson\\\\Example1\\\\ScriptHandler"
     suggestions(
       """
@@ -182,7 +182,7 @@ class PhpReferenceTest extends CompletionTest {
     )
   }
 
-  def testNamespaceSuggestion_givenEmptyPrefix_suggestTopLevelNamespaces() = {
+  def testNamespaceSuggestion_givenEmptyPrefix_suggestTopLevelNamespaces(): Unit = {
     suggestions(
       """
         |{
@@ -198,7 +198,7 @@ class PhpReferenceTest extends CompletionTest {
     )
   }
 
-  def testNamespaceSuggestion_givenPrefix_suggestTopLevelNamespaces() = {
+  def testNamespaceSuggestion_givenPrefix_suggestTopLevelNamespaces(): Unit = {
     suggestions(
       """
         |{
@@ -214,7 +214,7 @@ class PhpReferenceTest extends CompletionTest {
     )
   }
 
-  def testNamespaceSuggestion_givenTopLevelNamespace_suggestChildNamespaces() = {
+  def testNamespaceSuggestion_givenTopLevelNamespace_suggestChildNamespaces(): Unit = {
     suggestions(
       """
         |{
@@ -230,7 +230,7 @@ class PhpReferenceTest extends CompletionTest {
     )
   }
 
-  def testCallbackCompletion_givenPrefix_slashesShouldBeEscaped() = {
+  def testCallbackCompletion_givenPrefix_slashesShouldBeEscaped(): Unit = {
     completion(
       """
         |{
@@ -249,7 +249,7 @@ class PhpReferenceTest extends CompletionTest {
     )
   }
 
-  def testCallbackCompletion_givenClassAndMethodPrefix_methodShouldBeCompleted() = {
+  def testCallbackCompletion_givenClassAndMethodPrefix_methodShouldBeCompleted(): Unit = {
     completion(
       """
         |{
@@ -268,7 +268,7 @@ class PhpReferenceTest extends CompletionTest {
     )
   }
 
-  def testNamespaceCompletion_givenSecondLevelNamespacePrefix_slashesShouldBeEscaped() = {
+  def testNamespaceCompletion_givenSecondLevelNamespacePrefix_slashesShouldBeEscaped(): Unit = {
     completion(
       """
         |{

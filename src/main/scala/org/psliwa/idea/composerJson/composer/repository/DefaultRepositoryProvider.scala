@@ -34,7 +34,7 @@ class DefaultRepositoryProvider[Package](repositoryFactory: RepositoryFactory[Pa
     repositories.getOrElse(file, getRepositoryFromFactory(file))
   }
 
-  override def updateRepository(file: String, info: RepositoryInfo) = {
+  override def updateRepository(file: String, info: RepositoryInfo): Boolean = {
     val changed = !infos.get(file).contains(info)
 
     if (changed) {

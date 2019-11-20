@@ -4,7 +4,7 @@ import org.psliwa.idea.composerJson.intellij.codeAssist.CompletionTest
 
 class StructureSuggestionsTest extends CompletionTest {
 
-  def testSuggestionsOnTopLevel() = {
+  def testSuggestionsOnTopLevel(): Unit = {
     suggestions(
       """
         | {
@@ -15,7 +15,7 @@ class StructureSuggestionsTest extends CompletionTest {
     )
   }
 
-  def testSuggestionsOnTopLevelWithQuotes() = {
+  def testSuggestionsOnTopLevelWithQuotes(): Unit = {
     suggestions(
       """
         | {
@@ -26,7 +26,7 @@ class StructureSuggestionsTest extends CompletionTest {
     )
   }
 
-  def testSuggestionsOnTopLevelWithQuotes_givenPartialText() = {
+  def testSuggestionsOnTopLevelWithQuotes_givenPartialText(): Unit = {
     suggestions(
       """
         | {
@@ -38,7 +38,7 @@ class StructureSuggestionsTest extends CompletionTest {
     )
   }
 
-  def testSuggestionsOnTopLevelWithoutQuotes_givenPartialText() = {
+  def testSuggestionsOnTopLevelWithoutQuotes_givenPartialText(): Unit = {
     suggestions(
       """
         | {
@@ -50,7 +50,7 @@ class StructureSuggestionsTest extends CompletionTest {
     )
   }
 
-  def testEnumSuggestions() = {
+  def testEnumSuggestions(): Unit = {
     suggestions(
       """
         | {
@@ -62,7 +62,7 @@ class StructureSuggestionsTest extends CompletionTest {
     )
   }
 
-  def testEnumSuggestionsWithLandingColon() = {
+  def testEnumSuggestionsWithLandingColon(): Unit = {
     suggestions(
       """
         | {
@@ -74,7 +74,7 @@ class StructureSuggestionsTest extends CompletionTest {
     )
   }
 
-  def testEnumSuggestionsWithQuotes() = {
+  def testEnumSuggestionsWithQuotes(): Unit = {
     suggestions(
       """
         | {
@@ -86,7 +86,7 @@ class StructureSuggestionsTest extends CompletionTest {
     )
   }
 
-  def testEnumSuggestionsWithQuotesAndLandingColon() = {
+  def testEnumSuggestionsWithQuotesAndLandingColon(): Unit = {
     suggestions(
       """
         | {
@@ -98,7 +98,7 @@ class StructureSuggestionsTest extends CompletionTest {
     )
   }
 
-  def testNestedObjectSuggestions() = {
+  def testNestedObjectSuggestions(): Unit = {
     suggestions(
       """
         |{
@@ -112,7 +112,7 @@ class StructureSuggestionsTest extends CompletionTest {
     )
   }
 
-  def testOrSuggestions_firstAlternative() = {
+  def testOrSuggestions_firstAlternative(): Unit = {
     suggestions(
       """
         |{
@@ -123,7 +123,7 @@ class StructureSuggestionsTest extends CompletionTest {
     )
   }
 
-  def testOrSuggestions_secondAlternative() = {
+  def testOrSuggestions_secondAlternative(): Unit = {
     suggestions(
       """
         |{
@@ -136,7 +136,7 @@ class StructureSuggestionsTest extends CompletionTest {
     )
   }
 
-  def testBooleanSuggestions() = {
+  def testBooleanSuggestions(): Unit = {
     suggestions(
       """
         |{
@@ -147,7 +147,7 @@ class StructureSuggestionsTest extends CompletionTest {
     )
   }
 
-  def testArraySuggestions() = {
+  def testArraySuggestions(): Unit = {
     suggestions(
       """
         |{
@@ -162,7 +162,7 @@ class StructureSuggestionsTest extends CompletionTest {
     )
   }
 
-  def testSuggestions_doesNotSuggestAlreadyExistingProperty() = {
+  def testSuggestions_doesNotSuggestAlreadyExistingProperty(): Unit = {
     suggestions(
       """
         | {
@@ -175,7 +175,7 @@ class StructureSuggestionsTest extends CompletionTest {
     )
   }
 
-  def testObjectWithPatternProperties() = {
+  def testObjectWithPatternProperties(): Unit = {
     suggestions(
       """
         | {

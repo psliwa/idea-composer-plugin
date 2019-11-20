@@ -46,7 +46,7 @@ private[codeAssist] case class ConditionDuplicateIn(dependencyPropertyPath: Prop
 
 private[codeAssist] object Condition {
   import PsiExtractors._
-  def getValue(element: PsiElement) = {
+  def getValue(element: PsiElement): Option[Any] = {
     element match {
       case JsonStringLiteral(value) => Some(value)
       case JsonBooleanLiteral(value) => Some(value)

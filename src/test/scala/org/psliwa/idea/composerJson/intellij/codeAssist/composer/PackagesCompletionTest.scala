@@ -3,7 +3,7 @@ package org.psliwa.idea.composerJson.intellij.codeAssist.composer
 import org.psliwa.idea.composerJson.intellij.codeAssist.BaseLookupElement
 
 class PackagesCompletionTest extends AbstractPackagesTest {
-  def testPackageNameCompletion_versionQuotesShouldBeFixed() = {
+  def testPackageNameCompletion_versionQuotesShouldBeFixed(): Unit = {
     val contributor = getCompletionContributor
 
     val pkg = "symfony/symfony"
@@ -27,7 +27,7 @@ class PackagesCompletionTest extends AbstractPackagesTest {
     )
   }
 
-  def testPackageNameCompletion_startTypingWithoutQuotes_quotesShouldBeFixed() = {
+  def testPackageNameCompletion_startTypingWithoutQuotes_quotesShouldBeFixed(): Unit = {
     val contributor = getCompletionContributor
 
     val pkg = "symfony/symfony"
@@ -51,7 +51,7 @@ class PackagesCompletionTest extends AbstractPackagesTest {
     )
   }
 
-  def testVersionCompletion_givenPrefix_quotesShouldBeStillValid() = {
+  def testVersionCompletion_givenPrefix_quotesShouldBeStillValid(): Unit = {
     val pkg = "ps/image-optimizer"
 
     setCompletionPackageLoader(() => List(new BaseLookupElement(pkg)))
@@ -75,7 +75,7 @@ class PackagesCompletionTest extends AbstractPackagesTest {
     )
   }
 
-  def testVersionCompletion_givenPrefixWithSpace_completeVersion() = {
+  def testVersionCompletion_givenPrefixWithSpace_completeVersion(): Unit = {
     setCompletionVersionsLoader(_ => List("1.2.3"))
 
     completion(
@@ -96,7 +96,7 @@ class PackagesCompletionTest extends AbstractPackagesTest {
     )
   }
 
-  def testCompletionPackageVersion_givenPrefixWithSpaceAndTilda_completeVersion() = {
+  def testCompletionPackageVersion_givenPrefixWithSpaceAndTilda_completeVersion(): Unit = {
     setCompletionVersionsLoader(_ => List("1.2.3"))
 
     completion(
@@ -117,7 +117,7 @@ class PackagesCompletionTest extends AbstractPackagesTest {
     )
   }
 
-  def testVersionCompletion_givenPrefixWithComma_completeVersion() = {
+  def testVersionCompletion_givenPrefixWithComma_completeVersion(): Unit = {
     setCompletionVersionsLoader(_ => List("1.2.3"))
 
     completion(
@@ -138,7 +138,7 @@ class PackagesCompletionTest extends AbstractPackagesTest {
     )
   }
 
-  def testVersionCompletion_givenComparisonCharsRange_completeVersion() = {
+  def testVersionCompletion_givenComparisonCharsRange_completeVersion(): Unit = {
     setCompletionVersionsLoader(_ => List("1.2.3"))
 
     completion(
@@ -159,7 +159,7 @@ class PackagesCompletionTest extends AbstractPackagesTest {
     )
   }
 
-  def testVersionCompletion_givenVersionRange_completeFirstMember() = {
+  def testVersionCompletion_givenVersionRange_completeFirstMember(): Unit = {
     setCompletionVersionsLoader(_ => List("1.2.3"))
 
     completion(
@@ -180,7 +180,7 @@ class PackagesCompletionTest extends AbstractPackagesTest {
     )
   }
 
-  def testVersionCompletion_givenStability_completeStability() = {
+  def testVersionCompletion_givenStability_completeStability(): Unit = {
     setCompletionVersionsLoader(_ => List("1.2.3"))
 
     completion(
@@ -201,7 +201,7 @@ class PackagesCompletionTest extends AbstractPackagesTest {
     )
   }
 
-  def testVersionCompletion_givenRCStability_completeStability() = {
+  def testVersionCompletion_givenRCStability_completeStability(): Unit = {
     setCompletionVersionsLoader(_ => List("1.2.3"))
 
     completion(

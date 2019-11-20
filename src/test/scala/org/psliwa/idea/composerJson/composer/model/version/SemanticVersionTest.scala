@@ -1,7 +1,7 @@
 package org.psliwa.idea.composerJson.composer.model.version
 
 import org.psliwa.idea.composerJson.BasePropSpec
-import org.scalacheck.Prop.{forAll, BooleanOperators}
+import org.scalacheck.Prop.{forAll, propBoolean}
 import org.scalacheck.{Gen, Prop}
 
 import scala.util.Try
@@ -10,8 +10,8 @@ class SemanticVersionTest extends BasePropSpec {
 
   import VersionGenerators.SemanticVersion._
 
-  def minorOptionalPositive = minorOptional(g = positive, patchGen = patchOptional(positive))
-  def minorOptionalZero = minorOptional(g = Gen.const(0), patchGen = patchOptional(Gen.const(0)))
+  def minorOptionalPositive: Gen[Minor] = minorOptional(g = positive, patchGen = patchOptional(positive))
+  def minorOptionalZero: Gen[Minor] = minorOptional(g = Gen.const(0), patchGen = patchOptional(Gen.const(0)))
 
   property("constructor accepts zeros at beginning") {
     forAll(major, minorOptional(positiveZero)) { (major: Int, minor: Minor) =>
@@ -47,7 +47,7 @@ class SemanticVersionTest extends BasePropSpec {
 
       decremented.isDefined &&
       decremented.get.incrementLast == original
-    } && forAll(minorOptionalZero) { (minor: Minor) =>
+    } && forAll(minorOptionalZero) { minor: Minor =>
       val original = SemanticVersion(0, minor)
       val decremented = original.decrementLast
 
@@ -132,7 +132,7 @@ class SemanticVersionTest extends BasePropSpec {
   }
 
   property("do not drop zero when major is zero and minor is missing") {
-    forAll(positiveZero) { (major: Int) =>
+    forAll(positiveZero) { major: Int =>
       val original = SemanticVersion(major, None)
       val updated = original.dropZeros
 
@@ -183,6 +183,6 @@ class SemanticVersionTest extends BasePropSpec {
   //util functions
 
   def parts(version: SemanticVersion): List[Int] = version.major :: version.minor.toList ++ version.patch
-  def last(a: SemanticVersion) = parts(a).last
+  def last(a: SemanticVersion): Int = parts(a).last
 
 }

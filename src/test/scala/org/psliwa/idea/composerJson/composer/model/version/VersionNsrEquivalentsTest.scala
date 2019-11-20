@@ -3,7 +3,7 @@ package org.psliwa.idea.composerJson.composer.model.version
 import org.psliwa.idea.composerJson.BasePropSpec
 import org.psliwa.idea.composerJson.composer.model.version.{VersionGenerators => gen}
 import org.scalacheck.{Gen, Prop}
-import org.scalacheck.Prop.{forAll, BooleanOperators}
+import org.scalacheck.Prop.{forAll, propBoolean}
 
 import scala.language.implicitConversions
 
@@ -12,7 +12,7 @@ class VersionNsrEquivalentsTest extends BasePropSpec {
   def semanticVersionGen: Gen[SemanticConstraint] = gen.semanticVersion(size = 3)
 
   property("pure semantic versions should not have equivalents") {
-    forAll(semanticVersionGen) { (version: Constraint) =>
+    forAll(semanticVersionGen) { version: Constraint =>
       equivalentsFor(version).isEmpty
     }
   }
@@ -39,7 +39,7 @@ class VersionNsrEquivalentsTest extends BasePropSpec {
 
     rangeVersion match {
       case LogicalConstraint(
-          List(OperatorConstraint(>=, SemanticConstraint(start), _), OperatorConstraint(<, SemanticConstraint(end), _)),
+          List(OperatorConstraint(_, SemanticConstraint(start), _), OperatorConstraint(_, SemanticConstraint(end), _)),
           AND,
           _
           ) =>
@@ -68,22 +68,22 @@ class VersionNsrEquivalentsTest extends BasePropSpec {
   }
 
   private def equivalentsFor(constraint: Constraint) = VersionEquivalents.equivalentsFor(constraint)
-  def last(a: SemanticVersion) = (a.patch.toList ++ a.minor.toList ++ List(a.major)).head
+  def last(a: SemanticVersion): Int = (a.patch.toList ++ a.minor.toList ++ List(a.major)).head
   case class Range[T <: Ordered[T]](start: T, end: T) {
     def contains(value: T): Boolean = value >= start && value < end
   }
 
   implicit class SemanticVersionOps(val version: SemanticVersion) {
-    def `[*.*.*]` = version.ensureExactlyParts(3)
-    def `[*.*]` = version.ensureExactlyParts(2)
-    def `[*]` = version.ensureExactlyParts(1)
-    def `[*.]` = version.ensureParts(1)
-    def `[*.*.]` = version.ensureParts(2)
+    def `[*.*.*]` : SemanticVersion = version.ensureExactlyParts(3)
+    def `[*.*]` : SemanticVersion = version.ensureExactlyParts(2)
+    def `[*]` : SemanticVersion = version.ensureExactlyParts(1)
+    def `[*.]` : SemanticVersion = version.ensureParts(1)
+    def `[*.*.]` : SemanticVersion = version.ensureParts(2)
 
-    def `[*]?` = version.partsNumber == 1
-    def `[*.*]?` = version.partsNumber == 2
-    def `[*.*.]?` = version.partsNumber >= 2
-    def `[*.*.*]?` = version.partsNumber == 3
+    def `[*]?` : Boolean = version.partsNumber == 1
+    def `[*.*]?` : Boolean = version.partsNumber == 2
+    def `[*.*.]?` : Boolean = version.partsNumber >= 2
+    def `[*.*.*]?` : Boolean = version.partsNumber == 3
   }
 
   implicit def unwrapSemanticVersion(wrapper: SemanticVersionOps): SemanticVersion = wrapper.version

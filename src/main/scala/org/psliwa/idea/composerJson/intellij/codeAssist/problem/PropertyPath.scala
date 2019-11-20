@@ -10,7 +10,7 @@ import scala.annotation.tailrec
   * "*" char can be used as wildcard
   */
 private[codeAssist] case class PropertyPath(headProperty: String, tailProperties: List[String]) {
-  def /(property: String) = copy(tailProperties = tailProperties ++ List(property))
+  def /(property: String): PropertyPath = copy(tailProperties = tailProperties ++ List(property))
 
   lazy val lastProperty: String = (headProperty :: tailProperties).last
 }

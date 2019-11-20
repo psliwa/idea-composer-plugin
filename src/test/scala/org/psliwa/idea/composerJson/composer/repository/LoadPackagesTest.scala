@@ -6,7 +6,7 @@ import org.junit.Test
 class LoadPackagesTest {
 
   @Test
-  def loadJsonFromPackagist_shouldBeLoaded() = {
+  def loadJsonFromPackagist_shouldBeLoaded(): Unit = {
     val result = Packagist.loadPackagesFromPackagist(Packagist.defaultUrl)
 
     assertFalse(result.isFailure)
@@ -14,7 +14,7 @@ class LoadPackagesTest {
   }
 
   @Test
-  def loadJsonFromPackagist_givenInvalidIri_expectedError() = {
+  def loadJsonFromPackagist_givenInvalidIri_expectedError(): Unit = {
     val result = Packagist.loadUri(Packagist.defaultUrl)("some/invalid/uri.json")
 
     assertTrue(result.isFailure)

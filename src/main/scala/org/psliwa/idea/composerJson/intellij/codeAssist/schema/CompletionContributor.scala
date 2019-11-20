@@ -25,11 +25,14 @@ class CompletionContributor extends AbstractCompletionContributor {
     case _ => List()
   }
 
-  override protected def propertyCompletionProvider(parent: Capture, properties: Map[String, Property]) = {
+  override protected def propertyCompletionProvider(
+      parent: Capture,
+      properties: Map[String, Property]
+  ): List[(Capture, CompletionProvider[CompletionParameters])] = {
     propertyCompletionProvider(
       parent,
       (_: CompletionParameters) => properties.map(x => new BaseLookupElement(x._1, description = x._2.description)),
-      k => insertHandlerFor(properties.get(k.name).get.schema)
+      k => insertHandlerFor(properties(k.name).schema)
     )
   }
 

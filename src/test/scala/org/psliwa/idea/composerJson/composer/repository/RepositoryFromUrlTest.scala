@@ -11,7 +11,7 @@ import scala.util.Try
 class RepositoryFromUrlTest {
 
   @Test
-  def givenValidUrl_givenValidJsonData_shouldCreateValidRepository() = {
+  def givenValidUrl_givenValidJsonData_shouldCreateValidRepository(): Unit = {
 
     //given
 
@@ -33,7 +33,7 @@ class RepositoryFromUrlTest {
   }
 
   @Test
-  def givenInvalidUrl_shouldCreateEmptyRepository() = {
+  def givenInvalidUrl_shouldCreateEmptyRepository(): Unit = {
     //given
 
     val load = loadUrl(Map()) _
@@ -50,7 +50,7 @@ class RepositoryFromUrlTest {
   }
 
   @Test
-  def givenIncludesInContents_includesShouldAlsoBeLoaded() = {
+  def givenIncludesInContents_includesShouldAlsoBeLoaded(): Unit = {
 
     //given
 
@@ -60,8 +60,8 @@ class RepositoryFromUrlTest {
     val content = "some-content"
     val includeContent = "some-include-content"
 
-    val repositoryPackages = new RepositoryPackages(Map("package" -> List("1.0.0")), List(includePath))
-    val includeRepositoryPackages = new RepositoryPackages(Map("package2" -> List("2.0.0")), List())
+    val repositoryPackages = RepositoryPackages(Map("package" -> List("1.0.0")), List(includePath))
+    val includeRepositoryPackages = RepositoryPackages(Map("package2" -> List("2.0.0")), List())
 
     val load = loadUrl(Map(url -> content, rootUrl + "/" + includePath -> includeContent)) _
     val parse = parsePackages(Map(content -> repositoryPackages, includeContent -> includeRepositoryPackages)) _
@@ -77,7 +77,7 @@ class RepositoryFromUrlTest {
   }
 
   @Test
-  def givenNestedIncludesInContents_includesShouldAlsoBeLoaded() = {
+  def givenNestedIncludesInContents_includesShouldAlsoBeLoaded(): Unit = {
     //given
 
     val rootUrl = "http://some-url.com"
@@ -130,10 +130,10 @@ class RepositoryFromUrlTest {
   }
 
   private def loadUrl(contents: Map[String, String])(url: String): Try[String] = {
-    Try { contents.get(url).get }
+    Try { contents(url) }
   }
 
   private def parsePackages(results: Map[String, RepositoryPackages])(data: String): Try[RepositoryPackages] = {
-    Try { results.get(data).get }
+    Try { results(data) }
   }
 }

@@ -19,7 +19,7 @@ private class PackageInfoCaretListener(packagesInfoMap: Map[String, List[Package
     }
   }
 
-  private def caretPositionChanged(editor: EditorEx, position: LogicalPosition) = {
+  private def caretPositionChanged(editor: EditorEx, position: LogicalPosition): Unit = {
     val color = editor.getColorsScheme.getAttributes(JsonSyntaxHighlighterFactory.JSON_BLOCK_COMMENT).getForegroundColor
     val font = editor.getColorsScheme.getFont(EditorFontType.CONSOLE_ITALIC)
 
@@ -37,7 +37,7 @@ private class PackageInfoCaretListener(packagesInfoMap: Map[String, List[Package
     }
   }
 
-  private def removeOverlays(editor: EditorEx) = {
+  private def removeOverlays(editor: EditorEx): Unit = {
     editor.getContentComponent.getComponents.collect {
       case overlay: PackageInfoOverlayView => overlay
     } foreach editor.getContentComponent.remove

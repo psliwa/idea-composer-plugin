@@ -5,17 +5,17 @@ import org.junit.Test
 
 class FormatTest {
   @Test
-  def givenValidUrl_itShouldBeValidUri() = {
+  def givenValidUrl_itShouldBeValidUri(): Unit = {
     assertTrue(UriFormat.isValid("http://somevalid.url.com/some?query=123"))
   }
 
   @Test
-  def givenInvalidUrl_itShouldBeInvalidUri() = {
+  def givenInvalidUrl_itShouldBeInvalidUri(): Unit = {
     assertFalse(UriFormat.isValid("invalid url"))
   }
 
   @Test
-  def givenEmails_checkTheyValidity() = {
+  def givenEmails_checkTheyValidity(): Unit = {
     val emails = List(
       "me@psliwa.org" -> true,
       "some+123@gmail.com" -> true,

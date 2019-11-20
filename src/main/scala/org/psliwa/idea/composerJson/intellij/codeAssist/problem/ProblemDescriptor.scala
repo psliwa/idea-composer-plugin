@@ -11,7 +11,7 @@ private[codeAssist] case class ProblemDescriptor[QuickFix](
     private val maybeRange: Option[TextRange] = None,
     highlightType: ProblemHighlightType = ProblemHighlightType.GENERIC_ERROR_OR_WARNING
 ) {
-  lazy val range = maybeRange.getOrElse(element.getTextRange)
+  lazy val range: TextRange = maybeRange.getOrElse(element.getTextRange)
 }
 
 private[codeAssist] object ProblemDescriptor {

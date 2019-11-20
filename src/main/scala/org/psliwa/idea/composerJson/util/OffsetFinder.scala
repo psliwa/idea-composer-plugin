@@ -4,8 +4,8 @@ import scala.annotation.tailrec
 import scala.language.implicitConversions
 
 case class Matcher[A](is: A => Boolean) {
-  def &&(matcher: Matcher[A]) = Matcher[A](t => is(t) && matcher.is(t))
-  def ||(matcher: Matcher[A]) = Matcher[A](t => is(t) || matcher.is(t))
+  def &&(matcher: Matcher[A]): Matcher[A] = Matcher[A](t => is(t) && matcher.is(t))
+  def ||(matcher: Matcher[A]): Matcher[A] = Matcher[A](t => is(t) || matcher.is(t))
 }
 
 trait OffsetFinder[Haystack, A] {
@@ -14,7 +14,7 @@ trait OffsetFinder[Haystack, A] {
   protected def reverseStop(haystack: Haystack)(offset: Int): Boolean
   protected def objectAt(haystack: Haystack, offset: Int): A
 
-  def not(matcher: Matcher[A]) = Matcher[A](!matcher.is(_))
+  def not(matcher: Matcher[A]): Matcher[A] = Matcher[A](!matcher.is(_))
 
   def findOffset(matchers: Matcher[A]*)(offset: Int)(implicit haystack: Haystack): Option[Int] = {
     findOffset(Matcher[A](c => matchers.exists(_ is c)))(offset)
@@ -42,11 +42,11 @@ trait OffsetFinder[Haystack, A] {
     loop(offset)
   }
 
-  def findOffsetReverse(expectedMatcher: Matcher[A])(offset: Int)(implicit haystack: Haystack) = {
+  def findOffsetReverse(expectedMatcher: Matcher[A])(offset: Int)(implicit haystack: Haystack): Option[Int] = {
     findOffset(reverseStop(haystack) _, -1)(expectedMatcher)(offset)
   }
 
-  def ensure(s: Matcher[A]*)(offset: Int)(implicit haystack: Haystack) = {
+  def ensure(s: Matcher[A]*)(offset: Int)(implicit haystack: Haystack): Option[A] = {
     val obj = objectAt(haystack, offset)
 
     if (s.exists(_ is obj)) Some(obj)

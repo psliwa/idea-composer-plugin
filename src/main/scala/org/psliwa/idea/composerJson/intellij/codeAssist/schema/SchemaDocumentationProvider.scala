@@ -5,6 +5,7 @@ import java.util
 import com.intellij.lang.documentation.DocumentationProvider
 import com.intellij.psi.{PsiElement, PsiManager}
 import com.intellij.patterns.PlatformPatterns._
+import com.intellij.patterns.PsiElementPattern
 import org.psliwa.idea.composerJson.json.{Property, SArray, SObject, Schema}
 import org.psliwa.idea.composerJson._
 
@@ -34,11 +35,7 @@ class SchemaDocumentationProvider extends DocumentationProvider {
   }
 
   private def ensureInValidFile(element: PsiElement): Option[PsiElement] = {
-    if (pattern.accepts(element)) {
-      Some(element)
-    } else {
-      None
-    }
+    Some(element).filter(pattern.accepts)
   }
 
   override def generateDoc(element: PsiElement, originalElement: PsiElement): String = {
@@ -54,19 +51,17 @@ class SchemaDocumentationProvider extends DocumentationProvider {
 
     def loop(tokens: List[SchemaToken], schema: Schema): Option[Property] = {
       schema match {
-        case SObject(properties, _) => {
+        case SObject(properties, _) =>
           tokens match {
             case PropertyToken(name) :: Nil => properties.get(name)
             case PropertyToken(name) :: t => properties.get(name).map(_.schema).flatMap(loop(t, _))
             case _ => None
           }
-        }
-        case SArray(child) => {
+        case SArray(child) =>
           tokens match {
             case ArrayToken() :: t => loop(t, child)
             case _ => None
           }
-        }
         case _ => None
       }
     }
@@ -77,6 +72,7 @@ class SchemaDocumentationProvider extends DocumentationProvider {
   private def findTokens(element: PsiElement): List[SchemaToken] = {
     import org.psliwa.idea.composerJson.intellij.PsiExtractors._
 
+    @scala.annotation.tailrec
     def loop(element: PsiElement, tokens: List[SchemaToken]): List[SchemaToken] = {
       element match {
         case JsonArray(_) => loop(element.getParent, ArrayToken() :: tokens)
@@ -93,7 +89,8 @@ class SchemaDocumentationProvider extends DocumentationProvider {
 private object SchemaDocumentationProvider {
   import com.intellij.json.psi.JsonFile
 
-  val pattern = psiElement().inFile(psiFile(classOf[JsonFile]).withName(ComposerJson))
+  val pattern: PsiElementPattern.Capture[PsiElement] =
+    psiElement().inFile(psiFile(classOf[JsonFile]).withName(ComposerJson))
 
   sealed private trait SchemaToken
   private case class PropertyToken(name: String) extends SchemaToken

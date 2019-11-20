@@ -7,7 +7,7 @@ import org.psliwa.idea.composerJson.intellij.codeAssist.CompletionTest
 
 class FilePathReferenceTest extends CompletionTest {
 
-  def testGivenFileInArrayOfFilePaths_referenceShouldBeCreated() = {
+  def testGivenFileInArrayOfFilePaths_referenceShouldBeCreated(): Unit = {
     val file = "file.txt"
 
     checkFileReference(file, s"""
@@ -17,7 +17,7 @@ class FilePathReferenceTest extends CompletionTest {
       """.stripMargin)
   }
 
-  def testGivenFileInFilePathsObject_referenceShouldBeCreated() = {
+  def testGivenFileInFilePathsObject_referenceShouldBeCreated(): Unit = {
     val file = "file.txt"
 
     checkFileReference(
@@ -34,7 +34,7 @@ class FilePathReferenceTest extends CompletionTest {
     )
   }
 
-  def testGivenFileInArrayInFilePathsObject_referenceShouldBeCreated() = {
+  def testGivenFileInArrayInFilePathsObject_referenceShouldBeCreated(): Unit = {
     val file = "file.txt"
 
     checkFileReference(
@@ -51,7 +51,7 @@ class FilePathReferenceTest extends CompletionTest {
     )
   }
 
-  def testGivenNonFilePathProperty_referenceShouldNotBeCreated() = {
+  def testGivenNonFilePathProperty_referenceShouldNotBeCreated(): Unit = {
     val file = "file.txt"
 
     checkEmptyFileReferences(file, s"""
@@ -61,7 +61,7 @@ class FilePathReferenceTest extends CompletionTest {
       """.stripMargin)
   }
 
-  def testGivenRequireProperty_referenceToVendorDirShouldBeCreated() = {
+  def testGivenRequireProperty_referenceToVendorDirShouldBeCreated(): Unit = {
     writeAction(() => {
       myFixture.getTempDirFixture
         .findOrCreateDir("vendor")

@@ -34,14 +34,14 @@ private object CreateFilesystemItemQuickFix {
   }
 
   private class CreateDirectoryQuickFix(element: JsonStringLiteral) extends CreateFilesystemItemQuickFix(element) {
-    override def getText = ComposerBundle.message("inspection.quickfix.createDirectory", getPath)
+    override def getText: String = ComposerBundle.message("inspection.quickfix.createDirectory", getPath)
 
     override def createLeafItem(directory: PsiDirectory, s: String): Either[String, PsiFileSystemItem] =
       tryCreateDir(directory, s)
   }
 
   private class CreateFileQuickFix(element: JsonStringLiteral) extends CreateFilesystemItemQuickFix(element) {
-    override def getText = ComposerBundle.message("inspection.quickfix.createFile", getPath)
+    override def getText: String = ComposerBundle.message("inspection.quickfix.createFile", getPath)
     override def createLeafItem(directory: PsiDirectory, s: String): Either[String, PsiFileSystemItem] =
       tryCreateFile(directory, s)
   }
@@ -66,7 +66,7 @@ private object CreateFilesystemItemQuickFix {
               case None => Left(ComposerBundle.message("inspection.quickfix.filepathCannotBeCreated", getPath))
             }
           case "." :: t => createFilePath(dir, t)
-          case h :: t => {
+          case h :: t =>
             val subDir = Option(dir.findSubdirectory(h))
               .map(Right(_))
               .getOrElse(tryCreateDir(dir, h))
@@ -75,7 +75,6 @@ private object CreateFilesystemItemQuickFix {
               case Right(x) => createFilePath(x, t)
               case _ => subDir
             }
-          }
           case Nil => Right(dir)
         }
       }
@@ -83,13 +82,13 @@ private object CreateFilesystemItemQuickFix {
       createFilePath(dir, getPath.split("/").filter(!_.isEmpty).toList).left
         .map(notifyError)
         .right
-        .filter(_ => !isUnitTestMode)
-        .foreach(_.right.foreach(navigateTo))
+        .filterToOption(_ => !isUnitTestMode)
+        .foreach(_.foreach(navigateTo))
     }
 
     private def isUnitTestMode = ApplicationManager.getApplication.isUnitTestMode
 
-    private def notifyError(error: String) = {
+    private def notifyError(error: String): Unit = {
       Notifications.Bus.notify(
         new Notification(
           errorNotificationDisplayGroupId,
@@ -106,6 +105,6 @@ private object CreateFilesystemItemQuickFix {
 
     override def getFamilyName: String = ComposerBundle.message("inspection.group")
 
-    protected def getPath = element.getTextFragments.asScala.map(_.second).mkString("")
+    protected def getPath: String = element.getTextFragments.asScala.map(_.second).mkString("")
   }
 }

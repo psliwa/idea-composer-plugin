@@ -12,6 +12,6 @@ private class ComposedRepository[Package](repositories: List[Repository[Package]
       .flatMap(_.getPackageVersions(packageName))
   }
 
-  override def map[NewPackage](f: (Package) => NewPackage): Repository[NewPackage] =
+  override def map[NewPackage](f: Package => NewPackage): Repository[NewPackage] =
     new ComposedRepository(repositories.map(_ map f))
 }

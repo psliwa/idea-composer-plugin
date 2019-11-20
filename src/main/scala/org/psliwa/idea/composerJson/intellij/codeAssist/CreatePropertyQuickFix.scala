@@ -74,6 +74,7 @@ private class CreatePropertyQuickFix(element: PsiElement, propertyName: String, 
   private def getEndOffset(element: PsiElement) = element.getTextRange.getEndOffset
   private def findTrailingComma(element: PsiElement): Option[LeafPsiElement] =
     findNextComma(element.getNode.getTreeNext)
+  @scala.annotation.tailrec
   private def findNextComma(node: ASTNode): Option[LeafPsiElement] = {
     node match {
       case PsiExtractors.PsiWhiteSpace(()) => findNextComma(node.getTreeNext)

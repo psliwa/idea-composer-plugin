@@ -7,7 +7,7 @@ import org.psliwa.idea.composerJson.composer.model.PackageName
 class LoadVersionsTest {
 
   @Test
-  def loadFromPackagist_givenValidPackage_expectSomeVersions() = {
+  def loadFromPackagist_givenValidPackage_expectSomeVersions(): Unit = {
     val result = Packagist.loadVersions(Packagist.defaultUrl)(PackageName("symfony/symfony"))
 
     assertTrue(result.isSuccess)
@@ -15,7 +15,7 @@ class LoadVersionsTest {
   }
 
   @Test
-  def loadFromPackagist_givenInvalidPackage_expectError() = {
+  def loadFromPackagist_givenInvalidPackage_expectError(): Unit = {
     val result =
       Packagist.loadVersions(Packagist.defaultUrl)(PackageName("some-unexisting-vendor/some-unexisting-package-123"))
 

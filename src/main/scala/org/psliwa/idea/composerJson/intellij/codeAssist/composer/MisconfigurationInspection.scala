@@ -78,7 +78,7 @@ class MisconfigurationInspection extends AbstractInspection {
     ProblemChecker(
       ("autoload" / "psr-0" / "") || ("autoload" / "psr-4" / ""),
       ComposerBundle.message("inspection.misconfig.emptyPsrNamespace"),
-      (jsonObject, _) => List.empty
+      (_, _) => List.empty
     ),
     ProblemChecker(
       "require" / "*" matches "#".r,
@@ -128,8 +128,8 @@ class MisconfigurationInspection extends AbstractInspection {
     ComposerBundle.message("inspection.misconfig.requiredForLibrary", property),
     (jsonObject, _) =>
       List(
-        new CreatePropertyQuickFix(jsonObject, property, new SString()),
-        new SetPropertyValueQuickFix(jsonObject, "type", new SString(), "project")
+        new CreatePropertyQuickFix(jsonObject, property, SString()),
+        new SetPropertyValueQuickFix(jsonObject, "type", SString(), "project")
       ),
     ProblemHighlightType.GENERIC_ERROR
   )

@@ -48,7 +48,7 @@ private class PhpCallbackReference(element: JsonStringLiteral)
       phpIndex
         .getClassesByFQN(className)
         .asScala
-        .toStream
+        .to(LazyList)
         .flatMap(cls => cls.getMethods.asScala)
         .filter(method => method.getAccess.isPublic && method.isStatic && !method.isAbstract)
         .filter(method => methodMatcher.prefixMatches(method.getName))
@@ -58,7 +58,7 @@ private class PhpCallbackReference(element: JsonStringLiteral)
       phpIndex
         .getAllClassNames(classMatcher)
         .asScala
-        .toStream
+        .to(LazyList)
         .flatMap(className => Option(phpIndex.getClassByName(className)).toList)
         .filter(cls => !cls.isAbstract && !cls.isInterface && !cls.isInterface)
         .filter(_.hasStaticMembers)
@@ -73,7 +73,8 @@ private class PhpCallbackReference(element: JsonStringLiteral)
 }
 
 private object PhpCallbackReference {
-  lazy val MethodStubIndexKey = StubIndexKey.createIndexKey("org.psliwa.idea.composerJson.phpMethod")
+  lazy val MethodStubIndexKey: StubIndexKey[Nothing, Nothing] =
+    StubIndexKey.createIndexKey("org.psliwa.idea.composerJson.phpMethod")
   private[php] val ComposerEventTypes = List(
     "\\Composer\\EventDispatcher\\Event",
     "\\Composer\\Script\\Event",

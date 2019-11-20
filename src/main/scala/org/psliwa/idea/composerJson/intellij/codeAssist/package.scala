@@ -13,7 +13,7 @@ package object codeAssist {
 
   type Capture = PsiElementPattern.Capture[_ <: PsiElement]
   private[codeAssist] type InsertHandlerFinder = BaseLookupElement => Option[InsertHandler[LookupElement]]
-  private[codeAssist] type LookupElements = (CompletionParameters) => Iterable[BaseLookupElement]
+  private[codeAssist] type LookupElements = CompletionParameters => Iterable[BaseLookupElement]
 
   private val autoPopupCondition = (context: InsertionContext) => {
     val text = context.getEditor.getDocument.getCharsSequence

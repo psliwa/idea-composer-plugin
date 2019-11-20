@@ -11,11 +11,10 @@ private class CharContainsMatcher(prefix: String) extends PrefixMatcher(prefix) 
     def loop(prefix: String, name: String): Boolean = {
       prefix match {
         case "" => true
-        case _ => {
+        case _ =>
           val index = name.indexOf(prefix.head)
           if (index >= 0) loop(prefix.tail, name.substring(index + 1))
           else false
-        }
       }
     }
 

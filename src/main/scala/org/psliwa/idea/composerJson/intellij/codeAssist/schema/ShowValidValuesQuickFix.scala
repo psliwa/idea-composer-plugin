@@ -15,7 +15,7 @@ private class ShowValidValuesQuickFix(element: JsonStringLiteral) extends LocalQ
 
   override def invoke(project: Project, file: PsiFile, startElement: PsiElement, endElement: PsiElement): Unit = {
     for {
-      document <- documentFor(project, file)
+      _ <- documentFor(project, file)
       editor <- editorFor(project)
     } yield {
       val range = element.getTextRange

@@ -9,7 +9,7 @@ import scala.language.implicitConversions
 class SchemaTest {
 
   @Test
-  def parseEmptyObject() = {
+  def parseEmptyObject(): Unit = {
     assertSchemaEquals(
       new SObject(Map[String, Property](), true),
       Schema.parse(
@@ -24,7 +24,7 @@ class SchemaTest {
   }
 
   @Test
-  def parseEmptyObject_additionalPropertiesAreNotAllowed() = {
+  def parseEmptyObject_additionalPropertiesAreNotAllowed(): Unit = {
     assertSchemaEquals(
       new SObject(Map[String, Property](), false),
       Schema.parse(
@@ -40,7 +40,7 @@ class SchemaTest {
   }
 
   @Test
-  def parseSchemaWithOnlyScalarValues() = {
+  def parseSchemaWithOnlyScalarValues(): Unit = {
     assertSchemaEquals(
       new SObject(
         Map[String, Property](
@@ -63,7 +63,7 @@ class SchemaTest {
   }
 
   @Test
-  def parseSchemaWithRequiredAndDescribedProperties() = {
+  def parseSchemaWithRequiredAndDescribedProperties(): Unit = {
     assertSchemaEquals(
       new SObject(
         Map(
@@ -82,7 +82,7 @@ class SchemaTest {
   }
 
   @Test
-  def parseSchemaWithScalarArrayValues() = {
+  def parseSchemaWithScalarArrayValues(): Unit = {
     assertSchemaEquals(
       new SObject(
         Map[String, Property](
@@ -116,7 +116,7 @@ class SchemaTest {
   }
 
   @Test
-  def parseStringSchemaWithFormat() = {
+  def parseStringSchemaWithFormat(): Unit = {
     assertSchemaEquals(
       new SObject(
         Map[String, Property](
@@ -137,7 +137,7 @@ class SchemaTest {
   }
 
   @Test
-  def parseSchemaWithNestedArrayValues() = {
+  def parseSchemaWithNestedArrayValues(): Unit = {
     assertSchemaEquals(
       new SObject(
         Map[String, Property](
@@ -175,7 +175,7 @@ class SchemaTest {
     )
   }
   @Test
-  def parseSchemaWithArrayOfObjects() = {
+  def parseSchemaWithArrayOfObjects(): Unit = {
     assertSchemaEquals(
       new SObject(
         Map[String, Property](
@@ -212,7 +212,7 @@ class SchemaTest {
   }
 
   @Test
-  def parseSchemaWithStringChoice() = {
+  def parseSchemaWithStringChoice(): Unit = {
     assertSchemaEquals(
       new SObject(
         Map[String, Property](
@@ -235,7 +235,7 @@ class SchemaTest {
   }
 
   @Test
-  def parseSchemaWithOr() = {
+  def parseSchemaWithOr(): Unit = {
     assertSchemaEquals(
       new SObject(
         Map[String, Property](
@@ -261,7 +261,7 @@ class SchemaTest {
   }
 
   @Test
-  def parseSchemaWithInlineOr() = {
+  def parseSchemaWithInlineOr(): Unit = {
     assertSchemaEquals(
       new SObject(
         Map[String, Property](
@@ -284,7 +284,7 @@ class SchemaTest {
   }
 
   @Test
-  def parseSchemaWithWildcardObject() = {
+  def parseSchemaWithWildcardObject(): Unit = {
     assertSchemaEquals(
       new SObject(Map[String, Property]()),
       Schema.parse(
@@ -296,7 +296,7 @@ class SchemaTest {
   }
 
   @Test
-  def parseSchemaWithWildcardArray() = {
+  def parseSchemaWithWildcardArray(): Unit = {
     assertSchemaEquals(
       new SObject(
         Map[String, Property](
@@ -317,7 +317,7 @@ class SchemaTest {
   }
 
   @Test
-  def parsePackagesType() = {
+  def parsePackagesType(): Unit = {
     assertSchemaEquals(
       new SObject(
         Map[String, Property](
@@ -338,7 +338,7 @@ class SchemaTest {
   }
 
   @Test
-  def givenSchemaIsInvalid_expectNone() = {
+  def givenSchemaIsInvalid_expectNone(): Unit = {
     assertEquals(None,
                  Schema.parse(
                    """
@@ -348,7 +348,7 @@ class SchemaTest {
   }
 
   @Test
-  def parseSchemaWithPathProperty() = {
+  def parseSchemaWithPathProperty(): Unit = {
     assertSchemaEquals(
       new SObject(
         Map[String, Property](
@@ -369,7 +369,7 @@ class SchemaTest {
   }
 
   @Test
-  def parseSchemaWithPathProperty_filePathCouldNotExist() = {
+  def parseSchemaWithPathProperty_filePathCouldNotExist(): Unit = {
     assertSchemaEquals(
       new SObject(
         Map[String, Property](
@@ -390,7 +390,7 @@ class SchemaTest {
   }
 
   @Test
-  def parseSchemaWithRefs_refsShouldBeResolved() = {
+  def parseSchemaWithRefs_refsShouldBeResolved(): Unit = {
     assertSchemaEquals(
       new SObject(
         Map[String, Property](
@@ -425,7 +425,7 @@ class SchemaTest {
   }
 
   @Test
-  def parseSchemaWithRefs_givenInvalidRef_parsingShouldFail() = {
+  def parseSchemaWithRefs_givenInvalidRef_parsingShouldFail(): Unit = {
     assertEquals(
       None,
       Schema.parse(
@@ -451,7 +451,7 @@ class SchemaTest {
   }
 
   @Test
-  def parseObjectSchema_givenEnumRef_expectedValidObject() = {
+  def parseObjectSchema_givenEnumRef_expectedValidObject(): Unit = {
     assertSchemaEquals(
       new SObject(
         Map[String, Property](
@@ -475,7 +475,7 @@ class SchemaTest {
   }
 
   @Test
-  def parseObjectSchema_givenPatternProperties_expectObjectWithPatternProperties() = {
+  def parseObjectSchema_givenPatternProperties_expectObjectWithPatternProperties(): Unit = {
     assertSchemaEquals(
       SObject(new Properties(Map(), Map("(.*)".r -> Property(SString(), required = false, "")))),
       Schema.parse(
@@ -491,5 +491,5 @@ class SchemaTest {
     )
   }
 
-  def assertSchemaEquals(expected: Schema, actual: Option[Schema]) = assertEquals(Some(expected), actual)
+  def assertSchemaEquals(expected: Schema, actual: Option[Schema]): Unit = assertEquals(Some(expected), actual)
 }

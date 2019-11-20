@@ -108,7 +108,7 @@ class PhpInspectionTest extends InspectionTest {
     )
   }
 
-  def testCallbackValidity_givenMethodIsPrivate_isShouldBeReported() = {
+  def testCallbackValidity_givenMethodIsPrivate_isShouldBeReported(): Unit = {
     checkInspection(
       """
         |{
@@ -120,7 +120,7 @@ class PhpInspectionTest extends InspectionTest {
     )
   }
 
-  def testCallbackValidity_givenMethodIsNotStatic_isShouldBeReported() = {
+  def testCallbackValidity_givenMethodIsNotStatic_isShouldBeReported(): Unit = {
     checkInspection(
       """
         |{
@@ -132,7 +132,7 @@ class PhpInspectionTest extends InspectionTest {
     )
   }
 
-  def testCallbackValidity_givenMethodHasInvalidArgumentType_isShouldBeReported() = {
+  def testCallbackValidity_givenMethodHasInvalidArgumentType_isShouldBeReported(): Unit = {
     checkInspection(
       """
         |{
@@ -144,7 +144,7 @@ class PhpInspectionTest extends InspectionTest {
     )
   }
 
-  def testCallbackValidity_givenMethodHasTooManyArgs_isShouldBeReported() = {
+  def testCallbackValidity_givenMethodHasTooManyArgs_isShouldBeReported(): Unit = {
     checkInspection(
       """
         |{
@@ -156,7 +156,7 @@ class PhpInspectionTest extends InspectionTest {
     )
   }
 
-  def testCallbackValidity_givenMethodOptionalExtraArg_isShouldNotBeReported() = {
+  def testCallbackValidity_givenMethodOptionalExtraArg_isShouldNotBeReported(): Unit = {
     checkInspection("""
         |{
         |  "scripts": {
@@ -166,7 +166,7 @@ class PhpInspectionTest extends InspectionTest {
       """.stripMargin)
   }
 
-  def testCallbackValidity_givenAbstractMethod_isShouldBeReported() = {
+  def testCallbackValidity_givenAbstractMethod_isShouldBeReported(): Unit = {
     checkInspection(
       """
         |{
@@ -178,7 +178,7 @@ class PhpInspectionTest extends InspectionTest {
     )
   }
 
-  def testCallbackValidity_givenMethodWithoutEventTypeHint_isShouldNotBeReported() = {
+  def testCallbackValidity_givenMethodWithoutEventTypeHint_isShouldNotBeReported(): Unit = {
     checkInspection("""
         |{
         |  "scripts": {
@@ -188,7 +188,7 @@ class PhpInspectionTest extends InspectionTest {
       """.stripMargin)
   }
 
-  def testCallbackValidity_givenCallbackIsACommand_isShouldNotBeReported() = {
+  def testCallbackValidity_givenCallbackIsACommand_isShouldNotBeReported(): Unit = {
     checkInspection("""
         |{
         |  "scripts": {
@@ -198,7 +198,7 @@ class PhpInspectionTest extends InspectionTest {
       """.stripMargin)
   }
 
-  def testCallbackValidity_methodIsEmpty_isShouldBeReported() = {
+  def testCallbackValidity_methodIsEmpty_isShouldBeReported(): Unit = {
     checkInspection("""
         |{
         |  "scripts": {

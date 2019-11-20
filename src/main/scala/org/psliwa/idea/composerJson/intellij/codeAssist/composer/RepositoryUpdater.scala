@@ -7,6 +7,7 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.SystemInfo
 import com.intellij.patterns.PlatformPatterns._
+import com.intellij.patterns.PsiElementPattern
 import com.intellij.psi.PsiElement
 import com.intellij.ui.EditorNotifications
 import org.psliwa.idea.composerJson._
@@ -151,7 +152,7 @@ class RepositoryUpdater extends Annotator {
 }
 
 private object RepositoryUpdater {
-  val pattern = psiElement(classOf[JsonObject])
+  val pattern: PsiElementPattern.Capture[JsonObject] = psiElement(classOf[JsonObject])
     .inFile(psiFile(classOf[JsonFile]).withName(ComposerJson))
     .withLanguage(JsonLanguage.INSTANCE)
     .withParent(

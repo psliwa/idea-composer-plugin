@@ -8,6 +8,7 @@ import com.intellij.json.psi._
 import com.intellij.lang.annotation.{AnnotationHolder, Annotator}
 import com.intellij.openapi.util.TextRange
 import com.intellij.patterns.PlatformPatterns._
+import com.intellij.patterns.PsiElementPattern
 import com.intellij.psi.PsiElement
 import com.jetbrains.php.PhpIndex
 import com.jetbrains.php.lang.psi.elements.{Method, PhpClass}
@@ -76,7 +77,7 @@ class PhpCallbackAnnotator extends Annotator {
 
     for (cls <- classes.asScala) {
       findMethod(cls, methodName) match {
-        case Some(method) => {
+        case Some(method) =>
           if (!method.getAccess.isPublic) {
             problems += createMethodProblem(element, elementRange, methodName, "inspection.php.methodIsNotPublic")
           }
@@ -103,10 +104,8 @@ class PhpCallbackAnnotator extends Annotator {
               problems += createMethodProblem(element, elementRange, methodName, "inspection.php.tooManyArgs")
             }
           }
-        }
-        case _ => {
+        case _ =>
           problems += createMethodProblem(element, elementRange, methodName, "inspection.php.methodDoesNotExist")
-        }
       }
     }
 
@@ -133,7 +132,7 @@ private object PhpCallbackAnnotator {
     )
   )
 
-  val pattern = psiElement(classOf[JsonStringLiteral])
+  val pattern: PsiElementPattern.Capture[JsonStringLiteral] = psiElement(classOf[JsonStringLiteral])
     .inFile(psiFile(classOf[JsonFile]).withName(ComposerJson))
     .withLanguage(JsonLanguage.INSTANCE)
     .and(

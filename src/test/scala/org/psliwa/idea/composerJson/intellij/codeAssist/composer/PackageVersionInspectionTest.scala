@@ -15,7 +15,7 @@ class PackageVersionInspectionTest extends InspectionTest {
     ProjectSettings(myFixture.getProject).getUnboundedVersionInspectionSettings.clear()
   }
 
-  def testGivenUnboundVersion_thatShouldBeReported() = {
+  def testGivenUnboundVersion_thatShouldBeReported(): Unit = {
     checkInspection(s"""
         |{
         |  "require": {
@@ -25,7 +25,7 @@ class PackageVersionInspectionTest extends InspectionTest {
       """.stripMargin)
   }
 
-  def testGivenBoundVersion_thatIsOk() = {
+  def testGivenBoundVersion_thatIsOk(): Unit = {
     checkInspection("""
         |{
         |  "require": {
@@ -35,7 +35,7 @@ class PackageVersionInspectionTest extends InspectionTest {
       """.stripMargin)
   }
 
-  def testGivenSemVerBoundedVersion_thatIsOk() = {
+  def testGivenSemVerBoundedVersion_thatIsOk(): Unit = {
     checkInspection("""
         |{
         |  "require": {
@@ -45,7 +45,7 @@ class PackageVersionInspectionTest extends InspectionTest {
       """.stripMargin)
   }
 
-  def testGivenUnboundVersion_givenPackageIsExcluded_thatIsOk() = {
+  def testGivenUnboundVersion_givenPackageIsExcluded_thatIsOk(): Unit = {
     val pkg = "vendor/pkg"
 
     ProjectSettings(myFixture.getProject).getUnboundedVersionInspectionSettings.addExcludedPattern(new PatternItem(pkg))
@@ -59,7 +59,7 @@ class PackageVersionInspectionTest extends InspectionTest {
       """.stripMargin)
   }
 
-  def testGivenComparisonWildcardedVersion_thatShouldBeReported() = {
+  def testGivenComparisonWildcardedVersion_thatShouldBeReported(): Unit = {
     checkInspection(s"""
         |{
         |  "require": {
@@ -69,7 +69,7 @@ class PackageVersionInspectionTest extends InspectionTest {
       """.stripMargin)
   }
 
-  def testGivenComparisonAndWrappedWildcardComboVersion_thatShouldBeReported() = {
+  def testGivenComparisonAndWrappedWildcardComboVersion_thatShouldBeReported(): Unit = {
     checkInspection(s"""
         |{
         |  "require": {
@@ -79,7 +79,7 @@ class PackageVersionInspectionTest extends InspectionTest {
       """.stripMargin)
   }
 
-  def testGivenComparisonAnWildcardComboInLogicalConstraint_thatShouldBeReported() = {
+  def testGivenComparisonAnWildcardComboInLogicalConstraint_thatShouldBeReported(): Unit = {
     checkInspection(s"""
         |{
         |  "require": {

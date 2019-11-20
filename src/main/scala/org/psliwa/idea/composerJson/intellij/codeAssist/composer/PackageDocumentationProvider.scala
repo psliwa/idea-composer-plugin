@@ -5,6 +5,7 @@ import java.util
 import com.intellij.lang.documentation.DocumentationProvider
 import com.intellij.psi.{PsiElement, PsiManager}
 import com.intellij.patterns.PlatformPatterns._
+import com.intellij.patterns.PsiElementPattern
 import org.psliwa.idea.composerJson.intellij.PsiElements._
 import org.psliwa.idea.composerJson.composer.model.PackageDescriptor._
 import org.psliwa.idea.composerJson.composer.model.PackageName
@@ -34,7 +35,7 @@ class PackageDocumentationProvider extends DocumentationProvider {
 }
 
 private object PackageDocumentationProvider {
-  val packageNamePattern = psiElement().withParent(
+  val packageNamePattern: PsiElementPattern.Capture[PsiElement] = psiElement().withParent(
     packageElement.beforeLeaf(psiElement().withText(":"))
   )
 }

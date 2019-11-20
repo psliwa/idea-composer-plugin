@@ -5,7 +5,7 @@ import org.psliwa.idea.composerJson.intellij.codeAssist.{BaseLookupElement, Comp
 
 class PackageSuggestionsTest extends AbstractPackagesTest {
 
-  def testPackageSuggestions() = {
+  def testPackageSuggestions(): Unit = {
     val packages = List("some/package1", "some/package2")
     setCompletionPackageLoader(() => packages.map(new BaseLookupElement(_)))
 
@@ -21,7 +21,7 @@ class PackageSuggestionsTest extends AbstractPackagesTest {
     )
   }
 
-  def testPackageSuggestions_givenVendorAndSlash_suggestMatchingPackages() = {
+  def testPackageSuggestions_givenVendorAndSlash_suggestMatchingPackages(): Unit = {
     val packages = List("some/package1", "some/package2", "another/package3")
     setCompletionPackageLoader(() => packages.map(new BaseLookupElement(_)))
 
@@ -38,7 +38,7 @@ class PackageSuggestionsTest extends AbstractPackagesTest {
     )
   }
 
-  def testVersionSuggestions() = {
+  def testVersionSuggestions(): Unit = {
 
     val pkg = "ps/image-optimizer"
     val versions = List("dev-master", "1.0.0")
@@ -60,7 +60,7 @@ class PackageSuggestionsTest extends AbstractPackagesTest {
     )
   }
 
-  def testVersionSuggestions_includeVersionWildcards() = {
+  def testVersionSuggestions_includeVersionWildcards(): Unit = {
     val versions = List("1.2.1")
     setCompletionVersionsLoader(_ => versions)
 
@@ -76,7 +76,7 @@ class PackageSuggestionsTest extends AbstractPackagesTest {
     )
   }
 
-  def testVersionsSuggestions_givenNsrOperator_suggestOnlySemanticVersions() = {
+  def testVersionsSuggestions_givenNsrOperator_suggestOnlySemanticVersions(): Unit = {
     val versions = List("1.2.1", "1.2.2", "v1.2.3", "dev-master")
     setCompletionVersionsLoader(_ => versions)
 
@@ -93,7 +93,7 @@ class PackageSuggestionsTest extends AbstractPackagesTest {
     )
   }
 
-  def testVersionsSuggestions_givenAsterixInPrefix_suggestAsterixWildcards() = {
+  def testVersionsSuggestions_givenAsterixInPrefix_suggestAsterixWildcards(): Unit = {
     val versions = List("1.2.1", "1.3.2", "dev-master")
     setCompletionVersionsLoader(_ => versions)
 
@@ -110,7 +110,7 @@ class PackageSuggestionsTest extends AbstractPackagesTest {
     )
   }
 
-  def testVersionsSuggestions_givenSuggestionAfterSpace_allVersionsShouldBeSuggested() = {
+  def testVersionsSuggestions_givenSuggestionAfterSpace_allVersionsShouldBeSuggested(): Unit = {
     val versions = List("1.2.1", "1.3.2", "dev-master")
     setCompletionVersionsLoader(_ => versions)
 
@@ -126,7 +126,7 @@ class PackageSuggestionsTest extends AbstractPackagesTest {
     )
   }
 
-  def testVersionsSuggestions_givenSuggestionAfterSpaceAndSomePrefix_validVersionsShouldBeSuggested() = {
+  def testVersionsSuggestions_givenSuggestionAfterSpaceAndSomePrefix_validVersionsShouldBeSuggested(): Unit = {
     val versions = List("1.2.1", "1.3.1", "dev-master")
     setCompletionVersionsLoader(_ => versions)
 
@@ -143,7 +143,7 @@ class PackageSuggestionsTest extends AbstractPackagesTest {
     )
   }
 
-  def testVersionsSuggestions_givenFewSemanticVersions_itShouldBeDescSorted() = {
+  def testVersionsSuggestions_givenFewSemanticVersions_itShouldBeDescSorted(): Unit = {
     val versions = List("1.2.1", "1.3.1", "dev-master", /*"1.2",*/ "1.0.0")
 
     setCompletionVersionsLoader(_ => versions)
@@ -160,7 +160,7 @@ class PackageSuggestionsTest extends AbstractPackagesTest {
     )
   }
 
-  def testVersionsSuggestions_givenSuggestionsAfterSpaceWithTilda_semanticVersionsShouldBeSuggested() = {
+  def testVersionsSuggestions_givenSuggestionsAfterSpaceWithTilda_semanticVersionsShouldBeSuggested(): Unit = {
     val versions = List("1.2.1", "1.3.1", "dev-master")
     setCompletionVersionsLoader(_ => versions)
 
@@ -177,7 +177,7 @@ class PackageSuggestionsTest extends AbstractPackagesTest {
     )
   }
 
-  def testVersionsSuggestions_givenSuggestionsAfterComma_allVersionsShouldBeSuggested() = {
+  def testVersionsSuggestions_givenSuggestionsAfterComma_allVersionsShouldBeSuggested(): Unit = {
     val versions = List("1.2.1", "1.3.1", "dev-master")
     setCompletionVersionsLoader(_ => versions)
 
@@ -193,7 +193,7 @@ class PackageSuggestionsTest extends AbstractPackagesTest {
     )
   }
 
-  def testVersionsSuggestions_givenSuggestionsAfterComparisonChar_allSemanticVersionsShouldBeSuggested() = {
+  def testVersionsSuggestions_givenSuggestionsAfterComparisonChar_allSemanticVersionsShouldBeSuggested(): Unit = {
     val versions = List("1.2.1", "1.3.1", "dev-master")
     setCompletionVersionsLoader(_ => versions)
 
@@ -212,7 +212,8 @@ class PackageSuggestionsTest extends AbstractPackagesTest {
     }
   }
 
-  def testVersionSuggestions_givenSuggestionsAfterSpaceAndComparisonChar_allSemanticVersionsShouldBeSuggested() = {
+  def testVersionSuggestions_givenSuggestionsAfterSpaceAndComparisonChar_allSemanticVersionsShouldBeSuggested()
+      : Unit = {
     val versions = List("1.2.1", "1.3.1", "dev-master")
     setCompletionVersionsLoader(_ => versions)
 
@@ -231,7 +232,7 @@ class PackageSuggestionsTest extends AbstractPackagesTest {
     }
   }
 
-  def testVersionSuggestions_givenSuggestionAfterAtMark_stabilityShouldBeSuggested() = {
+  def testVersionSuggestions_givenSuggestionAfterAtMark_stabilityShouldBeSuggested(): Unit = {
     val versions = List("1.2.1")
     setCompletionVersionsLoader(_ => versions)
 
@@ -248,7 +249,7 @@ class PackageSuggestionsTest extends AbstractPackagesTest {
     )
   }
 
-  def testVersionSuggestions_givenSuggestionAfterCommaAndAtMark_versionsShouldBeSuggested() = {
+  def testVersionSuggestions_givenSuggestionAfterCommaAndAtMark_versionsShouldBeSuggested(): Unit = {
     val versions = List("1.2.1")
     setCompletionVersionsLoader(_ => versions)
 
@@ -265,7 +266,7 @@ class PackageSuggestionsTest extends AbstractPackagesTest {
     )
   }
 
-  def testPackageSuggestion_versionLoaderShouldNotBeCalled() = {
+  def testPackageSuggestion_versionLoaderShouldNotBeCalled(): Unit = {
     setCompletionVersionsLoader(_ => { fail("version loader should not be called"); List() })
 
     suggestions(

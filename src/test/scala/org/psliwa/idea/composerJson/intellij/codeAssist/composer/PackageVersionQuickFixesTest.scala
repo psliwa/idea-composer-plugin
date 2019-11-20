@@ -21,7 +21,7 @@ class PackageVersionQuickFixesTest extends InspectionTest {
     ProjectSettings(myFixture.getProject).getUnboundedVersionInspectionSettings.clear()
   }
 
-  def testExcludePatternQuickFix_givenExactPattern() = {
+  def testExcludePatternQuickFix_givenExactPattern(): Unit = {
     val pkg = "vendor/pkg321"
     checkQuickFix(ExcludePatternQuickFix(pkg), s"""
         |{
@@ -34,7 +34,7 @@ class PackageVersionQuickFixesTest extends InspectionTest {
     assertPatternExcluded(pkg)
   }
 
-  def testExcludePatternQuickFix_givenVendorWildcardPattern() = {
+  def testExcludePatternQuickFix_givenVendorWildcardPattern(): Unit = {
     val pkg = "vendor/pkg321"
     checkQuickFix(
       ExcludePatternQuickFix("vendor/*"),

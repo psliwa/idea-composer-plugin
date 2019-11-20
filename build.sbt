@@ -99,7 +99,7 @@ lazy val proguard: Project = (project in file("target/proguard"))
         libraryJars
       )
 
-      val result = cmd !
+      val result = cmd.!
 
       if (result != 0) {
         sys.error(s"Proguard exit status: $result")

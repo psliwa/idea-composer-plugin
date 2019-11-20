@@ -7,31 +7,31 @@ import org.junit.Test
 class VersionEquivalentsTest {
 
   @Test
-  def simpleSemanticVersionShouldNotHasEquivalents() = {
+  def simpleSemanticVersionShouldNotHasEquivalents(): Unit = {
     assertEquals(Nil, equivalents("1.2.3"))
   }
 
   @Test
-  def nsrTildeOperatorShouldHasRangeEquivalent() = {
+  def nsrTildeOperatorShouldHasRangeEquivalent(): Unit = {
     assertEquals(List(">=1.2.3 <1.3.0"), equivalents("~1.2.3"))
     assertEquals(List(">=1.2 <2.0.0"), equivalents("~1.2"))
     assertEquals(List(">=1.0 <2.0.0"), equivalents("~1"))
   }
 
   @Test
-  def nsrDashOperatorShouldHasRangeEquivalent() = {
+  def nsrDashOperatorShouldHasRangeEquivalent(): Unit = {
     assertEquals(List(">=1.2.3 <2.0.0"), equivalents("^1.2.3"))
     assertEquals(List(">=1.2 <2.0.0"), equivalents("^1.2"))
   }
 
   @Test
-  def givenPreReleaseSemanticVersion_nsrDashOperatorShouldHasRangeEquivalent() = {
+  def givenPreReleaseSemanticVersion_nsrDashOperatorShouldHasRangeEquivalent(): Unit = {
     assertEquals(List(">=0.2.3 <0.3.0"), equivalents("^0.2.3"))
     assertEquals(List(">=0.2 <0.3.0"), equivalents("^0.2"))
   }
 
   @Test
-  def nsrRangeShouldHasNsrDashOperatorEquivalent() = {
+  def nsrRangeShouldHasNsrDashOperatorEquivalent(): Unit = {
     assertEquals(List("^1.2.1"), equivalents(">=1.2.1,<2.0.0"))
   }
 
@@ -41,7 +41,7 @@ class VersionEquivalentsTest {
   }
 
   @Test
-  def nsrRangeShouldHasNsrOperatorEquivalent() = {
+  def nsrRangeShouldHasNsrOperatorEquivalent(): Unit = {
     assertEquals(List("~1.2.3"), equivalents(">=1.2.3,<1.3.0"))
     assertEquals(List("~1.2.0"), equivalents(">=1.2,<1.3"))
     assertEquals(List("~1.2"), equivalents(">=1.2,<2.0.0"))
@@ -49,7 +49,7 @@ class VersionEquivalentsTest {
   }
 
   @Test
-  def nonNsrRangeShouldNotHasEquivalents() = {
+  def nonNsrRangeShouldNotHasEquivalents(): Unit = {
     List(">=1.2.3,<1.3.3", ">=1.2.3,<1.6.0", ">1.2.3,<1.3.3").foreach(version => {
       assertEquals(Nil, equivalents(version))
     })

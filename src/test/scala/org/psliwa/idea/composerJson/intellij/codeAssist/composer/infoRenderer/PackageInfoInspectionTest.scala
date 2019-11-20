@@ -26,7 +26,7 @@ class PackageInfoInspectionTest extends InspectionTest {
   }
 
   def testGivenInstalledPackage_itsVersionShouldBeCollected(): Unit = {
-    createComposerLock(List(PackageDescriptor("some/pkg", "1.0.1")), ".")
+    createComposerLock(List(PackageDescriptor("some/pkg", "1.0.1")))
 
     checkInspection(
       s"""

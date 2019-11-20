@@ -15,8 +15,6 @@ import org.psliwa.idea.composerJson.composer.command.DefaultPackagesInstaller.Re
 import org.psliwa.idea.composerJson.composer.model.PackageName
 import org.psliwa.idea.composerJson.intellij.Notifications
 
-import scala.compat.Platform.EOL
-
 trait PackagesInstaller {
   def install(packages: List[PackageName]): Unit
 }
@@ -45,10 +43,9 @@ class DefaultPackagesInstaller(project: Project, file: PsiFile) extends Packages
           val packageNames = packages.map(_.presentation).mkString(", ")
 
           install(indicator) match {
-            case Result.Failure(message) => {
+            case Result.Failure(message) =>
               handleFailure(packages, message)
-            }
-            case Result.Success => {
+            case Result.Success =>
               //refresh parent directory and composer.lock file in order to inter alia reanalyze composer.json
               val parentDir = file.getVirtualFile.getParent
               parentDir.refresh(true, false)
@@ -60,7 +57,6 @@ class DefaultPackagesInstaller(project: Project, file: PsiFile) extends Packages
                 ComposerBundle.message("inspection.notInstalledPackage.success", packageNames),
                 Some(project)
               )
-            }
             case Result.Cancelled =>
               Notifications.info(
                 ComposerBundle.message("inspection.notInstalledPackage.cancelledTitle"),
@@ -150,7 +146,8 @@ private object DefaultPackagesInstaller {
   object Result {
     case class Failure(message: String) extends Result
     object Failure {
-      def apply(e: Throwable): Failure = Failure(e.toString + "\n\n" + e.getStackTrace.mkString("", EOL, EOL))
+      def apply(e: Throwable): Failure =
+        Failure(e.toString + "\n\n" + e.getStackTrace.mkString("", System.lineSeparator(), System.lineSeparator()))
     }
     case object Success extends Result
     case object Cancelled extends Result

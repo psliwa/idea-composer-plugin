@@ -20,11 +20,11 @@ case class SemanticVersion(major: Int, private[version] val other: Option[(Int, 
   }
 
   def this(major: Int, minor: Int) = {
-    this(major, Some(minor, None))
+    this(major, Some((minor, None)))
   }
 
   def this(major: Int, minor: Int, patch: Int) = {
-    this(major, Some(minor, Some(patch)))
+    this(major, Some((minor, Some(patch))))
   }
 
   def this(versions: Array[Int]) = {
@@ -51,7 +51,7 @@ case class SemanticVersion(major: Int, private[version] val other: Option[(Int, 
     else Some(new SemanticVersion(reversedParts.tail.reverse.toArray))
   }
 
-  def append(part: Int) = {
+  def append(part: Int): Option[SemanticVersion] = {
     if (reversedParts.size == maxPartsNumber) None
     else Some(new SemanticVersion((part :: reversedParts).reverse.toArray))
   }
@@ -62,7 +62,7 @@ case class SemanticVersion(major: Int, private[version] val other: Option[(Int, 
     ensure(i <= maxPartsNumber && i > 0)
 
     if (parts.size >= i) this
-    else new SemanticVersion((parts.toList ++ List.fill(i - parts.size)(0)).toArray)
+    else new SemanticVersion((parts ++ List.fill(i - parts.size)(0)).toArray)
   }
 
   def ensureExactlyParts(i: Int): SemanticVersion = {

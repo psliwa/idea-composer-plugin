@@ -2,7 +2,7 @@ package org.psliwa.idea.composerJson.json
 
 import org.psliwa.idea.composerJson.util.parsers.JSON
 
-import scala.language.{higherKinds, implicitConversions, postfixOps}
+import scala.language.{implicitConversions, postfixOps}
 import scala.util.Try
 import scala.util.matching.Regex
 import spray.json._
@@ -11,7 +11,7 @@ import scalaz.Scalaz._
 sealed trait Schema
 
 case class SObject(properties: Properties, additionalProperties: Boolean = true) extends Schema {
-  lazy val requiredProperties = properties.named.filter(_._2.required)
+  lazy val requiredProperties: Map[String, Property] = properties.named.filter(_._2.required)
 
   def this(properties: Map[String, Property]) = this(new Properties(properties, Map()), true)
   def this(properties: Map[String, Property], additionalProperties: Boolean) =
@@ -122,20 +122,19 @@ object Schema {
 
   private def parseDefinitions(jsonObject: JsObject): Map[String, Schema] = {
     jsonObject.fields.flatMap {
-      case (name, definition) => {
+      case (name, definition) =>
         val maybeSchema = for {
           obj <- ensureJsonObject(definition)
           schema <- jsonObjectToSchema(obj, Map())
         } yield schema
 
         maybeSchema.map(schema => Map(name -> schema)).getOrElse(Map())
-      }
     }
   }
 
   import OptionOps._
 
-  private def jsonObjectToStringSchema: Converter[JsObject] = (o, defs) => {
+  private def jsonObjectToStringSchema: Converter[JsObject] = (o, _) => {
     for {
       o <- ensureType(o, "string")
       formatValue <- o.fields.get("format").orElse(Some(JsString("any")))
@@ -180,7 +179,7 @@ object Schema {
     } yield SOr(schemaValues)
   }
 
-  private def jsonObjectToEnum: Converter[JsObject] = (t, defs) => {
+  private def jsonObjectToEnum: Converter[JsObject] = (t, _) => {
     if (t.fields.contains("enum")) {
       for {
         arr <- t.fields.get("enum").flatMap(tryJsonArray)
@@ -281,7 +280,7 @@ object Schema {
     }
   }
 
-  private def jsonObjectToPackagesSchema: Converter[JsObject] = (t, defs) => {
+  private def jsonObjectToPackagesSchema: Converter[JsObject] = (t, _) => {
     if (t.fields.get("type").contains(JsString("packages"))) {
       Some(SPackages)
     } else {

@@ -16,7 +16,7 @@ class FilePathQuickFixesTest extends InspectionTest {
     myFixture.enableInspections(classOf[FilePathInspection])
   }
 
-  def testRunRemoveValueQuickFix_valueShouldBeRemoved() = {
+  def testRunRemoveValueQuickFix_valueShouldBeRemoved(): Unit = {
     checkQuickFix(RemoveEntryQuickFix)(
       """
         |{
@@ -34,7 +34,7 @@ class FilePathQuickFixesTest extends InspectionTest {
     )
   }
 
-  def testGivenFilePathIsLastOne_runRemoveValueQuickFix_lastCommaShouldBeRemoved() = {
+  def testGivenFilePathIsLastOne_runRemoveValueQuickFix_lastCommaShouldBeRemoved(): Unit = {
     writeAction(() => myFixture.getTempDirFixture.findOrCreateDir("some").createChildData(this, "existing"))
 
     checkQuickFix(RemoveEntryQuickFix)(
@@ -56,7 +56,7 @@ class FilePathQuickFixesTest extends InspectionTest {
     )
   }
 
-  def testGivenFilePathsElement_runRemovePropertyQuickFix_propertyShouldBeRemoved() = {
+  def testGivenFilePathsElement_runRemovePropertyQuickFix_propertyShouldBeRemoved(): Unit = {
     checkQuickFix(RemoveEntryQuickFix)(
       """
         |{
@@ -78,7 +78,7 @@ class FilePathQuickFixesTest extends InspectionTest {
     )
   }
 
-  def testGivenFilePathsElement_filePathsGivenAsArray_runRemovePropertyQuickFix_propertyShouldBeRemoved() = {
+  def testGivenFilePathsElement_filePathsGivenAsArray_runRemovePropertyQuickFix_propertyShouldBeRemoved(): Unit = {
     checkQuickFix(RemoveEntryQuickFix)(
       """
         |{
@@ -101,7 +101,7 @@ class FilePathQuickFixesTest extends InspectionTest {
     )
   }
 
-  def testRunCreateDirectoryQuickFix_directoryShouldBeCreated() = {
+  def testRunCreateDirectoryQuickFix_directoryShouldBeCreated(): Unit = {
     val dir = "some/unexisting"
 
     runQuickFix(CreateDirectoryQuickFix(dir))(
@@ -115,7 +115,7 @@ class FilePathQuickFixesTest extends InspectionTest {
     assertTrue(findDir(dir).isDefined)
   }
 
-  def testGivenFilePathPartiallyExists_runCreateDirectoryQuickFix_missingDirectoriesShouldBeCreated() = {
+  def testGivenFilePathPartiallyExists_runCreateDirectoryQuickFix_missingDirectoriesShouldBeCreated(): Unit = {
     val dir = "some/unexisting"
 
     writeAction(() => myFixture.getTempDirFixture.findOrCreateDir(dir.split("/")(0)))
@@ -131,7 +131,7 @@ class FilePathQuickFixesTest extends InspectionTest {
     assertTrue(findDir(dir).isDefined)
   }
 
-  def testGivenFilePathHasTwoSlashesInRow_directoryShouldBeCreated() = {
+  def testGivenFilePathHasTwoSlashesInRow_directoryShouldBeCreated(): Unit = {
     val dir = "some//unexisting"
 
     runQuickFix(CreateDirectoryQuickFix(dir))(
@@ -145,7 +145,7 @@ class FilePathQuickFixesTest extends InspectionTest {
     assertTrue(findDir(dir).isDefined)
   }
 
-  def testDirectoryInGivenPathCannotBeCreate_directoryShouldNotBeCreated() = {
+  def testDirectoryInGivenPathCannotBeCreate_directoryShouldNotBeCreated(): Unit = {
     val dir = "some/unexisting"
     writeAction(() => myFixture.getTempDirFixture.createFile(dir.split("/")(0)))
 
@@ -160,7 +160,7 @@ class FilePathQuickFixesTest extends InspectionTest {
     assertTrue(findDir(dir).isEmpty)
   }
 
-  def testRunCreateFileQuickFix_fileShouldBeCreated() = {
+  def testRunCreateFileQuickFix_fileShouldBeCreated(): Unit = {
     val dir = "some/unexisting.file"
 
     runQuickFix(CreateFileQuickFix(dir))(
@@ -174,7 +174,7 @@ class FilePathQuickFixesTest extends InspectionTest {
     assertTrue(findFile(dir).isDefined)
   }
 
-  def testRunCreateFileQuickFix_filePathIsRelative_fileShouldBeCreated() = {
+  def testRunCreateFileQuickFix_filePathIsRelative_fileShouldBeCreated(): Unit = {
     val dir = "./some/../some/unexisting.file"
 
     runQuickFix(CreateFileQuickFix(dir))(

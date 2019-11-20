@@ -8,7 +8,7 @@ import org.psliwa.idea.composerJson.intellij.codeAssist.InspectionTest
 
 class RepositoryUpdaterTest extends InspectionTest {
 
-  def testGivenNotPackagistRepository_urlRepositoriesShouldBeEmpty() = {
+  def testGivenNotPackagistRepository_urlRepositoriesShouldBeEmpty(): Unit = {
     val url = "https://github.com/foobar/intermediate.git"
     checkInspection(
       s"""{
@@ -24,7 +24,7 @@ class RepositoryUpdaterTest extends InspectionTest {
     assertRepositories(List())
   }
 
-  def testGivenComposerRepository_thereShouldBeOneUrlRepository() = {
+  def testGivenComposerRepository_thereShouldBeOneUrlRepository(): Unit = {
     val url = "https://github.com/foobar/intermediate.git"
     checkInspection(
       s"""{
@@ -40,7 +40,7 @@ class RepositoryUpdaterTest extends InspectionTest {
     assertRepositories(List(url + "/packages.json"))
   }
 
-  def testGivenPathRepository_givenPathIsRelative_thereShouldBeOneUrlRepository() = {
+  def testGivenPathRepository_givenPathIsRelative_thereShouldBeOneUrlRepository(): Unit = {
     val url = "some/relative/path"
 
     List("", "/") foreach { suffix =>
@@ -59,7 +59,7 @@ class RepositoryUpdaterTest extends InspectionTest {
     }
   }
 
-  def testGivenPathRepository_givenPathIsAbsolute_thereShouldBeOneUrlRepository() = {
+  def testGivenPathRepository_givenPathIsAbsolute_thereShouldBeOneUrlRepository(): Unit = {
     val url = "/some/relative/path"
     List("", "/") foreach { suffix =>
       checkInspection(
@@ -77,7 +77,7 @@ class RepositoryUpdaterTest extends InspectionTest {
     }
   }
 
-  def testGivenExcludedPackagistRepo_thereShouldNotBeIncludedPackagistRepo() = {
+  def testGivenExcludedPackagistRepo_thereShouldNotBeIncludedPackagistRepo(): Unit = {
     checkInspection(
       s"""{
          |  "repositories": [
@@ -91,7 +91,7 @@ class RepositoryUpdaterTest extends InspectionTest {
     assertRepositories(List(), includePackagist = false)
   }
 
-  def testRepositoryInfoShouldBeClearedWhenRepositoriesPropertyWasRemoved() = {
+  def testRepositoryInfoShouldBeClearedWhenRepositoriesPropertyWasRemoved(): Unit = {
     checkInspection(
       s"""{
          |  "repositories": [
@@ -112,7 +112,7 @@ class RepositoryUpdaterTest extends InspectionTest {
     assertRepositories(List(), includePackagist = true)
   }
 
-  def testGivenDirectlyIncludedPackagistRepo_thereShouldBeIncludedPackagistRepo() = {
+  def testGivenDirectlyIncludedPackagistRepo_thereShouldBeIncludedPackagistRepo(): Unit = {
     checkInspection(
       s"""{
          |  "repositories": [
@@ -126,7 +126,7 @@ class RepositoryUpdaterTest extends InspectionTest {
     assertRepositories(List(), includePackagist = true)
   }
 
-  def testGivenInlinePackage_thereShouldBeInlinePackageInRepository() = {
+  def testGivenInlinePackage_thereShouldBeInlinePackageInRepository(): Unit = {
     checkInspection(
       s"""{
          |  "repositories": [
@@ -144,7 +144,7 @@ class RepositoryUpdaterTest extends InspectionTest {
     assertRepositories(List(), includePackagist = true, Map("inline/package" -> List("1.0.8")))
   }
 
-  def testGivenIncompleteInlinePackage_repositoryShouldBeEmpty() = {
+  def testGivenIncompleteInlinePackage_repositoryShouldBeEmpty(): Unit = {
     checkInspection(
       s"""{
          |  "repositories": [
@@ -158,14 +158,13 @@ class RepositoryUpdaterTest extends InspectionTest {
          |}""".stripMargin
     )
 
-    val repoInfos = getRepositoryInfo
     assertTrue(getRepositoryInfo.isDefined)
 
     val packages = getRepositoryInfo.get.repository.map(_.getPackages).getOrElse(List())
     assertEquals(List(), packages)
   }
 
-  def testGivenTwoInlinePackageVersions_thereShouldBeBothVersionsInRepository() = {
+  def testGivenTwoInlinePackageVersions_thereShouldBeBothVersionsInRepository(): Unit = {
     checkInspection(
       s"""{
          |  "repositories": [
@@ -210,11 +209,10 @@ class RepositoryUpdaterTest extends InspectionTest {
   private def assertRepository[A](repository: Repository[A], expectedPackages: Map[String, List[String]]): Unit = {
     assertTrue(
       expectedPackages.forall {
-        case (packageName, versions) => {
+        case (packageName, versions) =>
           repository.getPackages.contains(packageName) && versions.forall(
             repository.getPackageVersions(PackageName(packageName)).contains
           )
-        }
       }
     )
   }

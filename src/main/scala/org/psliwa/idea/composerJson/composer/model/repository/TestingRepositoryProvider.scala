@@ -5,7 +5,7 @@ import scala.collection.mutable
 //RepositoryProvider only for testing
 class TestingRepositoryProvider extends RepositoryProvider[Nothing] {
 
-  val infos = mutable.Map[String, RepositoryInfo]()
+  val infos: mutable.Map[String, RepositoryInfo] = mutable.Map[String, RepositoryInfo]()
 
   override def repositoryFor(file: String): Repository[Nothing] = EmptyRepository
   override def updateRepository(file: String, info: RepositoryInfo): Boolean = {

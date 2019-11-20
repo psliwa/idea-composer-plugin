@@ -20,7 +20,7 @@ class SchemaInspectionTest extends InspectionTest {
     myFixture.enableInspections(classOf[SchemaInspection])
   }
 
-  def testReportNotAllowedPropertyOnTopLevel() = {
+  def testReportNotAllowedPropertyOnTopLevel(): Unit = {
     checkInspection(
       s"""
         |{
@@ -31,7 +31,7 @@ class SchemaInspectionTest extends InspectionTest {
     )
   }
 
-  def testReportValueThatDoesNotMatchRequiredPattern() = {
+  def testReportValueThatDoesNotMatchRequiredPattern(): Unit = {
     checkInspection(
       s"""
          |{
@@ -42,7 +42,7 @@ class SchemaInspectionTest extends InspectionTest {
     )
   }
 
-  def testReportNotAllowedPropertyInNestedLevel() = {
+  def testReportNotAllowedPropertyInNestedLevel(): Unit = {
     checkInspection(
       s"""
         |{
@@ -58,7 +58,7 @@ class SchemaInspectionTest extends InspectionTest {
     )
   }
 
-  def testReportInvalidPropertyValueInEnum() = {
+  def testReportInvalidPropertyValueInEnum(): Unit = {
 
     val allowed = List("dev", "alpha", "beta", "rc", "RC", "stable").map("'" + _ + "'").mkString(" or ")
 
@@ -72,7 +72,7 @@ class SchemaInspectionTest extends InspectionTest {
     )
   }
 
-  def testDoesNotReportValidPropertyValueInEnum() = {
+  def testDoesNotReportValidPropertyValueInEnum(): Unit = {
     checkInspection(
       s"""
         |{
@@ -83,7 +83,7 @@ class SchemaInspectionTest extends InspectionTest {
     )
   }
 
-  def testReportInvalidPropertyValueInBooleanProperty() = {
+  def testReportInvalidPropertyValueInBooleanProperty(): Unit = {
     checkInspection(
       s"""
          |{
@@ -94,7 +94,7 @@ class SchemaInspectionTest extends InspectionTest {
     )
   }
 
-  def testReportInvalidArrayPropertyValueInStringProperty() = {
+  def testReportInvalidArrayPropertyValueInStringProperty(): Unit = {
     checkInspection(
       s"""
         |{
@@ -105,7 +105,7 @@ class SchemaInspectionTest extends InspectionTest {
     )
   }
 
-  def testReportInvalidObjectPropertyValueInStringProperty() = {
+  def testReportInvalidObjectPropertyValueInStringProperty(): Unit = {
     checkInspection(
       s"""
         |{
@@ -116,7 +116,7 @@ class SchemaInspectionTest extends InspectionTest {
     )
   }
 
-  def testReportInvalidPropertyValueInObjectProperty() = {
+  def testReportInvalidPropertyValueInObjectProperty(): Unit = {
     checkInspection(
       s"""
         |{
@@ -127,7 +127,7 @@ class SchemaInspectionTest extends InspectionTest {
     )
   }
 
-  def testReportInvalidPropertyValueTypeInEnumProperty() = {
+  def testReportInvalidPropertyValueTypeInEnumProperty(): Unit = {
     checkInspection(
       s"""
         |{
@@ -138,7 +138,7 @@ class SchemaInspectionTest extends InspectionTest {
     )
   }
 
-  def testDoesNotReportErrorWhenObjectPropertyHasNotValueYet() = {
+  def testDoesNotReportErrorWhenObjectPropertyHasNotValueYet(): Unit = {
     try {
       checkInspection(
         s"""
@@ -149,11 +149,11 @@ class SchemaInspectionTest extends InspectionTest {
       """.stripMargin
       )
     } catch {
-      case e: ComparisonFailure => //ignore syntax error assertionError, check only scala MatchFailure
+      case _: ComparisonFailure => //ignore syntax error assertionError, check only scala MatchFailure
     }
   }
 
-  def testReportInvalidItemValueInArray() = {
+  def testReportInvalidItemValueInArray(): Unit = {
     checkInspection(
       s"""
         |{
@@ -167,7 +167,7 @@ class SchemaInspectionTest extends InspectionTest {
     )
   }
 
-  def testReportInvalidPropertyValueInArray() = {
+  def testReportInvalidPropertyValueInArray(): Unit = {
     checkInspection(
       s"""
         |{
@@ -178,7 +178,7 @@ class SchemaInspectionTest extends InspectionTest {
     )
   }
 
-  def testReportInvalidPropertyValueInOrSchema() = {
+  def testReportInvalidPropertyValueInOrSchema(): Unit = {
     checkInspection(
       s"""
         |{
@@ -189,7 +189,7 @@ class SchemaInspectionTest extends InspectionTest {
     )
   }
 
-  def testReportInvalidPropertyValueInNumericProperty() = {
+  def testReportInvalidPropertyValueInNumericProperty(): Unit = {
     checkInspection(
       s"""
         |{
@@ -202,7 +202,7 @@ class SchemaInspectionTest extends InspectionTest {
     )
   }
 
-  def testDoesNotReportValidPropertyValueInNumericProperty() = {
+  def testDoesNotReportValidPropertyValueInNumericProperty(): Unit = {
     checkInspection(
       s"""
         |{
@@ -215,7 +215,7 @@ class SchemaInspectionTest extends InspectionTest {
     )
   }
 
-  def testReportInvalidPropertyValueInPackages() = {
+  def testReportInvalidPropertyValueInPackages(): Unit = {
     checkInspection(
       s"""
         |{
@@ -226,7 +226,7 @@ class SchemaInspectionTest extends InspectionTest {
     )
   }
 
-  def testDoesNotReportValidPropertyValueInPackages() = {
+  def testDoesNotReportValidPropertyValueInPackages(): Unit = {
     checkInspection(
       s"""
         |{
@@ -237,7 +237,7 @@ class SchemaInspectionTest extends InspectionTest {
     )
   }
 
-  def testDoesNotReportValidPropertyValueInArray() = {
+  def testDoesNotReportValidPropertyValueInArray(): Unit = {
     checkInspection(
       s"""
         |{
@@ -250,7 +250,7 @@ class SchemaInspectionTest extends InspectionTest {
     )
   }
 
-  def testDoesNotReportValidExtraProperty() = {
+  def testDoesNotReportValidExtraProperty(): Unit = {
     checkInspection(
       s"""
         |{
@@ -275,7 +275,7 @@ class SchemaInspectionTest extends InspectionTest {
     )
   }
 
-  def testDoesNotReportValidRequireWithPackagesAndVersions() = {
+  def testDoesNotReportValidRequireWithPackagesAndVersions(): Unit = {
     checkInspection(
       s"""
         |{
@@ -288,7 +288,7 @@ class SchemaInspectionTest extends InspectionTest {
     )
   }
 
-  def testReportInvalidStringPropertyValue() = {
+  def testReportInvalidStringPropertyValue(): Unit = {
     checkInspection(
       s"""
         |{
@@ -301,7 +301,7 @@ class SchemaInspectionTest extends InspectionTest {
     )
   }
 
-  def testNotReportCorrectEmailValue() = {
+  def testNotReportCorrectEmailValue(): Unit = {
     checkInspection(
       s"""
          |{
@@ -314,7 +314,7 @@ class SchemaInspectionTest extends InspectionTest {
     )
   }
 
-  def testNotReportCorrectEmailWithNonAsciiCharsValue() = {
+  def testNotReportCorrectEmailWithNonAsciiCharsValue(): Unit = {
     checkInspection(
       s"""
          |{
@@ -327,7 +327,7 @@ class SchemaInspectionTest extends InspectionTest {
     )
   }
 
-  def testReportMissingProperties() = {
+  def testReportMissingProperties(): Unit = {
     checkInspection(
       s"""
         |{
@@ -340,7 +340,7 @@ class SchemaInspectionTest extends InspectionTest {
     )
   }
 
-  def testReportMissingPropertiesOnDeeperLevel() = {
+  def testReportMissingPropertiesOnDeeperLevel(): Unit = {
     checkInspection(
       s"""
         |{
@@ -353,7 +353,7 @@ class SchemaInspectionTest extends InspectionTest {
     )
   }
 
-  def testDoesNotReportWhenStringPropertyValueIsEmptyString() = {
+  def testDoesNotReportWhenStringPropertyValueIsEmptyString(): Unit = {
     checkInspection(
       s"""
         |{
@@ -364,7 +364,7 @@ class SchemaInspectionTest extends InspectionTest {
     )
   }
 
-  def testReportAlreadyDefinedProperty() = {
+  def testReportAlreadyDefinedProperty(): Unit = {
     checkInspection(
       s"""
         |{
@@ -376,7 +376,7 @@ class SchemaInspectionTest extends InspectionTest {
     )
   }
 
-  def testInspectionObjectWithPatternProperties() = {
+  def testInspectionObjectWithPatternProperties(): Unit = {
     checkInspection(
       s"""
          |{
@@ -391,7 +391,7 @@ class SchemaInspectionTest extends InspectionTest {
     )
   }
 
-  def testValidEnumValueForMultipleOrs() = {
+  def testValidEnumValueForMultipleOrs(): Unit = {
     checkInspection(
       s"""
          |{
@@ -406,7 +406,7 @@ class SchemaInspectionTest extends InspectionTest {
     )
   }
 
-  def testInvalidEnumValueForMultipleAlternatives() = {
+  def testInvalidEnumValueForMultipleAlternatives(): Unit = {
     checkInspection(
       s"""
          |{

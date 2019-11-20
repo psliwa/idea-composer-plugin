@@ -8,7 +8,7 @@ import org.psliwa.idea.composerJson.composer.repository.DefaultRepositoryProvide
 
 class DefaultRepositoryFactoryTest {
 
-  val packagistRepository = Repository.inMemory(List("packagist"))
+  val packagistRepository: Repository[String] = Repository.inMemory(List("packagist"))
   val factory = new DefaultRepositoryFactory(url => Repository.inMemory(List(url)), packagistRepository, pkg => pkg)
 
   @Test
@@ -16,7 +16,7 @@ class DefaultRepositoryFactoryTest {
 
     //when
 
-    val repository = factory.repositoryFor(RepositoryInfo(List("url1", "url2"), false))
+    val repository = factory.repositoryFor(RepositoryInfo(List("url1", "url2"), packagist = false))
 
     //then
 
@@ -28,7 +28,7 @@ class DefaultRepositoryFactoryTest {
 
     //when
 
-    val repository = factory.repositoryFor(new RepositoryInfo(List(), true))
+    val repository = factory.repositoryFor(RepositoryInfo(List(), true))
 
     //then
 
@@ -46,7 +46,7 @@ class DefaultRepositoryFactoryTest {
     //when
 
     val repository =
-      factory.repositoryFor(new RepositoryInfo(List(), false, Some(Repository.inMemory[String](packages, versions))))
+      factory.repositoryFor(RepositoryInfo(List(), false, Some(Repository.inMemory[String](packages, versions))))
 
     //then
 

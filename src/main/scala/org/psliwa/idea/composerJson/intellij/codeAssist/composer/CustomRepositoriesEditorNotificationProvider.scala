@@ -24,20 +24,16 @@ class CustomRepositoriesEditorNotificationProvider(notifications: EditorNotifica
 
       panel.createActionLabel(
         ComposerBundle.message("editorNotifications.customRepositories.yes"),
-        new Runnable {
-          override def run(): Unit = {
-            getSettings().enable(file.getCanonicalPath)
-            notifications.updateNotifications(file)
-          }
+        () => {
+          getSettings().enable(file.getCanonicalPath)
+          notifications.updateNotifications(file)
         }
       )
       panel.createActionLabel(
         ComposerBundle.message("editorNotifications.customRepositories.no"),
-        new Runnable {
-          override def run(): Unit = {
-            getSettings().disable(file.getCanonicalPath)
-            notifications.updateNotifications(file)
-          }
+        () => {
+          getSettings().disable(file.getCanonicalPath)
+          notifications.updateNotifications(file)
         }
       )
 

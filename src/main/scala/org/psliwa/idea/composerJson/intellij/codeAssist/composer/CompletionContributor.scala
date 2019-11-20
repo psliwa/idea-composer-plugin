@@ -46,7 +46,7 @@ class CompletionContributor extends AbstractCompletionContributor {
       s: Schema,
       parent: Capture
   ): List[(Capture, CompletionProvider[CompletionParameters])] = s match {
-    case SPackages => {
+    case SPackages =>
       propertyCompletionProvider(
         parent,
         new LookupElementsCompletionProvider(loadPackages, _ => Some(StringPropertyValueInsertHandler))
@@ -59,7 +59,7 @@ class CompletionContributor extends AbstractCompletionContributor {
               val pattern = "^(?i).*@[a-z]*$".r
               query match {
                 case pattern() => minimumStabilities.map(new BaseLookupElement(_))
-                case _ => {
+                case _ =>
                   VersionSuggestions
                     .suggestionsForVersions(loadVersions(context.completionParameters)(context.packageName),
                                             context.typedQuery,
@@ -69,12 +69,10 @@ class CompletionContributor extends AbstractCompletionContributor {
                       case (version, index) =>
                         new BaseLookupElement(version, Option(Icons.Packagist), true, None, None, "", Some(index))
                     }
-                }
               }
             })
           )
         )
-    }
     case _ => List()
   }
 
@@ -99,7 +97,7 @@ class CompletionContributor extends AbstractCompletionContributor {
     new Repository[BaseLookupElement] {
       override def getPackages: scala.Seq[BaseLookupElement] = packagesLoader()
       override def getPackageVersions(packageName: PackageName): scala.Seq[String] = versionsLoader(packageName)
-      override def map[NewPackage](f: (BaseLookupElement) => NewPackage): Repository[NewPackage] =
+      override def map[NewPackage](f: BaseLookupElement => NewPackage): Repository[NewPackage] =
         Repository.callback(getPackages.map(f), getPackageVersions)
     }
   }

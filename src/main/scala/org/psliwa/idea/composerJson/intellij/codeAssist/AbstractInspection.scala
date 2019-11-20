@@ -8,7 +8,7 @@ import org.psliwa.idea.composerJson.json.Schema
 import PsiElements._
 
 abstract class AbstractInspection extends LocalInspectionTool {
-  val schema = ComposerSchema
+  val schema: Option[Schema] = ComposerSchema
 
   final override def checkFile(file: PsiFile,
                                manager: InspectionManager,

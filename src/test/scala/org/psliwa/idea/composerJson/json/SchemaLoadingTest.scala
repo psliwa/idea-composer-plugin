@@ -7,12 +7,12 @@ import org.psliwa.idea.composerJson.ComposerSchemaFilepath
 class SchemaLoadingTest {
 
   @Test
-  def loadComposerCompletionSchema() = {
+  def loadComposerCompletionSchema(): Unit = {
     assertNotEquals(None, SchemaLoader.load(ComposerSchemaFilepath))
   }
 
   @Test
-  def loadComposerSchema_givenPathIsInvalid_returnNone() = {
+  def loadComposerSchema_givenPathIsInvalid_returnNone(): Unit = {
     assertEquals(None, SchemaLoader.load("invalid-file"))
   }
 }

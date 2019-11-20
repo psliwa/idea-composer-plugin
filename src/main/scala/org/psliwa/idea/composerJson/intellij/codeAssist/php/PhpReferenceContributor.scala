@@ -34,7 +34,7 @@ class PhpReferenceContributor extends PsiReferenceContributor {
     )
   }
 
-  private def registerNamespaceProvider(registrar: PsiReferenceRegistrar) = {
+  private def registerNamespaceProvider(registrar: PsiReferenceRegistrar): Unit = {
     val rootElement = psiElement(classOf[JsonProperty])
       .withName("autoload", "autoload-dev")
       .withSuperParent(2, rootPsiElementPattern)

@@ -36,7 +36,7 @@ class PackageInfoOverlay(editorFactory: EditorFactory) extends ApplicationCompon
   override def getComponentName: String = "composer.editorOverlay"
 
   private class CaretListener extends CaretAdapter {
-    var listener = newCaretListener
+    var listener: PackageInfoCaretListener = newCaretListener
 
     override def caretPositionChanged(e: CaretEvent): Unit = {
       listener.caretPositionChanged(e)

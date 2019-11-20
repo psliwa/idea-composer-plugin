@@ -18,8 +18,8 @@ import scala.util.matching.Regex
 class SchemaInspection extends AbstractInspection {
 
   val vowels = "aeiou"
-  val numberPattern = "^\"-?\\d+(\\.\\d+)?\"$".r
-  val booleanPattern = "^\"(true|false)\"$".r
+  val numberPattern: Regex = "^\"-?\\d+(\\.\\d+)?\"$".r
+  val booleanPattern: Regex = "^\"(true|false)\"$".r
 
   override protected def collectProblems(element: PsiElement, schema: Schema, problems: ProblemsHolder): Unit = {
     val collectedProblems = collectProblems(element, schema).toSet
@@ -52,7 +52,7 @@ class SchemaInspection extends AbstractInspection {
     schema match {
       case so @ SObject(schemaProperties, additionalProperties) =>
         element match {
-          case JsonObject(properties) => {
+          case JsonObject(properties) =>
             val notAllowedPropertyProblems = for {
               property <- properties.asScala
               problem <- collectNotAllowedPropertyProblems(property, schemaProperties, additionalProperties)
@@ -81,7 +81,6 @@ class SchemaInspection extends AbstractInspection {
               }
 
             notAllowedPropertyProblems.toList ::: alreadyDefinedPropertiesProblems ::: requiredPropertiesProblems.toList
-          }
           case _ => List(invalidTypeProblem(element, schema))
         }
       case SPackages | SFilePaths(_) =>
@@ -112,7 +111,7 @@ class SchemaInspection extends AbstractInspection {
         }
       case SStringChoice(choices) =>
         element match {
-          case x @ JsonStringLiteral(value) if !choices.contains(value) => {
+          case x @ JsonStringLiteral(value) if !choices.contains(value) =>
             List(
               ProblemDescriptor(
                 element,
@@ -122,7 +121,6 @@ class SchemaInspection extends AbstractInspection {
                 Seq(new ShowValidValuesQuickFix(x))
               )
             )
-          }
           case JsonStringLiteral(_) => List.empty
           case _ => List(invalidTypeProblem(element, schema))
         }
@@ -141,7 +139,7 @@ class SchemaInspection extends AbstractInspection {
             } yield problem
           case _ => List(invalidTypeProblem(element, schema))
         }
-      case SOr(items) => {
+      case SOr(items) =>
         // TODO: find the better matching item and report problems for it
         val problemsForItems = items.map(collectProblems(element, _))
         problemsForItems.find(_.isEmpty) match {
@@ -155,7 +153,6 @@ class SchemaInspection extends AbstractInspection {
             else if (problems.size >= items.length) List(invalidTypeProblem(element, schema))
             else List.empty
         }
-      }
       case SNumber =>
         element match {
           case PsiExtractors.JsonNumberLiteral(_) => List.empty

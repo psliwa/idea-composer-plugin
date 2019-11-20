@@ -6,33 +6,33 @@ import org.psliwa.idea.composerJson.composer.model.version._
 
 class UpperBoundTest {
 
-  val boundedConstraint = new SemanticConstraint(new SemanticVersion(1, 0))
-  val unboundedConstraint = new WildcardConstraint(None)
+  val boundedConstraint = SemanticConstraint(new SemanticVersion(1, 0))
+  val unboundedConstraint = WildcardConstraint(None)
 
   @Test
-  def givenSemVer_itShouldBeBounded() = {
+  def givenSemVer_itShouldBeBounded(): Unit = {
     checkBounded(SemanticConstraint(new SemanticVersion(1, 0, 0)))
   }
 
   @Test
-  def givenWildcardedBoundedConstraint_itShouldBeBounded() = {
-    checkBounded(new WildcardConstraint(Some(boundedConstraint)))
+  def givenWildcardedBoundedConstraint_itShouldBeBounded(): Unit = {
+    checkBounded(WildcardConstraint(Some(boundedConstraint)))
   }
 
   @Test
-  def givenEmptyWildcard_itShouldBeUnbounded() = {
-    checkUnbounded(new WildcardConstraint(None))
+  def givenEmptyWildcard_itShouldBeUnbounded(): Unit = {
+    checkUnbounded(WildcardConstraint(None))
   }
 
   @Test
-  def givenBoundedConstraintWithNsrOperator_itShouldBeBounded() = {
+  def givenBoundedConstraintWithNsrOperator_itShouldBeBounded(): Unit = {
     List(ConstraintOperator.^, ConstraintOperator.~).foreach(operator => {
-      checkBounded(new OperatorConstraint(operator, boundedConstraint))
+      checkBounded(OperatorConstraint(operator, boundedConstraint))
     })
   }
 
   @Test
-  def givenBoundedConstraintWithComparisonOperatorWithoutUpperBound_itShouldBeUnbounded() = {
+  def givenBoundedConstraintWithComparisonOperatorWithoutUpperBound_itShouldBeUnbounded(): Unit = {
     import org.psliwa.idea.composerJson.composer.model.version.ConstraintOperator._
 
     List(>=, >, ConstraintOperator.!=).foreach(operator => {

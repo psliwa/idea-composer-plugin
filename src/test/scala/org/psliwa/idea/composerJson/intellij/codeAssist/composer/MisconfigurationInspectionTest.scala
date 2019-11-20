@@ -11,7 +11,8 @@ class MisconfigurationInspectionTest extends InspectionTest {
     myFixture.enableInspections(classOf[MisconfigurationInspection])
   }
 
-  def testUnstableProject_givenProjectType_givenDevMinimumStability_givenDisabledPreferStable_misconfigurationShouldBeReported() = {
+  def testUnstableProject_givenProjectType_givenDevMinimumStability_givenDisabledPreferStable_misconfigurationShouldBeReported()
+      : Unit = {
     checkInspection(
       s"""
         |{
@@ -24,7 +25,8 @@ class MisconfigurationInspectionTest extends InspectionTest {
     )
   }
 
-  def testUnstableProject_givenProjectType_givenDevMinimumStability_givenExplicitlyDisabledPreferStable_misconfigurationShouldBeReported() = {
+  def testUnstableProject_givenProjectType_givenDevMinimumStability_givenExplicitlyDisabledPreferStable_misconfigurationShouldBeReported()
+      : Unit = {
     checkInspection(
       s"""
         |{
@@ -38,7 +40,8 @@ class MisconfigurationInspectionTest extends InspectionTest {
     )
   }
 
-  def testUnstableProject_givenProjectType_givenDevMinimumStability_givenEnabledPreferStable_misconfigurationShouldNotBeReported() = {
+  def testUnstableProject_givenProjectType_givenDevMinimumStability_givenEnabledPreferStable_misconfigurationShouldNotBeReported()
+      : Unit = {
     checkInspection(
       s"""
         |{
@@ -52,7 +55,8 @@ class MisconfigurationInspectionTest extends InspectionTest {
     )
   }
 
-  def testUnstableProject_givenLibraryType_givenDevMinimumStability_givenDisabledPreferStable_misconfigurationShouldNotBeReported() = {
+  def testUnstableProject_givenLibraryType_givenDevMinimumStability_givenDisabledPreferStable_misconfigurationShouldNotBeReported()
+      : Unit = {
     checkInspection(
       s"""
         |{
@@ -67,7 +71,8 @@ class MisconfigurationInspectionTest extends InspectionTest {
     )
   }
 
-  def testUnstableProject_givenProjectType_givenStableMinimumStability_givenDisabledPreferStable_misconfigurationShouldNotBeReported() = {
+  def testUnstableProject_givenProjectType_givenStableMinimumStability_givenDisabledPreferStable_misconfigurationShouldNotBeReported()
+      : Unit = {
     checkInspection(
       s"""
         |{
@@ -80,7 +85,8 @@ class MisconfigurationInspectionTest extends InspectionTest {
     )
   }
 
-  def testUnstableProject_givenProjectType_givenMissingMinimumStability_givenDisabledPreferStable_misconfigurationShouldNotBeReported() = {
+  def testUnstableProject_givenProjectType_givenMissingMinimumStability_givenDisabledPreferStable_misconfigurationShouldNotBeReported()
+      : Unit = {
     checkInspection(
       s"""
         |{
@@ -93,7 +99,7 @@ class MisconfigurationInspectionTest extends InspectionTest {
     )
   }
 
-  def testLicenseProperty_itIsMissing_warningShouldBeReported() = {
+  def testLicenseProperty_itIsMissing_warningShouldBeReported(): Unit = {
     checkInspection(
       s"""
         |{
@@ -103,7 +109,7 @@ class MisconfigurationInspectionTest extends InspectionTest {
     )
   }
 
-  def testLicenseProperty_itIsDefinedAsArray_warningShouldNotBeReported() = {
+  def testLicenseProperty_itIsDefinedAsArray_warningShouldNotBeReported(): Unit = {
     checkInspection(
       s"""
          |{
@@ -114,7 +120,7 @@ class MisconfigurationInspectionTest extends InspectionTest {
     )
   }
 
-  def testTypeProperty_typeIsComposerInstaller_warningShouldBeReported() = {
+  def testTypeProperty_typeIsComposerInstaller_warningShouldBeReported(): Unit = {
     checkInspection(
       s"""
         |{
@@ -127,7 +133,7 @@ class MisconfigurationInspectionTest extends InspectionTest {
     )
   }
 
-  def testNameIsCamelCase_warningShouldBeReported() = {
+  def testNameIsCamelCase_warningShouldBeReported(): Unit = {
     checkInspection(
       s"""
          |{
@@ -138,7 +144,7 @@ class MisconfigurationInspectionTest extends InspectionTest {
     )
   }
 
-  def testDependencyDefinedInRequireAndRequireDev_warningShouldBeReported() = {
+  def testDependencyDefinedInRequireAndRequireDev_warningShouldBeReported(): Unit = {
     checkInspection(
       s"""
          |{
@@ -154,7 +160,7 @@ class MisconfigurationInspectionTest extends InspectionTest {
     )
   }
 
-  def testEmptyNamespaceForPsr0_warningShouldBeReported() = {
+  def testEmptyNamespaceForPsr0_warningShouldBeReported(): Unit = {
     checkInspection(
       s"""
          |{
@@ -174,7 +180,7 @@ class MisconfigurationInspectionTest extends InspectionTest {
     )
   }
 
-  def testCommitRefAsPackageVersion_warningShouldBeReported() = {
+  def testCommitRefAsPackageVersion_warningShouldBeReported(): Unit = {
     checkInspection(
       s"""
          |{
@@ -188,7 +194,7 @@ class MisconfigurationInspectionTest extends InspectionTest {
     )
   }
 
-  def testNameProperty_givenLibraryPackageType_namePropertyIsMissing_errorShouldBeReported() = {
+  def testNameProperty_givenLibraryPackageType_namePropertyIsMissing_errorShouldBeReported(): Unit = {
     checkInspection(
       s"""
         |{
@@ -200,7 +206,7 @@ class MisconfigurationInspectionTest extends InspectionTest {
     )
   }
 
-  def testDescriptionProperty_givenLibraryPackageType_descPropertyIsMissing_errorShouldBeReported() = {
+  def testDescriptionProperty_givenLibraryPackageType_descPropertyIsMissing_errorShouldBeReported(): Unit = {
     checkInspection(
       s"""
         |{
@@ -212,7 +218,7 @@ class MisconfigurationInspectionTest extends InspectionTest {
     )
   }
 
-  def testNameProperty_givenLibraryPackageType_givenNameProperty_errorShouldNotBeReported() = {
+  def testNameProperty_givenLibraryPackageType_givenNameProperty_errorShouldNotBeReported(): Unit = {
     checkInspection(
       s"""
         |{
@@ -225,7 +231,7 @@ class MisconfigurationInspectionTest extends InspectionTest {
     )
   }
 
-  def testNameProperty_givenProjectPackageType_namePropertyIsMissing_errorShouldNotBeReported() = {
+  def testNameProperty_givenProjectPackageType_namePropertyIsMissing_errorShouldNotBeReported(): Unit = {
     checkInspection(
       s"""
         |{
@@ -236,7 +242,8 @@ class MisconfigurationInspectionTest extends InspectionTest {
     )
   }
 
-  def testNameProperty_givenLibraryPackageType_namePropertyIsMissing_givenAuthorsProperty_errorShouldBeReported() = {
+  def testNameProperty_givenLibraryPackageType_namePropertyIsMissing_givenAuthorsProperty_errorShouldBeReported()
+      : Unit = {
     checkInspection(
       s"""
         |{

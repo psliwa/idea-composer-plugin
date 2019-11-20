@@ -6,6 +6,6 @@ private class CallbackRepository[Package](packages: => Seq[Package], versions: P
     extends Repository[Package] {
   override def getPackages: Seq[Package] = packages
   override def getPackageVersions(packageName: PackageName): Seq[String] = versions(packageName)
-  override def map[NewPackage](f: (Package) => NewPackage): Repository[NewPackage] =
+  override def map[NewPackage](f: Package => NewPackage): Repository[NewPackage] =
     new CallbackRepository(packages.map(f), versions)
 }

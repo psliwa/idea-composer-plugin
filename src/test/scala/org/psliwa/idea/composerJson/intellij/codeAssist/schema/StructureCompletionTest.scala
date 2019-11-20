@@ -4,7 +4,7 @@ import org.psliwa.idea.composerJson.intellij.codeAssist.CompletionTest
 
 class StructureCompletionTest extends CompletionTest {
 
-  def testCompletionQuotedStringProperty_propertyValueShouldBeCompleted() = {
+  def testCompletionQuotedStringProperty_propertyValueShouldBeCompleted(): Unit = {
     completion(
       """
         |{
@@ -19,7 +19,7 @@ class StructureCompletionTest extends CompletionTest {
     )
   }
 
-  def testCompletionQuotedStringProperty_propertyValueExists_caretShouldBeMovedToPropertyValue() = {
+  def testCompletionQuotedStringProperty_propertyValueExists_caretShouldBeMovedToPropertyValue(): Unit = {
     completion(
       """
         |{
@@ -34,7 +34,8 @@ class StructureCompletionTest extends CompletionTest {
     )
   }
 
-  def testCompletionQuotedStringProperty_propertyValueExists_thisIsNotLastPropertyInObject_caretShouldBeMovedToPropertyValue() = {
+  def testCompletionQuotedStringProperty_propertyValueExists_thisIsNotLastPropertyInObject_caretShouldBeMovedToPropertyValue()
+      : Unit = {
     completion(
       """
         |{
@@ -51,7 +52,7 @@ class StructureCompletionTest extends CompletionTest {
     )
   }
 
-  def testCompletionStringProperty_unexpectedObjectPropertyValueExists_caretShouldBeMovedToPropertyValue() = {
+  def testCompletionStringProperty_unexpectedObjectPropertyValueExists_caretShouldBeMovedToPropertyValue(): Unit = {
     completion(
       """
         |{
@@ -66,7 +67,8 @@ class StructureCompletionTest extends CompletionTest {
     )
   }
 
-  def testCompletionStringProperty_unexpectedNestedObjectPropertyValueExists_caretShouldBeMovedToPropertyValue() = {
+  def testCompletionStringProperty_unexpectedNestedObjectPropertyValueExists_caretShouldBeMovedToPropertyValue()
+      : Unit = {
     completion(
       """
         |{
@@ -89,7 +91,7 @@ class StructureCompletionTest extends CompletionTest {
     )
   }
 
-  def testCompletionStringProperty_unexpectedArrayPropertyValueExists_caretShouldBeMovedToPropertyValue() = {
+  def testCompletionStringProperty_unexpectedArrayPropertyValueExists_caretShouldBeMovedToPropertyValue(): Unit = {
     completion(
       """
         |{
@@ -104,7 +106,7 @@ class StructureCompletionTest extends CompletionTest {
     )
   }
 
-  def testCompletionStringProperty_unexpectedLiteralPropertyValueExists_caretShouldBeMovedToPropertyValue() = {
+  def testCompletionStringProperty_unexpectedLiteralPropertyValueExists_caretShouldBeMovedToPropertyValue(): Unit = {
     completion(
       """
         |{
@@ -119,7 +121,7 @@ class StructureCompletionTest extends CompletionTest {
     )
   }
 
-  def testCompletionQuotedStringPropertyOutsideQuotes_quotesShouldBeFixed_propertyValueShouldBeCompleted() = {
+  def testCompletionQuotedStringPropertyOutsideQuotes_quotesShouldBeFixed_propertyValueShouldBeCompleted(): Unit = {
     completion(
       """
         |{
@@ -134,7 +136,7 @@ class StructureCompletionTest extends CompletionTest {
     )
   }
 
-  def testCompletionObjectProperty_curlyBracketsShouldBeFixed() = {
+  def testCompletionObjectProperty_curlyBracketsShouldBeFixed(): Unit = {
     completion(
       """
         |{
@@ -149,7 +151,7 @@ class StructureCompletionTest extends CompletionTest {
     )
   }
 
-  def testCompletionArrayProperty_squareBracketsShouldBeFixed() = {
+  def testCompletionArrayProperty_squareBracketsShouldBeFixed(): Unit = {
     completion(
       """
         |{
@@ -164,7 +166,7 @@ class StructureCompletionTest extends CompletionTest {
     )
   }
 
-  def testCompletionPackageProperty_curlyBracketsShouldBeFixed() = {
+  def testCompletionPackageProperty_curlyBracketsShouldBeFixed(): Unit = {
     completion(
       """
         |{
@@ -179,7 +181,7 @@ class StructureCompletionTest extends CompletionTest {
     )
   }
 
-  def testCompletionBooleanProperty_colonShouldBeAdded() = {
+  def testCompletionBooleanProperty_colonShouldBeAdded(): Unit = {
     completion(
       """
         |{
@@ -194,7 +196,7 @@ class StructureCompletionTest extends CompletionTest {
     )
   }
 
-  def testCompletionOrProperty_chooseFirstAlternativeAsBaseOfFix() = {
+  def testCompletionOrProperty_chooseFirstAlternativeAsBaseOfFix(): Unit = {
     completion(
       """
         |{
@@ -209,7 +211,7 @@ class StructureCompletionTest extends CompletionTest {
     )
   }
 
-  def testCompletedPropertyInObjectIsNotLast_commaShouldBeAdded() = {
+  def testCompletedPropertyInObjectIsNotLast_commaShouldBeAdded(): Unit = {
     completion(
       """
         |{
@@ -226,7 +228,7 @@ class StructureCompletionTest extends CompletionTest {
     )
   }
 
-  def testCompletionBooleanPropertyIsNotLast_commaShouldBeAdded() = {
+  def testCompletionBooleanPropertyIsNotLast_commaShouldBeAdded(): Unit = {
     completion(
       """
         |{
@@ -243,7 +245,8 @@ class StructureCompletionTest extends CompletionTest {
     )
   }
 
-  def testCompletionStringPropertyOutsideQuotes_givenPropertyHasPreviousSiblingStringProperty_quotesShouldBeFixed() = {
+  def testCompletionStringPropertyOutsideQuotes_givenPropertyHasPreviousSiblingStringProperty_quotesShouldBeFixed()
+      : Unit = {
     completion(
       """
         |{

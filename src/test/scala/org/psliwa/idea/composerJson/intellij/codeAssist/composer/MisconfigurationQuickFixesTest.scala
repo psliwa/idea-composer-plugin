@@ -15,7 +15,7 @@ class MisconfigurationQuickFixesTest extends InspectionTest {
   val SetNameTo = ComposerBundle.message("inspection.quickfix.setPropertyValue", "name", _: String)
   val RemoveDependency = ComposerBundle.message("inspection.quickfix.removeDependency", _: String)
 
-  val atLeastOne = new Range(Some(1), None)
+  val atLeastOne = Range(Some(1), None)
 
   override def setUp(): Unit = {
     super.setUp()
@@ -23,7 +23,7 @@ class MisconfigurationQuickFixesTest extends InspectionTest {
     myFixture.enableInspections(classOf[MisconfigurationInspection])
   }
 
-  def testSetPreferStableQuickFix_preferStableIsMissing_createPreferStableProperty() = {
+  def testSetPreferStableQuickFix_preferStableIsMissing_createPreferStableProperty(): Unit = {
     checkQuickFix(FixPreferStable, atLeastOne)(
       """
         |{
@@ -41,7 +41,7 @@ class MisconfigurationQuickFixesTest extends InspectionTest {
     )
   }
 
-  def testSetPreferStableQuickFix_preferStableIsFalse_setTrueValue() = {
+  def testSetPreferStableQuickFix_preferStableIsFalse_setTrueValue(): Unit = {
     checkQuickFix(FixPreferStable, atLeastOne)(
       """
         |{
@@ -60,7 +60,7 @@ class MisconfigurationQuickFixesTest extends InspectionTest {
     )
   }
 
-  def testSetPreferStableQuickFix_preferStableHasNoValue_setTrueValue() = {
+  def testSetPreferStableQuickFix_preferStableHasNoValue_setTrueValue(): Unit = {
     checkQuickFix(FixPreferStable, atLeastOne)(
       """
         |{
@@ -79,7 +79,7 @@ class MisconfigurationQuickFixesTest extends InspectionTest {
     )
   }
 
-  def testSetMinimumStabilityQuickFix_setStableMinimumStability() = {
+  def testSetMinimumStabilityQuickFix_setStableMinimumStability(): Unit = {
     checkQuickFix(FixMinimumStability, atLeastOne)(
       """
         |{
@@ -96,7 +96,7 @@ class MisconfigurationQuickFixesTest extends InspectionTest {
     )
   }
 
-  def testSetMinimumStabilityQuickFix_setStableMinimumStabilityForRootProperty() = {
+  def testSetMinimumStabilityQuickFix_setStableMinimumStabilityForRootProperty(): Unit = {
     checkQuickFix(FixMinimumStability, atLeastOne)(
       """
         |{
@@ -119,7 +119,7 @@ class MisconfigurationQuickFixesTest extends InspectionTest {
     )
   }
 
-  def testFixComposerInstallerType_setTypeToComposerPlugin() = {
+  def testFixComposerInstallerType_setTypeToComposerPlugin(): Unit = {
     checkQuickFix(SetTypeToComposerPlugin)(
       """
         |{
@@ -138,7 +138,7 @@ class MisconfigurationQuickFixesTest extends InspectionTest {
     )
   }
 
-  def testFixMissingLicense_createLicenseProperty() = {
+  def testFixMissingLicense_createLicenseProperty(): Unit = {
     checkQuickFix(CreateLicenseProperty)(
       """
         |{
@@ -154,7 +154,7 @@ class MisconfigurationQuickFixesTest extends InspectionTest {
     )
   }
 
-  def testFixCamelCaseName() = {
+  def testFixCamelCaseName(): Unit = {
     checkQuickFix(SetNameTo("some-vendor/some-package"))(
       """
         |{
@@ -169,7 +169,7 @@ class MisconfigurationQuickFixesTest extends InspectionTest {
     )
   }
 
-  def testNameStartUpperCase_makeFirstLetterLowerCase() = {
+  def testNameStartUpperCase_makeFirstLetterLowerCase(): Unit = {
     checkQuickFix(SetNameTo("some-vendor/some-package"))(
       """
         |{
@@ -184,7 +184,7 @@ class MisconfigurationQuickFixesTest extends InspectionTest {
     )
   }
 
-  def testNamePackageStartUpperCase_makeFirstLetterLowerCase() = {
+  def testNamePackageStartUpperCase_makeFirstLetterLowerCase(): Unit = {
     checkQuickFix(SetNameTo("some-vendor/some-package"))(
       """
         |{
@@ -199,7 +199,7 @@ class MisconfigurationQuickFixesTest extends InspectionTest {
     )
   }
 
-  def testNamePackageWithDashAndUpperCase_makeThisLetterLowerCase() = {
+  def testNamePackageWithDashAndUpperCase_makeThisLetterLowerCase(): Unit = {
     checkQuickFix(SetNameTo("some-vendor/some-package"))(
       """
         |{
@@ -214,7 +214,7 @@ class MisconfigurationQuickFixesTest extends InspectionTest {
     )
   }
 
-  def testDependencyInRequiredAndRequiredDev_removeDependency() = {
+  def testDependencyInRequiredAndRequiredDev_removeDependency(): Unit = {
     checkQuickFix(RemoveDependency("some/pkg"), atLeastOne)(
       """
         |{
@@ -238,7 +238,7 @@ class MisconfigurationQuickFixesTest extends InspectionTest {
     )
   }
 
-  def testCreateNamePropertyQuickFix() = {
+  def testCreateNamePropertyQuickFix(): Unit = {
     checkQuickFix(CreateNameProperty)(
       """
         |{

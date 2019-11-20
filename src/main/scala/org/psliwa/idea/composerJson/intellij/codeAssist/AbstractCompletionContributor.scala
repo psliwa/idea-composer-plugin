@@ -18,7 +18,7 @@ import scala.collection.Seq
 
 abstract class AbstractCompletionContributor extends com.intellij.codeInsight.completion.CompletionContributor {
 
-  protected lazy val maybeSchema = ComposerSchema
+  protected lazy val maybeSchema: Option[Schema] = ComposerSchema
 
   maybeSchema.foreach(addCompletionProvidersForSchema)
 
@@ -33,11 +33,10 @@ abstract class AbstractCompletionContributor extends com.intellij.codeInsight.co
   private def completionProvidersForSchema(s: Schema,
                                            parent: Capture): List[(Capture, CompletionProvider[CompletionParameters])] =
     s match {
-      case SObject(properties, _) => {
+      case SObject(properties, _) =>
         propertyCompletionProvider(parent, properties.named) ++
           completionProvidersForProperties(properties.named, parent, string().equalTo(_: String)) ++
           completionProvidersForProperties(properties.patterned, parent, stringMatches)
-      }
       case SOr(l) => l.flatMap(completionProvidersForSchema(_, parent))
       case SArray(i) => completionProvidersForSchema(i, psiElement(classOf[JsonArray]).withParent(parent))
       case _ => getCompletionProvidersForSchema(s, parent)
@@ -102,7 +101,7 @@ abstract class AbstractCompletionContributor extends com.intellij.codeInsight.co
 object AbstractCompletionContributor {
 
   private object PropertyCompletionProvider {
-    def apply(es: LookupElements, getInsertHandler: InsertHandlerFinder) = {
+    def apply(es: LookupElements, getInsertHandler: InsertHandlerFinder): ParametersDependantCompletionProvider = {
       new ParametersDependantCompletionProvider(context => {
         import scala.jdk.CollectionConverters._
 
@@ -136,7 +135,7 @@ object AbstractCompletionContributor {
       addLookupElementsToResult(es, getInsertHandler)(parameters, mapResult(result))
     }
 
-    protected def mapResult(result: CompletionResultSet) = result
+    protected def mapResult(result: CompletionResultSet): CompletionResultSet = result
   }
 
   abstract class AbstractCompletionProvider
@@ -154,7 +153,9 @@ object AbstractCompletionContributor {
       })
     }
 
-    protected def insertHandler(element: PsiElement, le: BaseLookupElement, getInsertHandler: InsertHandlerFinder) = {
+    protected def insertHandler(element: PsiElement,
+                                le: BaseLookupElement,
+                                getInsertHandler: InsertHandlerFinder): InsertHandler[LookupElement] = {
       if (!le.quoted) null
       else getInsertHandler(le).getOrElse(QuoteInsertHandler)
     }

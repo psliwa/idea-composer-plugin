@@ -25,5 +25,5 @@ private class UrlPsiReference(element: PsiElement) extends PsiReferenceBase[PsiE
 }
 
 private object UrlPsiReference {
-  val EmptyArray = Array[AnyRef]()
+  val EmptyArray: Array[AnyRef] = Array[AnyRef]()
 }

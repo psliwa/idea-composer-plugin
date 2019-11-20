@@ -22,7 +22,7 @@ class SchemaQuickFixesTest extends InspectionTest {
   private val CreatePropertyQuickFix = ComposerBundle.message("inspection.quickfix.createProperty", _: String)
   private val ShowValidValuesQuickFix = ComposerBundle.message("inspection.quickfix.chooseValidValue")
 
-  def testRemoveQuotes_givenQuotedNumber_quotesShouldBeRemoved() = {
+  def testRemoveQuotes_givenQuotedNumber_quotesShouldBeRemoved(): Unit = {
     checkQuickFix(RemoveQuotesQuickFix)(
       s"""
         |{
@@ -43,7 +43,7 @@ class SchemaQuickFixesTest extends InspectionTest {
     )
   }
 
-  def testRemoveQuotes_givenQuotedString_quotesShouldNotBeRemoved() = {
+  def testRemoveQuotes_givenQuotedString_quotesShouldNotBeRemoved(): Unit = {
     checkQuickFix(RemoveQuotesQuickFix, 0)(
       s"""
         |{
@@ -64,7 +64,7 @@ class SchemaQuickFixesTest extends InspectionTest {
     )
   }
 
-  def testRemoveEntry_givenUnsupportedProperty_itShouldBeRemoved() = {
+  def testRemoveEntry_givenUnsupportedProperty_itShouldBeRemoved(): Unit = {
     checkQuickFix(RemoveEntryQuickFix)(
       s"""
         |{
@@ -92,7 +92,7 @@ class SchemaQuickFixesTest extends InspectionTest {
     )
   }
 
-  def testRemoveEntry_givenUnsupportedPropertyIsLastOne_commaAfterPreviousPropertyShouldBeRemoved() = {
+  def testRemoveEntry_givenUnsupportedPropertyIsLastOne_commaAfterPreviousPropertyShouldBeRemoved(): Unit = {
     checkQuickFix(RemoveEntryQuickFix)(
       s"""
         |{
@@ -112,7 +112,8 @@ class SchemaQuickFixesTest extends InspectionTest {
     )
   }
 
-  def testRemoveEntry_givenObjectProperty_givenPropertyIsNotLastOne_commaAfterPreviousPropertyShouldNotBeRemoved() = {
+  def testRemoveEntry_givenObjectProperty_givenPropertyIsNotLastOne_commaAfterPreviousPropertyShouldNotBeRemoved()
+      : Unit = {
     checkQuickFix(RemoveEntryQuickFix)(
       s"""
         |{
@@ -134,7 +135,8 @@ class SchemaQuickFixesTest extends InspectionTest {
     )
   }
 
-  def testRemoveProperty_givenStringProperty_givenPropertyIsNotLastOne_commaAfterPreviousPropertyShouldNotBeRemoved() = {
+  def testRemoveProperty_givenStringProperty_givenPropertyIsNotLastOne_commaAfterPreviousPropertyShouldNotBeRemoved()
+      : Unit = {
     checkQuickFix(RemoveEntryQuickFix)(
       s"""
         |{
@@ -154,7 +156,7 @@ class SchemaQuickFixesTest extends InspectionTest {
     )
   }
 
-  def testRemoveProperty_givenAlreadyDefinedProperty_removeIt() = {
+  def testRemoveProperty_givenAlreadyDefinedProperty_removeIt(): Unit = {
     checkQuickFix(RemoveEntryQuickFix)(
       s"""
          |{
@@ -190,7 +192,7 @@ class SchemaQuickFixesTest extends InspectionTest {
   //    )
   //  }
 
-  def testCreateProperty_propertyShouldBeCreated() = {
+  def testCreateProperty_propertyShouldBeCreated(): Unit = {
     checkQuickFix(CreatePropertyQuickFix("name"))(
       s"""
          |{
@@ -214,7 +216,8 @@ class SchemaQuickFixesTest extends InspectionTest {
     )
   }
 
-  def testCreateProperty_thereAreSomePropertiesAlready_caretIsBeforeExistingProperty_propertyShouldBeCreatedBeforeExistingOne() = {
+  def testCreateProperty_thereAreSomePropertiesAlready_caretIsBeforeExistingProperty_propertyShouldBeCreatedBeforeExistingOne()
+      : Unit = {
     checkQuickFix(CreatePropertyQuickFix("name"))(
       s"""
          |{
@@ -240,7 +243,8 @@ class SchemaQuickFixesTest extends InspectionTest {
     )
   }
 
-  def testCreateProperty_thereAreSomePropertiesAlready_caretIsAfterExistingProperty_propertyShouldBeCreatedAfterExistingOne() = {
+  def testCreateProperty_thereAreSomePropertiesAlready_caretIsAfterExistingProperty_propertyShouldBeCreatedAfterExistingOne()
+      : Unit = {
     checkQuickFix(CreatePropertyQuickFix("name"))(
       s"""
          |{
@@ -266,7 +270,8 @@ class SchemaQuickFixesTest extends InspectionTest {
     )
   }
 
-  def testCreateProperty_thereAreSomePropertiesAlready_caretIsBetweenExistingProperties_propertyShouldBeCreatedBetweenExistingOne() = {
+  def testCreateProperty_thereAreSomePropertiesAlready_caretIsBetweenExistingProperties_propertyShouldBeCreatedBetweenExistingOne()
+      : Unit = {
     checkQuickFix(CreatePropertyQuickFix("name"))(
       s"""
          |{
@@ -294,7 +299,8 @@ class SchemaQuickFixesTest extends InspectionTest {
     )
   }
 
-  def testCreateProperty_thereAreSomePropertiesAlready_caretIsInsideFirstProperty_propertyShouldBeCreatedAfterThatProperty() = {
+  def testCreateProperty_thereAreSomePropertiesAlready_caretIsInsideFirstProperty_propertyShouldBeCreatedAfterThatProperty()
+      : Unit = {
     checkQuickFix(CreatePropertyQuickFix("name"))(
       s"""
         |{
@@ -322,7 +328,7 @@ class SchemaQuickFixesTest extends InspectionTest {
     )
   }
 
-  def testCreateProperty_noneNewLineGiven_newLinesShouldBeFixed() = {
+  def testCreateProperty_noneNewLineGiven_newLinesShouldBeFixed(): Unit = {
     checkQuickFix(CreatePropertyQuickFix("name"))(
       s"""
          |{
@@ -345,7 +351,7 @@ class SchemaQuickFixesTest extends InspectionTest {
     )
   }
 
-  def testFixEnum_valueShouldBeSelected() = {
+  def testFixEnum_valueShouldBeSelected(): Unit = {
     checkQuickFix(ShowValidValuesQuickFix)(
       s"""
         |{

@@ -8,13 +8,13 @@ import org.psliwa.idea.composerJson.intellij.codeAssist.InspectionTest
 
 class NotInstalledPackageInspectionTest extends InspectionTest {
 
-  override def setUp() = {
+  override def setUp(): Unit = {
     super.setUp()
 
     myFixture.enableInspections(classOf[NotInstalledPackageInspection])
   }
 
-  def testGivenUninstalledPackage_thatShouldBeReported() = {
+  def testGivenUninstalledPackage_thatShouldBeReported(): Unit = {
     checkInspection("""
         |{
         |  "require": {
@@ -24,7 +24,7 @@ class NotInstalledPackageInspectionTest extends InspectionTest {
       """.stripMargin)
   }
 
-  def testGivenVirtualPackage_thatShouldNotBeReported() = {
+  def testGivenVirtualPackage_thatShouldNotBeReported(): Unit = {
     checkInspection("""
         |{
         |  "require": {
@@ -34,7 +34,7 @@ class NotInstalledPackageInspectionTest extends InspectionTest {
       """.stripMargin)
   }
 
-  def testGivenInstalledPackage_thatShouldNotBeReported() = {
+  def testGivenInstalledPackage_thatShouldNotBeReported(): Unit = {
     createComposerLock(Packages(PackageDescriptor("vendor/pkg", "1.0.2")))
 
     checkInspection("""
@@ -65,7 +65,7 @@ class NotInstalledPackageInspectionTest extends InspectionTest {
       """.stripMargin)
   }
 
-  def testGivenInstalledPackage_givenPackageNameInDifferentCase_thatShouldNotBeReported() = {
+  def testGivenInstalledPackage_givenPackageNameInDifferentCase_thatShouldNotBeReported(): Unit = {
     createComposerLock(Packages(PackageDescriptor("veNdor/pkg", "1.0.2")))
 
     checkInspection("""
@@ -77,7 +77,7 @@ class NotInstalledPackageInspectionTest extends InspectionTest {
       """.stripMargin)
   }
 
-  def testGivenUninstalledPackage_packageHasNotVersionYet_thatShouldNotBeReported() = {
+  def testGivenUninstalledPackage_packageHasNotVersionYet_thatShouldNotBeReported(): Unit = {
     checkInspection("""
         |{
         |  "require": {
@@ -87,7 +87,7 @@ class NotInstalledPackageInspectionTest extends InspectionTest {
       """.stripMargin)
   }
 
-  def testGivenInstalledProdPackage_thatPackageIsOnlyInRequireDev_thatShouldNotBeReported() = {
+  def testGivenInstalledProdPackage_thatPackageIsOnlyInRequireDev_thatShouldNotBeReported(): Unit = {
     createComposerLock(Packages(PackageDescriptor("vendor/pkg", "1.0.2")))
 
     checkInspection("""
@@ -99,7 +99,7 @@ class NotInstalledPackageInspectionTest extends InspectionTest {
       """.stripMargin)
   }
 
-  def testGivenUninstalledPackage_givenPackageIsInRequireDev_thatShouldBeReported() = {
+  def testGivenUninstalledPackage_givenPackageIsInRequireDev_thatShouldBeReported(): Unit = {
     checkInspection("""
         |{
         |  "require-dev": {
@@ -109,7 +109,7 @@ class NotInstalledPackageInspectionTest extends InspectionTest {
       """.stripMargin)
   }
 
-  def testGivenInstalledDevPackage_thatPackageIsOnlyInRequireDev_thatShouldNotBeReported() = {
+  def testGivenInstalledDevPackage_thatPackageIsOnlyInRequireDev_thatShouldNotBeReported(): Unit = {
     createComposerLock(Packages(PackageDescriptor("vendor/pkg", "1.0.2", isDev = true)))
 
     checkInspection("""
@@ -121,7 +121,7 @@ class NotInstalledPackageInspectionTest extends InspectionTest {
       """.stripMargin)
   }
 
-  def testGivenInstalledDevPackage_thatPackageIsOnlyInRequire_thatShouldBeReported() = {
+  def testGivenInstalledDevPackage_thatPackageIsOnlyInRequire_thatShouldBeReported(): Unit = {
     createComposerLock(Packages(PackageDescriptor("vendor/pkg", "1.0.2", isDev = true)))
 
     checkInspection("""

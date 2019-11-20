@@ -8,7 +8,7 @@ import org.psliwa.idea.composerJson._
 class SchemaDocumentationProviderTest extends DocumentationTest {
   override protected def documentationProvider: DocumentationProvider = new SchemaDocumentationProvider
 
-  def testGivenPropertyOnFirstLevel_docShouldBeFromSchemaDesc() = {
+  def testGivenPropertyOnFirstLevel_docShouldBeFromSchemaDesc(): Unit = {
     checkDocumentation(
       """
         |{
@@ -19,7 +19,7 @@ class SchemaDocumentationProviderTest extends DocumentationTest {
     )
   }
 
-  def testGivenNestedProperty_docShouldBeFromSchemaDesc() = {
+  def testGivenNestedProperty_docShouldBeFromSchemaDesc(): Unit = {
     checkDocumentation(
       """
         |{
@@ -32,7 +32,7 @@ class SchemaDocumentationProviderTest extends DocumentationTest {
     )
   }
 
-  def testGivenPropertyInArray_docShouldBeFromSchemaDesc() = {
+  def testGivenPropertyInArray_docShouldBeFromSchemaDesc(): Unit = {
     checkDocumentation(
       """
         |{
@@ -47,7 +47,7 @@ class SchemaDocumentationProviderTest extends DocumentationTest {
     )
   }
 
-  def testGivenPropertyInTopLevel_externalDocUrlShouldExist() = {
+  def testGivenPropertyInTopLevel_externalDocUrlShouldExist(): Unit = {
     checkDocumentation(
       """
         |{
@@ -58,7 +58,7 @@ class SchemaDocumentationProviderTest extends DocumentationTest {
     )
   }
 
-  def testGivenNotComposerJsonFile_docsShouldNotBeFound() = {
+  def testGivenNotComposerJsonFile_docsShouldNotBeFound(): Unit = {
     val unexpectedUrl = "getcomposer.org/doc/04-schema.md#name"
     checkDocumentation(
       """

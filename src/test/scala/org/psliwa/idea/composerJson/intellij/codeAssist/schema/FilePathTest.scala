@@ -3,7 +3,7 @@ package org.psliwa.idea.composerJson.intellij.codeAssist.schema
 import org.psliwa.idea.composerJson.intellij.codeAssist.CompletionTest
 
 class FilePathTest extends CompletionTest {
-  def testSuggestions_givenEmptyPrefix_suggestPathOnTopLevel() = {
+  def testSuggestions_givenEmptyPrefix_suggestPathOnTopLevel(): Unit = {
     writeAction(() => {
       myFixture.getTempDirFixture
         .findOrCreateDir("dir1")
@@ -27,7 +27,7 @@ class FilePathTest extends CompletionTest {
     )
   }
 
-  def testSuggestions_givenDirectoryPrefix_suggestPathsFromGivenDirectory() = {
+  def testSuggestions_givenDirectoryPrefix_suggestPathsFromGivenDirectory(): Unit = {
     writeAction(() => {
       myFixture.getTempDirFixture.findOrCreateDir("dir1").createChildDirectory(this, "dir1.1")
       myFixture.getTempDirFixture.findOrCreateDir("dir1").createChildData(this, "file1.txt")
@@ -45,7 +45,7 @@ class FilePathTest extends CompletionTest {
     )
   }
 
-  def testSuggestions_givenDirectoryPrefix_givenFileInDirectory_suggestFileFromGivenDirectory() = {
+  def testSuggestions_givenDirectoryPrefix_givenFileInDirectory_suggestFileFromGivenDirectory(): Unit = {
     writeAction(() => {
       myFixture.getTempDirFixture
         .findOrCreateDir("dir1")
@@ -63,7 +63,7 @@ class FilePathTest extends CompletionTest {
     )
   }
 
-  def testSuggestionsInAutoloadProperty() = {
+  def testSuggestionsInAutoloadProperty(): Unit = {
     writeAction(() => {
       myFixture.getTempDirFixture.findOrCreateDir("dir1")
     })
@@ -82,7 +82,7 @@ class FilePathTest extends CompletionTest {
     )
   }
 
-  def testSuggestionsInAutoloadProperty_givenArrayOfFilePaths_completionShouldWorkAsWell() = {
+  def testSuggestionsInAutoloadProperty_givenArrayOfFilePaths_completionShouldWorkAsWell(): Unit = {
     writeAction(() => {
       myFixture.getTempDirFixture.findOrCreateDir("dir1")
     })
@@ -101,7 +101,7 @@ class FilePathTest extends CompletionTest {
     )
   }
 
-  def testSuggestionsInAutoload_filePathsShouldNotBeSuggestedAsAutoloadProperties() = {
+  def testSuggestionsInAutoload_filePathsShouldNotBeSuggestedAsAutoloadProperties(): Unit = {
     writeAction(() => {
       myFixture.getTempDirFixture.findOrCreateDir("dir1")
     })
@@ -121,7 +121,7 @@ class FilePathTest extends CompletionTest {
     )
   }
 
-  def testAutoloadCompletion_completeAutoloadPropertyValuesAsObjects() = {
+  def testAutoloadCompletion_completeAutoloadPropertyValuesAsObjects(): Unit = {
     completion(
       """
         |{
@@ -140,7 +140,7 @@ class FilePathTest extends CompletionTest {
     )
   }
 
-  def testFilepathPropertyCompletion_completePropertyAsString() = {
+  def testFilepathPropertyCompletion_completePropertyAsString(): Unit = {
     completion(
       """
         |{

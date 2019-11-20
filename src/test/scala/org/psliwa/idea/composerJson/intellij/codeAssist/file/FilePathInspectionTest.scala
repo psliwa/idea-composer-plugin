@@ -12,7 +12,7 @@ class FilePathInspectionTest extends InspectionTest {
     myFixture.enableInspections(classOf[FilePathInspection])
   }
 
-  def testGivenFilePathElementInArray_givenFilePathDoesNotExist_warningShouldBeReported() = {
+  def testGivenFilePathElementInArray_givenFilePathDoesNotExist_warningShouldBeReported(): Unit = {
     checkInspection(
       """
         |{
@@ -22,7 +22,7 @@ class FilePathInspectionTest extends InspectionTest {
     )
   }
 
-  def testGivenFilePathElement_givenFilePathDoesNotExist_warningShouldBeReported() = {
+  def testGivenFilePathElement_givenFilePathDoesNotExist_warningShouldBeReported(): Unit = {
     checkInspection(
       """
         |{
@@ -32,7 +32,7 @@ class FilePathInspectionTest extends InspectionTest {
     )
   }
 
-  def testGivenFilePathElementInArray_givenExistingFilePath_warningShouldNotBeReported() = {
+  def testGivenFilePathElementInArray_givenExistingFilePath_warningShouldNotBeReported(): Unit = {
     writeAction(() => myFixture.getTempDirFixture.findOrCreateDir("some").createChildData(this, "existing"))
 
     checkInspection(
@@ -44,7 +44,7 @@ class FilePathInspectionTest extends InspectionTest {
     )
   }
 
-  def testGivenFilePathElement_givenExistingFilePath_warningShouldNotBeReported() = {
+  def testGivenFilePathElement_givenExistingFilePath_warningShouldNotBeReported(): Unit = {
     writeAction(() => myFixture.getTempDirFixture.findOrCreateDir("some").createChildData(this, "existing"))
 
     checkInspection(
@@ -56,7 +56,7 @@ class FilePathInspectionTest extends InspectionTest {
     )
   }
 
-  def testGivenFilePathElement_givenElementDoesNotRequireExistingPath_warningShouldNotBeNeverReported() = {
+  def testGivenFilePathElement_givenElementDoesNotRequireExistingPath_warningShouldNotBeNeverReported(): Unit = {
     checkInspection(
       """
         |{
@@ -68,7 +68,7 @@ class FilePathInspectionTest extends InspectionTest {
     )
   }
 
-  def testGivenFilePathsElement_givenFilePathDoesNotExist_warningShouldBeReported() = {
+  def testGivenFilePathsElement_givenFilePathDoesNotExist_warningShouldBeReported(): Unit = {
     checkInspection(
       """
         |{
@@ -82,7 +82,7 @@ class FilePathInspectionTest extends InspectionTest {
     )
   }
 
-  def testGivenFilePathsElement_givenArrayOfUnexistingFilePaths_warningShouldBeReported() = {
+  def testGivenFilePathsElement_givenArrayOfUnexistingFilePaths_warningShouldBeReported(): Unit = {
     checkInspection(
       """
         |{
@@ -96,7 +96,7 @@ class FilePathInspectionTest extends InspectionTest {
     )
   }
 
-  def testGivenFilePathsElement_givenExistingFilePath_warningShouldNotBeReported() = {
+  def testGivenFilePathsElement_givenExistingFilePath_warningShouldNotBeReported(): Unit = {
     writeAction(() => myFixture.getTempDirFixture.findOrCreateDir("some").createChildData(this, "existing"))
 
     checkInspection(
@@ -112,7 +112,7 @@ class FilePathInspectionTest extends InspectionTest {
     )
   }
 
-  def testGivenFilePathsElement_givenExistingRelativeFilePath_warningShouldNotBeReported() = {
+  def testGivenFilePathsElement_givenExistingRelativeFilePath_warningShouldNotBeReported(): Unit = {
     writeAction(() => myFixture.getTempDirFixture.findOrCreateDir("some").createChildDirectory(this, "existing"))
 
     checkInspection(
@@ -128,7 +128,7 @@ class FilePathInspectionTest extends InspectionTest {
     )
   }
 
-  def testGivenFilePathsElement_givenRelativeUnexistingPath_warningShouldBeReported() = {
+  def testGivenFilePathsElement_givenRelativeUnexistingPath_warningShouldBeReported(): Unit = {
     checkInspection(
       """
         |{
@@ -162,7 +162,7 @@ class FilePathInspectionTest extends InspectionTest {
     )
   }
 
-  def testGivenFilePathsElement_givenArrayOfExistingFilePaths_warningShouldNotBeReported() = {
+  def testGivenFilePathsElement_givenArrayOfExistingFilePaths_warningShouldNotBeReported(): Unit = {
     writeAction(() => myFixture.getTempDirFixture.findOrCreateDir("some").createChildData(this, "existing"))
 
     checkInspection(
@@ -178,7 +178,7 @@ class FilePathInspectionTest extends InspectionTest {
     )
   }
 
-  def testGivenFilePathsPropertyDoesNotHaveValue_warningShouldNotBeReported() = {
+  def testGivenFilePathsPropertyDoesNotHaveValue_warningShouldNotBeReported(): Unit = {
     try {
       checkInspection(
         """
@@ -192,11 +192,11 @@ class FilePathInspectionTest extends InspectionTest {
         """.stripMargin
       )
     } catch {
-      case e: ComparisonFailure => //ignore syntax error assertionError, check only scala MatchFailure
+      case _: ComparisonFailure => //ignore syntax error assertionError, check only scala MatchFailure
     }
   }
 
-  def testFilepathButAlsoAcceptsUrl_givenValidUrl_warningShouldNotBeReported() = {
+  def testFilepathButAlsoAcceptsUrl_givenValidUrl_warningShouldNotBeReported(): Unit = {
     checkInspection(
       """
         |{

@@ -10,7 +10,7 @@ class PresentationStringTest {
   val semVer121 = SemanticConstraint(new SemanticVersion(1, 2, 1))
 
   @Test
-  def testPresentationString() = {
+  def testPresentationString(): Unit = {
     List(
       (semVer120, "1.2.0"),
       (DevConstraint("master"), "dev-master"),

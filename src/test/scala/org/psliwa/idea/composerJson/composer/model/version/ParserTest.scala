@@ -5,7 +5,7 @@ import org.junit.Test
 
 class ParserTest {
   @Test
-  def parseDevMasterConstraint() = {
+  def parseDevMasterConstraint(): Unit = {
     assertConstraintEquals(
       DevConstraint("master"),
       "dev-master"
@@ -13,7 +13,7 @@ class ParserTest {
   }
 
   @Test
-  def parseDevTrunkConstraint() = {
+  def parseDevTrunkConstraint(): Unit = {
     assertConstraintEquals(
       DevConstraint("trunk"),
       "dev-trunk"
@@ -21,7 +21,7 @@ class ParserTest {
   }
 
   @Test
-  def parseFullWildcardConstraint() = {
+  def parseFullWildcardConstraint(): Unit = {
     assertConstraintEquals(
       WildcardConstraint(None),
       "*"
@@ -29,7 +29,7 @@ class ParserTest {
   }
 
   @Test
-  def parseHashConstraint() = {
+  def parseHashConstraint(): Unit = {
     assertConstraintEquals(
       HashConstraint("afafaf"),
       "afafaf"
@@ -37,7 +37,7 @@ class ParserTest {
   }
 
   @Test
-  def parseSemanticConstraint() = {
+  def parseSemanticConstraint(): Unit = {
     assertConstraintEquals(
       SemanticConstraint(new SemanticVersion(1, 2, 3)),
       "1.2.3"
@@ -45,12 +45,12 @@ class ParserTest {
   }
 
   @Test
-  def givenToLongSemantic_parseError() = {
+  def givenToLongSemantic_parseError(): Unit = {
     assertEquals(None, Parser.parse("1.2.3.4"))
   }
 
   @Test
-  def parseSemanticConstraintWithLongParts() = {
+  def parseSemanticConstraintWithLongParts(): Unit = {
     assertConstraintEquals(
       SemanticConstraint(new SemanticVersion(123, 234, 345)),
       "123.234.345"
@@ -58,7 +58,7 @@ class ParserTest {
   }
 
   @Test
-  def parseDateConstraint_formatYMDWithoutSeparators() = {
+  def parseDateConstraint_formatYMDWithoutSeparators(): Unit = {
     assertConstraintEquals(
       DateConstraint("20101012"),
       "20101012"
@@ -66,7 +66,7 @@ class ParserTest {
   }
 
   @Test
-  def parseDateConstraint_formatYMDHisWithoutSeparators() = {
+  def parseDateConstraint_formatYMDHisWithoutSeparators(): Unit = {
     assertConstraintEquals(
       DateConstraint("20101012203020"),
       "20101012203020"
@@ -74,7 +74,7 @@ class ParserTest {
   }
 
   @Test
-  def parseDateConstraint_formatYMDHis() = {
+  def parseDateConstraint_formatYMDHis(): Unit = {
     assertConstraintEquals(
       DateConstraint("20101012-203020"),
       "20101012-203020"
@@ -82,17 +82,17 @@ class ParserTest {
   }
 
   @Test
-  def parseDateConstraint_formatYM() = {
+  def parseDateConstraint_formatYM(): Unit = {
     List("2010.10", "2010-10").foreach(version => assertConstraintEquals(DateConstraint(version), version))
   }
 
   @Test
-  def parseDateConstraint_formatYMD() = {
+  def parseDateConstraint_formatYMD(): Unit = {
     List("2010.10.12", "2010-10-12").foreach(version => assertConstraintEquals(DateConstraint(version), version))
   }
 
   @Test
-  def parseAlias() = {
+  def parseAlias(): Unit = {
     List(" as ", " AS ").foreach(as => {
       assertConstraintEquals(
         AliasedConstraint(DevConstraint("master"), SemanticConstraint(new SemanticVersion(1, 2, 0)), as),
@@ -102,7 +102,7 @@ class ParserTest {
   }
 
   @Test
-  def parseWildcardedSemVer() = {
+  def parseWildcardedSemVer(): Unit = {
     assertConstraintEquals(
       WildcardConstraint(Some(SemanticConstraint(new SemanticVersion(1, 2)))),
       "1.2.*"
@@ -110,7 +110,7 @@ class ParserTest {
   }
 
   @Test
-  def parseWrappedSemVer() = {
+  def parseWrappedSemVer(): Unit = {
     assertConstraintEquals(
       WrappedConstraint(SemanticConstraint(new SemanticVersion(1, 2)), Some("v"), Some("@dev")),
       "v1.2@dev"
@@ -131,7 +131,7 @@ class ParserTest {
   }
 
   @Test
-  def parseLogicalAndConstraint() = {
+  def parseLogicalAndConstraint(): Unit = {
     List(",", ", ", " ").foreach(separator => {
       assertConstraintEquals(
         LogicalConstraint(List(DevConstraint("master"), DevConstraint("trunk")), LogicalOperator.AND, separator),
@@ -141,7 +141,7 @@ class ParserTest {
   }
 
   @Test
-  def parseHyphenRangeConstraint() = {
+  def parseHyphenRangeConstraint(): Unit = {
     List("-", " - ").foreach(separator => {
       assertConstraintEquals(
         HyphenRangeConstraint(SemanticConstraint(new SemanticVersion(1, 2)),
@@ -153,12 +153,12 @@ class ParserTest {
   }
 
   @Test
-  def parseNumberOutOfIntegerRange_resultShouldBeNone() = {
+  def parseNumberOutOfIntegerRange_resultShouldBeNone(): Unit = {
     assertEquals(None, Parser.parse("0231231231231231246131253124113"))
   }
 
   @Test
-  def parseLogicalOrConstraint() = {
+  def parseLogicalOrConstraint(): Unit = {
     List("||", " || ", "|", " | ").foreach(separator => {
       assertConstraintEquals(
         LogicalConstraint(List(DevConstraint("master"), DevConstraint("trunk")), LogicalOperator.OR, separator),
@@ -168,7 +168,7 @@ class ParserTest {
   }
 
   @Test
-  def parseLogicalConstraint_andHasGreaterPrecedenceThanOr() = {
+  def parseLogicalConstraint_andHasGreaterPrecedenceThanOr(): Unit = {
     assertConstraintEquals(
       LogicalConstraint(
         List(
@@ -183,7 +183,7 @@ class ParserTest {
   }
 
   @Test
-  def parseLogicalConstraint_andHasGreaterPrecedenceThanOr_inversedOrder() = {
+  def parseLogicalConstraint_andHasGreaterPrecedenceThanOr_inversedOrder(): Unit = {
     assertConstraintEquals(
       LogicalConstraint(
         List(
@@ -198,7 +198,7 @@ class ParserTest {
   }
 
   @Test
-  def parseOperatorWithWrappedWildcard() = {
+  def parseOperatorWithWrappedWildcard(): Unit = {
     assertConstraintEquals(
       OperatorConstraint(
         ConstraintOperator.>,
@@ -209,11 +209,11 @@ class ParserTest {
   }
 
   @Test
-  def givenVersionWithValidBegining_butEndingIsMalformed_noneExpected() = {
+  def givenVersionWithValidBegining_butEndingIsMalformed_noneExpected(): Unit = {
     assertEquals(None, Parser.parse(">1.2 someInvalid"))
   }
 
-  private def assertConstraintEquals(expected: Constraint, actual: String) = {
+  private def assertConstraintEquals(expected: Constraint, actual: String): Unit = {
     assertEquals(s"parsing: '$actual'", Some(expected), Parser.parse(actual))
   }
 }

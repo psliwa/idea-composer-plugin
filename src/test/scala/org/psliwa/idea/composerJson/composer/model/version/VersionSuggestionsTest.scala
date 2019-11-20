@@ -3,7 +3,7 @@ package org.psliwa.idea.composerJson.composer.model.version
 import org.psliwa.idea.composerJson.BasePropSpec
 import org.psliwa.idea.composerJson.composer.model.version.{VersionGenerators => gen}
 import org.scalacheck.{Gen, Prop}
-import org.scalacheck.Prop.{forAll, BooleanOperators}
+import org.scalacheck.Prop.{forAll, propBoolean}
 
 class VersionSuggestionsTest extends BasePropSpec {
 
@@ -24,7 +24,7 @@ class VersionSuggestionsTest extends BasePropSpec {
   //properties
 
   property("suggestions for pure semantic version") {
-    forAll(semanticVersionGen(prefix = "")) { (version: GeneratedVersion) =>
+    forAll(semanticVersionGen(prefix = "")) { version: GeneratedVersion =>
       val suggestions = VersionSuggestions.suggestionsForVersion(version.get, "")
 
       checkSemanticVersionAlternatives(version.get, suggestions)
@@ -43,7 +43,7 @@ class VersionSuggestionsTest extends BasePropSpec {
   }
 
   property("suggestions for prefixed semantic version") {
-    forAll(semanticVersionGen(prefix = "v")) { (version: GeneratedVersion) =>
+    forAll(semanticVersionGen(prefix = "v")) { version: GeneratedVersion =>
       val suggestions = VersionSuggestions.suggestionsForVersion(version.get, "")
 
       val pureSemanticVersion = version.get.drop(1)
@@ -55,7 +55,7 @@ class VersionSuggestionsTest extends BasePropSpec {
   }
 
   property("suggestions for non semantic version") {
-    forAll(nonSemanticVersionGen) { (version: GeneratedVersion) =>
+    forAll(nonSemanticVersionGen) { version: GeneratedVersion =>
       val suggestions = VersionSuggestions.suggestionsForVersion(version.get, "")
 
       suggestions.contains(version.get) :| "suggestions contain original version" &&

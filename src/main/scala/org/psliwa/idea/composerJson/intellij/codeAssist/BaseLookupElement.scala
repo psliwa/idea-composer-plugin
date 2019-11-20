@@ -23,15 +23,15 @@ final private[codeAssist] class BaseLookupElement(
   presentation.setTypeText(if (description == "") null else description)
   presentation.setStrikeout(description.startsWith("DEPRECATED"))
 
-  override def getLookupString = name
+  override def getLookupString: String = name
   override def renderElement(presentation: LookupElementPresentation): Unit = presentation.copyFrom(this.presentation)
   override def handleInsert(context: InsertionContext): Unit = insertHandler.foreach(_.handleInsert(context, this))
 
-  def withInsertHandler(insertHandler: InsertHandler[LookupElement]) = {
+  def withInsertHandler(insertHandler: InsertHandler[LookupElement]): BaseLookupElement = {
     new BaseLookupElement(name, icon, quoted, Some(insertHandler), psiElement, description, priority)
   }
 
-  def withPsiElement(psiElement: PsiElement) = {
+  def withPsiElement(psiElement: PsiElement): BaseLookupElement = {
     new BaseLookupElement(name, icon, quoted, insertHandler, Some(psiElement), description, priority)
   }
 
