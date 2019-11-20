@@ -67,7 +67,7 @@ class SchemaDocumentationProviderTest extends DocumentationTest {
         |}
       """.stripMargin,
       urls => urls.foreach(url => assertFalse(url.contains(unexpectedUrl))),
-      doc => Unit,
+      _ => (),
       "some.json"
     )
   }

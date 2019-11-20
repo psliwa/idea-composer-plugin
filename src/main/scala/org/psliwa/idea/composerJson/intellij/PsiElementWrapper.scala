@@ -72,7 +72,7 @@ private class PsiElementWrapper(element: PsiElement) extends PsiElement {
 
   override def getManager: PsiManager = element.getManager
 
-  override def checkDelete(): Unit = Unit
+  override def checkDelete(): Unit = ()
 
   override def isValid: Boolean = element.isValid
 
@@ -86,7 +86,7 @@ private class PsiElementWrapper(element: PsiElement) extends PsiElement {
 
   override def getLastChild: PsiElement = element.getLastChild
 
-  override def checkAdd(element: PsiElement): Unit = Unit
+  override def checkAdd(element: PsiElement): Unit = ()
 
   override def getChildren: Array[PsiElement] = element.getChildren
 

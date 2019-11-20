@@ -23,7 +23,7 @@ class SchemaInspection extends AbstractInspection {
   }
 
   private def collectProblems(element: PsiElement, schema: Schema): Seq[ProblemDescriptor[LocalQuickFix]] = {
-    import scala.collection.JavaConverters._
+    import scala.jdk.CollectionConverters._
     import PsiExtractors._
 
     def collectNotAllowedPropertyProblems(property: JsonProperty, schemaProperties: Properties, additionalProperties: Boolean): Seq[ProblemDescriptor[LocalQuickFix]] = {
@@ -105,7 +105,7 @@ class SchemaInspection extends AbstractInspection {
       }
       case SArray(item) => element match {
         case JsonArray(values) => for {
-          value <- values.asScala
+          value <- values.asScala.toList
           problem <- collectProblems(value, item)
         } yield problem
         case _ => List(invalidTypeProblem(element, schema))

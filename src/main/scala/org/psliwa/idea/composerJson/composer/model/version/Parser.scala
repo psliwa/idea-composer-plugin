@@ -40,12 +40,12 @@ object Parser {
   } yield DateConstraint(year + s1 + month + s2 + day + s3 + hour + s4 + minute + s5 + seconds)
 
   private val wildcard = for {
-    version <- semantic.map(Some(_)) | succeed(None)
+    version <- semantic.map(Some(_): Option[SemanticConstraint]) | succeed(None: Option[SemanticConstraint])
     _ <- "^(\\.)?\\*".r
   } yield WildcardConstraint(version)
 
   private val wrapped = for {
-    prefix <- string("v").map(Some(_)) | succeed(None)
+    prefix <- string("v").map(Some(_): Option[String]) | succeed(None: Option[String])
     version <- wildcard | semantic
     suffix <- "^([@\\-]?[a-z0-9]+)".r
   } yield WrappedConstraint(version, prefix, Some(suffix))

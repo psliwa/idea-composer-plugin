@@ -13,7 +13,7 @@ import org.psliwa.idea.composerJson.intellij.codeAssist.BaseLookupElement
 import org.psliwa.idea.composerJson.settings.ProjectSettings
 import org.psliwa.idea.composerJson.util.Funcs._
 
-import scala.collection.{Seq, mutable}
+import scala.collection.mutable
 
 class PackagesLoader extends ApplicationComponent {
   private val repositoryProviders = mutable.Map[Project,RepositoryProvider[_ <: BaseLookupElement]]()

@@ -10,7 +10,7 @@ import org.psliwa.idea.composerJson.json.Schema
 import PsiElements._
 import org.psliwa.idea.composerJson.composer.model.{PackageDescriptor, PackageName}
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 class PackageInfoInspection extends AbstractInspection {
   override protected def collectProblems(element: PsiElement, schema: Schema, problems: ProblemsHolder): Unit = {

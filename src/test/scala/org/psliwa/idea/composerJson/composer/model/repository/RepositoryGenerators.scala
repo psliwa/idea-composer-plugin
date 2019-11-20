@@ -7,7 +7,7 @@ import org.psliwa.idea.composerJson.composer.model.PackageName
 
 object RepositoryGenerators {
 
-  private implicit val _ = seqMonoid[String]
+  private implicit val seqStringSemigrup: Semigroup[Seq[String]] = seqSemigroup[String]
 
   private def pkgGen: Gen[PackageName] = Gen.listOfN(5, Gen.alphaLowerChar).map(_.mkString("")).map(PackageName)
   private def versionGen: Gen[String] = for {
@@ -36,8 +36,7 @@ object RepositoryGenerators {
     repos = versions.map(InMemoryRepository(packageNames.map(_.presentation), _))
   } yield (new ComposedRepository(repos), versions.reduce[Map[PackageName, Seq[String]]](_ |+| _))
 
-  private def seqMonoid[A]: Monoid[Seq[A]] = new Monoid[Seq[A]] {
-    override def zero: Seq[A] = Seq.empty
+  private def seqSemigroup[A]: Semigroup[Seq[A]] = new Semigroup[Seq[A]] {
     override def append(f1: Seq[A], f2: => Seq[A]): Seq[A] = f1 ++ f2
   }
 

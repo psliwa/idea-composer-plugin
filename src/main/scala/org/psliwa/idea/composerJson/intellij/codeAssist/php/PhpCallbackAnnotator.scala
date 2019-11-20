@@ -63,7 +63,7 @@ class PhpCallbackAnnotator extends Annotator {
   }
 
   private def getMethodProblems(element: PsiElement, methodName: String, classes: util.Collection[PhpClass], elementRange: TextRange) = {
-    import scala.collection.JavaConverters._
+    import scala.jdk.CollectionConverters._
 
     val problems = ListBuffer[ProblemDescriptor[IntentionAction]]()
     

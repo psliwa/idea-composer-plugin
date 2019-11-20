@@ -22,7 +22,7 @@ class PackageDocumentationProvider extends DocumentationProvider {
 
   override def getUrlFor(element: PsiElement, originalElement: PsiElement): util.List[String] = {
     if(packageNamePattern.accepts(originalElement)) {
-      import scala.collection.JavaConverters._
+      import scala.jdk.CollectionConverters._
       documentationUrl(originalElement, PackageName(getStringValue(originalElement.getParent).getOrElse(""))).toList.asJava
     } else {
       null

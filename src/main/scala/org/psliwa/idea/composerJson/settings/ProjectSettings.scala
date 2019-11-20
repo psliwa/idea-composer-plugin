@@ -55,7 +55,7 @@ class ProjectSettings extends PersistentStateComponent[Element] {
   }
 
   private def writeComposerUpdateOptionsState(element: Element): Unit = {
-    import scala.collection.JavaConverters._
+    import scala.jdk.CollectionConverters._
 
     val composerUpdateOptionsElement = new Element("composerUpdateOptions")
     element.addContent(composerUpdateOptionsElement)
@@ -72,10 +72,10 @@ class ProjectSettings extends PersistentStateComponent[Element] {
   }
 
   private def loadUnboundedVersionsInspectionState(state: Element): Unit = {
-    import scala.collection.JavaConverters._
+    import scala.jdk.CollectionConverters._
 
     val patterns: Seq[PatternItem] = for {
-      unboundedVersionsSettings <- state.getChildren("unboundedVersionInspectionSettings").asScala
+      unboundedVersionsSettings <- state.getChildren("unboundedVersionInspectionSettings").asScala.toList
       excludedPackages <- unboundedVersionsSettings.getChildren("excludedPackages").asScala
       pattern <- excludedPackages.getChildren("pattern").asScala
       patternAttr <- Option(pattern.getAttribute("pattern")).toList
@@ -92,10 +92,10 @@ class ProjectSettings extends PersistentStateComponent[Element] {
   }
 
   private def loadCustomRepositoriesState(state: Element): Unit = {
-    import scala.collection.JavaConverters._
+    import scala.jdk.CollectionConverters._
 
     val config: Seq[(String,Boolean)] = for {
-      customRepositoriesSettings <- state.getChildren("customRepositories").asScala
+      customRepositoriesSettings <- state.getChildren("customRepositories").asScala.toList
       file <- customRepositoriesSettings.getChildren("file").asScala
       pathAttr <- Option(file.getAttribute("path")).toList
       path <- Option(pathAttr.getValue).toList
@@ -108,10 +108,10 @@ class ProjectSettings extends PersistentStateComponent[Element] {
   }
 
   private def loadComposerUpdateOptionsState(state: Element): Unit = {
-    import scala.collection.JavaConverters._
+    import scala.jdk.CollectionConverters._
 
     val options: Seq[String] = for {
-      composerUpdateOptions <- state.getChildren("composerUpdateOptions").asScala
+      composerUpdateOptions <- state.getChildren("composerUpdateOptions").asScala.toList
       option <- composerUpdateOptions.getChildren("option").asScala
       optionValueAttr <- Option(option.getAttribute("name")).toList
       optionValue <- Option(optionValueAttr.getValue).toList
@@ -132,7 +132,7 @@ class ProjectSettings extends PersistentStateComponent[Element] {
 }
 
 object ProjectSettings {
-  import scala.collection.JavaConverters._
+  import scala.jdk.CollectionConverters._
 
   def getInstance(project: Project): ProjectSettings = ServiceManager.getService(project, classOf[ProjectSettings])
   def apply(project: Project): ProjectSettings = getInstance(project)

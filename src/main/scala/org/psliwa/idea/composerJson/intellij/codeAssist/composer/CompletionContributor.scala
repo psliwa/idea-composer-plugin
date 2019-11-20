@@ -6,6 +6,7 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.Project
 import com.intellij.patterns.PlatformPatterns._
 import com.intellij.psi.PsiElement
+import org.psliwa.idea.composerJson.Icons
 import org.psliwa.idea.composerJson.composer.model.PackageName
 import org.psliwa.idea.composerJson.composer.model.repository._
 import org.psliwa.idea.composerJson.composer.model.version.VersionSuggestions
@@ -16,10 +17,8 @@ import org.psliwa.idea.composerJson.json.{SObject, SPackages, SStringChoice, Sch
 import org.psliwa.idea.composerJson.util.CharOffsetFinder._
 import org.psliwa.idea.composerJson.util.ImplicitConversions._
 import org.psliwa.idea.composerJson.util.OffsetFinder.ImplicitConversions._
-import org.psliwa.idea.composerJson.{Icons, intellij}
 
 import scala.annotation.tailrec
-import scala.collection.Seq
 
 class CompletionContributor extends AbstractCompletionContributor {
 
@@ -46,7 +45,6 @@ class CompletionContributor extends AbstractCompletionContributor {
           psiElement().withSuperParent(2, psiElement().and(propertyCapture(parent))).afterLeaf(":"),
           new VersionCompletionProvider(context => {
             val query = context.typedQuery.stripQuotes
-//            val packageName = PackageNa
             val pattern = "^(?i).*@[a-z]*$".r
             query match {
               case pattern() => minimumStabilities.map(new BaseLookupElement(_))
@@ -63,7 +61,7 @@ class CompletionContributor extends AbstractCompletionContributor {
     case _ => List()
   }
 
-  private def loadPackages(context: CompletionParameters) = {
+  private def loadPackages(context: CompletionParameters): Seq[BaseLookupElement] = {
     repositoryProvider(context.getOriginalFile.getProject, context.getOriginalFile.getVirtualFile.getCanonicalPath).getPackages
   }
 

@@ -11,7 +11,7 @@ import com.jetbrains.php.PhpIndex
 import com.jetbrains.php.completion.{PhpLookupElement, PhpClassLookupElement}
 import com.jetbrains.php.lang.psi.elements.Method
 import org.psliwa.idea.composerJson.intellij.codeAssist.AutoPopupInsertHandler
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import PhpCallbackReference._
 import PhpUtils._
 

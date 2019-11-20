@@ -7,7 +7,7 @@ import org.psliwa.idea.composerJson.intellij.PsiElements
 import PsiElements._
 import org.psliwa.idea.composerJson.composer.model.{Packages, PackageName}
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 private object NotInstalledPackages {
   def getNotInstalledPackageProperties(element: PsiElement, installedPackages: Packages): Seq[JsonProperty] = for {
@@ -26,7 +26,7 @@ private object NotInstalledPackages {
   }
 
   def getPackageVersion(property: JsonProperty): String = {
-    import scala.collection.JavaConverters._
+    import scala.jdk.CollectionConverters._
 
     val maybeVersion = for {
       value <- Option(property.getValue)

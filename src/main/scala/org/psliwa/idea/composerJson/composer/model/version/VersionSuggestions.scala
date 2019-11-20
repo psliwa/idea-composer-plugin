@@ -38,7 +38,6 @@ object VersionSuggestions {
   def suggestionsForVersions(versions: Seq[String], prefix: String, mostSignificantFirst: Boolean = true): Seq[String] = {
     versions.flatMap(suggestionsAsConstraintsForVersions(_, prefix))
       .distinct
-      .view
       .sortWith((a,b) => mostSignificantFirst == isGreater(a, b))
       .map(_.presentation)
   }
@@ -96,7 +95,6 @@ object VersionSuggestions {
   def suggestionsForVersion(version: String, prefix: String, mostSignificantFirst: Boolean = true): Seq[String] = {
     suggestionsAsConstraintsForVersions(version, prefix)
       .distinct
-      .view
       .sortWith((a,b) => mostSignificantFirst == isGreater(a, b))
       .map(_.presentation)
   }

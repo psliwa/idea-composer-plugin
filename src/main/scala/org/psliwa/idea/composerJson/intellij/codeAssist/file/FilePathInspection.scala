@@ -21,7 +21,7 @@ class FilePathInspection extends AbstractInspection {
   }
 
   private def collectProblems(element: PsiElement, schema: Schema): Option[Seq[ProblemDescriptor[LocalQuickFix]]] = {
-    import scala.collection.JavaConverters._
+    import scala.jdk.CollectionConverters._
 
     val maybeRootDir = Option(element.getContainingFile).flatMap(file => Option(file.getContainingDirectory))
 
@@ -31,7 +31,7 @@ class FilePathInspection extends AbstractInspection {
           case SObject(schemaProperties, _) => element match {
             case JsonObject(properties) => {
               val problemsPerProperty = for {
-                property <- properties.asScala
+                property <- properties.asScala.toList
                 schemaProperty <- schemaProperties.get(property.getName).toList
                 value <- Option(property.getValue).toList
                 problems = collectProblems(value, schemaProperty.schema)
@@ -75,7 +75,8 @@ class FilePathInspection extends AbstractInspection {
           }
           case SFilePaths(true) => element match {
             case JsonObject(properties) =>
-              val problems = properties.asScala.flatMap(property => Option(property.getValue)).map(collectProblems(_, schema))
+              val problems = properties.asScala.toList
+                .flatMap(property => Option(property.getValue)).map(collectProblems(_, schema))
               bestMatchingProblems(problems)
             case jsl@JsonStringLiteral(value) => {
               if(!pathExists(rootDir, value)) {

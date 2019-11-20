@@ -105,6 +105,7 @@ object DefaultRepositoryProvider {
     }
 
     def loadPackagesFromUrls(urls: Seq[String]): Map[String,Seq[String]] = {
+      import scala.collection.parallel.CollectionConverters._
       urls.par
         .flatMap(loadPackages(_).toList)
         .flatMap(pkgs => Seq(pkgs, RepositoryPackages(loadPackagesFromUrls(pkgs.includes.map(buildUrl)), Nil)))

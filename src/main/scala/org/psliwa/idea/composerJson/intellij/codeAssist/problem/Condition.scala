@@ -5,7 +5,7 @@ import com.intellij.psi.PsiElement
 import org.psliwa.idea.composerJson.intellij.PsiExtractors
 import PropertyPath._
 import org.psliwa.idea.composerJson.intellij.PsiElements._
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 import scala.util.matching.Regex
 

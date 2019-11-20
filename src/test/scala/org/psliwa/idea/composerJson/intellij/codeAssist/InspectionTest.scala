@@ -39,14 +39,14 @@ abstract class InspectionTest extends BasePlatformTestCase {
   }
 
   def runQuickFix(quickFix: String, expectedQuickFixCount: Range)(actual: String): Unit = {
-    import scala.collection.JavaConversions._
+    import scala.jdk.CollectionConverters._
 
     myFixture.configureByText(ComposerJson, actual.replace("\r", ""))
 
     val caretOffset = myFixture.getEditor.getCaretModel.getOffset
 
     //side effect of getAllQuickFixes - caret is moved to "0" offset
-    val quickFixes = myFixture.getAllQuickFixes(ComposerJson).filter(qf => qf.getFamilyName.contains(quickFix) || qf.getText.contains(quickFix))
+    val quickFixes = myFixture.getAllQuickFixes(ComposerJson).asScala.filter(qf => qf.getFamilyName.contains(quickFix) || qf.getText.contains(quickFix))
     val quickFixesCount = quickFixes.length
 
     val msg = s"Expected $expectedQuickFixCount '$quickFix' quick fix, $quickFixesCount found"

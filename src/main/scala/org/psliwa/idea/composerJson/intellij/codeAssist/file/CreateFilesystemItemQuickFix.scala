@@ -8,7 +8,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.psi.{PsiDirectory, PsiElement, PsiFile, PsiFileSystemItem}
 import com.intellij.util.IncorrectOperationException
 import org.psliwa.idea.composerJson.ComposerBundle
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 import scala.annotation.tailrec
 

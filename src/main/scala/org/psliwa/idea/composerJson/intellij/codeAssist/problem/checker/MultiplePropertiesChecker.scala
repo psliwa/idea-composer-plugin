@@ -5,7 +5,7 @@ import org.psliwa.idea.composerJson.intellij.PsiElements._
 import org.psliwa.idea.composerJson.intellij.codeAssist.problem.PropertyPath._
 import org.psliwa.idea.composerJson.intellij.codeAssist.problem.{CheckResult, Condition, PropertyPath}
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 private[codeAssist] case class MultiplePropertiesChecker(propertyPath: PropertyPath, condition: Condition) extends Checker {
   override def check(jsonObject: JsonObject): CheckResult = {

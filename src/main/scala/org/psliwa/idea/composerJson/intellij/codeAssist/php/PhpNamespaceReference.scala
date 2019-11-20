@@ -11,7 +11,7 @@ import com.jetbrains.php.{PhpIcons, PhpIndex}
 import org.psliwa.idea.composerJson.intellij.codeAssist.php.PhpNamespaceReference._
 import org.psliwa.idea.composerJson.intellij.codeAssist.php.PhpUtils._
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 private class PhpNamespaceReference(element: JsonStringLiteral) extends PsiPolyVariantReferenceBase[JsonStringLiteral](element) {
   private val namespaceName = getFixedReferenceName(element.getText)

@@ -63,7 +63,7 @@ private object PsiElements {
   }
 
   def findProperty(jsonObject: JsonObject, propertyName: String): Option[JsonProperty] = {
-    import scala.collection.JavaConverters._
+    import scala.jdk.CollectionConverters._
     jsonObject.getPropertyList.asScala.find(_.getName == propertyName)
   }
 }

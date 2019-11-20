@@ -30,6 +30,7 @@ lazy val ideaComposerPlugin = (project in file("."))
       "org.scala-lang" % "scala-library" % Versions.scala,
       "org.scala-lang" % "scala-compiler" % Versions.scala,
       "org.scala-lang.modules" %% "scala-parser-combinators" % Versions.scalaParsers,
+      "org.scala-lang.modules" %% "scala-parallel-collections" % "0.2.0",
       "io.spray" %%  "spray-json" % Versions.sprayJson,
       "org.scalaz" %% "scalaz-core" % Versions.scalaz,
       "com.novocode" % "junit-interface" % Versions.junitInterface % "test",

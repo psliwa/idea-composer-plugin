@@ -17,7 +17,7 @@ abstract class DocumentationTest extends BasePlatformTestCase {
   }
 
   protected def checkDocumentation(s: String, externalUrlsAssertion: List[String] => Unit, docAssertion: String => Unit, filename: String): Unit = {
-    import scala.collection.JavaConverters._
+    import scala.jdk.CollectionConverters._
 
     myFixture.configureByText(filename, s.replace("\r", ""))
 

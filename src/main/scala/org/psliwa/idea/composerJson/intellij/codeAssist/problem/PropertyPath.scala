@@ -2,7 +2,7 @@ package org.psliwa.idea.composerJson.intellij.codeAssist.problem
 
 import com.intellij.json.psi.{JsonObject, JsonProperty}
 import org.psliwa.idea.composerJson.intellij.PsiElements._
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 import scala.annotation.tailrec
 

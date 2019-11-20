@@ -81,7 +81,7 @@ class RepositoryUpdater extends Annotator {
 
   private def mapRepositoryElements[A](repositoriesElement: JsonArray, requiredRepositoryType: String, f: JsonObject => Option[A]): Seq[A] = {
     for {
-      child <- repositoriesElement.getChildren
+      child <- repositoriesElement.getChildren.toList
       objectElement <- ensureJsonObject(child).toList
       repositoryType <- getJsonPropertyValue(objectElement, "type", getStringValue).toList
       if repositoryType == requiredRepositoryType

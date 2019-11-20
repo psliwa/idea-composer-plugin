@@ -76,7 +76,7 @@ class DefaultPackagesInstaller(project: Project, file: PsiFile) extends Packages
             val message = new StringBuilder()
 
             try {
-              import scala.collection.JavaConverters._
+              import scala.jdk.CollectionConverters._
               val handler = composerExecution
                 .createProcessHandler(project, file.getVirtualFile.getParent.getCanonicalPath, ("update" :: packages.map(_.presentation)).asJava, "")
 
