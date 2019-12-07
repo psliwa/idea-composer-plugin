@@ -1,6 +1,6 @@
 object Versions {
-  val idea = "2019.2.3"
-  val phpPlugin = "192.6817.12"
+  val idea = "2019.3"
+  val phpPlugin = "193.5233.102"
 
   val scala = "2.13.1"
   val scalaz = "7.2.29"

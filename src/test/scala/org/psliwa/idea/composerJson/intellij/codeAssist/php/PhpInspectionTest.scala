@@ -207,4 +207,16 @@ class PhpInspectionTest extends InspectionTest {
         |}
       """.stripMargin)
   }
+
+  def testCallbackValidity_givenCallbackIsNotClassName_isShouldNotBeReported(): Unit = {
+    checkInspection(
+      """
+        |{
+        |  "scripts": {
+        |    "post-create-project-cmd": "php"
+        |  }
+        |}
+      """.stripMargin
+    )
+  }
 }

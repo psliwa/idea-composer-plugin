@@ -1,11 +1,9 @@
 package org.psliwa.idea.composerJson.intellij.codeAssist.file
 
-import com.intellij.psi.{PsiElement, PsiFileSystemItem}
 import org.junit.Assert._
-import org.psliwa.idea.composerJson._
-import org.psliwa.idea.composerJson.intellij.codeAssist.CompletionTest
+import org.psliwa.idea.composerJson.intellij.codeAssist.FilePathReferences
 
-class FilePathReferenceTest extends CompletionTest {
+class FilePathReferenceTest extends FilePathReferences {
 
   def testGivenFileInArrayOfFilePaths_referenceShouldBeCreated(): Unit = {
     val file = "file.txt"
@@ -81,33 +79,5 @@ class FilePathReferenceTest extends CompletionTest {
     )
 
     assertEquals(2, references.length)
-  }
-
-  private def checkFileReference(file: String, s: String): Unit = {
-    myFixture.getTempDirFixture.createFile(file)
-    assertEquals(1, getResolvedFileReferences(endsWith(file), s).length)
-  }
-
-  private def checkEmptyFileReferences(file: String, s: String): Unit = {
-    myFixture.getTempDirFixture.createFile(file)
-
-    assertEquals(0, getResolvedFileReferences(endsWith(file), s).length)
-  }
-
-  private def endsWith(suffix: String)(s: String) = s.endsWith(suffix)
-
-  private def getResolvedFileReferences(fileComparator: String => Boolean,
-                                        s: String,
-                                        mapElement: PsiElement => PsiElement = _.getParent) = {
-    myFixture.configureByText(ComposerJson, s)
-
-    val element = mapElement(myFixture.getFile.findElementAt(myFixture.getCaretOffset))
-
-    element.getReferences
-      .map(_.resolve())
-      .filter(_.isInstanceOf[PsiFileSystemItem])
-      .map(_.asInstanceOf[PsiFileSystemItem])
-      .map(_.getVirtualFile.getCanonicalPath)
-      .filter(fileComparator)
   }
 }

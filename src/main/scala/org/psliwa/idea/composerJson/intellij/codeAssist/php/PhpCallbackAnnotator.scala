@@ -20,7 +20,7 @@ import org.psliwa.idea.composerJson.intellij.codeAssist.problem.ProblemDescripto
 import scala.collection.mutable.ListBuffer
 
 class PhpCallbackAnnotator extends Annotator {
-  private val callbackRegexp = "^(?i)[a-z0-9_\\\\]+(::[a-z0-9_]*)?$".r
+  private val callbackRegexp = "^[A-Z][A-Za-z0-9_\\\\]*(::[A-Za-z0-9_]*)?$".r
 
   override def annotate(element: PsiElement, holder: AnnotationHolder): Unit = {
     if (PhpCallbackAnnotator.pattern.accepts(element)) {

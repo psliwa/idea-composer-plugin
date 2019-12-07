@@ -1,14 +1,12 @@
 package org.psliwa.idea.composerJson.intellij.codeAssist.php
 
-import com.intellij.json.psi.{JsonArray, JsonProperty, JsonStringLiteral}
-import com.intellij.psi._
+import com.intellij.json.psi.{JsonProperty, JsonStringLiteral}
 import com.intellij.patterns.PlatformPatterns._
 import com.intellij.patterns.StandardPatterns._
+import com.intellij.psi._
 import com.intellij.util.ProcessingContext
-import org.psliwa.idea.composerJson.intellij.PsiElements
-import PsiElements._
-import org.psliwa.idea.composerJson.EmptyPsiElementNamePlaceholder
-import org.psliwa.idea.composerJson.intellij.Patterns._
+import org.psliwa.idea.composerJson.intellij.PsiElements._
+import org.psliwa.idea.composerJson.intellij.codeAssist.scripts.ScriptsPsiElementPattern
 
 class PhpReferenceContributor extends PsiReferenceContributor {
 
@@ -18,18 +16,8 @@ class PhpReferenceContributor extends PsiReferenceContributor {
   }
 
   private def registerCallbackProvider(registrar: PsiReferenceRegistrar) {
-    val rootElement = psiElement(classOf[JsonProperty])
-      .withName("scripts")
-      .withSuperParent(2, rootPsiElementPattern)
-
     registrar.registerReferenceProvider(
-      or(
-        psiElement(classOf[JsonStringLiteral])
-          .withParent(classOf[JsonArray])
-          .withSuperParent(4, rootElement),
-        psiElement(classOf[JsonStringLiteral])
-          .withSuperParent(3, rootElement)
-      ),
+      ScriptsPsiElementPattern.Pattern,
       PhpCallbackReferenceProvider
     )
   }

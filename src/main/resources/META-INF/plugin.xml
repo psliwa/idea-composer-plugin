@@ -367,12 +367,18 @@ This plugin adds auto completion and inspections support for composer.json file 
                 language="JSON"
                 implementation="org.psliwa.idea.composerJson.intellij.codeAssist.php.PhpReferenceContributor"
                 />
+        <psi.referenceContributor
+                language="JSON"
+                implementation="org.psliwa.idea.composerJson.intellij.codeAssist.scripts.ScriptsReferenceContributor"
+        />
         <editorNotificationProvider
                 implementation="org.psliwa.idea.composerJson.intellij.codeAssist.composer.CustomRepositoriesEditorNotificationProvider"
                 />
         <documentationProvider implementation="org.psliwa.idea.composerJson.intellij.codeAssist.composer.PackageDocumentationProvider"
                 />
         <documentationProvider implementation="org.psliwa.idea.composerJson.intellij.codeAssist.schema.SchemaDocumentationProvider"
+                />
+        <json.catalog.exclusion implementation="org.psliwa.idea.composerJson.intellij.codeAssist.ComposerJsonSchemaExclusion"
                 />
     </extensions>
 
