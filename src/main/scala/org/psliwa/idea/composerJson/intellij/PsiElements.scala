@@ -7,6 +7,8 @@ import com.intellij.patterns.PsiElementPattern
 import com.intellij.psi.PsiElement
 import org.psliwa.idea.composerJson._
 
+import scala.annotation.tailrec
+
 private object PsiElements {
   private val booleans = Map("true" -> true, "false" -> false)
 
@@ -59,6 +61,23 @@ private object PsiElements {
     ensureJsonBoolean(value)
       .map(_.getText)
       .flatMap(booleans.get)
+  }
+
+  def findParentProperty(value: JsonElement): Option[JsonProperty] = {
+    @tailrec
+    def loop(element: PsiElement): Option[JsonProperty] = {
+      Option(element.getParent) match {
+        case Some(parent) =>
+          ensureJsonProperty(parent) match {
+            case Some(property) => Some(property)
+            case None => loop(parent)
+          }
+        case None =>
+          None
+      }
+    }
+
+    loop(value)
   }
 
   def findProperty(jsonObject: JsonObject, propertyName: String): Option[JsonProperty] = {
