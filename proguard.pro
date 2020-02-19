@@ -6,6 +6,7 @@
 -dontwarn com.intellij.memory.**
 -dontwarn javax.xml.bind.ModuleUtil
 -dontwarn module-info
+-dontwarn one.util.streamex.**
 
 -keep class org.psliwa.idea.composerJson.**
 -keepclassmembers class org.psliwa.idea.composerJson.** {

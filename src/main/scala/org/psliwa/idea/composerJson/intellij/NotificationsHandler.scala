@@ -6,24 +6,22 @@ import org.psliwa.idea.composerJson.settings.AppSettings
 
 class NotificationsHandler(project: Project) extends ProjectComponent {
   override def projectOpened(): Unit = {
-    if (AppSettings.getInstance.wasCharityNotificationShown &&
-        !AppSettings.getInstance.wasCharitySummaryNotificationShown &&
-        AppSettings.getInstance.isCharityNotificationStillValid) {
-      AppSettings.getInstance.charitySummaryNotificationWasShown()
+    if (!AppSettings.getInstance.wasFarewellNotificationShown) {
+      AppSettings.getInstance.farewellNotificationWasShown()
 
-      val title = "Thank you dear programmer! :)"
+      val title = "Farewell composer.json plugin users!"
       val text =
         """
-          |Three weeks ago I released new version of <b>PHP composer.json support</b> plugin with the special message directed to the users. In this message I wanted to encourage everyone to support charity and help others as much as you can. Also I declared myself to pay 1$ for <a href="https://en.wosp.org.pl/">WOŚP</a> for every star on <a href="https://github.com/psliwa/idea-composer-plugin">github</a> and every vote on <a href="https://plugins.jetbrains.com/plugin/7631-php-composer-json-support">jetbrains plugins page</a> between 24th December 2017 and 14th January 2018.
+          |More than 5 years ago I published first version of composer.json plugin. I created this plugin because composer.json smart editing features were missing in PhpStorm. The plugin was evolving through the time. There even was a charity action 2 years ago that was a success. After this action this plugin became the top rated - but the time has come.
           |<br /><br />
-          |There was <b>328</b> <a href="https://github.com/psliwa/idea-composer-plugin">github</a> stars and <a href="https://plugins.jetbrains.com/plugin/7631-php-composer-json-support">plugin</a> votes in total in this time frame. Additionally I was given <b>5$</b> via paypal, so my donation to <a href="https://en.wosp.org.pl/">WOŚP</a> will be at least <b>333$</b>.
+          |Since PhpStorm 2020.1 big part of the plugin's features have been built-in into IDE itself so all composer.json editing features are handled by PhpStorm itself. The plugin is not needed anymore - it is the last release.
           |<br /><br />
-          |Up to two weeks I will publish payments confirmation on my <a href="https://twitter.com/psliwa">twitter</a> account.
+          |Thanks for using composer.json plugin, sending suggestions, reporting bugs and feature requests.
           |<br /><br />
-          |Thank you for participation, enjoy!
+          |If you wish you can <a href="https://www.paypal.me/psliwa">donate me on paypal</a>.
           |<br /><br />
           |@psliwa
-        """.stripMargin
+          |""".stripMargin
       Notifications.balloonInfo(title, text, Some(project))
     }
   }

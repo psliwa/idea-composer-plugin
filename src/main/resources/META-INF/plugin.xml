@@ -1,7 +1,7 @@
 <idea-plugin>
   <id>org.psliwa.idea.composer</id>
   <name>PHP composer.json support</name>
-  <version>1.0.37</version>
+  <version>1.0.38</version>
   <vendor email="me@psliwa.org" url="https://github.com/psliwa/idea-composer-plugin">psliwa</vendor>
 
     <description><![CDATA[
@@ -14,6 +14,11 @@ This plugin adds auto completion and inspections support for composer.json file 
     ]]></description>
 
   <change-notes><![CDATA[
+<h2>1.0.38</h2>
+<ul>
+  <li>Farewell notification - the last release</li>
+</ul>
+
 <h2>1.0.37</h2>
 <ul>
   <li>Support for aliases in "scripts"</li>
@@ -290,7 +295,7 @@ This plugin adds auto completion and inspections support for composer.json file 
 </ul>
   ]]></change-notes>
 
-    <idea-version since-build="192.0"/>
+    <idea-version since-build="201.0" until-build="202"/>
 
     <depends>com.intellij.modules.platform</depends>
     <depends>com.jetbrains.php</depends>
@@ -300,112 +305,7 @@ This plugin adds auto completion and inspections support for composer.json file 
                              id="ComposerJson.settings" />
         <projectService serviceImplementation="org.psliwa.idea.composerJson.settings.ProjectSettings"/>
         <applicationService serviceImplementation="org.psliwa.idea.composerJson.settings.AppSettings"/>
-        <fileTypeFactory implementation="org.psliwa.idea.composerJson.intellij.filetype.ComposerJsonFileTypeFactory"/>
-        <completion.contributor language="JSON"
-                                implementationClass="org.psliwa.idea.composerJson.intellij.codeAssist.schema.CompletionContributor"/>
-        <completion.contributor language="JSON"
-                                implementationClass="org.psliwa.idea.composerJson.intellij.codeAssist.composer.CompletionContributor"/>
-        <localInspection
-                bundle="org.psliwa.idea.composerJson.messages.ComposerBundle"
-                language="JSON"
-                implementationClass="org.psliwa.idea.composerJson.intellij.codeAssist.schema.SchemaInspection"
-                displayName="JSON schema"
-                shortName="ComposerJsonSchema"
-                level="ERROR"
-                enabledByDefault="true"
-                groupKey="inspection.group"
-                hasStaticDescription="true"
-                />
-        <localInspection
-                bundle="org.psliwa.idea.composerJson.messages.ComposerBundle"
-                language="JSON"
-                implementationClass="org.psliwa.idea.composerJson.intellij.codeAssist.file.FilePathInspection"
-                displayName="File paths"
-                enabledByDefault="true"
-                level="WARNING"
-                groupKey="inspection.group"
-                hasStaticDescription="true"
-                />
-        <localInspection
-                bundle="org.psliwa.idea.composerJson.messages.ComposerBundle"
-                language="JSON"
-                implementationClass="org.psliwa.idea.composerJson.intellij.codeAssist.composer.MisconfigurationInspection"
-                displayName="Misconfigurations"
-                enabledByDefault="true"
-                level="WEAK WARNING"
-                groupKey="inspection.group"
-                hasStaticDescription="true"
-                />
-        <localInspection
-                bundle="org.psliwa.idea.composerJson.messages.ComposerBundle"
-                language="JSON"
-                implementationClass="org.psliwa.idea.composerJson.intellij.codeAssist.composer.NotInstalledPackageInspection"
-                displayName="Not installed package"
-                enabledByDefault="true"
-                level="WEAK WARNING"
-                groupKey="inspection.group"
-                hasStaticDescription="true"
-                />
-        <localInspection
-                bundle="org.psliwa.idea.composerJson.messages.ComposerBundle"
-                language="JSON"
-                implementationClass="org.psliwa.idea.composerJson.intellij.codeAssist.composer.infoRenderer.PackageInfoInspection"
-                displayName="Package info renderer"
-                enabledByDefault="true"
-                level="WEAK WARNING"
-                groupKey="inspection.group"
-                hasStaticDescription="true"
-                />
-        <annotator
-                language="JSON"
-                implementationClass="org.psliwa.idea.composerJson.intellij.codeAssist.composer.PackageVersionAnnotator"
-                />
-        <annotator
-                language="JSON"
-                implementationClass="org.psliwa.idea.composerJson.intellij.codeAssist.composer.RepositoryUpdater"
-                />
-        <annotator
-                language="JSON"
-                implementationClass="org.psliwa.idea.composerJson.intellij.codeAssist.php.PhpCallbackAnnotator"
-                />
-        <psi.referenceContributor
-                language="JSON"
-                implementation="org.psliwa.idea.composerJson.intellij.codeAssist.file.FilePathReferenceContributor"
-                />
-        <psi.referenceContributor
-                language="JSON"
-                implementation="org.psliwa.idea.composerJson.intellij.codeAssist.file.UrlReferenceContributor"
-                />
-        <psi.referenceContributor
-                language="JSON"
-                implementation="org.psliwa.idea.composerJson.intellij.codeAssist.php.PhpReferenceContributor"
-                />
-        <psi.referenceContributor
-                language="JSON"
-                implementation="org.psliwa.idea.composerJson.intellij.codeAssist.scripts.ScriptsReferenceContributor"
-        />
-        <editorNotificationProvider
-                implementation="org.psliwa.idea.composerJson.intellij.codeAssist.composer.CustomRepositoriesEditorNotificationProvider"
-                />
-        <documentationProvider implementation="org.psliwa.idea.composerJson.intellij.codeAssist.composer.PackageDocumentationProvider"
-                />
-        <documentationProvider implementation="org.psliwa.idea.composerJson.intellij.codeAssist.schema.SchemaDocumentationProvider"
-                />
-        <json.catalog.exclusion implementation="org.psliwa.idea.composerJson.intellij.codeAssist.ComposerJsonSchemaExclusion"
-                />
     </extensions>
-
-    <application-components>
-        <component>
-            <implementation-class>org.psliwa.idea.composerJson.intellij.codeAssist.composer.PackagesLoader</implementation-class>
-        </component>
-        <component>
-            <implementation-class>org.psliwa.idea.composerJson.composer.InstalledPackagesWatcher</implementation-class>
-        </component>
-        <component>
-            <implementation-class>org.psliwa.idea.composerJson.intellij.codeAssist.composer.infoRenderer.PackageInfoOverlay</implementation-class>
-        </component>
-    </application-components>
 
     <project-components>
         <component>

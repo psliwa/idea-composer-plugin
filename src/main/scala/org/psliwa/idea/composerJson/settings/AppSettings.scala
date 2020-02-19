@@ -9,10 +9,12 @@ import org.jdom.Element
 class AppSettings extends PersistentStateComponent[Element] {
   private var charityNotificationShown: Boolean = false
   private var charitySummaryNotificationShown: Boolean = false
+  private var farewellNotificationShown: Boolean = false
 
   override def loadState(name: Element): Unit = {
     charityNotificationShown = loadBoolean(name, "charityNotificationShown")
     charitySummaryNotificationShown = loadBoolean(name, "charitySummaryNotificationShown")
+    farewellNotificationShown = loadBoolean(name, "farewellNotificationShown")
   }
 
   private def loadBoolean(element: Element, name: String) = {
@@ -32,6 +34,7 @@ class AppSettings extends PersistentStateComponent[Element] {
     element.addContent(
       new Element("charitySummaryNotificationShown").addContent(charitySummaryNotificationShown.toString)
     )
+    element.addContent(new Element("farewellNotificationShown").addContent(farewellNotificationShown.toString))
   }
 
   def wasCharityNotificationShown: Boolean = charityNotificationShown
@@ -40,6 +43,9 @@ class AppSettings extends PersistentStateComponent[Element] {
 
   def wasCharitySummaryNotificationShown: Boolean = charitySummaryNotificationShown
   def charitySummaryNotificationWasShown(): Unit = charitySummaryNotificationShown = true
+
+  def wasFarewellNotificationShown: Boolean = farewellNotificationShown
+  def farewellNotificationWasShown(): Unit = farewellNotificationShown = true
 }
 
 object AppSettings {
